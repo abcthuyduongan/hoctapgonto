@@ -1,0 +1,27 @@
+{
+  "math_completion": true,
+  "memory_completion": true,
+  "sentence_completion": true,
+  "in_memory_history": [
+    {
+      "game": "math-quest",
+      "score": 8,
+      "total": 8
+    },
+    {
+      "game": "memory-match",
+      "score": 6,
+      "total": 6
+    },
+    {
+      "game": "sentence-builder",
+      "score": 5,
+      "total": 5
+    }
+  ],
+  "persisted_history": "Chưa kiểm chứng vì môi trường chặn điều hướng gốc URL",
+  "star_counter": "19 ngôi sao",
+  "export_name": "BaoAn_3D_KetQua.json",
+  "after_reload": "Chưa kiểm chứng vì môi trường chặn điều hướng gốc URL",
+  "errors": []
+}

@@ -1,0 +1,223 @@
+/* BAO AN LEARNING — Alpha 2.9 DESIGN MATCH
+   Final design layer: live DOM over independent art assets, no text/buttons in images.
+   This layer intentionally comes LAST, superseding historical Alpha2.x polish. */
+:root{--ba-navy:#093c82;--ba-blue:#0874cb;--ba-yellow:#ffe15f;--ba-ink:#173d69;--ba-cream:#fff9e7}
+html{scroll-behavior:smooth}
+button,select{touch-action:manipulation}
+button:focus-visible,a:focus-visible,select:focus-visible{outline:4px solid #ffc846!important;outline-offset:3px}
+/* NAVIGATION */
+.site-header{background:linear-gradient(100deg,#063476,#0d5ead 55%,#0871c4)!important;border-bottom:3px solid #7acbff!important;box-shadow:0 5px 15px #033a7866!important}
+.site-header .brand-mark{background:linear-gradient(160deg,#fff3ac,#ffa91c)!important;box-shadow:0 4px 0 #b67413,0 8px 10px #002f6966!important}
+.site-header .nav-item.active{background:linear-gradient(180deg,#fff,#deefff)!important;color:#1559a6!important;box-shadow:0 5px 0 #153d79!important}
+/* PORTAL: one contiguous picture world, three playable islands; no rectangular product cards. */
+.portal273-home{background:#edf9ff}
+.portal273-hero{
+  display:grid!important;grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) auto;
+  width:100%;min-height:max(760px,calc(100dvh - 83px));padding:clamp(16px,2.3vh,26px) 24px 25px!important;
+  place-items:center;gap:6px;isolation:isolate;position:relative;overflow:hidden;
+  background:linear-gradient(180deg,#0b68b9 0%,#4fc0ff 44%,#39aad9 100%)!important;
+}
+.portal273-backdrop{
+  inset:0!important;opacity:1!important;filter:saturate(1.34) contrast(1.15) brightness(1.04)!important;
+  background-image:url('/art/premium-world-clarity.webp')!important;background-size:cover!important;background-position:center 44%!important;
+  transform:scale(1.035);z-index:-3;
+}
+.portal273-sky-glow{
+  background:linear-gradient(180deg,#004e9a18 0%,transparent 17%,transparent 68%,#052e734b 100%),
+  radial-gradient(ellipse at 49% -4%,#fff5b74d,transparent 50%)!important;z-index:-2;
+}
+.portal273-hero::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:-1;
+ background:linear-gradient(90deg,#042e5e57,transparent 20%,transparent 80%,#04355e5a),linear-gradient(0deg,#04386833,transparent 18%)!important}
+.portal273-heading{grid-row:1!important;grid-column:1;margin:0 auto!important;width:min(720px,calc(100% - 180px));padding:0!important;position:relative;z-index:5;text-align:center;filter:drop-shadow(0 6px 10px #073d6890)}
+.portal273-heading .portal273-eyebrow{padding:5px 12px;background:#07549bca;color:#fff1a2;border:2px solid #a6deff;border-radius:999px;font-size:11px;letter-spacing:.13em}
+.portal273-heading h1{margin:10px 0 8px!important;font-size:clamp(39px,4.2vw,67px)!important;line-height:.95!important;color:#fff!important;letter-spacing:-.025em;text-shadow:0 3px 0 #2365b9,0 7px 0 #103c87,0 12px 22px #023c7390!important}
+.portal273-heading h1 span{color:#ffdb53!important;text-shadow:0 3px 0 #eb9e21,0 7px 0 #9a5c1b,0 12px 21px #3c220a77!important}
+.portal273-heading p{font-size:clamp(13px,1.3vw,17px)!important;color:#fff!important;text-shadow:0 3px 8px #003d78!important;margin:8px 0 0!important}
+.portal273-mascot{position:absolute!important;left:clamp(4px,1.4vw,25px)!important;bottom:clamp(98px,15vh,170px)!important;z-index:6!important;display:block!important;width:clamp(120px,14vw,210px)!important;max-width:none!important;pointer-events:none!important}
+.portal273-mascot img{display:block;width:100%!important;height:auto!important;aspect-ratio:510/540!important;object-fit:contain!important;filter:drop-shadow(0 17px 15px #063b6c7a);border:0!important;box-shadow:none!important;background:none!important;border-radius:0!important}
+.portal273-mascot-bubble{display:block!important;position:absolute;top:-75px!important;left:32%!important;transform:rotate(-3deg)!important;width:clamp(166px,13vw,205px)!important;min-width:0!important;padding:11px 13px!important;background:#fff9e8!important;border:3px solid white!important;border-radius:23px 23px 23px 7px!important;box-shadow:0 7px 0 #f3c77b,0 15px 20px #06457361!important;color:#6f431b!important;text-align:center}
+.portal273-mascot-bubble strong{display:block;font-size:clamp(13px,1.1vw,16px)!important}
+.portal273-mascot-bubble span{font-size:clamp(11px,.92vw,14px)!important}
+.portal273-progress-board{position:absolute!important;right:clamp(10px,1.75vw,28px)!important;top:clamp(130px,17vh,175px)!important;z-index:7!important;order:unset!important;width:clamp(162px,14.5vw,215px)!important;min-width:0!important;margin:0!important;border-radius:15px!important;padding:14px!important;background:linear-gradient(155deg,#935a29f4,#613310f7)!important;border:3px solid #fbd99d!important;box-shadow:0 6px 0 #4b2b13,0 14px 19px #0b41776e!important;color:#fff4c6!important}
+.portal273-progress-board h2{font-size:clamp(15px,1.2vw,19px)!important;margin-bottom:9px!important}
+.portal273-progress-line{height:14px!important;margin-bottom:6px!important}
+.portal273-progress-stars{font-size:clamp(20px,2vw,29px)!important;margin-bottom:4px!important}
+.portal273-progress-board small{line-height:1.25;font-size:11px!important}
+.portal273-world-grid{
+  grid-row:2!important;grid-column:1!important;position:relative;z-index:4;display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:clamp(10px,1.25vw,24px)!important;
+  width:min(100%,1160px)!important;padding:0 clamp(65px,7vw,112px)!important;
+  margin:6px auto 0!important;align-items:end!important;justify-content:center!important;
+}
+.portal273-world{
+  position:relative!important;isolation:isolate!important;display:flex!important;flex-direction:column!important;
+  justify-content:flex-end!important;align-self:end!important;min-width:0!important;width:100%!important;
+  min-height:clamp(370px,46vh,440px)!important;height:clamp(370px,46vh,440px)!important;
+  padding:0 4px 0!important;background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;
+  overflow:visible!important;filter:none!important;transition:none!important;
+}
+.portal273-world::before{display:none!important}
+.portal273-island-art{
+  position:absolute!important;z-index:0!important;left:-17%!important;right:-17%!important;
+  top:-17px!important;height:clamp(280px,34vh,345px)!important;overflow:visible!important;
+  transform:translateZ(0)!important;filter:drop-shadow(0 22px 17px #023e7170);animation:ba-island-drift 6.5s ease-in-out infinite!important;
+}
+.portal273-world:nth-child(2) .portal273-island-art{animation-delay:-2.2s!important}
+.portal273-world:nth-child(3) .portal273-island-art{animation-delay:-4s!important}
+.portal273-island-art img{display:block!important;width:100%!important;height:100%!important;object-fit:contain!important;max-width:none!important;filter:saturate(1.23) contrast(1.12)!important;transform:none!important}
+.portal273-island-art::after{display:none!important}
+.portal273-world-body{position:relative!important;z-index:2!important;left:auto!important;right:auto!important;bottom:auto!important;
+ margin:0 auto!important;width:100%!important;padding:0 9px 10px!important;display:flex!important;flex-direction:column!important;align-items:center!important;gap:5px!important;
+ border:0!important;border-radius:0!important;background:none!important;box-shadow:none!important;backdrop-filter:none!important;text-align:center!important;
+}
+.portal273-world-chip{position:absolute!important;top:-30px!important;left:50%!important;transform:translateX(-50%)!important;z-index:3!important;white-space:nowrap!important;font-size:9px!important;font-weight:950!important;padding:4px 10px!important;background:linear-gradient(#0e74c9,#074480)!important;color:white!important;border:2px solid #e3f5ff!important;border-radius:999px!important;box-shadow:0 3px 0 #043b74!important}
+.portal273-world-tag{display:none!important}
+.portal273-world h2{width:100%!important;white-space:normal!important;margin:0!important;padding:10px 4px 8px!important;
+ font-size:clamp(20px,1.9vw,30px)!important;line-height:1!important;font-weight:1000!important;color:#fff!important;
+ background:linear-gradient(180deg,#165eaa,#073a7f)!important;border:2px solid #a3d9ff!important;border-radius:18px!important;
+ text-shadow:0 2px 3px #002656!important;box-shadow:0 5px 0 #062f64,0 12px 15px #053e6a5c!important;
+}
+.portal273-world p{font-size:clamp(12px,1vw,16px)!important;font-weight:900!important;margin:3px 0!important;color:#fff4c0!important;text-shadow:0 2px 6px #003c76,0 2px 3px #002b62!important}
+.portal273-world label{font-size:10px!important;color:#fff!important;font-weight:900!important;text-shadow:0 2px 4px #00376c!important}
+.portal273-world select{min-height:35px!important;max-width:100%!important;width:100%!important;border-radius:12px!important;border:2px solid #ffedb7!important;color:#553e22!important;background:#fffaf0!important;box-shadow:0 3px 0 #c89542,0 6px 13px #00549c70!important;padding:4px 6px!important;font-size:11px!important}
+.portal273-start{width:100%!important;min-height:48px!important;max-height:48px!important;margin:4px 0 0!important;font-size:17px!important;
+ border:2px solid #fff0a5!important;border-radius:16px!important;background:linear-gradient(180deg,#fff39c,#ffc82b 63%,#f5a11a)!important;color:#6c3e09!important;
+ box-shadow:0 5px 0 #c97b0c,0 12px 14px #073c6b7a!important;transform:none!important;
+}
+.portal273-start span{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:linear-gradient(#40b4ff,#0572cc);color:white;text-shadow:0 1px 3px #05518e;box-shadow:0 2px 0 #015aa7}
+.portal273-start:hover:not(:disabled){transform:translateY(-2px)!important;filter:brightness(1.07)!important}
+.portal273-bottom-actions{grid-row:3!important;grid-column:1!important;position:relative;z-index:5;margin:5px auto 0!important;gap:12px!important;display:flex!important;justify-content:center!important;width:min(100%,900px)!important;padding:0!important}
+.portal273-bottom-actions button,.portal273-bottom-actions a{min-height:51px!important;padding:8px 25px!important;border-radius:18px!important;font-size:15px!important;background:linear-gradient(180deg,#2b93e9,#0b56b3)!important;color:#fff!important;border:2px solid #9fd8ff!important;box-shadow:0 5px 0 #064687,0 12px 18px #032b5e6e!important}
+.portal273-journey{padding:19px 28px!important;background:linear-gradient(180deg,#f8fcff,#e4f4ff)!important}
+/* DESKTOP OVERRIDES FOR WIDER VIEW */
+@media(min-width:1500px){.portal273-world-grid{width:min(100%,1350px)!important;padding:0 135px!important}.portal273-world{height:480px!important}.portal273-island-art{height:370px!important}}
+@media(max-width:1150px){
+  .portal273-world-grid{padding:0 72px!important;width:100%!important}
+  .portal273-mascot{width:140px!important;left:-10px!important;bottom:145px!important}
+  .portal273-mascot-bubble{display:none!important}
+  .portal273-progress-board{top:115px!important;right:9px!important;width:150px!important;padding:9px!important}
+  .portal273-progress-board h2{font-size:14px!important}
+}
+@media(max-width:820px){
+ .portal273-hero{min-height:810px!important}
+ .portal273-heading{width:min(600px,calc(100% - 28px))!important}
+ .portal273-heading h1{font-size:46px!important}
+ .portal273-world-grid{padding:0 12px!important;gap:8px!important}
+ .portal273-world{height:390px!important;min-height:390px!important}
+ .portal273-island-art{height:285px!important;top:0!important;left:-13%!important;right:-13%!important}
+ .portal273-world h2{font-size:20px!important}
+ .portal273-mascot,.portal273-progress-board{display:none!important}
+ .portal273-world-body{padding:0 4px 8px!important}
+ .portal273-world select{font-size:10px!important}
+}
+@media(max-width:600px){
+ .portal273-hero{display:flex!important;flex-direction:column!important;justify-content:flex-start!important;min-height:0!important;padding:19px 12px 24px!important;gap:18px!important}
+ .portal273-heading{order:0;width:100%!important;padding:0!important}
+ .portal273-heading h1{font-size:clamp(36px,9.1vw,48px)!important}
+ .portal273-heading p{font-size:12px!important}
+ .portal273-mascot{display:flex!important;position:relative!important;order:1;left:auto!important;bottom:auto!important;align-items:center!important;gap:7px!important;margin:0 auto!important;width:100%!important;max-width:370px!important}
+ .portal273-mascot img{width:85px!important;height:95px!important}
+ .portal273-mascot-bubble{display:block!important;position:static!important;transform:none!important;max-width:225px;width:auto!important;padding:9px 10px!important}
+ .portal273-progress-board{display:none!important}
+ .portal273-world-grid{order:2!important;display:grid!important;grid-template-columns:1fr!important;gap:22px!important;width:100%!important;max-width:420px!important;padding:0 16px!important;margin:0 auto!important}
+ .portal273-world,.portal273-world:last-child{grid-column:1!important;height:360px!important;min-height:360px!important;width:100%!important;max-width:none!important;justify-self:center!important;margin:0!important;padding:0!important}
+ .portal273-island-art{top:-7px!important;height:270px!important;left:-12%!important;right:-12%!important}
+ .portal273-world-body{width:100%!important;padding:0 10px 7px!important}
+ .portal273-world h2{font-size:clamp(24px,6.2vw,30px)!important}
+ .portal273-world p{font-size:14px!important}
+ .portal273-world select{font-size:12px!important}
+ .portal273-bottom-actions{order:3!important;display:grid!important;grid-template-columns:1fr 1fr;gap:8px!important;width:100%!important;margin:0!important}
+ .portal273-bottom-actions button,.portal273-bottom-actions a{width:100%!important;min-width:0;padding:9px!important;font-size:12px!important}
+ .portal273-journey{flex-direction:column!important;align-items:flex-start!important;gap:16px!important;padding:16px!important}
+}
+@keyframes ba-island-drift{0%,100%{transform:translate3d(0,0,0)}50%{transform:translate3d(0,-6px,0)}}
+/* PREMIUM GAME PLAYFIELDS — art reaches edges, controls are real buttons */
+.immersive-dialog .game-dialog-head{background:linear-gradient(105deg,#063774,#0960b3 63%,#0879c4)!important;box-shadow:0 5px 15px #0a315c66!important}
+.immersive-dialog .world-stage{position:relative!important;isolation:isolate!important;background:#57bce7!important}
+.immersive-dialog .world-stage .stage-backdrop{opacity:1!important;filter:saturate(1.22) contrast(1.14)!important;background-size:cover!important;background-position:center!important}
+.immersive-dialog .world-math .stage-backdrop{background-image:url('/art/premium-math-cinematic.webp')!important}
+.immersive-dialog .world-memory .stage-backdrop{background-image:url('/art/premium-memory-cinematic.webp')!important}
+.immersive-dialog .world-sentence .stage-backdrop{background-image:url('/art/premium-sentence-cinematic.webp')!important}
+.immersive-dialog .world-stage .stage-overlay{background:linear-gradient(90deg,#073d6170 0%,transparent 31%,transparent 72%,#07497135 100%),linear-gradient(180deg,#70d9ed10 0%,transparent 45%,#063e6759 100%)!important}
+.immersive-dialog .world-hud{max-width:1500px!important}
+.immersive-dialog .hud-label{color:#fff!important;background:linear-gradient(180deg,#1668b2,#0a447f)!important;border:2px solid #b9edff!important;box-shadow:0 4px 0 #082f62,0 10px 18px #073c6c5c!important;border-radius:999px!important}
+.immersive-dialog .hud-score{background:linear-gradient(180deg,#fff6bd,#ffd365)!important;border:2px solid #fff5d1!important;box-shadow:0 4px 0 #ca8528!important;color:#734716!important;border-radius:999px!important}
+.immersive-dialog .world-math .challenge-card,.immersive-dialog .world-sentence .sentence-scroll{
+ border:4px solid #f9df9c!important;border-radius:27px!important;background:linear-gradient(160deg,#fffdf5f8,#fff5dbfa)!important;
+ box-shadow:0 9px 0 #bb8a4b,0 22px 38px #10395e99,inset 0 2px 0 #fff!important;
+}
+.immersive-dialog .quest-scroll,.immersive-dialog .sentence-prompt{background:linear-gradient(180deg,#fff4d4,#ffe9b2)!important;border:2px solid #efc77b!important;border-radius:20px!important;box-shadow:0 4px 0 #e4b66d!important;color:#684222!important}
+.immersive-dialog .answer-option{border-radius:19px!important;border:3px solid #b9e2ff!important;background:linear-gradient(180deg,#fff,#e7f4ff)!important;box-shadow:0 6px 0 #7db6d7,0 10px 14px #07487331!important;color:#174d8d!important;transition:filter .15s ease,transform .15s ease!important}
+.immersive-dialog .answer-option:hover:not(:disabled){transform:translateY(-3px)!important;filter:brightness(1.03)}
+.immersive-dialog .answer-option.correct{background:linear-gradient(#efffda,#acf37e)!important;border-color:#6fcf6b!important;box-shadow:0 5px 0 #369a4e!important}
+.immersive-dialog .answer-option.incorrect{background:linear-gradient(#fff4ed,#ffc6bf)!important;border-color:#fa9f90!important;box-shadow:0 5px 0 #ce7671!important}
+.immersive-dialog .guide-speech,.immersive-dialog .forest-speech{background:#fffaf0!important;border:3px solid #fff!important;color:#694221!important;border-radius:22px!important;box-shadow:0 6px 0 #e7b86d,0 14px 23px #043d6b65!important}
+.immersive-dialog .world-guide .guide-figure img,.immersive-dialog .forest-mascot,.immersive-dialog .sentence-guide img{filter:drop-shadow(0 17px 15px #043d6266)!important}
+/* Memory Match: vibrant fantasy board and cards, no layout changes between flips. */
+.immersive-dialog .world-memory{background:#176c8c!important}
+.immersive-dialog .world-memory .memory-feedback-slot{background:linear-gradient(110deg,#07568bde,#0b7d91d7)!important;border:2px solid #cefbff!important;border-radius:21px!important;box-shadow:0 5px 0 #064c7a,0 14px 26px #0636536c!important;color:#fff!important}
+.immersive-dialog .world-memory .forest-board{border:4px solid #e6d8a3!important;background:linear-gradient(150deg,#1b5b75e8,#074c61f2 75%,#073a55ee)!important;box-shadow:0 8px 0 #a57a40,0 24px 45px #002e5a91!important;border-radius:32px!important}
+.immersive-dialog .world-memory .memory-card{border-radius:18px!important;overflow:visible!important}
+.immersive-dialog .world-memory .memory-back{background:linear-gradient(140deg,#2c9cc8,#0878af 58%,#0862a2)!important;border:3px solid #90e1ff!important;border-radius:16px!important;box-shadow:0 5px 0 #064e89,0 10px 14px #073a5d7a!important;color:#b7ffff!important;font-size:30px!important}
+.immersive-dialog .world-memory .memory-front{background:linear-gradient(160deg,#fffcef,#f7e5b3)!important;border:3px solid #ffdf8e!important;border-radius:16px!important;box-shadow:0 5px 0 #c68c3b,0 10px 14px #073d526b!important;color:#63431e!important;font-weight:1000!important}
+.immersive-dialog .world-memory .memory-card.found .memory-front{background:linear-gradient(160deg,#f1ffe1,#baf1a3)!important;border-color:#76df8d!important}
+.immersive-dialog .memory-board-subline{color:#f5fbe8!important}
+.immersive-dialog .memory-topline{color:#fff5cc!important}
+/* Sentence Builder: colorful raised tactile word tiles. */
+.immersive-dialog .world-sentence .sentence-drop{background:linear-gradient(180deg,#fffdf3,#fff1d8)!important;border:3px dashed #eead60!important;border-radius:18px!important}
+.immersive-dialog .world-sentence .sentence-bank{border-radius:20px!important;background:linear-gradient(145deg,#d4ecff,#e9d5ff)!important;border:3px solid #b4d5ff!important}
+.immersive-dialog .world-sentence .word-tile{border-radius:13px!important;background:linear-gradient(180deg,#fff,#d9eeff)!important;border:2px solid #80b8e6!important;color:#214d87!important;box-shadow:0 5px 0 #6ca2d6!important}
+.immersive-dialog .world-sentence .word-tile.selected{background:linear-gradient(180deg,#fff8cd,#ffdb8f)!important;border-color:#ecb15f!important;box-shadow:0 4px 0 #d39b3a!important}
+/* Parent and Creator are clean workspace surfaces, unlike the playful gameplay. */
+.parent-workspace,.creator-workspace{background:linear-gradient(180deg,#edf8ff,#fff);border-radius:27px;padding:clamp(16px,2.3vw,34px)}
+.parent-workspace .heading-block,.creator-workspace .heading-block{padding:23px 26px;border-radius:23px;background:linear-gradient(100deg,#0d4d9c,#117bb8);color:#fff;box-shadow:0 7px 0 #073a79,0 13px 26px #0a4c872d}
+.parent-workspace .heading-block h1,.creator-workspace .heading-block h1,.parent-workspace .heading-block p,.creator-workspace .heading-block p{color:#fff!important}
+.parent-workspace .panel,.creator-workspace .panel,.parent-workspace .stat-card{border:1px solid #cbe5f9!important;border-radius:23px!important;background:#fff!important;box-shadow:0 8px 22px #0c5a9e18!important}
+/* Responsive gameplay without squeezing interactive card targets. */
+@media(max-width:760px){
+ .immersive-dialog .world-stage{padding:10px 10px 16px!important}
+ .immersive-dialog .world-memory .forest-board{padding:14px 10px!important}
+ .immersive-dialog .world-memory .memory-grid{gap:8px!important}
+ .immersive-dialog .world-memory .memory-card{min-height:70px!important}
+ .immersive-dialog .world-memory .memory-feedback-slot{height:75px!important;min-height:75px!important;margin-bottom:12px!important;padding:7px 9px!important}
+ .immersive-dialog .world-math .challenge-card,.immersive-dialog .world-sentence .sentence-scroll{padding:15px 13px!important}
+ .parent-workspace,.creator-workspace{padding:14px!important;border-radius:14px}
+ .parent-workspace .heading-block,.creator-workspace .heading-block{padding:17px!important}
+}
+@media(prefers-reduced-motion:reduce){.portal273-island-art,.portal273-world,.portal273-start{animation:none!important;transition:none!important}}
+html[data-motion="off"] .portal273-island-art,html[data-motion="off"] .portal273-world,html[data-motion="off"] .portal273-start{animation:none!important;transition:none!important}
+/* Art direction correction from visual review: warm forest/wood, mint leaf-backed cards. */
+.immersive-dialog .world-memory .forest-board{
+ background:linear-gradient(135deg,#966334ef 0%,#70421fee 56%,#593019f4 100%)!important;
+ border:6px solid #d6a86b!important;border-radius:31px!important;
+ box-shadow:inset 0 4px 0 #ffe6a2aa,inset 0 -7px 0 #3b210a55,0 10px 0 #4b2b16,0 23px 35px #002f2a9c!important;
+}
+.immersive-dialog .world-memory .forest-board::before{content:"";position:absolute;inset:8px;pointer-events:none;border:2px dashed #ffde9d50;border-radius:22px}
+.immersive-dialog .world-memory .forest-board{position:relative}
+.immersive-dialog .world-memory .memory-back{
+ background:#107451 url('/art/memory-card-back.svg') center/cover no-repeat!important;
+ border:4px solid #e8c77a!important;border-radius:18px!important;
+ box-shadow:0 5px 0 #84552c,0 10px 15px #102f2c99!important;
+ color:transparent!important;text-shadow:none!important;font-size:0!important;
+}
+.immersive-dialog .world-memory .memory-front{
+ background:linear-gradient(180deg,#fffaf0,#ffedcb)!important;
+ border:4px solid #ebbc75!important;border-radius:18px!important;
+ color:#5d3b1b!important;font-size:clamp(14px,1.5vw,24px)!important;
+ box-shadow:0 5px 0 #a26a37,0 11px 17px #153a3c94!important;
+}
+.immersive-dialog .world-memory .memory-topline{color:#fff2be!important;font-size:clamp(14px,1.2vw,19px)!important}
+.immersive-dialog .world-memory .memory-board-subline{color:#fff3c9!important}
+.immersive-dialog .world-memory .memory-feedback-slot{background:linear-gradient(125deg,#75451dda,#945f28ec)!important;border-color:#f0d1a1!important;box-shadow:0 5px 0 #623b1b,0 10px 21px #002b3691!important}
+.immersive-dialog .world-memory .hud-label{background:linear-gradient(#8d5d29,#613513)!important;border-color:#f4d5a4!important;box-shadow:0 4px 0 #573411,0 9px 16px #092d4d7a!important}
+/* Protect the top bar of full-screen games on narrow phones. */
+.immersive-dialog .game-dialog-head>div:first-child{min-width:0;flex:1 1 0}
+.immersive-dialog .game-dialog-head h2{overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.immersive-dialog .game-dialog-head .button{flex-shrink:0}
+@media(max-width:420px){
+ .immersive-dialog .game-dialog-head{gap:6px!important;padding:7px 9px!important}
+ .immersive-dialog .game-dialog-head .eyebrow{display:none!important}
+ .immersive-dialog .game-dialog-head h2{font-size:14px!important;max-width:none!important}
+ .immersive-dialog .game-dialog-head .button{font-size:11px!important;padding:8px 9px!important;max-width:128px!important;min-height:40px!important}
+ .immersive-dialog .world-memory .memory-front{font-size:14px!important}
+}

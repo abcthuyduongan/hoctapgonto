@@ -1,0 +1,275 @@
+{
+  "schema": "baoan-learning-content",
+  "formatVersion": 1,
+  "exportedAt": "2026-10-13T14:13:53.310Z",
+  "packs": [
+    {
+      "id": "math3-adventure",
+      "version": 1,
+      "title": "Toán 3 · Phép tính vui",
+      "subject": "math",
+      "grade": 3,
+      "kind": "quiz",
+      "source": "local",
+      "publishedAt": "2026-10-12T00:00:00.000Z",
+      "items": [
+        {
+          "kind": "multiple-choice",
+          "id": "math-1",
+          "objectiveId": "MATH3.NUMBER",
+          "prompt": "24 + 18 = ?",
+          "options": [
+            "42",
+            "41",
+            "32",
+            "43"
+          ],
+          "correctIndex": 0,
+          "explanation": "24 + 18 = 42 (cộng hàng đơn vị rồi đến hàng chục)."
+        },
+        {
+          "kind": "multiple-choice",
+          "id": "math-2",
+          "objectiveId": "MATH3.NUMBER",
+          "prompt": "63 − 27 = ?",
+          "options": [
+            "46",
+            "36",
+            "34",
+            "38"
+          ],
+          "correctIndex": 1,
+          "explanation": "63 − 27 = 36. Có thể kiểm tra: 36 + 27 = 63."
+        },
+        {
+          "kind": "multiple-choice",
+          "id": "math-3",
+          "objectiveId": "MATH3.NUMBER",
+          "prompt": "7 × 6 = ?",
+          "options": [
+            "36",
+            "48",
+            "42",
+            "40"
+          ],
+          "correctIndex": 2,
+          "explanation": "7 × 6 = 42."
+        },
+        {
+          "kind": "multiple-choice",
+          "id": "math-4",
+          "objectiveId": "MATH3.NUMBER",
+          "prompt": "56 : 8 = ?",
+          "options": [
+            "8",
+            "6",
+            "9",
+            "7"
+          ],
+          "correctIndex": 3,
+          "explanation": "56 : 8 = 7, vì 7 × 8 = 56."
+        },
+        {
+          "kind": "multiple-choice",
+          "id": "math-5",
+          "objectiveId": "MATH3.NUMBER",
+          "prompt": "Số liền sau của 399 là số nào?",
+          "options": [
+            "400",
+            "398",
+            "409",
+            "390"
+          ],
+          "correctIndex": 0,
+          "explanation": "Số liền sau của 399 là 400."
+        },
+        {
+          "kind": "multiple-choice",
+          "id": "math-6",
+          "objectiveId": "MATH3.NUMBER",
+          "prompt": "35 + 26 = ?",
+          "options": [
+            "51",
+            "61",
+            "62",
+            "71"
+          ],
+          "correctIndex": 1,
+          "explanation": "35 + 26 = 61."
+        },
+        {
+          "kind": "multiple-choice",
+          "id": "math-7",
+          "objectiveId": "MATH3.NUMBER",
+          "prompt": "9 × 4 = ?",
+          "options": [
+            "32",
+            "45",
+            "36",
+            "27"
+          ],
+          "correctIndex": 2,
+          "explanation": "9 × 4 = 36."
+        },
+        {
+          "kind": "multiple-choice",
+          "id": "math-8",
+          "objectiveId": "MATH3.NUMBER",
+          "prompt": "72 : 9 = ?",
+          "options": [
+            "7",
+            "9",
+            "6",
+            "8"
+          ],
+          "correctIndex": 3,
+          "explanation": "72 : 9 = 8."
+        }
+      ]
+    },
+    {
+      "id": "english3-family",
+      "version": 1,
+      "title": "Tiếng Anh · Gia đình",
+      "subject": "english",
+      "grade": 3,
+      "kind": "pairs",
+      "source": "local",
+      "publishedAt": "2026-10-12T00:00:00.000Z",
+      "items": [
+        {
+          "kind": "pair",
+          "id": "en-1",
+          "left": "mother",
+          "right": "mẹ",
+          "objectiveId": "ENG3.FAMILY"
+        },
+        {
+          "kind": "pair",
+          "id": "en-2",
+          "left": "father",
+          "right": "bố",
+          "objectiveId": "ENG3.FAMILY"
+        },
+        {
+          "kind": "pair",
+          "id": "en-3",
+          "left": "sister",
+          "right": "chị / em gái",
+          "objectiveId": "ENG3.FAMILY"
+        },
+        {
+          "kind": "pair",
+          "id": "en-4",
+          "left": "brother",
+          "right": "anh / em trai",
+          "objectiveId": "ENG3.FAMILY"
+        },
+        {
+          "kind": "pair",
+          "id": "en-5",
+          "left": "grandmother",
+          "right": "bà",
+          "objectiveId": "ENG3.FAMILY"
+        },
+        {
+          "kind": "pair",
+          "id": "en-6",
+          "left": "grandfather",
+          "right": "ông",
+          "objectiveId": "ENG3.FAMILY"
+        }
+      ]
+    },
+    {
+      "id": "english3-sentences",
+      "version": 1,
+      "title": "Tiếng Anh · Ghép câu đơn giản",
+      "subject": "english",
+      "grade": 3,
+      "kind": "sentences",
+      "source": "local",
+      "publishedAt": "2026-10-12T00:00:00.000Z",
+      "items": [
+        {
+          "kind": "sentence",
+          "id": "sen-1",
+          "objectiveId": "ENG3.SENTENCES",
+          "prompt": "Sắp xếp thành câu nói về bản thân.",
+          "words": [
+            "I",
+            "am",
+            "a",
+            "student."
+          ],
+          "hint": "Bắt đầu bằng chủ ngữ I."
+        },
+        {
+          "kind": "sentence",
+          "id": "sen-2",
+          "objectiveId": "ENG3.SENTENCES",
+          "prompt": "Sắp xếp câu giới thiệu người thân.",
+          "words": [
+            "This",
+            "is",
+            "my",
+            "mother."
+          ],
+          "hint": "Bắt đầu bằng This."
+        },
+        {
+          "kind": "sentence",
+          "id": "sen-3",
+          "objectiveId": "ENG3.SENTENCES",
+          "prompt": "Sắp xếp câu nói về sở thích.",
+          "words": [
+            "I",
+            "like",
+            "playing",
+            "chess."
+          ],
+          "hint": "Sau I là động từ like."
+        },
+        {
+          "kind": "sentence",
+          "id": "sen-4",
+          "objectiveId": "ENG3.SENTENCES",
+          "prompt": "Sắp xếp câu nói về ngôi nhà.",
+          "words": [
+            "My",
+            "house",
+            "is",
+            "small."
+          ],
+          "hint": "Bắt đầu bằng My house."
+        },
+        {
+          "kind": "sentence",
+          "id": "sen-5",
+          "objectiveId": "ENG3.SENTENCES",
+          "prompt": "Sắp xếp câu hỏi về tên.",
+          "words": [
+            "What",
+            "is",
+            "your",
+            "name?"
+          ],
+          "hint": "Từ để hỏi đứng đầu câu."
+        },
+        {
+          "kind": "sentence",
+          "id": "sen-6",
+          "objectiveId": "ENG3.SENTENCES",
+          "prompt": "Sắp xếp câu kể về việc học.",
+          "words": [
+            "We",
+            "go",
+            "to",
+            "school."
+          ],
+          "hint": "Bắt đầu bằng We."
+        }
+      ]
+    }
+  ]
+}

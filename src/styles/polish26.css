@@ -1,0 +1,162 @@
+/* ALPHA 2.6 — PREMIUM VISUAL LAYER
+   Decorative illustrations contain no fake UI. All text, buttons, result and feedback are real DOM.
+   Responsive and reduced-motion behavior must be checked on ACTUAL build screenshots.
+*/
+:root{
+  --va-navy:#08244d;--va-ocean:#135fa8;--va-sky:#17a3e7;--va-mint:#2cca9b;
+  --va-tangerine:#ffac42;--va-violet:#9370dd;--va-ink:#204365;--va-cream:#fff9e9;
+  --va-ambient:0 22px 60px rgba(11,60,123,.15);--va-lift:0 8px 0 #a4cadb,0 24px 42px #0c518229;
+}
+body{background:radial-gradient(ellipse at 80% 4%,#c7eeff 0%,transparent 37%),linear-gradient(#d9f4ff 0%,#f3faff 40%,#eef7ff 100%)}
+.site-header{background:linear-gradient(100deg,#07316f,#0658a9 56%,#1166bf);border-bottom:2px solid #81d6ff;box-shadow:0 7px 20px #05376629}
+.site-main{padding-bottom:80px}
+.brand-mark{border-radius:16px;transform:rotate(-5deg);background:linear-gradient(160deg,#ffe694,#ffae2e);border:2px solid #fff3cb;box-shadow:0 4px 0 #a97327,0 8px 12px #0828574f}
+.brand-words strong{font-weight:950;letter-spacing:.01em;font-size:23px}
+.brand-words small{font-size:11px;letter-spacing:.16em}
+.experience-controls{display:flex;align-items:center;gap:8px;margin-left:auto}
+.control-pill{display:flex;align-items:center;gap:6px;min-height:44px;padding:9px 11px;border-radius:13px;background:#ffffff19;color:#f4fbff;border:1px solid #cde9ff5d;font-weight:800;font-size:12px;box-shadow:inset 0 1px 0 #fff3}
+.control-pill:hover{background:#ffffff34}.control-pill[aria-pressed=true]{background:#e3f7ff;color:#125298;border-color:#fffaea}
+.control-pill:focus-visible{outline-color:#ffd453}
+/* LANDING: image paints the atmosphere only; no screenshot-as-interface */
+.world-hero{min-height:438px;background:#127abd;border-color:#cef6ff;box-shadow:0 9px 0 #a8d5e4,0 25px 55px #0a649f3b}
+.world-hero-sky{inset:0;background-image:url('/art/original-world.webp');background-size:cover;background-position:center 48%;opacity:.94;transform:scale(1.04);animation:va-scenery 12s ease-in-out infinite alternate}
+.world-hero-shine{background:linear-gradient(96deg,#064287f5 0%,#064b91ed 29%,#064b91b5 48%,#0563a510 82%)}
+.world-kicker{border:1px solid #b6e8ffae;background:#052d69aa;letter-spacing:.09em}
+.world-hero h1{max-width:600px;color:white;font-weight:950;letter-spacing:-.045em;text-shadow:0 4px 0 #0a408a,0 12px 28px #07316070}
+.world-hero h1 span{background:linear-gradient(#fff4ae,#ffd655);background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 3px 1px #a8761f)}
+.world-hero p{max-width:450px;font-size:16px;font-weight:650;color:#f0faff;text-shadow:0 1px 2px #0b3964}
+.world-hero .hero-tags span{box-shadow:0 4px 0 #07396d4d;color:#fff;font-weight:850}
+.world-cta{min-height:58px;box-shadow:0 7px 0 #be741f,0 15px 27px #0b3b6e70;transition:transform .2s,box-shadow .2s}
+.world-cta:hover{transform:translateY(-3px)}
+.world-hero .hero-scene:after{content:'✦';position:absolute;right:20%;bottom:10%;color:#fff7a6;font-size:62px;text-shadow:0 0 20px #fff,0 7px 8px #e9a02e;animation:va-breathe 4s ease-in-out infinite}
+.section-heading{margin-bottom:18px}.section-heading h2{color:#0d4583}.section-heading p{color:#597b9d}
+.world-card-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:23px}
+.world-card{border-color:#d8eeff!important;border-width:3px!important;box-shadow:var(--va-lift)!important;border-radius:27px!important;transition:transform .22s,box-shadow .22s}
+.world-card:hover{transform:translateY(-6px);box-shadow:0 13px 0 #a4cadb,0 28px 45px #0b528330!important}
+.world-card-scene{height:215px;background:#b2ecf3;isolation:isolate;position:relative}
+.world-card-scene:before{content:'';position:absolute;inset:0;border-top:5px solid #fff6;z-index:3;pointer-events:none}
+.world-card-scene img{object-fit:cover;object-position:50% 44%;transform:scale(1.01);filter:saturate(1.06)}
+.world-card:hover img{transform:scale(1.09)}
+.world-card-scene::after{height:48%;background:linear-gradient(0deg,#03346c99,transparent);pointer-events:none}
+.world-game-number{left:13px;top:13px;background:#09356be8;border-color:#d4f8ffd9;box-shadow:0 3px 0 #1b5d88;font-size:10px}
+.world-card-orb{height:51px;width:51px;border:3px solid #fff8cd;font-size:29px;box-shadow:0 5px 0 #a66a14,0 7px 14px #53331c55}
+.world-card-body{background:linear-gradient(176deg,#fff,#f5fbff);display:flex;flex-direction:column;flex:1;padding:21px 23px 24px}
+.world-card h3{letter-spacing:-.04em;font-size:26px;line-height:1.13;color:#12467b;margin:8px 0 7px}
+.world-card .world-subtitle{color:#2386b7;margin:0 0 10px}
+.world-card p{line-height:1.58;min-height:62px;font-size:13px;color:#5c7996}
+.world-card .field-label{margin-top:auto;margin-bottom:8px}
+.world-card .select{border:2px solid #cee7f8;min-height:51px;box-shadow:inset 0 1px 3px #1f67960a}
+.world-card .game-play{min-height:53px;margin-top:15px;border-radius:14px;font-weight:950;letter-spacing:.01em}
+.world-card.mint .game-play{background:linear-gradient(#72e3a0,#22ad68);border-color:#e3ffe9;box-shadow:0 5px 0 #128451}
+.world-card.sky .game-play{background:linear-gradient(#bc94ff,#8152e0);border-color:#f2e4ff;box-shadow:0 5px 0 #643eaa}
+.world-mini-app{background:linear-gradient(105deg,#f9fdff,#e7f8ec);border-color:#c8eff2;padding:26px 32px;box-shadow:0 7px 0 #c4e3e6,0 18px 30px #2a96ab22}
+.world-care{padding:24px 30px}
+/* GAME PLAYFIELD */
+.overlay{background:#041d42d9;backdrop-filter:blur(10px);z-index:50}
+.game-dialog.adventure-dialog{width:min(1220px,100%);border:4px solid #c5eeff;max-height:calc(100dvh - 38px);background:#eaf8ff;box-shadow:0 24px 75px #0008}
+.adventure-dialog .game-dialog-head{background:linear-gradient(102deg,#082d64,#0c67b3 65%,#1475bd);border-bottom:3px solid #98deff;min-height:74px}
+.adventure-dialog .game-dialog-head .eyebrow{color:#ffe18d;letter-spacing:.14em;font-size:10px}
+.adventure-dialog .game-dialog-head h2{font-weight:950;letter-spacing:-.02em}
+.adventure-dialog .game-dialog-head .button{min-height:45px}
+.world-stage{min-height:624px;padding:23px 30px 18px}
+.world-stage .stage-backdrop{background-size:cover;filter:none;opacity:1}
+.world-math .stage-backdrop{background-image:url('/art/original-math.webp')}
+.world-memory .stage-backdrop{background-image:url('/art/original-memory.webp')}
+.world-sentence .stage-backdrop{background-image:url('/art/original-sentence.webp')}
+.world-math .stage-overlay{background:linear-gradient(90deg,#0b478655,#0963920a 48%,#074b7735),linear-gradient(0deg,#0c4e7577,transparent 42%)}
+.world-memory .stage-overlay{background:radial-gradient(ellipse at 50% 42%,#23644c04,#062f347a 85%),linear-gradient(0deg,#001f29a1,#001f2910 40%)}
+.world-sentence .stage-overlay{background:linear-gradient(90deg,#754a3842,transparent 50%,#754a3842),linear-gradient(0deg,#643c5375,transparent 52%)}
+.world-hud{position:relative;z-index:2;justify-content:space-between}
+.hud-label{border:2px solid #cceeff;background:#08325fcf;box-shadow:0 4px 0 #073158,inset 0 1px 0 #fff3}
+.hud-score{background:linear-gradient(#fffad8,#ffcc58);border-color:#fff8cd;box-shadow:0 4px 0 #b77a24}
+.world-stage .challenge-card,.world-stage .sentence-scroll,.world-stage .forest-board{
+  border-radius:26px;backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);
+}
+.math-adventure-layout{max-width:1050px;grid-template-columns:minmax(120px,.27fr) minmax(0,1fr);gap:27px}
+.world-guide .guide-figure{border:6px solid #fff1be;background:linear-gradient(#a1edff,#33b7b5);width:172px;height:190px;border-radius:31% 31% 24% 24%;box-shadow:0 10px 0 #0e6c8a,0 19px 35px #10436978}
+.world-guide .guide-figure img{object-position:center 10%;transform:scale(1.05)}
+.guide-speech,.forest-speech{line-height:1.55;background:#fffdf4;border-color:#ffe8b2;box-shadow:0 6px 0 #b89858}
+.world-stage .challenge-card{background:linear-gradient(#fffdf6f8,#fff5dff4);border-color:#fff9dd;box-shadow:0 9px 0 #ac864f,0 18px 44px #0736666d}
+.quest-scroll{background:linear-gradient(160deg,#fff9e4,#ffe9bc);border:2px solid #e9c888;box-shadow:inset 0 3px 8px #efcd9065}
+.world-stage .quiz-question{color:#58371e;overflow-wrap:anywhere;font-weight:950}
+.world-stage .answer-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+.world-stage .answer-option{min-height:76px;border:3px solid #b5dbf8;border-radius:18px;background:linear-gradient(#fff,#e4f1ff);box-shadow:0 5px 0 #7faed1,0 10px 18px #4877ac23;text-shadow:0 1px 0 #fff8;transition:transform .16s,background .16s,box-shadow .16s}
+.world-stage .answer-option:hover:not(:disabled){transform:translateY(-3px) scale(1.007);background:linear-gradient(#fff,#d5f0ff)}
+.world-stage .answer-option:active:not(:disabled){transform:translateY(3px)}
+.world-stage .answer-option.correct{background:linear-gradient(#e9ffe2,#92e4a6);color:#12653b;border-color:#4ccc83;box-shadow:0 5px 0 #238c53}
+.world-stage .answer-option.incorrect{background:linear-gradient(#fff5ed,#ffd7d2);border-color:#f1948f;color:#b3404f}
+.world-stage .answer-index{flex:none}
+.world-stage .answer-feedback{margin-top:18px}
+.world-stage .progress-track{margin:12px 0 22px;background:#d2e8d4;height:17px}
+.world-stage .progress-track>div{background:linear-gradient(#b5f584,#3ec862);box-shadow:inset 0 3px 0 #e8ffe0a9}
+.world-stage .game-help{text-align:center;margin-top:20px}
+/* 3D cards: coherent back/front materials, clear found state, no dependence on picture text. */
+.world-memory .forest-board{background:linear-gradient(140deg,#0b4446ea,#062c36e6);border:4px solid #baede2;box-shadow:0 10px 0 #0c625a,0 20px 40px #042829b5}
+.world-memory .memory-card{height:106px}
+.world-memory .memory-grid{gap:14px}
+.memory-back{background:linear-gradient(155deg,#31b6b1,#087378);border:4px solid #9cf5d5;box-shadow:0 6px 0 #07504b,0 12px 18px #022526aa}
+.memory-back::before{border-style:dotted;opacity:.8}
+.memory-front{background:linear-gradient(#fffefa,#eaf8ff);border:4px solid #ffdd8e;color:#205780;box-shadow:0 6px 0 #0e5d53,0 12px 20px #042421aa}
+.memory-card.found .memory-front{background:linear-gradient(#e2ffdf,#b4f4c6);border-color:#55d894}
+.world-memory .forest-speech{background:#f5ffe8;color:#31664f;border-color:#b8e6ab}
+/* Word tiles communicate draggable affordance and show selected words as real UI. */
+.world-sentence .sentence-scroll{background:#fffaf4f3;border-color:#fff6d9;box-shadow:0 9px 0 #b8795a,0 19px 40px #613a4e70}
+.world-sentence .sentence-drop{padding:15px;display:flex;flex-wrap:wrap;align-items:center;gap:10px;min-height:106px;border:3px dashed #dbafd6;background:#fffdf8}
+.world-sentence .sentence-bank{padding:16px 8px;display:flex;flex-wrap:wrap;justify-content:center;gap:12px}
+.world-sentence .word-tile{min-width:52px;padding:10px 13px;background:linear-gradient(160deg,#fff,#e5f1ff);border-color:#abc9fa;box-shadow:0 5px 0 #97abd1;font-weight:900}
+.world-sentence .word-tile.selected{background:linear-gradient(#f2e7ff,#dec6ff);border-color:#b49be8;box-shadow:0 4px 0 #9279cd}
+.world-sentence .sentence-actions{flex-wrap:wrap}
+.sentence-guide img{border-radius:28%;object-position:center 8%}
+.world-stage-bottom{z-index:2;position:relative}
+.world-particles{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:-1}
+.world-particles i{position:absolute;width:9px;height:9px;border-radius:50%;background:#fff4a5;opacity:.7;box-shadow:0 0 22px 7px #fff3a855;animation:va-fairy 7s linear infinite}
+.world-particles i:nth-child(1){top:10%;left:12%;animation-delay:-2s}.world-particles i:nth-child(2){top:71%;left:9%;animation-delay:-4s;width:5px;height:5px}.world-particles i:nth-child(3){top:19%;right:20%;animation-delay:-1s}.world-particles i:nth-child(4){bottom:13%;right:7%;animation-delay:-5s;width:6px;height:6px}.world-particles i:nth-child(5){top:54%;left:47%;animation-delay:-6s;width:5px;height:5px}.world-particles i:nth-child(6){top:80%;right:38%;animation-delay:-3s;width:6px;height:6px}
+.trophy-reveal{isolation:isolate;overflow:hidden}.trophy-reveal:before{content:'';position:absolute;inset:-35%;background:repeating-conic-gradient(from 0deg,transparent 0deg 14deg,#ffdc7560 15deg 21deg,transparent 22deg 35deg);animation:va-reward 22s linear infinite;z-index:-1}
+/* Parent and Creator are professional workspaces; decorative imagery must never include fake forms or data. */
+.parent-workspace .heading-block{background:radial-gradient(circle at 87% 23%,#63c7f78a,transparent 25%),linear-gradient(112deg,#0b4591,#1488bd);box-shadow:0 7px 0 #94cade,0 22px 30px #29659720}
+.parent-workspace .heading-block h1{font-size:clamp(28px,3vw,39px)}
+.parent-stats .stat-card{border-radius:22px;padding:24px;background:linear-gradient(155deg,#fff,#f3faff);position:relative;overflow:hidden}
+.parent-stats .stat-card:after{content:'';position:absolute;width:108px;height:108px;border-radius:50%;background:#dff6ff90;right:-43px;top:-38px}
+.parent-stats .stat-card strong{font-variant-numeric:tabular-nums}
+.parent-workspace .panel{background:linear-gradient(#fff,#fbfdff);border-color:#cfebf8}
+.creator-workspace .panel{border-color:#cce7f7}
+.creator-workspace .heading-block{background:linear-gradient(115deg,#164a92,#229dc9)}
+.site-footer{background:#f6fbff;border-top:1px solid #c9e4f4;color:#5983a1}
+@keyframes va-scenery{0%{transform:scale(1.02) translateX(0)}100%{transform:scale(1.07) translateX(-1.5%)}}
+@keyframes va-fairy{0%{transform:translate(0,12px) scale(.7);opacity:.18}50%{opacity:.85}100%{transform:translate(17px,-25px) scale(1.1);opacity:.08}}
+@keyframes va-breathe{0%,100%{transform:scale(.92) rotate(-8deg)}50%{transform:scale(1.06) rotate(5deg)}}
+@keyframes va-reward{to{transform:rotate(360deg)}}
+@media(max-width:1160px){.control-label{display:none}.experience-controls{gap:6px}.world-card-grid{gap:16px}.world-card-body{padding:18px}.world-card h3{font-size:23px}}
+@media(max-width:850px){.world-card-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.world-card-scene{height:205px}.world-card p{min-height:0}.world-hero{min-height:390px}.world-hero .hero-copy{max-width:560px}}
+@media(max-width:760px){
+ .site-header{position:relative}.header-content{gap:9px}.experience-controls{margin-left:auto;padding:0 4px}
+ .control-pill{padding:7px;min-width:43px;justify-content:center}.site-main{padding-top:18px}
+ .world-card-grid{grid-template-columns:1fr;gap:22px}.world-card-scene{height:222px}
+ .world-hero{min-height:385px;padding:25px 20px}.world-hero-sky{inset:0;opacity:.75;background-position:57% 50%}
+ .world-hero-shine{background:linear-gradient(90deg,#063d83f2,#06488cd5 67%,#1769a855)}
+ .world-hero .hero-copy{max-width:100%}.world-hero p{max-width:310px}.world-hero .hero-scene:after{font-size:31px;right:13%;bottom:12%}
+ .world-stage{min-height:560px;padding:14px 12px}.game-dialog.adventure-dialog{max-height:calc(100dvh - 12px)}
+ .math-adventure-layout,.sentence-adventure-layout{display:block}.world-stage .challenge-card,.world-stage .sentence-scroll{padding:18px}
+ .world-stage .answer-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .world-stage .answer-option{font-size:clamp(16px,5vw,23px);min-height:69px;border-width:2px;padding:9px 7px}
+ .world-memory .memory-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+ .world-memory .memory-card{height:82px}.world-memory .forest-board{padding:13px}
+ .world-sentence .sentence-scroll{padding:16px}.world-sentence .word-tile{padding:10px;min-height:46px}
+ .trophy-reveal{margin:36px auto!important}
+}
+@media(max-width:390px){
+ .brand-words strong{font-size:15px}.brand-words small{font-size:9px}.brand-mark{height:38px;width:38px}
+ .world-hero h1{font-size:29px}.world-hero .hero-tags span{padding:7px 9px}
+ .world-stage .answer-option{min-height:65px;gap:5px}.world-stage .answer-index{width:29px;height:29px}
+ .world-memory .memory-card{height:74px}.hud-label,.hud-score{padding:7px!important;font-size:9px!important}
+}
+@media(prefers-reduced-motion:reduce){
+ *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+}
+html[data-motion="off"] *,html[data-motion="off"] *::before,html[data-motion="off"] *::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+/* 320px safeguard: navigation labels must wrap rather than create horizontal page overflow. */
+@media(max-width:390px){
+ .top-navigation{width:100%;min-width:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;margin-left:0}
+ .nav-item{min-width:0;white-space:normal;line-height:1.25;overflow-wrap:anywhere;padding:8px 3px;font-size:10px}
+ .nav-item span{font-size:14px;margin-right:2px}
+}

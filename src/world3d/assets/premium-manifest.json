@@ -1,0 +1,10 @@
+{
+  "version": "3.3-premium-art-gate",
+  "assets": [
+    {"id":"fox-guide","path":"public/models/fox-guide.glb","role":"Mascot Bảo An","mustHaveAnimation":true,"minAnimations":3,"mustHaveTextures":true,"license":""},
+    {"id":"math-world","path":"public/models/math-world.glb","role":"Đảo Toán Học","mustHaveAnimation":false,"minAnimations":0,"mustHaveTextures":true,"license":""},
+    {"id":"memory-world","path":"public/models/memory-world.glb","role":"Khu Rừng Trí Nhớ","mustHaveAnimation":false,"minAnimations":0,"mustHaveTextures":true,"license":""},
+    {"id":"language-world","path":"public/models/language-world.glb","role":"Xưởng Ngôn Từ","mustHaveAnimation":false,"minAnimations":0,"mustHaveTextures":true,"license":""},
+    {"id":"environment","path":"public/models/environment.glb","role":"Lâu đài, thác nước, mây và vật trang trí","mustHaveAnimation":false,"minAnimations":0,"mustHaveTextures":true,"license":""}
+  ]
+}

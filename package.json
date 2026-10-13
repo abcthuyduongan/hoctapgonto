@@ -1,0 +1,36 @@
+{
+  "name": "bao-an-learning-v3-6-3d",
+  "private": true,
+  "version": "3.6.2-rc.2",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview --host 0.0.0.0",
+    "typecheck": "tsc --noEmit",
+    "test:core": "node --experimental-strip-types --test tests/sdk.test.mjs tests/seed.test.mjs tests/validation.test.mjs tests/reports.test.mjs tests/memory281.test.mjs tests/stability27.test.mjs tests/premium280.test.mjs tests/real3d31.test.mjs",
+    "test:syntax": "node tests/check-tsx.mjs",
+    "verify:offline": "npm run test:core && npm run test:content && npm run test:syntax && tsc --noEmit -p tsconfig.core.json && tsc src/world3d/engine.ts --allowImportingTsExtensions --noEmit --target ES2022 --module ESNext --lib ES2022,DOM --strict --skipLibCheck --noUnusedLocals --noUnusedParameters",
+    "test:visual": "playwright test --config=playwright.config.ts",
+    "test:assets": "node --test tests/visual-assets.test.mjs",
+    "test:stability": "playwright test --config=playwright.config.ts tests/visual/stability-alpha27.spec.ts",
+    "test:real3d": "node --experimental-strip-types --test tests/real3d31.test.mjs",
+    "test:model-import": "node --experimental-strip-types --test tests/glb-import.test.mjs",
+    "gate:premium-art": "node tests/release-3d-assets.mjs",
+    "test:guide-model": "node --experimental-strip-types --test tests/glb-import.test.mjs tests/glb-guide-integration.test.mjs tests/glb-guide-runtime.test.mjs",
+    "test:guide-animation": "node --experimental-strip-types --test tests/glb-animation.test.mjs tests/glb-import.test.mjs tests/glb-guide-integration.test.mjs tests/glb-guide-runtime.test.mjs",
+    "test:content": "node --experimental-strip-types --test tests/content-import-v362.test.mjs"
+  },
+  "dependencies": {
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "@vitejs/plugin-react": "^5.0.0",
+    "typescript": "~5.9.0",
+    "vite": "^7.1.0",
+    "@playwright/test": "^1.55.0"
+  }
+}

@@ -1,0 +1,45 @@
+[
+  {
+    "width": 1440,
+    "main": {
+      "sx": 1440,
+      "sy": 900,
+      "w": 1440,
+      "h": 900,
+      "ready": true,
+      "glb": true
+    },
+    "errors": []
+  },
+  {
+    "memory_two_cards_unlocked": true
+  },
+  {
+    "memory_reentry": true
+  },
+  {
+    "math_next_question": true
+  },
+  {
+    "sentence_click": true
+  },
+  {
+    "parent_visible": true,
+    "export_button": true
+  },
+  {
+    "motion_reduced": true
+  },
+  {
+    "width": 390,
+    "main": {
+      "sx": 390,
+      "sy": 844,
+      "w": 390,
+      "h": 844,
+      "ready": true,
+      "glb": true
+    },
+    "errors": []
+  }
+]

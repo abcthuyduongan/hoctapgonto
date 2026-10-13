@@ -1,0 +1,123 @@
+{
+  "url": "http://127.0.0.1:37003/BAO_AN_LEARNING_V3_6_PLAYABLE.html",
+  "cases": [
+    {
+      "size": "1440x900",
+      "errors": [],
+      "origin": "set_content (in-memory storage test double)",
+      "page": {
+        "viewport": [
+          1440,
+          900
+        ],
+        "width": 1440,
+        "height": 900,
+        "canvas": true,
+        "renderer": "canvas"
+      },
+      "buttonWidths": [
+        {
+          "name": "Math Quest",
+          "left": 194.40625,
+          "right": 524.640625,
+          "visible": true
+        },
+        {
+          "name": "Memory Match",
+          "left": 554.875,
+          "right": 885.109375,
+          "visible": true
+        },
+        {
+          "name": "Sentence Builder",
+          "left": 915.34375,
+          "right": 1245.59375,
+          "visible": true
+        }
+      ],
+      "importOptions": [
+        2,
+        2,
+        2
+      ],
+      "math-quest_sampleQuestion": "Thử thách 1 / 8\n⭐ 0 sao\n24 + 18 = ?\nA   42\nB   41\nC   32\nD   43\nChọn đáp án để vượt thử thách!",
+      "math_next_question": true,
+      "memory-match_sampleQuestion": "Đã ghép 0 / 6 cặp\n⭐ 0 sao\n✦\n✦\n✦\n✦\n✦\n✦\n✦\n✦\n✦\n✦\n✦\n✦\nLật hai thẻ để tìm một cặp nhé!",
+      "memory_unlocked": true,
+      "sentence-builder_sampleQuestion": "Câu 1 / 6\n⭐ 0 sao\nChọn từ bên dưới để tạo câu đúng!\nstudent\nI\na\nam\n✓ Kiểm tra câu\nChạm vào từ để ghép câu.",
+      "sentence_click": true,
+      "curriculum_saved_to_mock_storage": true,
+      "historyAvailable": true
+    },
+    {
+      "size": "390x844",
+      "errors": [],
+      "origin": "set_content (in-memory storage test double)",
+      "page": {
+        "viewport": [
+          390,
+          844
+        ],
+        "width": 390,
+        "height": 844,
+        "canvas": true,
+        "renderer": "canvas"
+      },
+      "buttonWidths": [
+        {
+          "name": "Math Quest",
+          "left": 283,
+          "right": 375,
+          "visible": true
+        },
+        {
+          "name": "Memory Match",
+          "left": 283,
+          "right": 375,
+          "visible": true
+        },
+        {
+          "name": "Sentence Builder",
+          "left": 283,
+          "right": 375,
+          "visible": true
+        }
+      ]
+    },
+    {
+      "size": "320x640",
+      "errors": [],
+      "origin": "set_content (in-memory storage test double)",
+      "page": {
+        "viewport": [
+          320,
+          640
+        ],
+        "width": 320,
+        "height": 640,
+        "canvas": true,
+        "renderer": "canvas"
+      },
+      "buttonWidths": [
+        {
+          "name": "Math Quest",
+          "left": 228,
+          "right": 306,
+          "visible": true
+        },
+        {
+          "name": "Memory Match",
+          "left": 228,
+          "right": 306,
+          "visible": true
+        },
+        {
+          "name": "Sentence Builder",
+          "left": 228,
+          "right": 306,
+          "visible": true
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,295 @@
+
+> bao-an-learning-v3-1-real3d@3.1.0-alpha.1 verify:offline
+> npm run test:core && npm run test:syntax && tsc --noEmit -p tsconfig.core.json && tsc src/world3d/engine.ts --noEmit --target ES2022 --module ESNext --lib ES2022,DOM --strict --skipLibCheck --noUnusedLocals --noUnusedParameters
+
+
+> bao-an-learning-v3-1-real3d@3.1.0-alpha.1 test:core
+> node --experimental-strip-types --test tests/sdk.test.mjs tests/seed.test.mjs tests/validation.test.mjs tests/reports.test.mjs tests/memory281.test.mjs tests/stability27.test.mjs tests/premium280.test.mjs tests/real3d31.test.mjs
+
+TAP version 13
+# Subtest: Memory Match: StrictMode effect replay does not freeze the board after two cards
+ok 1 - Memory Match: StrictMode effect replay does not freeze the board after two cards
+  ---
+  duration_ms: 995.372032
+  type: 'test'
+  ...
+# Subtest: Memory Match: visual quality rules and stable feedback area are present
+ok 2 - Memory Match: visual quality rules and stable feedback area are present
+  ---
+  duration_ms: 0.507015
+  type: 'test'
+  ...
+# Subtest: Alpha 2.8: success/retry tones play only after successfully persisted attempts
+ok 3 - Alpha 2.8: success/retry tones play only after successfully persisted attempts
+  ---
+  duration_ms: 1.114898
+  type: 'test'
+  ...
+# Subtest: Alpha 2.8: visual reactions do not write learning data
+ok 4 - Alpha 2.8: visual reactions do not write learning data
+  ---
+  duration_ms: 0.34333
+  type: 'test'
+  ...
+# Subtest: Alpha 2.8: every game has a persisted-result visual feedback state
+ok 5 - Alpha 2.8: every game has a persisted-result visual feedback state
+  ---
+  duration_ms: 0.292348
+  type: 'test'
+  ...
+# Subtest: Alpha 2.8: completion remains an overlay and focuses a real exit action
+ok 6 - Alpha 2.8: completion remains an overlay and focuses a real exit action
+  ---
+  duration_ms: 0.285365
+  type: 'test'
+  ...
+# Subtest: Alpha 2.8: all game mascots reflect success and retry without image duplication
+ok 7 - Alpha 2.8: all game mascots reflect success and retry without image duplication
+  ---
+  duration_ms: 0.317035
+  type: 'test'
+  ...
+# Subtest: Alpha 2.8: animation is transform/opacity only and cannot intercept buttons
+ok 8 - Alpha 2.8: animation is transform/opacity only and cannot intercept buttons
+  ---
+  duration_ms: 0.285506
+  type: 'test'
+  ...
+# Subtest: Alpha 2.8: premium stylesheet is last to preserve animation and responsive overrides
+ok 9 - Alpha 2.8: premium stylesheet is last to preserve animation and responsive overrides
+  ---
+  duration_ms: 0.270246
+  type: 'test'
+  ...
+# Subtest: Alpha 2.8: celebratory audio is opt-in, not tied to cloud or game state
+ok 10 - Alpha 2.8: celebratory audio is opt-in, not tied to cloud or game state
+  ---
+  duration_ms: 0.188578
+  type: 'test'
+  ...
+# Subtest: Alpha 2.8: transition is bound to the next question ID
+ok 11 - Alpha 2.8: transition is bound to the next question ID
+  ---
+  duration_ms: 0.371976
+  type: 'test'
+  ...
+# Subtest: Real 3D: projective renderer constructs vertices, normals and matrices, not a flat background
+ok 12 - Real 3D: projective renderer constructs vertices, normals and matrices, not a flat background
+  ---
+  duration_ms: 0.664518
+  type: 'test'
+  ...
+# Subtest: Real 3D: three modeled islands, castle, trees, cards, book, fox are distinct mesh assets
+ok 13 - Real 3D: three modeled islands, castle, trees, cards, book, fox are distinct mesh assets
+  ---
+  duration_ms: 0.258657
+  type: 'test'
+  ...
+# Subtest: Real 3D: fallback projects genuine 3D triangles, does not show an image posing as 3D
+ok 14 - Real 3D: fallback projects genuine 3D triangles, does not show an image posing as 3D
+  ---
+  duration_ms: 0.213341
+  type: 'test'
+  ...
+# Subtest: Real 3D: world controls use the existing game registry, pack validation and original game host
+ok 15 - Real 3D: world controls use the existing game registry, pack validation and original game host
+  ---
+  duration_ms: 0.107443
+  type: 'test'
+  ...
+# Subtest: Real 3D: scene pauses during gameplay and respects reduced motion
+ok 16 - Real 3D: scene pauses during gameplay and respects reduced motion
+  ---
+  duration_ms: 0.208644
+  type: 'test'
+  ...
+# Subtest: Real 3D: standalone offline build contains its own scene engine, mini games and saving
+ok 17 - Real 3D: standalone offline build contains its own scene engine, mini games and saving
+  ---
+  duration_ms: 0.179084
+  type: 'test'
+  ...
+# Subtest: Real 3D: offline file exists and full source retains the three modules
+ok 18 - Real 3D: offline file exists and full source retains the three modules
+  ---
+  duration_ms: 0.203361
+  type: 'test'
+  ...
+# (node:8889) ExperimentalWarning: Type Stripping is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: Báo cáo không đồng nhất tỷ lệ đúng với mức độ thành thạo
+ok 19 - Báo cáo không đồng nhất tỷ lệ đúng với mức độ thành thạo
+  ---
+  duration_ms: 0.655233
+  type: 'test'
+  ...
+# Subtest: Chỉ tính phiên chơi đã completed
+ok 20 - Chỉ tính phiên chơi đã completed
+  ---
+  duration_ms: 0.216019
+  type: 'test'
+  ...
+# (node:8895) ExperimentalWarning: Type Stripping is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: Registry: 3 game đều đúng SDK và đủ runtime / content-kind
+ok 21 - Registry: 3 game đều đúng SDK và đủ runtime / content-kind
+  ---
+  duration_ms: 1.505545
+  type: 'test'
+  ...
+# Subtest: SDK: phản hồi có eventId tất định cho cùng một lượt
+ok 22 - SDK: phản hồi có eventId tất định cho cùng một lượt
+  ---
+  duration_ms: 0.425452
+  type: 'test'
+  ...
+# Subtest: SDK: không cho item không thuộc bộ được ghi sự kiện
+ok 23 - SDK: không cho item không thuộc bộ được ghi sự kiện
+  ---
+  duration_ms: 1.722225
+  type: 'test'
+  ...
+# Subtest: SDK: không ghi sự kiện từ phiên đã kết thúc hoặc bị tráo bộ
+ok 24 - SDK: không ghi sự kiện từ phiên đã kết thúc hoặc bị tráo bộ
+  ---
+  duration_ms: 0.243714
+  type: 'test'
+  ...
+# Subtest: SDK: chặn số liệu, khóa lượt trả lời bị lỗi
+ok 25 - SDK: chặn số liệu, khóa lượt trả lời bị lỗi
+  ---
+  duration_ms: 0.384913
+  type: 'test'
+  ...
+# Subtest: SDK: chặn game dùng sai loại học liệu hoặc sai protocol
+ok 26 - SDK: chặn game dùng sai loại học liệu hoặc sai protocol
+  ---
+  duration_ms: 0.259789
+  type: 'test'
+  ...
+# Subtest: Sentence Builder: chấm đúng thứ tự cả khi từ lặp xuất hiện
+ok 27 - Sentence Builder: chấm đúng thứ tự cả khi từ lặp xuất hiện
+  ---
+  duration_ms: 0.611318
+  type: 'test'
+  ...
+# Subtest: Sentence Builder: bác bỏ thiếu từ, lặp chỉ số, chỉ số giả
+ok 28 - Sentence Builder: bác bỏ thiếu từ, lặp chỉ số, chỉ số giả
+  ---
+  duration_ms: 0.171017
+  type: 'test'
+  ...
+# Subtest: Sentence Builder: học liệu demo đã được kiểm tra và có ít nhất 2 câu
+ok 29 - Sentence Builder: học liệu demo đã được kiểm tra và có ít nhất 2 câu
+  ---
+  duration_ms: 1.758386
+  type: 'test'
+  ...
+# Subtest: Sentence Builder: phát hiện câu trùng, gợi ý thiếu và câu thiếu từ
+ok 30 - Sentence Builder: phát hiện câu trùng, gợi ý thiếu và câu thiếu từ
+  ---
+  duration_ms: 1.223284
+  type: 'test'
+  ...
+# (node:8911) ExperimentalWarning: Type Stripping is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: Tất cả học liệu mẫu vượt qua kiểm tra cấu trúc và trùng thẻ
+ok 31 - Tất cả học liệu mẫu vượt qua kiểm tra cấu trúc và trùng thẻ
+  ---
+  duration_ms: 3.274313
+  type: 'test'
+  ...
+# Subtest: Bộ học liệu mẫu có khóa phiên bản khác nhau
+ok 32 - Bộ học liệu mẫu có khóa phiên bản khác nhau
+  ---
+  duration_ms: 0.206369
+  type: 'test'
+  ...
+# Subtest: Cả ba môn học sử dụng cùng mẫu Memory Match
+ok 33 - Cả ba môn học sử dụng cùng mẫu Memory Match
+  ---
+  duration_ms: 0.362849
+  type: 'test'
+  ...
+# Subtest: Math answer feedback stays inside a permanently mounted reserved frame
+ok 34 - Math answer feedback stays inside a permanently mounted reserved frame
+  ---
+  duration_ms: 1.109561
+  type: 'test'
+  ...
+# Subtest: Memory and Sentence keep the play scene mounted while reward appears
+ok 35 - Memory and Sentence keep the play scene mounted while reward appears
+  ---
+  duration_ms: 1.934011
+  type: 'test'
+  ...
+# Subtest: Game stage is a stable internal scroller and the main page is locked
+ok 36 - Game stage is a stable internal scroller and the main page is locked
+  ---
+  duration_ms: 0.502725
+  type: 'test'
+  ...
+# Subtest: Answer recording no longer refetches all content packs on every click
+ok 37 - Answer recording no longer refetches all content packs on every click
+  ---
+  duration_ms: 0.337751
+  type: 'test'
+  ...
+# Subtest: Panoramic CSS is loaded after the stable feedback CSS
+ok 38 - Panoramic CSS is loaded after the stable feedback CSS
+  ---
+  duration_ms: 0.442819
+  type: 'test'
+  ...
+# (node:8933) ExperimentalWarning: Type Stripping is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: Bộ ghép cặp hợp lệ có thể dùng ở Memory Match
+ok 39 - Bộ ghép cặp hợp lệ có thể dùng ở Memory Match
+  ---
+  duration_ms: 1.654165
+  type: 'test'
+  ...
+# Subtest: Phát hiện trùng nội dung kể cả khác khoảng trắng và chữ hoa
+ok 40 - Phát hiện trùng nội dung kể cả khác khoảng trắng và chữ hoa
+  ---
+  duration_ms: 0.500434
+  type: 'test'
+  ...
+# Subtest: Không cho phép câu ghép cặp thiếu dữ liệu
+ok 41 - Không cho phép câu ghép cặp thiếu dữ liệu
+  ---
+  duration_ms: 0.262757
+  type: 'test'
+  ...
+# Subtest: Không cho phép trùng ID câu hỏi
+ok 42 - Không cho phép trùng ID câu hỏi
+  ---
+  duration_ms: 0.152986
+  type: 'test'
+  ...
+# Subtest: Phiên bản nội dung tham gia vào khóa bất biến
+ok 43 - Phiên bản nội dung tham gia vào khóa bất biến
+  ---
+  duration_ms: 0.123784
+  type: 'test'
+  ...
+# Subtest: Kiểm tra câu trắc nghiệm đủ bốn phương án, đáp án, lời giải
+ok 44 - Kiểm tra câu trắc nghiệm đủ bốn phương án, đáp án, lời giải
+  ---
+  duration_ms: 0.179108
+  type: 'test'
+  ...
+1..44
+# tests 44
+# suites 0
+# pass 44
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1297.75837
+
+> bao-an-learning-v3-1-real3d@3.1.0-alpha.1 test:syntax
+> node tests/check-tsx.mjs
+
+Syntax parsing: all src/*.ts and src/*.tsx files passed.

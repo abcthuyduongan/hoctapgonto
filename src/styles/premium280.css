@@ -1,0 +1,105 @@
+/* Alpha 2.8 Premium Game Experience
+   Effects are composited, do not occupy layout space, and respect motion preferences.
+   Real controls and learning content remain accessible HTML. */
+:root { --effect-gold:#ffcc3d; --effect-blue:#58cbff; }
+
+/* A bounded interaction reaction: never moves the reserved feedback frame. */
+.stable-response-zone,.sentence-result-reserve,.memory-feedback-slot{
+  position:relative;isolation:isolate;
+}
+.game-reaction{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:4;border-radius:inherit}
+.game-reaction-halo{
+  position:absolute;left:50%;top:50%;width:min(75%,400px);aspect-ratio:1;
+  transform:translate(-50%,-50%) scale(.4);border-radius:50%;opacity:0;
+  background:radial-gradient(circle, #fff7b770 0%,#ffe17c36 29%, transparent 66%);
+  animation:fx280-halo 750ms cubic-bezier(.2,.75,.3,1) both;
+}
+.game-reaction-retry .game-reaction-halo{background:radial-gradient(circle,#a0eefa88 0%,#b9e9ff25 32%,transparent 66%)}
+.game-reaction-particle{
+  position:absolute;left:50%;top:49%;width:14px;height:14px;background:#ffd55e;
+  border:2px solid #fff5d9;border-radius:4px;transform:translate(-50%,-50%) rotate(45deg) scale(.45);
+  box-shadow:0 0 12px #ffce54a8;opacity:0;
+  animation:fx280-spark 680ms ease-out both;
+}
+.game-reaction-retry .game-reaction-particle{background:#9beafe;border-color:#edfaff;box-shadow:0 0 12px #9beafe80}
+.game-reaction-1{--dx:-128px;--dy:-24px;animation-delay:30ms}.game-reaction-2{--dx:117px;--dy:-12px;animation-delay:80ms}
+.game-reaction-3{--dx:-83px;--dy:-63px;animation-delay:0ms}.game-reaction-4{--dx:93px;--dy:-68px;animation-delay:40ms}
+.game-reaction-5{--dx:-40px;--dy:42px;animation-delay:75ms}.game-reaction-6{--dx:62px;--dy:39px;animation-delay:15ms}
+@keyframes fx280-spark{
+  0%{opacity:0;transform:translate(-50%,-50%) rotate(45deg) scale(.35)}
+  24%{opacity:1}
+  100%{opacity:0;transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) rotate(115deg) scale(.9)}
+}
+@keyframes fx280-halo{
+  0%{opacity:0;transform:translate(-50%,-50%) scale(.25)}
+  40%{opacity:.85}
+  100%{opacity:0;transform:translate(-50%,-50%) scale(1.25)}
+}
+
+/* Fox reactions are purely decorative and leave the figure size untouched. */
+.world-guide .guide-figure,.sentence-guide,.forest-guide{isolation:isolate}
+.game-mascot-happy{animation:fx280-mascot-happy 550ms cubic-bezier(.2,.7,.28,1) both}
+.game-mascot-encourage{animation:fx280-mascot-encourage 560ms ease-in-out both}
+.game-mascot-idle{animation:fx280-mascot-idle 4200ms ease-in-out infinite}
+@keyframes fx280-mascot-happy{0%,100%{transform:translateY(0) rotate(0)}45%{transform:translateY(-8px) rotate(-4deg)}75%{transform:translateY(-2px) rotate(2deg)}}
+@keyframes fx280-mascot-encourage{0%,100%{transform:rotate(0) scale(1)}35%{transform:rotate(-3deg) scale(1.025)}70%{transform:rotate(2deg) scale(1.015)}}
+@keyframes fx280-mascot-idle{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+
+/* Stable card transitions on question changes (opacity/transform only). */
+.world-math .quest-scroll,.world-sentence .sentence-prompt{
+  animation:fx280-question-in 390ms cubic-bezier(.22,.8,.28,1) both;
+}
+@keyframes fx280-question-in{0%{opacity:.55}100%{opacity:1}}
+.world-math .answer-option.correct{animation:fx280-answer-correct 540ms ease-out both}
+.world-math .answer-option.incorrect{animation:fx280-answer-retry 350ms ease-in-out both}
+@keyframes fx280-answer-correct{0%,100%{filter:brightness(1);transform:scale(1)}45%{filter:brightness(1.19) drop-shadow(0 0 16px #ffda6e);transform:scale(1.015)}}
+@keyframes fx280-answer-retry{0%,100%{transform:translateX(0)}33%{transform:translateX(-3px)}66%{transform:translateX(3px)}}
+.world-memory .memory-card.found .memory-front{
+  border-color:#ffe287;box-shadow:0 0 0 3px #ffcc4b88,0 0 24px #ffe58aaf;
+  background:linear-gradient(145deg,#e8ffe6,#b8f9e6);
+}
+.world-memory .memory-card.found{animation:fx280-card-win 400ms ease-out}
+@keyframes fx280-card-win{0%,100%{filter:brightness(1)}50%{filter:brightness(1.3)}}
+.world-sentence .word-tile.selected{animation:fx280-tile-in 240ms ease-out both}
+@keyframes fx280-tile-in{0%{opacity:.7;transform:scale(.94)}75%{opacity:1;transform:scale(1.025)}100%{transform:scale(1)}}
+
+/* Completion scene stays over the playfield; only decorated pixels animate. */
+.premium-reward-panel{isolation:isolate;overflow:hidden;background:linear-gradient(145deg,#fffef4 0%,#ffedc1 66%,#ffe09b 100%);border-color:#fff8de}
+.premium-reward-panel > *{position:relative;z-index:2}
+.premium-reward-rays{
+  position:absolute;inset:-75%;z-index:0;pointer-events:none;
+  background:conic-gradient(from 0deg,transparent 0deg,#fff5bd63 18deg,transparent 38deg,#ffed9d3d 56deg,transparent 80deg,#fff5bd63 105deg,transparent 124deg);
+  animation:fx280-rotate 22s linear infinite;
+}
+@keyframes fx280-rotate{to{transform:rotate(360deg)}}
+.premium-reward-stars{display:flex;justify-content:center;align-items:center;gap:12px;margin:4px 0 19px;color:#ffb91f;text-shadow:0 2px 0 #cb8011,0 9px 14px #f7aa3666;font-size:clamp(31px,6vw,49px)}
+.premium-reward-stars span{display:inline-block;animation:fx280-star-pop 560ms cubic-bezier(.18,.75,.34,1.18) both}
+.premium-reward-stars span:nth-child(2){animation-delay:120ms;font-size:1.22em}
+.premium-reward-stars span:nth-child(3){animation-delay:240ms}
+@keyframes fx280-star-pop{0%{opacity:0;transform:scale(.25) rotate(-25deg)}72%{opacity:1;transform:scale(1.17) rotate(7deg)}100%{opacity:1;transform:scale(1) rotate(0)}}
+.premium-reward-note{display:block;margin:0 0 19px;color:#84502b;font-weight:900;font-size:13px}
+.premium-reward-confetti{position:absolute;inset:0;overflow:hidden;z-index:0;pointer-events:none}
+.premium-confetti{position:absolute;top:-30px;left:calc(var(--x) * 1%);width:12px;height:20px;opacity:0;border-radius:4px;background:var(--c);animation:fx280-confetti 3.3s ease-out both;animation-delay:var(--delay)}
+.premium-confetti-1{--x:6;--c:#ffe36c;--delay:0s}.premium-confetti-2{--x:17;--c:#86eacc;--delay:.18s}.premium-confetti-3{--x:29;--c:#fa84b1;--delay:.3s}
+.premium-confetti-4{--x:39;--c:#7edaff;--delay:.06s}.premium-confetti-5{--x:49;--c:#ffc952;--delay:.25s}.premium-confetti-6{--x:60;--c:#ec9efa;--delay:.45s}
+.premium-confetti-7{--x:72;--c:#8beac7;--delay:.15s}.premium-confetti-8{--x:82;--c:#ffd270;--delay:.33s}.premium-confetti-9{--x:93;--c:#75d3ff;--delay:.07s}
+.premium-confetti-10{--x:12;--c:#f5a0b5;--delay:.48s}.premium-confetti-11{--x:56;--c:#9befa7;--delay:.12s}.premium-confetti-12{--x:77;--c:#fce56d;--delay:.58s}
+@keyframes fx280-confetti{0%{opacity:0;transform:translate3d(0,0,0) rotate(0deg)}12%{opacity:1}85%{opacity:1}100%{opacity:0;transform:translate3d(45px,92vh,0) rotate(550deg)}}
+
+/* Touch devices still receive crisp feedback but no expensive backdrop anim on low-motion. */
+@media(max-width:760px){.premium-reward-panel{max-width:390px}.premium-reward-note{font-size:12px}}
+@media(prefers-reduced-motion:reduce){
+ .game-reaction *, .game-mascot-happy,.game-mascot-encourage,.game-mascot-idle,
+ .world-math .quest-scroll,.world-sentence .sentence-prompt,.world-math .answer-option.correct,
+ .world-math .answer-option.incorrect,.world-memory .memory-card.found,
+ .world-sentence .word-tile.selected,.premium-reward-panel .premium-reward-rays,
+ .premium-reward-stars span,.premium-reward-confetti i{animation:none!important;transition:none!important}
+ .game-reaction{display:none}
+}
+html[data-motion="off"] .game-reaction{display:none}
+html[data-motion="off"] .game-mascot-happy,html[data-motion="off"] .game-mascot-encourage,html[data-motion="off"] .game-mascot-idle,
+html[data-motion="off"] .world-math .quest-scroll,html[data-motion="off"] .world-sentence .sentence-prompt,
+html[data-motion="off"] .world-math .answer-option.correct,html[data-motion="off"] .world-math .answer-option.incorrect,
+html[data-motion="off"] .world-memory .memory-card.found,html[data-motion="off"] .world-sentence .word-tile.selected,
+html[data-motion="off"] .premium-reward-panel .premium-reward-rays,html[data-motion="off"] .premium-reward-stars span,
+html[data-motion="off"] .premium-reward-confetti i{animation:none!important;transition:none!important}
