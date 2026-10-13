@@ -1,0 +1,26 @@
+[
+  {
+    "script": "typecheck",
+    "exitCode": 0
+  },
+  {
+    "script": "test:core",
+    "exitCode": 1
+  },
+  {
+    "script": "test:content",
+    "exitCode": 0
+  },
+  {
+    "script": "test:guide-animation",
+    "exitCode": 0
+  },
+  {
+    "script": "gate:premium-art",
+    "exitCode": 1
+  },
+  {
+    "script": "build",
+    "exitCode": 1
+  }
+]

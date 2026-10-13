@@ -31,8 +31,8 @@ test('GLB contains colored materials distinct from the original procedural fox',
 });
 test('Runtime swaps only after successful import, updates WebGL buffer and preserves fallback',()=>{
  const engine=readFileSync(resolve(root,'src/world3d/engine.ts'),'utf8');
- const canvas=readFileSync(resolve(root,'src/world3d/WorldCanvas.tsx'),'utf8');
- assert.match(canvas,/world\.isSoftwareRenderer\?'\/models\/fox-guide-mobile\.glb':'\/models\/fox-guide-prototype\.glb'/);
+ const adapter=readFileSync(resolve(root,'src/world3d/renderer/legacyAdapter.ts'),'utf8');
+ assert.match(adapter,/world\.isSoftwareRenderer\?'\/models\/fox-guide-mobile\.glb':'\/models\/fox-guide-prototype\.glb'/);
  assert.match(engine,/async loadGuideModel/);
  assert.match(engine,/this\.build\(scene,this\.quality,false\)/);
  assert.match(engine,/gl\.bufferData\(gl\.ARRAY_BUFFER,merged/);

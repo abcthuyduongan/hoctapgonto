@@ -1,0 +1,11 @@
+
+> bao-an-learning-v3-6-3d@3.7.0-rc.1 gate:premium-art
+> node tests/release-3d-assets.mjs
+
+OK MODEL fox-guide meshes: 10 animations: 3
+OK MODEL math-world meshes: 12 animations: 0
+MISSING memory-world public/models/memory-world.glb
+MISSING language-world public/models/language-world.glb
+MISSING environment public/models/environment.glb
+
+PREMIUM ART GATE: NOT READY (3 defects). Do not release.

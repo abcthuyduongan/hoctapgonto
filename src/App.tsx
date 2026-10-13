@@ -151,7 +151,7 @@ export default function App() {
   }:null;
 
   return <div className={`app-shell ${page === 'student' ? 'ba-frame-shell' : ''}`}>
-    <header className="site-header"><div className="header-content"><a href="#home" className="brand" onClick={e=>{e.preventDefault();if(!active && !miniOpen)setPage('student');}} aria-label="Bảo An Learning, trang chủ"><div className="brand-mark"><span>✦</span></div><div className="brand-words"><strong>BẢO AN</strong><small>LEARNING <span>V3.6.2</span></small></div></a>
+    <header className="site-header"><div className="header-content"><a href="#home" className="brand" onClick={e=>{e.preventDefault();if(!active && !miniOpen)setPage('student');}} aria-label="Bảo An Learning, trang chủ"><div className="brand-mark"><span>✦</span></div><div className="brand-words"><strong>BẢO AN</strong><small>LEARNING <span>V3.7 RC1</span></small></div></a>
     <nav className="top-navigation" aria-label="Không gian ứng dụng">{menus.map(m=><button key={m.id} className={`nav-item ${page===m.id?'active':''}`} aria-current={page===m.id?'page':undefined} onClick={()=>setPage(m.id)} disabled={!!active||miniOpen}><span aria-hidden="true">{m.icon}</span> {m.label}</button>)}</nav>
     <div className="experience-controls" aria-label="Cài đặt trải nghiệm"><button type="button" className="control-pill" onClick={()=>setSoundOn(v=>!v)} aria-pressed={soundOn} title={soundOn?"Tắt âm thanh":"Bật âm thanh"}>{soundOn?"🔊":"🔇"}<span className="control-label">Âm thanh</span></button><button type="button" className="control-pill" onClick={()=>setMotionOn(v=>!v)} aria-pressed={motionOn} title={motionOn?"Giảm chuyển động":"Bật chuyển động"}>{motionOn?"✨":"◻"}<span className="control-label">Hiệu ứng</span></button></div></div></header>
     <main className={`site-main ${page === 'student' ? 'site-main-gameworld' : ''}`}>
@@ -162,7 +162,7 @@ export default function App() {
         {page==='creator'&&<CreatorScreen packs={packs} onPublish={publish} onImport={importContentPacks}/>}
       </>}
     </main>
-    <footer className="site-footer"><div><strong>✦ Bảo An Learning V3.6.2</strong><span>Học vui · Hiểu sâu · Tiến bộ mỗi ngày</span></div><span>V3.6.2 • Thử nghiệm nội bộ · Chưa có đăng nhập và đồng bộ cloud</span></footer>
+    <footer className="site-footer"><div><strong>✦ Bảo An Learning V3.7 RC1</strong><span>Học vui · Hiểu sâu · Tiến bộ mỗi ngày</span></div><span>V3.7 RC1 • Lát cắt 3D thử nghiệm · Chưa có đăng nhập và đồng bộ cloud</span></footer>
     {miniOpen && <div className="overlay" role="presentation"><div className="game-dialog" role="dialog" aria-modal="true" aria-label="Bảng cửu chương tương tác">
       <div className="game-dialog-head"><div><span className="eyebrow">MINI APP CENTER</span><h2>Ứng dụng Toán học</h2></div><button className="button outline" onClick={()=>setMiniOpen(false)}>← Thoát ứng dụng</button></div>
       <Suspense fallback={<div className="loading-state">Đang tải ứng dụng nhỏ…</div>}><TimesTable onExit={()=>setMiniOpen(false)}/></Suspense>

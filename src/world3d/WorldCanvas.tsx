@@ -1,40 +1,95 @@
 import { useEffect, useRef, useState } from 'react';
-import { LearningWorld3D } from './engine';
 import type { WorldId } from './engine';
+import type { QualityChoice, WorldRenderer } from './renderer/types';
+import { createWorldRenderer } from './renderer/rendererFactory';
 
 interface Props {
   selected: WorldId | null;
   onSelect: (id: WorldId) => void;
   active: boolean;
   motionOn: boolean;
+  premium3DEnabled?: boolean;
+  quality?: QualityChoice;
 }
 
-export default function WorldCanvas({selected,onSelect,active,motionOn}: Props){
-  const canvas=useRef<HTMLCanvasElement>(null);
-  const runtime=useRef<LearningWorld3D|null>(null);
-  const selection=useRef(onSelect);
-  const [state,setState]=useState<'loading'|'ready'|'fallback'>('loading');
-  useEffect(()=>{selection.current=onSelect},[onSelect]);
-  useEffect(()=>{
-    const node=canvas.current;
-    if(!node)return;
-    const prefers=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const world=new LearningWorld3D(node,{
-      quality:window.innerWidth<=640?'low':'full',
-      reducedMotion:prefers||!motionOn,
-      onSelect:(id)=>selection.current(id),
-      onReady:(ok)=>setState(ok?'ready':'fallback')
+export default function WorldCanvas({ selected, onSelect, active, motionOn,
+  premium3DEnabled = false, quality = 'auto' }: Props) {
+  const host = useRef<HTMLDivElement>(null);
+  const runtime = useRef<WorldRenderer | null>(null);
+  const current = useRef({ selected, onSelect, active, motionOn, quality });
+  current.current = { selected, onSelect, active, motionOn, quality };
+  const [state, setState] = useState<'loading' | 'ready' | 'fallback' | 'unavailable'>('loading');
+  const [recovery, setRecovery] = useState(0);
+  useEffect(() => {
+    const container = host.current;
+    if (!container) return;
+    let cancelled = false;
+    let recovering = false;
+    const abort = new AbortController();
+    const media = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const replaceCanvas = () => {
+      const canvas = document.createElement('canvas');
+      canvas.className = 'ba3d-canvas';
+      canvas.setAttribute('role', 'img');
+      canvas.setAttribute('aria-label', 'Thế giới học tập 3D: Toán học, Trí nhớ và Ngôn từ');
+      container.replaceChildren(canvas);
+      return canvas;
+    };
+    const sync = () => {
+      const settings = current.current;
+      runtime.current?.setMotion(settings.motionOn && !media.matches);
+      runtime.current?.setPaused(!settings.active || document.hidden);
+      runtime.current?.focusOn(settings.selected);
+    };
+    const updateDiagnostics = () => {
+      const stats = runtime.current?.getDiagnostics();
+      if (stats) {
+        container.dataset.engine = stats.engine;
+        container.dataset.diagnostics = JSON.stringify(stats);
+      }
+    };
+    const canvas = replaceCanvas();
+    setState('loading');
+    void createWorldRenderer({ canvas, premium3DEnabled: premium3DEnabled && recovery === 0,
+      replaceCanvas, onSelect: id => current.current.onSelect(id),
+      motionOn: current.current.motionOn && !media.matches,
+      paused: !current.current.active || document.hidden, quality: current.current.quality,
+      signal: abort.signal, onContextLost: () => {
+        if (!cancelled && !recovering) { recovering = true; setRecovery(value => value + 1); }
+      },
+    }).then(renderer => {
+      if (cancelled) { renderer.dispose(); return; }
+      runtime.current = renderer;
+      renderer.setQualityChoice?.(current.current.quality);
+      sync(); updateDiagnostics();
+      const engine = renderer.getDiagnostics().engine;
+      setState(engine === 'canvas' || (premium3DEnabled && engine !== 'three-webgl') ? 'fallback' : 'ready');
+    }).catch(error => {
+      if (!cancelled) { console.warn('Bảo An: cảnh 3D không khả dụng', error); setState('unavailable'); }
     });
-    runtime.current=world;
-    // Load an authored GLB in both WebGL and Canvas; Canvas uses a lighter mesh.
-    void world.loadGuideModel(world.isSoftwareRenderer?'/models/fox-guide-mobile.glb':'/models/fox-guide-prototype.glb');
-    return()=>{world.dispose();runtime.current=null;};
-  },[]);
-  useEffect(()=>{runtime.current?.focusOn(selected)},[selected]);
-  useEffect(()=>{runtime.current?.setPaused(!active)},[active]);
-  useEffect(()=>{runtime.current?.setMotion(motionOn&&!window.matchMedia('(prefers-reduced-motion: reduce)').matches)},[motionOn]);
+    document.addEventListener('visibilitychange', sync);
+    media.addEventListener('change', sync);
+    const diagnosticsTimer = window.setInterval(updateDiagnostics, 1000);
+    return () => {
+      cancelled = true; abort.abort();
+      runtime.current?.dispose(); runtime.current = null;
+      document.removeEventListener('visibilitychange', sync);
+      media.removeEventListener('change', sync);
+      window.clearInterval(diagnosticsTimer);
+      container.replaceChildren();
+    };
+  }, [premium3DEnabled, recovery]);
+  useEffect(() => { runtime.current?.focusOn(selected); }, [selected]);
+  useEffect(() => { runtime.current?.setPaused(!active || document.hidden); }, [active]);
+  useEffect(() => {
+    runtime.current?.setMotion(motionOn && !window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  }, [motionOn]);
+  useEffect(() => { runtime.current?.setQualityChoice?.(quality); }, [quality]);
   return <>
-    <canvas ref={canvas} className="ba3d-canvas" role="img" aria-label="Thế giới học tập 3D có ba đảo nổi: Toán học, Trí nhớ và Ngôn từ" />
-    {state==='fallback'&&<div className="ba3d-fallback" role="status">Thiết bị không hỗ trợ WebGL2. Các trò chơi vẫn sử dụng được qua các nút bên dưới.</div>}
+    <div ref={host} className="ba3d-render-host" data-state={state} data-premium={premium3DEnabled} />
+    {state === 'loading' && <div className="ba3d-render-status" role="status">Đang mở thế giới 3D… Con có thể bắt đầu chơi ngay.</div>}
+    {(state === 'fallback' || state === 'unavailable') && <div className="ba3d-render-status" role="status">
+      {state === 'fallback' ? 'Đang dùng cảnh dự phòng.' : 'Cảnh 3D không khả dụng.'} Chọn trò chơi bằng các nút Bắt đầu.
+    </div>}
   </>;
 }

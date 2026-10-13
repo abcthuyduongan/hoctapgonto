@@ -1,0 +1,170 @@
+
+> bao-an-learning-v3-6-3d@3.7.0-rc.1 test:renderer
+> node --experimental-strip-types --test tests/renderer-contract.test.mjs tests/quality-manager.test.mjs tests/model-asset-runtime.test.mjs
+
+TAP version 13
+# Subtest: fox-guide: self-contained candidate asset loads real 3D geometry and embedded PBR textures
+ok 1 - fox-guide: self-contained candidate asset loads real 3D geometry and embedded PBR textures
+  ---
+  duration_ms: 155.5267
+  type: 'test'
+  ...
+# Subtest: math-world: self-contained candidate asset loads real 3D geometry and embedded PBR textures
+ok 2 - math-world: self-contained candidate asset loads real 3D geometry and embedded PBR textures
+  ---
+  duration_ms: 110.0091
+  type: 'test'
+  ...
+# Subtest: fox: runtime skin has nontrivial bones, valid normalized weights, and bone clip channels
+ok 3 - fox: runtime skin has nontrivial bones, valid normalized weights, and bone clip channels
+  ---
+  duration_ms: 6.1035
+  type: 'test'
+  ...
+# Subtest: fox: AnimationMixer plays Idle, Cheer, and Victory and deforms skinned vertices
+ok 4 - fox: AnimationMixer plays Idle, Cheer, and Victory and deforms skinned vertices
+  ---
+  duration_ms: 21.2836
+  type: 'test'
+  ...
+# Subtest: premium manifest retains all five mandatory assets and fox texture/clip requirements
+ok 5 - premium manifest retains all five mandatory assets and fox texture/clip requirements
+  ---
+  duration_ms: 0.9312
+  type: 'test'
+  ...
+# Subtest: AssetLoader rejects a missing declared PBR map and disposes other successfully decoded resources
+ok 6 - AssetLoader rejects a missing declared PBR map and disposes other successfully decoded resources
+  ---
+  duration_ms: 31.9761
+  type: 'test'
+  ...
+# Subtest: AssetLoader abort after actual GLTF decoding disposes skins, textures, and bitmaps before rejecting
+ok 7 - AssetLoader abort after actual GLTF decoding disposes skins, textures, and bitmaps before rejecting
+  ---
+  duration_ms: 33.9609
+  type: 'test'
+  ...
+# Subtest: AssetLoader accepts correctly decoded PBR maps and shares one pending parse per asset path
+ok 8 - AssetLoader accepts correctly decoded PBR maps and shares one pending parse per asset path
+  ---
+  duration_ms: 33.3946
+  type: 'test'
+  ...
+# Subtest: auto begins conservatively and manual tiers preserve the selected quality
+ok 9 - auto begins conservatively and manual tiers preserve the selected quality
+  ---
+  duration_ms: 1.4502
+  type: 'test'
+  ...
+# Subtest: auto degrades only after sustained slow frames and ignores a short spike
+ok 10 - auto degrades only after sustained slow frames and ignores a short spike
+  ---
+  duration_ms: 0.3189
+  type: 'test'
+  ...
+# Subtest: hysteresis requires enough fast samples, resets interrupted streaks, and caps automatic upgrades
+ok 11 - hysteresis requires enough fast samples, resets interrupted streaks, and caps automatic upgrades
+  ---
+  duration_ms: 0.3419
+  type: 'test'
+  ...
+# Subtest: quality changes observe the minimum cooldown even with sufficient samples
+ok 12 - quality changes observe the minimum cooldown even with sufficient samples
+  ---
+  duration_ms: 0.1899
+  type: 'test'
+  ...
+# Subtest: manual selection resets prior streaks before returning to auto
+ok 13 - manual selection resets prior streaks before returning to auto
+  ---
+  duration_ms: 0.3193
+  type: 'test'
+  ...
+# Subtest: invalid frame samples cannot trigger automatic changes
+ok 14 - invalid frame samples cannot trigger automatic changes
+  ---
+  duration_ms: 0.4319
+  type: 'test'
+  ...
+# Subtest: metrics calculate FPS from median duration and expose P95 as frame milliseconds
+ok 15 - metrics calculate FPS from median duration and expose P95 as frame milliseconds
+  ---
+  duration_ms: 0.7868
+  type: 'test'
+  ...
+# Subtest: metrics omit pause gaps and invalid intervals without losing valid frame history
+ok 16 - metrics omit pause gaps and invalid intervals without losing valid frame history
+  ---
+  duration_ms: 0.1813
+  type: 'test'
+  ...
+# Subtest: metrics use a bounded recent window while keeping the cumulative sample count
+ok 17 - metrics use a bounded recent window while keeping the cumulative sample count
+  ---
+  duration_ms: 0.4718
+  type: 'test'
+  ...
+# Subtest: premium success preserves the canvas and initialization options without constructing fallback
+ok 18 - premium success preserves the canvas and initialization options without constructing fallback
+  ---
+  duration_ms: 1.1004
+  type: 'test'
+  ...
+# Subtest: premium opt-out constructs only legacy on the original canvas
+ok 19 - premium opt-out constructs only legacy on the original canvas
+  ---
+  duration_ms: 0.1674
+  type: 'test'
+  ...
+# Subtest: premium failure cleans up before replacing canvas and initializes fallback on the new canvas
+ok 20 - premium failure cleans up before replacing canvas and initializes fallback on the new canvas
+  ---
+  duration_ms: 1.4975
+  type: 'test'
+  ...
+# Subtest: already aborted construction never starts either loader or replaces the canvas
+ok 21 - already aborted construction never starts either loader or replaces the canvas
+  ---
+  duration_ms: 0.6836
+  type: 'test'
+  ...
+# Subtest: premium result resolving after abort is disposed once and never starts fallback
+ok 22 - premium result resolving after abort is disposed once and never starts fallback
+  ---
+  duration_ms: 0.3378
+  type: 'test'
+  ...
+# Subtest: premium rejection after abort propagates abort without fallback or warning
+ok 23 - premium rejection after abort propagates abort without fallback or warning
+  ---
+  duration_ms: 0.3237
+  type: 'test'
+  ...
+# Subtest: legacy result resolving after abort is disposed once
+ok 24 - legacy result resolving after abort is disposed once
+  ---
+  duration_ms: 0.2417
+  type: 'test'
+  ...
+# Subtest: abort during canvas replacement prevents fallback allocation
+ok 25 - abort during canvas replacement prevents fallback allocation
+  ---
+  duration_ms: 0.3812
+  type: 'test'
+  ...
+# Subtest: fallback errors remain visible to the host when both renderers fail
+ok 26 - fallback errors remain visible to the host when both renderers fail
+  ---
+  duration_ms: 0.5959
+  type: 'test'
+  ...
+1..26
+# tests 26
+# suites 0
+# pass 26
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 578.5014

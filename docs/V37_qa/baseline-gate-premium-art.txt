@@ -1,0 +1,11 @@
+
+> bao-an-learning-v3-6-3d@3.6.2-rc.2 gate:premium-art
+> node tests/release-3d-assets.mjs
+
+MISSING fox-guide public/models/fox-guide.glb
+MISSING math-world public/models/math-world.glb
+MISSING memory-world public/models/memory-world.glb
+MISSING language-world public/models/language-world.glb
+MISSING environment public/models/environment.glb
+
+PREMIUM ART GATE: NOT READY (5 defects). Do not release.

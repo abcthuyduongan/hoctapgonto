@@ -1,0 +1,10 @@
+{
+  "isolatedQAProfile": true,
+  "packs": [],
+  "sessions": [],
+  "events": [],
+  "localStorage": {
+    "ba.sound": "off",
+    "ba.motion": "on"
+  }
+}

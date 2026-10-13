@@ -1,0 +1,54 @@
+[
+  {
+    "gate": "typecheck",
+    "status": "PASS"
+  },
+  {
+    "gate": "core",
+    "status": "PASS",
+    "tests": 44
+  },
+  {
+    "gate": "content",
+    "status": "PASS",
+    "tests": 4
+  },
+  {
+    "gate": "legacy-animation",
+    "status": "PASS",
+    "tests": 13
+  },
+  {
+    "gate": "renderer",
+    "status": "PASS",
+    "tests": 26
+  },
+  {
+    "gate": "edge-production",
+    "status": "PASS",
+    "tests": 26
+  },
+  {
+    "gate": "chrome-production",
+    "status": "PASS",
+    "tests": 4
+  },
+  {
+    "gate": "offline-html",
+    "status": "PASS",
+    "math": 8,
+    "memory": 6,
+    "sentence": 5
+  },
+  {
+    "gate": "premium-art",
+    "status": "NOT_READY",
+    "missing": [
+      "memory-world",
+      "language-world",
+      "environment"
+    ],
+    "humanArtAcceptance": "PENDING",
+    "physicalPhones": "NOT_TESTED"
+  }
+]

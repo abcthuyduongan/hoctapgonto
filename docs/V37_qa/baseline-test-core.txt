@@ -1,0 +1,300 @@
+
+> bao-an-learning-v3-6-3d@3.6.2-rc.2 test:core
+> node --experimental-strip-types --test tests/sdk.test.mjs tests/seed.test.mjs tests/validation.test.mjs tests/reports.test.mjs tests/memory281.test.mjs tests/stability27.test.mjs tests/premium280.test.mjs tests/real3d31.test.mjs
+
+TAP version 13
+# node:internal/modules/cjs/loader:1383
+#   const err = new Error(message);
+#               ^
+# Error: Cannot find module '/opt/nvm/versions/node/v22.16.0/lib/node_modules/typescript/lib/typescript.js'
+# Require stack:
+# - D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\backups\\baseline-validation\\tests\\memory281.test.mjs
+#     at Function._resolveFilename (node:internal/modules/cjs/loader:1383:15)
+#     at defaultResolveImpl (node:internal/modules/cjs/loader:1025:19)
+#     at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1030:22)
+#     at Function._load (node:internal/modules/cjs/loader:1192:37)
+#     at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+#     at wrapModuleLoad (node:internal/modules/cjs/loader:237:24)
+#     at Module.require (node:internal/modules/cjs/loader:1463:12)
+#     at require (node:internal/modules/helpers:147:16)
+#     at file:///D:/Ph%E1%BA%A7n%20m%E1%BB%81m%202026/BAO_AN_LEARNING_lam%20l%E1%BA%A1i/backups/baseline-validation/tests/memory281.test.mjs:6:10
+#     at ModuleJob.run (node:internal/modules/esm/module_job:343:25) {
+#   code: 'MODULE_NOT_FOUND',
+#   requireStack: [
+#     'D:\\\\Phần mềm 2026\\\\BAO_AN_LEARNING_lam lại\\\\backups\\\\baseline-validation\\\\tests\\\\memory281.test.mjs'
+#   ]
+# }
+# Node.js v22.22.2
+# Subtest: tests\\memory281.test.mjs
+not ok 1 - tests\\memory281.test.mjs
+  ---
+  duration_ms: 86.4916
+  type: 'test'
+  location: 'D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\backups\\baseline-validation\\tests\\memory281.test.mjs:1:1'
+  failureType: 'testCodeFailure'
+  exitCode: 1
+  signal: ~
+  error: 'test failed'
+  code: 'ERR_TEST_FAILURE'
+  ...
+# Subtest: Alpha 2.8: success/retry tones play only after successfully persisted attempts
+ok 2 - Alpha 2.8: success/retry tones play only after successfully persisted attempts
+  ---
+  duration_ms: 2.6665
+  type: 'test'
+  ...
+# Subtest: Alpha 2.8: visual reactions do not write learning data
+ok 3 - Alpha 2.8: visual reactions do not write learning data
+  ---
+  duration_ms: 0.3752
+  type: 'test'
+  ...
+# Subtest: Alpha 2.8: every game has a persisted-result visual feedback state
+ok 4 - Alpha 2.8: every game has a persisted-result visual feedback state
+  ---
+  duration_ms: 0.3474
+  type: 'test'
+  ...
+# Subtest: Alpha 2.8: completion remains an overlay and focuses a real exit action
+ok 5 - Alpha 2.8: completion remains an overlay and focuses a real exit action
+  ---
+  duration_ms: 0.1959
+  type: 'test'
+  ...
+# Subtest: Alpha 2.8: all game mascots reflect success and retry without image duplication
+ok 6 - Alpha 2.8: all game mascots reflect success and retry without image duplication
+  ---
+  duration_ms: 0.4615
+  type: 'test'
+  ...
+# Subtest: Alpha 2.8: animation is transform/opacity only and cannot intercept buttons
+ok 7 - Alpha 2.8: animation is transform/opacity only and cannot intercept buttons
+  ---
+  duration_ms: 0.1977
+  type: 'test'
+  ...
+# Subtest: Alpha 2.8: premium stylesheet is last to preserve animation and responsive overrides
+ok 8 - Alpha 2.8: premium stylesheet is last to preserve animation and responsive overrides
+  ---
+  duration_ms: 0.1303
+  type: 'test'
+  ...
+# Subtest: Alpha 2.8: celebratory audio is opt-in, not tied to cloud or game state
+ok 9 - Alpha 2.8: celebratory audio is opt-in, not tied to cloud or game state
+  ---
+  duration_ms: 0.3262
+  type: 'test'
+  ...
+# Subtest: Alpha 2.8: transition is bound to the next question ID
+ok 10 - Alpha 2.8: transition is bound to the next question ID
+  ---
+  duration_ms: 0.3842
+  type: 'test'
+  ...
+# Subtest: Real 3D: projective renderer constructs vertices, normals and matrices, not a flat background
+ok 11 - Real 3D: projective renderer constructs vertices, normals and matrices, not a flat background
+  ---
+  duration_ms: 1.258
+  type: 'test'
+  ...
+# Subtest: Real 3D: three modeled islands, castle, trees, cards, book, fox are distinct mesh assets
+ok 12 - Real 3D: three modeled islands, castle, trees, cards, book, fox are distinct mesh assets
+  ---
+  duration_ms: 0.3484
+  type: 'test'
+  ...
+# Subtest: Real 3D: fallback projects genuine 3D triangles, does not show an image posing as 3D
+ok 13 - Real 3D: fallback projects genuine 3D triangles, does not show an image posing as 3D
+  ---
+  duration_ms: 0.2593
+  type: 'test'
+  ...
+# Subtest: Real 3D: world controls use the existing game registry, pack validation and original game host
+ok 14 - Real 3D: world controls use the existing game registry, pack validation and original game host
+  ---
+  duration_ms: 0.2148
+  type: 'test'
+  ...
+# Subtest: Real 3D: scene pauses during gameplay and respects reduced motion
+ok 15 - Real 3D: scene pauses during gameplay and respects reduced motion
+  ---
+  duration_ms: 0.1661
+  type: 'test'
+  ...
+# Subtest: Real 3D: standalone offline build contains its own scene engine, mini games and saving
+ok 16 - Real 3D: standalone offline build contains its own scene engine, mini games and saving
+  ---
+  duration_ms: 0.6136
+  type: 'test'
+  ...
+# Subtest: Real 3D: offline file exists and full source retains the three modules
+ok 17 - Real 3D: offline file exists and full source retains the three modules
+  ---
+  duration_ms: 1.264
+  type: 'test'
+  ...
+# Subtest: Báo cáo không đồng nhất tỷ lệ đúng với mức độ thành thạo
+ok 18 - Báo cáo không đồng nhất tỷ lệ đúng với mức độ thành thạo
+  ---
+  duration_ms: 1.8663
+  type: 'test'
+  ...
+# Subtest: Chỉ tính phiên chơi đã completed
+ok 19 - Chỉ tính phiên chơi đã completed
+  ---
+  duration_ms: 0.1819
+  type: 'test'
+  ...
+# Subtest: Registry: 3 game đều đúng SDK và đủ runtime / content-kind
+ok 20 - Registry: 3 game đều đúng SDK và đủ runtime / content-kind
+  ---
+  duration_ms: 0.9997
+  type: 'test'
+  ...
+# Subtest: SDK: phản hồi có eventId tất định cho cùng một lượt
+ok 21 - SDK: phản hồi có eventId tất định cho cùng một lượt
+  ---
+  duration_ms: 0.34
+  type: 'test'
+  ...
+# Subtest: SDK: không cho item không thuộc bộ được ghi sự kiện
+ok 22 - SDK: không cho item không thuộc bộ được ghi sự kiện
+  ---
+  duration_ms: 0.3239
+  type: 'test'
+  ...
+# Subtest: SDK: không ghi sự kiện từ phiên đã kết thúc hoặc bị tráo bộ
+ok 23 - SDK: không ghi sự kiện từ phiên đã kết thúc hoặc bị tráo bộ
+  ---
+  duration_ms: 0.1468
+  type: 'test'
+  ...
+# Subtest: SDK: chặn số liệu, khóa lượt trả lời bị lỗi
+ok 24 - SDK: chặn số liệu, khóa lượt trả lời bị lỗi
+  ---
+  duration_ms: 0.1659
+  type: 'test'
+  ...
+# Subtest: SDK: chặn game dùng sai loại học liệu hoặc sai protocol
+ok 25 - SDK: chặn game dùng sai loại học liệu hoặc sai protocol
+  ---
+  duration_ms: 0.2619
+  type: 'test'
+  ...
+# Subtest: Sentence Builder: chấm đúng thứ tự cả khi từ lặp xuất hiện
+ok 26 - Sentence Builder: chấm đúng thứ tự cả khi từ lặp xuất hiện
+  ---
+  duration_ms: 1.0301
+  type: 'test'
+  ...
+# Subtest: Sentence Builder: bác bỏ thiếu từ, lặp chỉ số, chỉ số giả
+ok 27 - Sentence Builder: bác bỏ thiếu từ, lặp chỉ số, chỉ số giả
+  ---
+  duration_ms: 0.1271
+  type: 'test'
+  ...
+# Subtest: Sentence Builder: học liệu demo đã được kiểm tra và có ít nhất 2 câu
+ok 28 - Sentence Builder: học liệu demo đã được kiểm tra và có ít nhất 2 câu
+  ---
+  duration_ms: 1.1589
+  type: 'test'
+  ...
+# Subtest: Sentence Builder: phát hiện câu trùng, gợi ý thiếu và câu thiếu từ
+ok 29 - Sentence Builder: phát hiện câu trùng, gợi ý thiếu và câu thiếu từ
+  ---
+  duration_ms: 0.678
+  type: 'test'
+  ...
+# Subtest: Tất cả học liệu mẫu vượt qua kiểm tra cấu trúc và trùng thẻ
+ok 30 - Tất cả học liệu mẫu vượt qua kiểm tra cấu trúc và trùng thẻ
+  ---
+  duration_ms: 1.7624
+  type: 'test'
+  ...
+# Subtest: Bộ học liệu mẫu có khóa phiên bản khác nhau
+ok 31 - Bộ học liệu mẫu có khóa phiên bản khác nhau
+  ---
+  duration_ms: 0.147
+  type: 'test'
+  ...
+# Subtest: Cả ba môn học sử dụng cùng mẫu Memory Match
+ok 32 - Cả ba môn học sử dụng cùng mẫu Memory Match
+  ---
+  duration_ms: 0.1904
+  type: 'test'
+  ...
+# Subtest: Math answer feedback stays inside a permanently mounted reserved frame
+ok 33 - Math answer feedback stays inside a permanently mounted reserved frame
+  ---
+  duration_ms: 1.3159
+  type: 'test'
+  ...
+# Subtest: Memory and Sentence keep the play scene mounted while reward appears
+ok 34 - Memory and Sentence keep the play scene mounted while reward appears
+  ---
+  duration_ms: 2.6135
+  type: 'test'
+  ...
+# Subtest: Game stage is a stable internal scroller and the main page is locked
+ok 35 - Game stage is a stable internal scroller and the main page is locked
+  ---
+  duration_ms: 0.958
+  type: 'test'
+  ...
+# Subtest: Answer recording no longer refetches all content packs on every click
+ok 36 - Answer recording no longer refetches all content packs on every click
+  ---
+  duration_ms: 0.8173
+  type: 'test'
+  ...
+# Subtest: Panoramic CSS is loaded after the stable feedback CSS
+ok 37 - Panoramic CSS is loaded after the stable feedback CSS
+  ---
+  duration_ms: 0.6332
+  type: 'test'
+  ...
+# Subtest: Bộ ghép cặp hợp lệ có thể dùng ở Memory Match
+ok 38 - Bộ ghép cặp hợp lệ có thể dùng ở Memory Match
+  ---
+  duration_ms: 1.476
+  type: 'test'
+  ...
+# Subtest: Phát hiện trùng nội dung kể cả khác khoảng trắng và chữ hoa
+ok 39 - Phát hiện trùng nội dung kể cả khác khoảng trắng và chữ hoa
+  ---
+  duration_ms: 0.2919
+  type: 'test'
+  ...
+# Subtest: Không cho phép câu ghép cặp thiếu dữ liệu
+ok 40 - Không cho phép câu ghép cặp thiếu dữ liệu
+  ---
+  duration_ms: 0.302
+  type: 'test'
+  ...
+# Subtest: Không cho phép trùng ID câu hỏi
+ok 41 - Không cho phép trùng ID câu hỏi
+  ---
+  duration_ms: 0.1822
+  type: 'test'
+  ...
+# Subtest: Phiên bản nội dung tham gia vào khóa bất biến
+ok 42 - Phiên bản nội dung tham gia vào khóa bất biến
+  ---
+  duration_ms: 0.1499
+  type: 'test'
+  ...
+# Subtest: Kiểm tra câu trắc nghiệm đủ bốn phương án, đáp án, lời giải
+ok 43 - Kiểm tra câu trắc nghiệm đủ bốn phương án, đáp án, lời giải
+  ---
+  duration_ms: 0.2129
+  type: 'test'
+  ...
+1..43
+# tests 43
+# suites 0
+# pass 42
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 212.9311

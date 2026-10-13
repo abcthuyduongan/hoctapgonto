@@ -1,0 +1,119 @@
+{
+  "date": "2026-10-13T23:46:50.335Z",
+  "browser": "155.0.4283.45",
+  "headless": true,
+  "os": "Windows_NT 10.0.26300",
+  "cpu": "Intel(R) Core(TM) Ultra 5 125H",
+  "memoryBytes": 33752997888,
+  "note": "Desktop Edge automation. Mobile viewports are emulation, not physical phone measurements.",
+  "views": [
+    {
+      "diagnostics": {
+        "engine": "three-webgl",
+        "frames": 198,
+        "fpsMedian": 59.9,
+        "fpsP95FrameMs": 16.800000000000182,
+        "tier": "balanced",
+        "dpr": 1,
+        "drawCalls": 87,
+        "triangles": 94200,
+        "textureBytesEstimate": 8388607.999999996,
+        "assetErrors": [],
+        "readyAssets": [
+          "math-world",
+          "fox-guide"
+        ],
+        "animationClips": [
+          "Idle",
+          "Cheer",
+          "Victory"
+        ],
+        "skeletalMeshes": 10,
+        "bones": 14,
+        "animationTime": 3.3666999999999994,
+        "activeClip": "Idle",
+        "motion": true,
+        "paused": false
+      },
+      "renderer": "ANGLE (Intel, Intel(R) Arc(TM) Graphics (0x00007D55) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "overflow": false
+    },
+    {
+      "diagnostics": {
+        "engine": "three-webgl",
+        "frames": 223,
+        "fpsMedian": 59.9,
+        "fpsP95FrameMs": 16.800000000000182,
+        "tier": "low",
+        "dpr": 1,
+        "drawCalls": 52,
+        "triangles": 48528,
+        "textureBytesEstimate": 8388607.999999996,
+        "assetErrors": [],
+        "readyAssets": [
+          "math-world",
+          "fox-guide"
+        ],
+        "animationClips": [
+          "Idle",
+          "Cheer",
+          "Victory"
+        ],
+        "skeletalMeshes": 10,
+        "bones": 14,
+        "animationTime": 3.7666999999999984,
+        "activeClip": "Idle",
+        "motion": true,
+        "paused": false
+      },
+      "renderer": "ANGLE (Intel, Intel(R) Arc(TM) Graphics (0x00007D55) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "overflow": false
+    },
+    {
+      "diagnostics": {
+        "engine": "three-webgl",
+        "frames": 228,
+        "fpsMedian": 59.9,
+        "fpsP95FrameMs": 16.800000000000182,
+        "tier": "low",
+        "dpr": 1,
+        "drawCalls": 49,
+        "triangles": 48024,
+        "textureBytesEstimate": 8388607.999999996,
+        "assetErrors": [],
+        "readyAssets": [
+          "math-world",
+          "fox-guide"
+        ],
+        "animationClips": [
+          "Idle",
+          "Cheer",
+          "Victory"
+        ],
+        "skeletalMeshes": 10,
+        "bones": 14,
+        "animationTime": 3.8333059999999994,
+        "activeClip": "Idle",
+        "motion": true,
+        "paused": false
+      },
+      "renderer": "ANGLE (Intel, Intel(R) Arc(TM) Graphics (0x00007D55) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "viewport": {
+        "width": 320,
+        "height": 640
+      },
+      "overflow": false
+    }
+  ],
+  "baselineBundle": [
+    "http://127.0.0.1:5176/assets/index-DTgO0IIM.js"
+  ]
+}

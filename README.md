@@ -1,4 +1,16 @@
-# BẢO AN LEARNING V3.6.2 · NỀN TẢNG CHUYỂN SANG NỘI DUNG
+# BẢO AN LEARNING V3.7 RC1 · LÁT CẮT 3D PR-02
+
+Đã thêm renderer Three.js tải riêng, lớp dự phòng WebGL/Canvas, chất lượng tự động/thủ công, model cáo có texture PBR + 14 xương + ba clip và Đảo Toán Học tự tạo. Đây là **bản thử nghiệm chờ duyệt**, chưa phải V3.7 FINAL. Memory/Language trong cảnh mới hiện chỉ là landmark tạm; chưa triển khai PR-03.
+
+- Chạy `MO_V37_PREMIUM_WINDOWS.bat`, rồi mở `http://localhost:5178/?premium3d=1` để xem lát cắt mới. Hoặc dùng `npm ci`, `npm run build`, `npm run preview -- --port 5178`.
+- Mặc định giữ renderer cũ; nút **Thử cảnh 3D mới** bật bản xem thử. `?premium3d=0` hoặc `VITE_PREMIUM_3D_ENABLED=false` quay về renderer cũ. Cấu hình này không thay đổi dữ liệu học tập.
+- Báo cáo, ảnh trong browser và tình trạng nghiệm thu: [docs/QA_V37_PREMIUM.md](docs/QA_V37_PREMIUM.md). Nguồn model: [docs/ASSET_LICENSES_V37.md](docs/ASSET_LICENSES_V37.md).
+- Kiểm tra code: `npm run typecheck`, `npm run test:core`, `npm run test:content`, `npm run test:guide-animation`, `npm run test:renderer`. Sau build chạy `npm run test:premium` (Edge) và `npm run test:visual` (Chrome).
+- `npm run gate:premium-art` **vẫn FAIL** do chưa có ba model còn lại và chưa duyệt mỹ thuật/điện thoại thật. Không giảm gate để gắn nhãn FINAL.
+- Hai tệp HTML offline V3.6.2 giữ nguyên renderer/localStorage riêng, không có renderer Three.js mới.
+- Preview cổng 5178 có dữ liệu riêng theo origin. Để dùng kết quả React đã lưu ở cổng 5173, chạy `START_WINDOWS.bat` trên đúng hostname cũ rồi bật nút xem thử; dữ liệu không bị xóa hoặc tự chuyển origin.
+
+## Tài liệu và bản HTML V3.6.2 đã bàn giao
 
 **Bắt đầu ở đây:** `docs/QA_V362_HANDOFF.md`, `docs/HUONG_DAN_HOC_LIEU_V362.md`.
 

@@ -5,6 +5,7 @@ import { titleSubject } from '../core/utils';
 import { compatible } from '../core/validation';
 import WorldCanvas from '../world3d/WorldCanvas';
 import type { WorldId } from '../world3d/engine';
+import type { QualityChoice } from '../world3d/renderer/types';
 
 interface Props {
   packs: ContentPack[];
@@ -23,16 +24,30 @@ const themes:Record<string,{world:string,icon:string,num:string,description:stri
 export default function StudentScreen({packs,sessions,onPlay,starting,onOpenMini,worldActive,motionOn}:Props){
   const [chosen,setChosen]=useState<Record<string,string>>({});
   const [focused,setFocused]=useState<WorldId|null>(null);
+  const [premium3DEnabled,setPremium3DEnabled]=useState(() => {
+    const flag = new URLSearchParams(window.location.search).get('premium3d');
+    return flag === '1' || (flag !== '0' && import.meta.env.VITE_PREMIUM_3D_ENABLED === 'true');
+  });
+  const [quality,setQuality]=useState<QualityChoice>('auto');
   const completed=sessions.filter(s=>s.status==='completed').length;
   const stars=Math.min(completed*3,999);
   return <div className="ba3d-home" id="home">
     <section className="ba3d-world" aria-label="Bảo An Learning: thế giới game 3D tương tác">
       <div className="ba3d-sky" aria-hidden="true" />
-      <WorldCanvas selected={focused} onSelect={setFocused} active={worldActive} motionOn={motionOn}/>
+      <WorldCanvas selected={focused} onSelect={setFocused} active={worldActive} motionOn={motionOn}
+        premium3DEnabled={premium3DEnabled} quality={quality}/>
+      <div className="ba3d-render-controls" aria-label="Cài đặt cảnh 3D">
+        <button type="button" onClick={()=>setPremium3DEnabled(value=>!value)} aria-pressed={premium3DEnabled}>
+          {premium3DEnabled?'3D mới · thử nghiệm':'Thử cảnh 3D mới'}
+        </button>
+        <label>Chất lượng <select aria-label="Chất lượng cảnh 3D" value={quality} onChange={event=>setQuality(event.target.value as QualityChoice)}>
+          <option value="auto">Tự động</option><option value="low">Nhẹ</option><option value="balanced">Cân bằng</option><option value="high">Cao</option>
+        </select></label>
+      </div>
       <div className="ba3d-softlight" aria-hidden="true" />
       <div className="ba3d-greeter" aria-label="Lời chào của nhân vật đồng hành"><span className="ba3d-hello">Chào nhà thám hiểm!</span><span>Ba thế giới đang đợi con khám phá ✨</span></div>
       <div className="ba3d-hero-title">
-        <span className="ba3d-edition">✦ REAL 3D GAME WORLD · V3.6.2 · RC2 ✦</span>
+        <span className="ba3d-edition">✦ {premium3DEnabled?'V3.7 · 3D THỬ NGHIỆM · PR02':'REAL 3D GAME WORLD · V3.7 RC1'} ✦</span>
         <h1>Khám phá <span>Thế giới học tập</span></h1>
         <p>Học qua trò chơi · Khám phá tri thức · Lớn lên mỗi ngày</p>
       </div>

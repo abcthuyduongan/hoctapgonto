@@ -1,0 +1,20 @@
+
+> bao-an-learning-v3-6-3d@3.6.2-rc.2 build
+> tsc -b && vite build
+
+vite v7.3.7 building client environment for production...
+✓ 0 modules transformed.
+✗ Build failed in 77ms
+error during build:
+[vite:build-html] EPERM: operation not permitted, realpath 'D:\Phần mềm 2026\BAO_AN_LEARNING_lam lại\backups\baseline-validation\src\main.tsx'
+file: D:/Phần mềm 2026/BAO_AN_LEARNING_lam lại/backups/baseline-validation/index.html
+    at node:fs:2853:18
+    at getRealPath (file:///D:/Ph%E1%BA%A7n%20m%E1%BB%81m%202026/BAO_AN_LEARNING_lam%20l%E1%BA%A1i/node_modules/vite/dist/node/chunks/config.js:33184:36)
+    at tryResolveRealFileOrType (file:///D:/Ph%E1%BA%A7n%20m%E1%BB%81m%202026/BAO_AN_LEARNING_lam%20l%E1%BA%A1i/node_modules/vite/dist/node/chunks/config.js:33178:9)
+    at tryCleanFsResolve (file:///D:/Ph%E1%BA%A7n%20m%E1%BB%81m%202026/BAO_AN_LEARNING_lam%20l%E1%BA%A1i/node_modules/vite/dist/node/chunks/config.js:32902:21)
+    at tryFsResolve (file:///D:/Ph%E1%BA%A7n%20m%E1%BB%81m%202026/BAO_AN_LEARNING_lam%20l%E1%BA%A1i/node_modules/vite/dist/node/chunks/config.js:32895:14)
+    at Object.handler (file:///D:/Ph%E1%BA%A7n%20m%E1%BB%81m%202026/BAO_AN_LEARNING_lam%20l%E1%BA%A1i/node_modules/vite/dist/node/chunks/config.js:32752:16)
+    at Object.handler (file:///D:/Ph%E1%BA%A7n%20m%E1%BB%81m%202026/BAO_AN_LEARNING_lam%20l%E1%BA%A1i/node_modules/vite/dist/node/chunks/config.js:33957:13)
+    at file:///D:/Ph%E1%BA%A7n%20m%E1%BB%81m%202026/BAO_AN_LEARNING_lam%20l%E1%BA%A1i/node_modules/rollup/dist/es/shared/node-entry.js:23609:40
+    at async PluginDriver.hookFirstAndGetPlugin (file:///D:/Ph%E1%BA%A7n%20m%E1%BB%81m%202026/BAO_AN_LEARNING_lam%20l%E1%BA%A1i/node_modules/rollup/dist/es/shared/node-entry.js:23491:28)
+    at async resolveId (file:///D:/Ph%E1%BA%A7n%20m%E1%BB%81m%202026/BAO_AN_LEARNING_lam%20l%E1%BA%A1i/node_modules/rollup/dist/es/shared/node-entry.js:21944:26)

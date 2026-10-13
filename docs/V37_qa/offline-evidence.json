@@ -1,0 +1,55 @@
+{
+  "date": "2026-10-13T23:42:41.078Z",
+  "branch": "Unchanged V3.6.2 standalone HTML",
+  "url": "file:///D:/Ph%E1%BA%A7n%20m%E1%BB%81m%202026/BAO_AN_LEARNING_lam%20l%E1%BA%A1i/BAO_AN_LEARNING_V3_6_2_PLAYABLE.html",
+  "isolatedBrowserContext": true,
+  "browser": "155.0.4283.45",
+  "headless": true,
+  "storage": "localStorage: baoan.real3d.offline1",
+  "tests": [
+    {
+      "game": "math-quest",
+      "completed": 8,
+      "total": 8,
+      "pass": true
+    },
+    {
+      "game": "memory-match",
+      "completed": 6,
+      "total": 6,
+      "pass": true
+    },
+    {
+      "game": "sentence-builder",
+      "completed": 5,
+      "total": 5,
+      "pass": true
+    }
+  ],
+  "status": "PASS",
+  "htmlSha256": "64b5166d4d2a1dd8197c1758ad02d553ebfc2666b7dc9d3691c3d9a354227215",
+  "note": "Independent file-URL legacy-renderer verification. Does not establish React IndexedDB or premium Three.js parity.",
+  "historyAfterRefresh": [
+    {
+      "game": "math-quest",
+      "score": 8,
+      "total": 8,
+      "time": "2026-10-13T23:42:52.306Z"
+    },
+    {
+      "game": "memory-match",
+      "score": 6,
+      "total": 6,
+      "time": "2026-10-13T23:43:02.324Z"
+    },
+    {
+      "game": "sentence-builder",
+      "score": 5,
+      "total": 5,
+      "time": "2026-10-13T23:43:07.733Z"
+    }
+  ],
+  "persistencePass": true,
+  "pageErrors": [],
+  "htmlUnchanged": true
+}

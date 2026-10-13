@@ -1,0 +1,87 @@
+[
+  {
+    "Algorithm": "SHA256",
+    "Hash": "7CCFAA18ABF1991877D52BAD31D0B81135E29C2EDF3A7331AFA1EF2B4B95432E",
+    "Path": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\src\\core\\content-io.ts"
+  },
+  {
+    "Algorithm": "SHA256",
+    "Hash": "3DCE9196B8128013EA87C95EA495AD51FE4817341CAF4C1BB96D22EC99CF2D74",
+    "Path": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\src\\core\\contracts.ts"
+  },
+  {
+    "Algorithm": "SHA256",
+    "Hash": "CDFAE21932EBB83D576DAC8758B402F09E3BCF7D0CDAD9AA644CFA8EB94C0B24",
+    "Path": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\src\\core\\experience.ts"
+  },
+  {
+    "Algorithm": "SHA256",
+    "Hash": "601CA3C6A04BFFDB4CC9B1AF81FBA53C2EE7096D3FCCF928B9B70001A98EB6C6",
+    "Path": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\src\\core\\registry.ts"
+  },
+  {
+    "Algorithm": "SHA256",
+    "Hash": "ECD3257753C6B3675D1C50E6876735D3AFA86EF16428CA47FE70ECA07F3B1F2A",
+    "Path": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\src\\core\\reports.ts"
+  },
+  {
+    "Algorithm": "SHA256",
+    "Hash": "45FA237A40F86E099BC6CC529435CD9E85C876C001A5A729FF7186DFAA528588",
+    "Path": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\src\\core\\sdk.ts"
+  },
+  {
+    "Algorithm": "SHA256",
+    "Hash": "64AF1944A55ADE92A055D53BECC1B4A43EEDEC760ECDAD36AF39FFC5854834AE",
+    "Path": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\src\\core\\seed.ts"
+  },
+  {
+    "Algorithm": "SHA256",
+    "Hash": "8149D8DE0B31452F4829E9E9FE010ADE3D912DEB6A6D9E8DF7B4E5E343B426C5",
+    "Path": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\src\\core\\storage.ts"
+  },
+  {
+    "Algorithm": "SHA256",
+    "Hash": "828C0FD0AAAC26C7CB538AE834E7C132F7016332A714804DF96E4063BB48D880",
+    "Path": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\src\\core\\utils.ts"
+  },
+  {
+    "Algorithm": "SHA256",
+    "Hash": "1B2FDC519A285BC956BB2B71E6EF31974C0F4087E595235A695A240AA0F227EA",
+    "Path": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\src\\core\\validation.ts"
+  },
+  {
+    "Algorithm": "SHA256",
+    "Hash": "5BB34B1958C1EB1F13D6529DC87D5616BA3EF89D060B307B9517DE9024A4AEC0",
+    "Path": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\src\\games\\FeedbackEffects.tsx"
+  },
+  {
+    "Algorithm": "SHA256",
+    "Hash": "3D94A7249443BA8E8B9AA4C832FA339B4311A0D9E4B4A1DAB002294808234BDE",
+    "Path": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\src\\games\\GameCompletion.tsx"
+  },
+  {
+    "Algorithm": "SHA256",
+    "Hash": "BE6AE95E746BFD13590F5872773C91BD837652BBF45BBB9149CB8D411B61D208",
+    "Path": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\src\\games\\GameMascot.tsx"
+  },
+  {
+    "Algorithm": "SHA256",
+    "Hash": "D9D6395B28C93859FBAEF89EEF11E203982A7AB6C1423FEC49B1300420AE5D2D",
+    "Path": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\src\\games\\loaders.ts"
+  },
+  {
+    "Algorithm": "SHA256",
+    "Hash": "C97A8C35953A7D2D28D598C0C39D80BD2DD3DA4FD6A689C0417076C4F16F306C",
+    "Path": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\src\\games\\MathQuest.tsx"
+  },
+  {
+    "Algorithm": "SHA256",
+    "Hash": "176668BBC65469DF726B00F5F75ED6F6CEE7C09897292F3ABD1ECECEBE98794F",
+    "Path": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\src\\games\\MemoryMatch.tsx"
+  },
+  {
+    "Algorithm": "SHA256",
+    "Hash": "204ADDF6154FC68EAAD7254C8098D420107478F37212C2441E83A0F58299EC35",
+    "Path": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\src\\games\\SentenceBuilder.tsx"
+  }
+]

@@ -57,8 +57,45 @@ html[data-motion='off'] .ba3d-island-control,html[data-motion='off'] .ba3d-play{
 
 /* V3.2 — scenic depth treatment: distant illustrated matte painting only;
    the interactive foreground islands, bridges, vegetation and mascot are 3D meshes. */
-.ba3d-sky{background:
+.ba3d-world:has([data-premium='false']) .ba3d-sky{background:
  linear-gradient(180deg,rgba(22,125,211,.26) 0%,rgba(119,220,246,.08) 42%,rgba(93,184,223,.16) 78%,rgba(29,115,184,.37) 100%),
  url('/art/premium-world-scene.webp') center 53%/cover no-repeat!important}
 .ba3d-softlight{background:linear-gradient(180deg,rgba(19,113,195,.16),transparent 31%,transparent 62%,rgba(6,82,151,.20))!important}
 .ba3d-world-name:focus-visible,.ba3d-play:focus-visible,.ba3d-island-control select:focus-visible{outline:3px solid #fff7bf;outline-offset:3px}
+
+/* Renderer lifecycle and slice preview controls live in one stylesheet. */
+.ba3d-render-host{position:absolute;inset:0;z-index:0}
+.ba3d-render-host[data-premium='true']{inset:135px 0 285px}
+.ba3d-render-status{position:absolute;left:50%;top:160px;transform:translateX(-50%);z-index:2;max-width:90%;padding:8px 12px;border-radius:12px;background:#164d71dd;color:#fff;font-size:12px;text-align:center;pointer-events:none}
+.ba3d-render-controls{position:absolute;left:14px;top:14px;z-index:6;display:flex;flex-direction:column;align-items:flex-start;gap:5px;font-size:12px;color:#fff}
+.ba3d-render-controls button,.ba3d-render-controls select{font:inherit;min-height:32px;border:1px solid #c6eafa;border-radius:8px;padding:4px 8px;background:#11456ee8;color:#fff;cursor:pointer}
+.ba3d-render-controls label{display:flex;align-items:center;gap:6px}
+.ba3d-render-controls button:focus-visible,.ba3d-render-controls select:focus-visible{outline:3px solid #fff0a3;outline-offset:2px}
+.ba3d-world:has([data-premium='true']) .ba3d-greeter{display:none}
+@media(max-width:1100px){.ba3d-render-host[data-premium='true']{inset:130px 0 280px}}
+@media(max-width:700px){
+ .ba3d-render-controls{top:102px;left:8px;right:8px;flex-direction:row;align-items:center;justify-content:space-between;font-size:10px}
+ .ba3d-render-controls button,.ba3d-render-controls select{min-height:34px;padding:3px 6px}
+ .ba3d-render-host[data-premium='true']{inset:141px 0 253px}
+ .ba3d-render-status{top:180px;font-size:10px}
+ .ba3d-island-control select,.ba3d-play,.ba3d-world-name{min-height:44px;height:44px}
+ .ba3d-shortcuts button{min-height:36px}
+}
+@media(max-width:370px){.ba3d-render-host[data-premium='true']{inset:134px 0 249px}.ba3d-render-controls{top:94px}.ba3d-render-controls label{gap:3px}}
+@media(max-width:370px) and (max-height:700px){
+ .immersive-dialog .world-math .quest-scroll{min-height:80px;padding:8px 10px;margin-bottom:10px}
+ .immersive-dialog .world-math .progress-track{margin:8px 0 10px}
+ .immersive-dialog .world-math .answer-option{min-height:56px;padding:7px;gap:5px}
+ .immersive-dialog .world-math .answer-grid{gap:8px}
+ .immersive-dialog .world-math .stable-response-zone{margin-top:12px}
+ .immersive-dialog .world-math .world-hud{margin-bottom:10px}
+}
+@media(max-height:520px) and (orientation:landscape){
+ .ba3d-hero-title{top:6px;width:55%}.ba3d-hero-title h1{font-size:24px}.ba3d-hero-title p,.ba3d-achievement,.ba3d-greeter,.ba3d-footnote{display:none}
+ .ba3d-render-controls{top:8px;left:8px;right:auto;flex-direction:column;font-size:10px}
+ .ba3d-render-host[data-premium='true']{inset:75px 0 190px}
+ .ba3d-anchors{bottom:49px;width:94%;gap:7px}
+ .ba3d-world-name{min-height:44px;padding:2px}.ba3d-world-name strong{font-size:16px}.ba3d-world-name small{font-size:10px}
+ .ba3d-island-control select{height:32px;font-size:10px}.ba3d-play{min-height:36px;font-size:12px}.ba3d-island-control{gap:4px}
+ .ba3d-shortcuts{bottom:5px;padding:4px 8px;min-height:32px}.ba3d-shortcuts button{min-height:28px;padding:3px 8px}
+}
