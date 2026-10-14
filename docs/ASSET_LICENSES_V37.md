@@ -7,7 +7,7 @@ Hai tệp dưới đây là **candidate tự tạo cho lát cắt PR-02 (cáo + 
 | Tệp | Nguồn hình học, texture, rig và clip | Khai báo manifest |
 |---|---|---|
 | `public/models/fox-guide.glb` | Tạo riêng trong dự án bằng `tools/generate_v37_slice_assets.mjs`, có hỗ trợ lập trình của Codex. Hình học, UV, texture PNG thủ tục, bộ xương và mọi keyframe đều được định nghĩa trong mã nguồn này. | `OWNED: original project-authored PR02 candidate; docs/ASSET_LICENSES_V37.md` |
-| `public/models/math-world.glb` | Tạo riêng trong dự án bằng cùng generator. Lâu đài, đảo đá/cỏ, cửa vòm, đường đi, cây, hoa và các số/ký hiệu là hình học thật. Texture được tính từ các hàm tuần hoàn, không tải ảnh bên ngoài. | `OWNED: original project-authored PR02 candidate; docs/ASSET_LICENSES_V37.md` |
+| `public/models/math-world.glb` | Tạo riêng trong dự án bằng cùng generator. Lâu đài, đảo đá phân tầng thuôn sâu, vách đá góc cạnh, mép cỏ/khóm cỏ, cửa/cửa sổ vòm, chỉ mái, cờ, đường lát đá/lan can, cây, hoa và các số/ký hiệu là hình học thật. Texture được tính từ các hàm tuần hoàn, không tải ảnh bên ngoài. | `OWNED: original project-authored PR02 candidate; docs/ASSET_LICENSES_V37.md` |
 
 `OWNED` là nhãn provenance nội bộ của tài nguyên gốc tạo cho dự án, không phải giấy phép CC0/CC-BY của một kho model. Không sử dụng mesh, rig, texture, phông chữ, ảnh concept hay keyframe của bên thứ ba; không có gói tài nguyên cần mua hoặc nguồn tải ngoài để ghi attribution. Mã generator được bàn giao cùng dự án để sửa, tạo lại và sử dụng trong Bảo An Learning. Generator chỉ sử dụng thư viện chuẩn Node.js (`fs`, `path`, `url`, `zlib`, `crypto`); thư viện runtime Three.js được khai báo riêng trong dependency của ứng dụng.
 
@@ -17,20 +17,22 @@ Metadata `asset.extras` trong mỗi GLB ghi `provenance=ORIGINAL_PROCEDURAL_V37_
 
 | Thuộc tính | Cáo | Đảo Toán Học |
 |---|---:|---:|
-| Kích thước tệp | 1.120.088 byte | 1.196.500 byte |
-| Mesh / primitive | 10 / 10 | 12 / 12 |
-| Tam giác | 22.116 | 22.720 |
-| Vertex có cả phần tách theo UV/normal | 13.891 | 17.504 |
-| Material glTF PBR | 10 | 12 |
-| PNG nhúng, 256 × 256, RGBA 8-bit | 9 | 15 |
+| Kích thước tệp | 1.120.088 byte | 1.839.516 byte |
+| Mesh / primitive | 10 / 10 | 16 / 16 |
+| Tam giác | 22.116 | 30.668 |
+| Vertex có cả phần tách theo UV/normal | 13.891 | 32.180 |
+| Material glTF PBR | 10 | 16 |
+| PNG nhúng, 256 × 256, RGBA 8-bit | 9 | 18 |
 | Skin / xương | 1 / 14 | 0 / 0 |
 | Animation clip | `Idle`, `Cheer`, `Victory` | Không yêu cầu |
 
-Các bộ texture gồm baseColor, tangent-space normal và metallicRoughness. Kênh G chứa độ nhám biến thiên, kênh B bằng 0 vì bề mặt dùng kim loại sơn/màu hoạt hình thay vì kim loại trần. Swatch hex sRGB được đổi sang linear-light trước khi ghi `baseColorFactor` theo glTF; PNG base color dùng sRGB, các map normal/roughness dùng dữ liệu tuyến tính. Base color được tint bằng material; texture fur, vải dệt, đá, cỏ, gỗ và satin tạo biến thiên bề mặt. Không dùng tấm ảnh concept phủ lên mặt phẳng để giả mô hình.
+Các bộ texture gồm baseColor, tangent-space normal và metallicRoughness. Kênh G chứa độ nhám biến thiên, kênh B bằng 0 vì bề mặt dùng kim loại sơn/màu hoạt hình thay vì kim loại trần. Swatch hex sRGB được đổi sang linear-light trước khi ghi `baseColorFactor` theo glTF; PNG base color dùng sRGB, các map normal/roughness dùng dữ liệu tuyến tính. Base color được tint bằng material; texture fur, vải dệt, đá xây, sa thạch tự nhiên, cỏ, gỗ và satin tạo biến thiên bề mặt. Texture sa thạch dùng đường trầm tích/hạt đá riêng, không dùng đường mạch gạch của lâu đài. Không dùng tấm ảnh concept phủ lên mặt phẳng để giả mô hình.
 
 Cáo dùng `JOINTS_0`, `WEIGHTS_0` và inverse bind matrices glTF, với trọng số trộn tại thân, tay và đuôi. Các clip tác động đến xương đầu, thân, tay, bàn tay hoặc đuôi; `Victory` có thêm nhún root. Không chỉ dịch chuyển toàn bộ scene. Xương: `Root`, `Spine`, `Chest`, `Head`, `Arm.L`, `Forearm.L`, `Paw.L`, `Leg.L`, `Arm.R`, `Forearm.R`, `Paw.R`, `Leg.R`, `Tail`, `TailTip`.
 
-Hệ tọa độ: Y lên trên, đơn vị theo world của renderer. Cáo nhìn về +Z, chân chạm Y=0; chiều cao bind pose 2,3014. Đảo có tâm X/Z=0, bán kính ngoài 2,035; mặt cỏ gần Y=0; đá dưới đảo xuống Y=-0,615; đỉnh lâu đài Y=3. Không dùng Draco/Meshopt/KTX2 hay tài nguyên mạng phụ.
+Hệ tọa độ: Y lên trên, đơn vị theo world của renderer. Cáo nhìn về +Z, chân chạm Y=0; chiều cao bind pose 2,3014. Đảo có mặt cỏ gần Y=0, bán kính khoảng 2,1; đá dưới đảo thuôn xuống Y=-1,51; đỉnh lâu đài Y=3. Bounds bản đảo hiện tại: X [-2,0671; 2,1109], Y [-1,51; 3], Z [-2,0503; 2,0503]. Không dùng Draco/Meshopt/KTX2 hay tài nguyên mạng phụ.
+
+Lượt tăng chiều sâu PR-02 bổ sung sáu tầng vách đá với silhouette bất quy tắc, 26 cụm đá góc cạnh, mép cỏ có khóm/lớp rêu, tám cụm hoa/cỏ, đường cong bằng phiến đá riêng và lan can ngắn dẫn đến bậc cửa. Lâu đài thêm chỉ/phân tầng đá, đường gân và lớp men mái, khung/bậu/thanh chia cửa sổ, kính màu hổ phách, cờ vải có ký hiệu nổi và chi tiết cửa gỗ/đồng. Hình học bổ sung nằm trong `mathWorld()` và helper cục bộ của nó; nhánh texture `rock` mới chỉ phục vụ vách đảo. Hàm xuất GLB, hình học/bộ xương/clip của cáo giữ nguyên. Dung lượng và số tam giác nằm dưới mục tiêu riêng của lát cắt (2 MB / 35.000 tam giác), chưa thay thế nghiệm thu hình ảnh và thiết bị thật.
 
 ## Tạo lại và xác định phiên bản
 
@@ -46,7 +48,7 @@ SHA-256 bản bàn giao:
 
 ```text
 fox-guide.glb  398382e919be69af9502cb103e3d1359147157e76ac852a30ad07cd60a23e9fc
-math-world.glb f933db86aa9d18827f133a220a08a522f8c2cc9f349d4553f52efe2ec89fb93a
+math-world.glb dd7cacdfb62d86b0dc287b264d6cc71df5822a2b6943c48d73c5c84b3091d6cb
 ```
 
 ## Giới hạn nghiệm thu

@@ -1,0 +1,2628 @@
+{
+  "date": "2026-10-14T00:32:30.300Z",
+  "target": "http://127.0.0.1:5180/?premium3d=1",
+  "browser": "155.0.4283.45",
+  "os": "Windows_NT 10.0.26300",
+  "cpu": "Intel(R) Core(TM) Ultra 5 125H",
+  "memoryBytes": 33752997888,
+  "note": "Headless Edge on Windows. Mobile and landscape are viewport/touch emulation on the same desktop GPU, not physical phone measurements. FPS samples use the renderer rolling window and are not an independent GPU profiler.",
+  "views": [
+    {
+      "name": "depth-default-1440x900",
+      "focus": "default",
+      "emulatedTouch": false,
+      "screenshot": "depth-default-1440x900.png",
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "dpr": 1
+      },
+      "horizontalOverflow": {
+        "root": 1440,
+        "body": 1440,
+        "exceedsViewport": false
+      },
+      "sections": {
+        ".site-header": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 76
+        },
+        ".top-navigation": {
+          "x": 259.078125,
+          "y": 10.5,
+          "width": 917.109375,
+          "height": 52
+        },
+        ".ba3d-world": {
+          "x": 0,
+          "y": 76,
+          "width": 1440,
+          "height": 824
+        },
+        ".ba3d-render-host": {
+          "x": 0,
+          "y": 201,
+          "width": 1440,
+          "height": 484
+        },
+        ".ba3d-hero-title": {
+          "x": 295,
+          "y": 98,
+          "width": 850,
+          "height": 84.59375
+        },
+        ".ba3d-anchors": {
+          "x": 130,
+          "y": 681,
+          "width": 1180,
+          "height": 154
+        },
+        ".ba3d-shortcuts": {
+          "x": 24,
+          "y": 844,
+          "width": 349.3125,
+          "height": 44
+        },
+        ".ba3d-render-controls": {
+          "x": 1273.109375,
+          "y": 100,
+          "width": 141.890625,
+          "height": 79
+        }
+      },
+      "controls": [
+        {
+          "text": "🏠 Thế giới game",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 473.28125,
+            "y": 10.5,
+            "width": 154.46875,
+            "height": 52
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": false
+        },
+        {
+          "text": "📊 Góc phụ huynh",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 634.75,
+            "y": 10.5,
+            "width": 160.09375,
+            "height": 52
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": false
+        },
+        {
+          "text": "📚 Xưởng học liệu",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 801.84375,
+            "y": 10.5,
+            "width": 160.140625,
+            "height": 52
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": false
+        },
+        {
+          "text": "Xem đảo Đảo Toán Học",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 145,
+            "y": 694,
+            "width": 352.65625,
+            "height": 52
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Toán 3 · Phép tính vui · Toán",
+          "tag": "SELECT",
+          "rect": {
+            "x": 145,
+            "y": 778,
+            "width": 234.65625,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Bắt đầu ▶",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 389.65625,
+            "y": 778,
+            "width": 108,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Xem đảo Khu Rừng Trí Nhớ",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 543.65625,
+            "y": 694,
+            "width": 352.671875,
+            "height": 52
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Tiếng Anh · Gia đình · Tiếng AnhToán · Phép nhân · ToánTiếng Việt · Từ trái nghĩa · Tiếng Việt",
+          "tag": "SELECT",
+          "rect": {
+            "x": 543.65625,
+            "y": 778,
+            "width": 234.671875,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Bắt đầu ▶",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 788.328125,
+            "y": 778,
+            "width": 108,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Xem đảo Xưởng Ngôn Từ",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 942.328125,
+            "y": 694,
+            "width": 352.65625,
+            "height": 52
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Tiếng Anh · Ghép câu đơn giản · Tiếng Anh",
+          "tag": "SELECT",
+          "rect": {
+            "x": 942.328125,
+            "y": 778,
+            "width": 234.65625,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Bắt đầu ▶",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 1186.984375,
+            "y": 778,
+            "width": 108,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        }
+      ],
+      "engine": "three-webgl",
+      "state": "ready",
+      "gameControlCounts": {
+        "focus": 3,
+        "pack": 3,
+        "start": 3
+      },
+      "diagnostics": {
+        "engine": "three-webgl",
+        "frames": 487,
+        "fpsMedian": 59.9,
+        "fpsP95FrameMs": 17,
+        "tier": "balanced",
+        "dpr": 1,
+        "drawCalls": 88,
+        "triangles": 122732,
+        "textureBytesEstimate": 9437183.999999998,
+        "assetErrors": [],
+        "readyAssets": [
+          "math-world",
+          "fox-guide"
+        ],
+        "animationClips": [
+          "Idle",
+          "Cheer",
+          "Victory"
+        ],
+        "skeletalMeshes": 10,
+        "bones": 14,
+        "animationTime": 8.150200000000025,
+        "activeClip": "Idle",
+        "motion": true,
+        "paused": false
+      },
+      "renderer": "ANGLE (Intel, Intel(R) Arc(TM) Graphics (0x00007D55) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "runtimeSamples": [
+        {
+          "engine": "three-webgl",
+          "frames": 187,
+          "fpsMedian": 59.9,
+          "fpsP95FrameMs": 17,
+          "tier": "balanced",
+          "dpr": 1,
+          "drawCalls": 88,
+          "triangles": 122732,
+          "textureBytesEstimate": 9437183.999999998,
+          "assetErrors": [],
+          "readyAssets": [
+            "math-world",
+            "fox-guide"
+          ],
+          "animationClips": [
+            "Idle",
+            "Cheer",
+            "Victory"
+          ],
+          "skeletalMeshes": 10,
+          "bones": 14,
+          "animationTime": 3.1502000000000043,
+          "activeClip": "Idle",
+          "motion": true,
+          "paused": false
+        },
+        {
+          "engine": "three-webgl",
+          "frames": 247,
+          "fpsMedian": 59.9,
+          "fpsP95FrameMs": 17,
+          "tier": "balanced",
+          "dpr": 1,
+          "drawCalls": 88,
+          "triangles": 122732,
+          "textureBytesEstimate": 9437183.999999998,
+          "assetErrors": [],
+          "readyAssets": [
+            "math-world",
+            "fox-guide"
+          ],
+          "animationClips": [
+            "Idle",
+            "Cheer",
+            "Victory"
+          ],
+          "skeletalMeshes": 10,
+          "bones": 14,
+          "animationTime": 4.150200000000005,
+          "activeClip": "Idle",
+          "motion": true,
+          "paused": false
+        },
+        {
+          "engine": "three-webgl",
+          "frames": 367,
+          "fpsMedian": 59.9,
+          "fpsP95FrameMs": 17,
+          "tier": "balanced",
+          "dpr": 1,
+          "drawCalls": 88,
+          "triangles": 122732,
+          "textureBytesEstimate": 9437183.999999998,
+          "assetErrors": [],
+          "readyAssets": [
+            "math-world",
+            "fox-guide"
+          ],
+          "animationClips": [
+            "Idle",
+            "Cheer",
+            "Victory"
+          ],
+          "skeletalMeshes": 10,
+          "bones": 14,
+          "animationTime": 6.150400000000015,
+          "activeClip": "Idle",
+          "motion": true,
+          "paused": false
+        },
+        {
+          "engine": "three-webgl",
+          "frames": 427,
+          "fpsMedian": 59.9,
+          "fpsP95FrameMs": 17,
+          "tier": "balanced",
+          "dpr": 1,
+          "drawCalls": 88,
+          "triangles": 122732,
+          "textureBytesEstimate": 9437183.999999998,
+          "assetErrors": [],
+          "readyAssets": [
+            "math-world",
+            "fox-guide"
+          ],
+          "animationClips": [
+            "Idle",
+            "Cheer",
+            "Victory"
+          ],
+          "skeletalMeshes": 10,
+          "bones": 14,
+          "animationTime": 7.150400000000021,
+          "activeClip": "Idle",
+          "motion": true,
+          "paused": false
+        }
+      ],
+      "errors": []
+    },
+    {
+      "name": "depth-math-1440x900",
+      "focus": "math",
+      "emulatedTouch": false,
+      "screenshot": "depth-math-1440x900.png",
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "dpr": 1
+      },
+      "horizontalOverflow": {
+        "root": 1440,
+        "body": 1440,
+        "exceedsViewport": false
+      },
+      "sections": {
+        ".site-header": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 76
+        },
+        ".top-navigation": {
+          "x": 259.078125,
+          "y": 10.5,
+          "width": 917.109375,
+          "height": 52
+        },
+        ".ba3d-world": {
+          "x": 0,
+          "y": 76,
+          "width": 1440,
+          "height": 824
+        },
+        ".ba3d-render-host": {
+          "x": 0,
+          "y": 201,
+          "width": 1440,
+          "height": 484
+        },
+        ".ba3d-hero-title": {
+          "x": 295,
+          "y": 98,
+          "width": 850,
+          "height": 84.59375
+        },
+        ".ba3d-anchors": {
+          "x": 130,
+          "y": 681,
+          "width": 1180,
+          "height": 154
+        },
+        ".ba3d-shortcuts": {
+          "x": 24,
+          "y": 844,
+          "width": 349.3125,
+          "height": 44
+        },
+        ".ba3d-render-controls": {
+          "x": 1273.109375,
+          "y": 100,
+          "width": 141.890625,
+          "height": 79
+        }
+      },
+      "controls": [
+        {
+          "text": "🏠 Thế giới game",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 473.28125,
+            "y": 10.5,
+            "width": 154.46875,
+            "height": 52
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": false
+        },
+        {
+          "text": "📊 Góc phụ huynh",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 634.75,
+            "y": 10.5,
+            "width": 160.09375,
+            "height": 52
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": false
+        },
+        {
+          "text": "📚 Xưởng học liệu",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 801.84375,
+            "y": 10.5,
+            "width": 160.140625,
+            "height": 52
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": false
+        },
+        {
+          "text": "Xem đảo Đảo Toán Học",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 145,
+            "y": 691,
+            "width": 352.65625,
+            "height": 52
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Toán 3 · Phép tính vui · Toán",
+          "tag": "SELECT",
+          "rect": {
+            "x": 145,
+            "y": 775,
+            "width": 234.65625,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Bắt đầu ▶",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 389.65625,
+            "y": 775,
+            "width": 108,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Xem đảo Khu Rừng Trí Nhớ",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 543.65625,
+            "y": 694,
+            "width": 352.671875,
+            "height": 52
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Tiếng Anh · Gia đình · Tiếng AnhToán · Phép nhân · ToánTiếng Việt · Từ trái nghĩa · Tiếng Việt",
+          "tag": "SELECT",
+          "rect": {
+            "x": 543.65625,
+            "y": 778,
+            "width": 234.671875,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Bắt đầu ▶",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 788.328125,
+            "y": 778,
+            "width": 108,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Xem đảo Xưởng Ngôn Từ",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 942.328125,
+            "y": 694,
+            "width": 352.65625,
+            "height": 52
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Tiếng Anh · Ghép câu đơn giản · Tiếng Anh",
+          "tag": "SELECT",
+          "rect": {
+            "x": 942.328125,
+            "y": 778,
+            "width": 234.65625,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Bắt đầu ▶",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 1186.984375,
+            "y": 778,
+            "width": 108,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        }
+      ],
+      "engine": "three-webgl",
+      "state": "ready",
+      "gameControlCounts": {
+        "focus": 3,
+        "pack": 3,
+        "start": 3
+      },
+      "diagnostics": {
+        "engine": "three-webgl",
+        "frames": 547,
+        "fpsMedian": 59.9,
+        "fpsP95FrameMs": 17,
+        "tier": "balanced",
+        "dpr": 1,
+        "drawCalls": 88,
+        "triangles": 122732,
+        "textureBytesEstimate": 9437183.999999998,
+        "assetErrors": [],
+        "readyAssets": [
+          "math-world",
+          "fox-guide"
+        ],
+        "animationClips": [
+          "Idle",
+          "Cheer",
+          "Victory"
+        ],
+        "skeletalMeshes": 10,
+        "bones": 14,
+        "animationTime": 9.15010000000002,
+        "activeClip": "Cheer",
+        "motion": true,
+        "paused": false
+      },
+      "renderer": "ANGLE (Intel, Intel(R) Arc(TM) Graphics (0x00007D55) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "errors": []
+    },
+    {
+      "name": "depth-default-390x844",
+      "focus": "default",
+      "emulatedTouch": true,
+      "screenshot": "depth-default-390x844.png",
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "horizontalOverflow": {
+        "root": 390,
+        "body": 390,
+        "exceedsViewport": false
+      },
+      "sections": {
+        ".site-header": {
+          "x": 0,
+          "y": 0,
+          "width": 390,
+          "height": 108
+        },
+        ".top-navigation": {
+          "x": 9,
+          "y": 56.5,
+          "width": 372,
+          "height": 44
+        },
+        ".ba3d-world": {
+          "x": 0,
+          "y": 108,
+          "width": 390,
+          "height": 736
+        },
+        ".ba3d-render-host": {
+          "x": 0,
+          "y": 220,
+          "width": 390,
+          "height": 382
+        },
+        ".ba3d-hero-title": {
+          "x": 12,
+          "y": 120,
+          "width": 366,
+          "height": 42.46875
+        },
+        ".ba3d-anchors": {
+          "x": 10,
+          "y": 606,
+          "width": 370,
+          "height": 180
+        },
+        ".ba3d-shortcuts": {
+          "x": 12,
+          "y": 792,
+          "width": 366,
+          "height": 44
+        },
+        ".ba3d-render-controls": {
+          "x": 12,
+          "y": 174,
+          "width": 366,
+          "height": 44
+        }
+      },
+      "controls": [
+        {
+          "text": "🏠 Thế giới game",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 9,
+            "y": 56.5,
+            "width": 120.65625,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": false
+        },
+        {
+          "text": "📊 Góc phụ huynh",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 134.65625,
+            "y": 56.5,
+            "width": 120.671875,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": false
+        },
+        {
+          "text": "📚 Xưởng học liệu",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 260.328125,
+            "y": 56.5,
+            "width": 120.65625,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": false
+        },
+        {
+          "text": "Xem đảo Đảo Toán Học",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 18,
+            "y": 612,
+            "width": 134,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Toán 3 · Phép tính vui · Toán",
+          "tag": "SELECT",
+          "rect": {
+            "x": 158,
+            "y": 612,
+            "width": 134,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Bắt đầu ▶",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 298,
+            "y": 612,
+            "width": 74,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Xem đảo Khu Rừng Trí Nhớ",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 18,
+            "y": 674,
+            "width": 134,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Tiếng Anh · Gia đình · Tiếng AnhToán · Phép nhân · ToánTiếng Việt · Từ trái nghĩa · Tiếng Việt",
+          "tag": "SELECT",
+          "rect": {
+            "x": 158,
+            "y": 674,
+            "width": 134,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Bắt đầu ▶",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 298,
+            "y": 674,
+            "width": 74,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Xem đảo Xưởng Ngôn Từ",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 18,
+            "y": 736,
+            "width": 134,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Tiếng Anh · Ghép câu đơn giản · Tiếng Anh",
+          "tag": "SELECT",
+          "rect": {
+            "x": 158,
+            "y": 736,
+            "width": 134,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Bắt đầu ▶",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 298,
+            "y": 736,
+            "width": 74,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        }
+      ],
+      "engine": "three-webgl",
+      "state": "ready",
+      "gameControlCounts": {
+        "focus": 3,
+        "pack": 3,
+        "start": 3
+      },
+      "diagnostics": {
+        "engine": "three-webgl",
+        "frames": 457,
+        "fpsMedian": 59.9,
+        "fpsP95FrameMs": 16.900000000000546,
+        "tier": "low",
+        "dpr": 1,
+        "drawCalls": 46,
+        "triangles": 64852,
+        "textureBytesEstimate": 9437183.999999998,
+        "assetErrors": [],
+        "readyAssets": [
+          "math-world",
+          "fox-guide"
+        ],
+        "animationClips": [
+          "Idle",
+          "Cheer",
+          "Victory"
+        ],
+        "skeletalMeshes": 10,
+        "bones": 14,
+        "animationTime": 7.650300000000012,
+        "activeClip": "Idle",
+        "motion": true,
+        "paused": false
+      },
+      "renderer": "ANGLE (Intel, Intel(R) Arc(TM) Graphics (0x00007D55) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "runtimeSamples": [
+        {
+          "engine": "three-webgl",
+          "frames": 217,
+          "fpsMedian": 59.9,
+          "fpsP95FrameMs": 17,
+          "tier": "low",
+          "dpr": 1,
+          "drawCalls": 46,
+          "triangles": 64852,
+          "textureBytesEstimate": 9437183.999999998,
+          "assetErrors": [],
+          "readyAssets": [
+            "math-world",
+            "fox-guide"
+          ],
+          "animationClips": [
+            "Idle",
+            "Cheer",
+            "Victory"
+          ],
+          "skeletalMeshes": 10,
+          "bones": 14,
+          "animationTime": 3.6499999999999995,
+          "activeClip": "Idle",
+          "motion": true,
+          "paused": false
+        },
+        {
+          "engine": "three-webgl",
+          "frames": 277,
+          "fpsMedian": 59.9,
+          "fpsP95FrameMs": 17,
+          "tier": "low",
+          "dpr": 1,
+          "drawCalls": 46,
+          "triangles": 64852,
+          "textureBytesEstimate": 9437183.999999998,
+          "assetErrors": [],
+          "readyAssets": [
+            "math-world",
+            "fox-guide"
+          ],
+          "animationClips": [
+            "Idle",
+            "Cheer",
+            "Victory"
+          ],
+          "skeletalMeshes": 10,
+          "bones": 14,
+          "animationTime": 4.6502000000000026,
+          "activeClip": "Idle",
+          "motion": true,
+          "paused": false
+        },
+        {
+          "engine": "three-webgl",
+          "frames": 336,
+          "fpsMedian": 59.9,
+          "fpsP95FrameMs": 17,
+          "tier": "low",
+          "dpr": 1,
+          "drawCalls": 46,
+          "triangles": 64852,
+          "textureBytesEstimate": 9437183.999999998,
+          "assetErrors": [],
+          "readyAssets": [
+            "math-world",
+            "fox-guide"
+          ],
+          "animationClips": [
+            "Idle",
+            "Cheer",
+            "Victory"
+          ],
+          "skeletalMeshes": 10,
+          "bones": 14,
+          "animationTime": 5.633400000000006,
+          "activeClip": "Idle",
+          "motion": true,
+          "paused": false
+        },
+        {
+          "engine": "three-webgl",
+          "frames": 396,
+          "fpsMedian": 59.9,
+          "fpsP95FrameMs": 16.900000000000546,
+          "tier": "low",
+          "dpr": 1,
+          "drawCalls": 46,
+          "triangles": 64852,
+          "textureBytesEstimate": 9437183.999999998,
+          "assetErrors": [],
+          "readyAssets": [
+            "math-world",
+            "fox-guide"
+          ],
+          "animationClips": [
+            "Idle",
+            "Cheer",
+            "Victory"
+          ],
+          "skeletalMeshes": 10,
+          "bones": 14,
+          "animationTime": 6.63330000000001,
+          "activeClip": "Idle",
+          "motion": true,
+          "paused": false
+        }
+      ],
+      "errors": []
+    },
+    {
+      "name": "depth-math-390x844",
+      "focus": "math",
+      "emulatedTouch": true,
+      "screenshot": "depth-math-390x844.png",
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "horizontalOverflow": {
+        "root": 390,
+        "body": 390,
+        "exceedsViewport": false
+      },
+      "sections": {
+        ".site-header": {
+          "x": 0,
+          "y": 0,
+          "width": 390,
+          "height": 108
+        },
+        ".top-navigation": {
+          "x": 9,
+          "y": 56.5,
+          "width": 372,
+          "height": 44
+        },
+        ".ba3d-world": {
+          "x": 0,
+          "y": 108,
+          "width": 390,
+          "height": 736
+        },
+        ".ba3d-render-host": {
+          "x": 0,
+          "y": 220,
+          "width": 390,
+          "height": 382
+        },
+        ".ba3d-hero-title": {
+          "x": 12,
+          "y": 120,
+          "width": 366,
+          "height": 42.46875
+        },
+        ".ba3d-anchors": {
+          "x": 10,
+          "y": 606,
+          "width": 370,
+          "height": 180
+        },
+        ".ba3d-shortcuts": {
+          "x": 12,
+          "y": 792,
+          "width": 366,
+          "height": 44
+        },
+        ".ba3d-render-controls": {
+          "x": 12,
+          "y": 174,
+          "width": 366,
+          "height": 44
+        }
+      },
+      "controls": [
+        {
+          "text": "🏠 Thế giới game",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 9,
+            "y": 56.5,
+            "width": 120.65625,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": false
+        },
+        {
+          "text": "📊 Góc phụ huynh",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 134.65625,
+            "y": 56.5,
+            "width": 120.671875,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": false
+        },
+        {
+          "text": "📚 Xưởng học liệu",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 260.328125,
+            "y": 56.5,
+            "width": 120.65625,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": false
+        },
+        {
+          "text": "Xem đảo Đảo Toán Học",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 18,
+            "y": 612,
+            "width": 134,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Toán 3 · Phép tính vui · Toán",
+          "tag": "SELECT",
+          "rect": {
+            "x": 158,
+            "y": 612,
+            "width": 134,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Bắt đầu ▶",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 298,
+            "y": 612,
+            "width": 74,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Xem đảo Khu Rừng Trí Nhớ",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 18,
+            "y": 674,
+            "width": 134,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Tiếng Anh · Gia đình · Tiếng AnhToán · Phép nhân · ToánTiếng Việt · Từ trái nghĩa · Tiếng Việt",
+          "tag": "SELECT",
+          "rect": {
+            "x": 158,
+            "y": 674,
+            "width": 134,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Bắt đầu ▶",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 298,
+            "y": 674,
+            "width": 74,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Xem đảo Xưởng Ngôn Từ",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 18,
+            "y": 736,
+            "width": 134,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Tiếng Anh · Ghép câu đơn giản · Tiếng Anh",
+          "tag": "SELECT",
+          "rect": {
+            "x": 158,
+            "y": 736,
+            "width": 134,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Bắt đầu ▶",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 298,
+            "y": 736,
+            "width": 74,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        }
+      ],
+      "engine": "three-webgl",
+      "state": "ready",
+      "gameControlCounts": {
+        "focus": 3,
+        "pack": 3,
+        "start": 3
+      },
+      "diagnostics": {
+        "engine": "three-webgl",
+        "frames": 576,
+        "fpsMedian": 59.9,
+        "fpsP95FrameMs": 17,
+        "tier": "low",
+        "dpr": 1,
+        "drawCalls": 46,
+        "triangles": 64852,
+        "textureBytesEstimate": 9437183.999999998,
+        "assetErrors": [],
+        "readyAssets": [
+          "math-world",
+          "fox-guide"
+        ],
+        "animationClips": [
+          "Idle",
+          "Cheer",
+          "Victory"
+        ],
+        "skeletalMeshes": 10,
+        "bones": 14,
+        "animationTime": 9.63360000000001,
+        "activeClip": "Cheer",
+        "motion": true,
+        "paused": false
+      },
+      "renderer": "ANGLE (Intel, Intel(R) Arc(TM) Graphics (0x00007D55) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "errors": []
+    },
+    {
+      "name": "depth-default-320x640",
+      "focus": "default",
+      "emulatedTouch": true,
+      "screenshot": "depth-default-320x640.png",
+      "viewport": {
+        "width": 320,
+        "height": 640,
+        "dpr": 1
+      },
+      "horizontalOverflow": {
+        "root": 320,
+        "body": 320,
+        "exceedsViewport": false
+      },
+      "sections": {
+        ".site-header": {
+          "x": 0,
+          "y": 0,
+          "width": 320,
+          "height": 108
+        },
+        ".top-navigation": {
+          "x": 9,
+          "y": 56.5,
+          "width": 302,
+          "height": 44
+        },
+        ".ba3d-world": {
+          "x": 0,
+          "y": 108,
+          "width": 320,
+          "height": 532
+        },
+        ".ba3d-render-host": {
+          "x": 0,
+          "y": 208,
+          "width": 320,
+          "height": 190
+        },
+        ".ba3d-hero-title": {
+          "x": 12,
+          "y": 116,
+          "width": 296,
+          "height": 42.09375
+        },
+        ".ba3d-anchors": {
+          "x": 10,
+          "y": 402,
+          "width": 300,
+          "height": 180
+        },
+        ".ba3d-shortcuts": {
+          "x": 12,
+          "y": 588,
+          "width": 296,
+          "height": 44
+        },
+        ".ba3d-render-controls": {
+          "x": 12,
+          "y": 164,
+          "width": 296,
+          "height": 44
+        }
+      },
+      "controls": [
+        {
+          "text": "🏠 Thế giới game",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 9,
+            "y": 56.5,
+            "width": 97.328125,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": false
+        },
+        {
+          "text": "📊 Góc phụ huynh",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 111.328125,
+            "y": 56.5,
+            "width": 97.328125,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": false
+        },
+        {
+          "text": "📚 Xưởng học liệu",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 213.65625,
+            "y": 56.5,
+            "width": 97.34375,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": false
+        },
+        {
+          "text": "Xem đảo Đảo Toán Học",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 18,
+            "y": 408,
+            "width": 99,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Toán 3 · Phép tính vui · Toán",
+          "tag": "SELECT",
+          "rect": {
+            "x": 123,
+            "y": 408,
+            "width": 99,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Bắt đầu ▶",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 228,
+            "y": 408,
+            "width": 74,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Xem đảo Khu Rừng Trí Nhớ",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 18,
+            "y": 470,
+            "width": 99,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Tiếng Anh · Gia đình · Tiếng AnhToán · Phép nhân · ToánTiếng Việt · Từ trái nghĩa · Tiếng Việt",
+          "tag": "SELECT",
+          "rect": {
+            "x": 123,
+            "y": 470,
+            "width": 99,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Bắt đầu ▶",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 228,
+            "y": 470,
+            "width": 74,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Xem đảo Xưởng Ngôn Từ",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 18,
+            "y": 532,
+            "width": 99,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Tiếng Anh · Ghép câu đơn giản · Tiếng Anh",
+          "tag": "SELECT",
+          "rect": {
+            "x": 123,
+            "y": 532,
+            "width": 99,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Bắt đầu ▶",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 228,
+            "y": 532,
+            "width": 74,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        }
+      ],
+      "engine": "three-webgl",
+      "state": "ready",
+      "gameControlCounts": {
+        "focus": 3,
+        "pack": 3,
+        "start": 3
+      },
+      "diagnostics": {
+        "engine": "three-webgl",
+        "frames": 466,
+        "fpsMedian": 59.9,
+        "fpsP95FrameMs": 17,
+        "tier": "low",
+        "dpr": 1,
+        "drawCalls": 46,
+        "triangles": 64852,
+        "textureBytesEstimate": 9437183.999999998,
+        "assetErrors": [],
+        "readyAssets": [
+          "math-world",
+          "fox-guide"
+        ],
+        "animationClips": [
+          "Idle",
+          "Cheer",
+          "Victory"
+        ],
+        "skeletalMeshes": 10,
+        "bones": 14,
+        "animationTime": 7.800400000000021,
+        "activeClip": "Idle",
+        "motion": true,
+        "paused": false
+      },
+      "renderer": "ANGLE (Intel, Intel(R) Arc(TM) Graphics (0x00007D55) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "runtimeSamples": [
+        {
+          "engine": "three-webgl",
+          "frames": 225,
+          "fpsMedian": 59.9,
+          "fpsP95FrameMs": 17,
+          "tier": "low",
+          "dpr": 1,
+          "drawCalls": 46,
+          "triangles": 64852,
+          "textureBytesEstimate": 9437183.999999998,
+          "assetErrors": [],
+          "readyAssets": [
+            "math-world",
+            "fox-guide"
+          ],
+          "animationClips": [
+            "Idle",
+            "Cheer",
+            "Victory"
+          ],
+          "skeletalMeshes": 10,
+          "bones": 14,
+          "animationTime": 3.783400000000004,
+          "activeClip": "Idle",
+          "motion": true,
+          "paused": false
+        },
+        {
+          "engine": "three-webgl",
+          "frames": 285,
+          "fpsMedian": 59.9,
+          "fpsP95FrameMs": 17.09999999999991,
+          "tier": "low",
+          "dpr": 1,
+          "drawCalls": 46,
+          "triangles": 64852,
+          "textureBytesEstimate": 9437183.999999998,
+          "assetErrors": [],
+          "readyAssets": [
+            "math-world",
+            "fox-guide"
+          ],
+          "animationClips": [
+            "Idle",
+            "Cheer",
+            "Victory"
+          ],
+          "skeletalMeshes": 10,
+          "bones": 14,
+          "animationTime": 4.783800000000008,
+          "activeClip": "Idle",
+          "motion": true,
+          "paused": false
+        },
+        {
+          "engine": "three-webgl",
+          "frames": 345,
+          "fpsMedian": 59.9,
+          "fpsP95FrameMs": 17,
+          "tier": "low",
+          "dpr": 1,
+          "drawCalls": 46,
+          "triangles": 64852,
+          "textureBytesEstimate": 9437183.999999998,
+          "assetErrors": [],
+          "readyAssets": [
+            "math-world",
+            "fox-guide"
+          ],
+          "animationClips": [
+            "Idle",
+            "Cheer",
+            "Victory"
+          ],
+          "skeletalMeshes": 10,
+          "bones": 14,
+          "animationTime": 5.783700000000009,
+          "activeClip": "Idle",
+          "motion": true,
+          "paused": false
+        },
+        {
+          "engine": "three-webgl",
+          "frames": 405,
+          "fpsMedian": 59.9,
+          "fpsP95FrameMs": 17,
+          "tier": "low",
+          "dpr": 1,
+          "drawCalls": 46,
+          "triangles": 64852,
+          "textureBytesEstimate": 9437183.999999998,
+          "assetErrors": [],
+          "readyAssets": [
+            "math-world",
+            "fox-guide"
+          ],
+          "animationClips": [
+            "Idle",
+            "Cheer",
+            "Victory"
+          ],
+          "skeletalMeshes": 10,
+          "bones": 14,
+          "animationTime": 6.783700000000017,
+          "activeClip": "Idle",
+          "motion": true,
+          "paused": false
+        }
+      ],
+      "errors": []
+    },
+    {
+      "name": "depth-math-320x640",
+      "focus": "math",
+      "emulatedTouch": true,
+      "screenshot": "depth-math-320x640.png",
+      "viewport": {
+        "width": 320,
+        "height": 640,
+        "dpr": 1
+      },
+      "horizontalOverflow": {
+        "root": 320,
+        "body": 320,
+        "exceedsViewport": false
+      },
+      "sections": {
+        ".site-header": {
+          "x": 0,
+          "y": 0,
+          "width": 320,
+          "height": 108
+        },
+        ".top-navigation": {
+          "x": 9,
+          "y": 56.5,
+          "width": 302,
+          "height": 44
+        },
+        ".ba3d-world": {
+          "x": 0,
+          "y": 108,
+          "width": 320,
+          "height": 532
+        },
+        ".ba3d-render-host": {
+          "x": 0,
+          "y": 208,
+          "width": 320,
+          "height": 190
+        },
+        ".ba3d-hero-title": {
+          "x": 12,
+          "y": 116,
+          "width": 296,
+          "height": 42.09375
+        },
+        ".ba3d-anchors": {
+          "x": 10,
+          "y": 402,
+          "width": 300,
+          "height": 180
+        },
+        ".ba3d-shortcuts": {
+          "x": 12,
+          "y": 588,
+          "width": 296,
+          "height": 44
+        },
+        ".ba3d-render-controls": {
+          "x": 12,
+          "y": 164,
+          "width": 296,
+          "height": 44
+        }
+      },
+      "controls": [
+        {
+          "text": "🏠 Thế giới game",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 9,
+            "y": 56.5,
+            "width": 97.328125,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": false
+        },
+        {
+          "text": "📊 Góc phụ huynh",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 111.328125,
+            "y": 56.5,
+            "width": 97.328125,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": false
+        },
+        {
+          "text": "📚 Xưởng học liệu",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 213.65625,
+            "y": 56.5,
+            "width": 97.34375,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": false
+        },
+        {
+          "text": "Xem đảo Đảo Toán Học",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 18,
+            "y": 408,
+            "width": 99,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Toán 3 · Phép tính vui · Toán",
+          "tag": "SELECT",
+          "rect": {
+            "x": 123,
+            "y": 408,
+            "width": 99,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Bắt đầu ▶",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 228,
+            "y": 408,
+            "width": 74,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Xem đảo Khu Rừng Trí Nhớ",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 18,
+            "y": 470,
+            "width": 99,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Tiếng Anh · Gia đình · Tiếng AnhToán · Phép nhân · ToánTiếng Việt · Từ trái nghĩa · Tiếng Việt",
+          "tag": "SELECT",
+          "rect": {
+            "x": 123,
+            "y": 470,
+            "width": 99,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Bắt đầu ▶",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 228,
+            "y": 470,
+            "width": 74,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Xem đảo Xưởng Ngôn Từ",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 18,
+            "y": 532,
+            "width": 99,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Tiếng Anh · Ghép câu đơn giản · Tiếng Anh",
+          "tag": "SELECT",
+          "rect": {
+            "x": 123,
+            "y": 532,
+            "width": 99,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Bắt đầu ▶",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 228,
+            "y": 532,
+            "width": 74,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        }
+      ],
+      "engine": "three-webgl",
+      "state": "ready",
+      "gameControlCounts": {
+        "focus": 3,
+        "pack": 3,
+        "start": 3
+      },
+      "diagnostics": {
+        "engine": "three-webgl",
+        "frames": 585,
+        "fpsMedian": 59.9,
+        "fpsP95FrameMs": 17,
+        "tier": "low",
+        "dpr": 1,
+        "drawCalls": 46,
+        "triangles": 64852,
+        "textureBytesEstimate": 9437183.999999998,
+        "assetErrors": [],
+        "readyAssets": [
+          "math-world",
+          "fox-guide"
+        ],
+        "animationClips": [
+          "Idle",
+          "Cheer",
+          "Victory"
+        ],
+        "skeletalMeshes": 10,
+        "bones": 14,
+        "animationTime": 9.783400000000027,
+        "activeClip": "Cheer",
+        "motion": true,
+        "paused": false
+      },
+      "renderer": "ANGLE (Intel, Intel(R) Arc(TM) Graphics (0x00007D55) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "errors": []
+    },
+    {
+      "name": "depth-default-844x390",
+      "focus": "default",
+      "emulatedTouch": true,
+      "screenshot": "depth-default-844x390.png",
+      "viewport": {
+        "width": 844,
+        "height": 390,
+        "dpr": 1
+      },
+      "horizontalOverflow": {
+        "root": 844,
+        "body": 844,
+        "exceedsViewport": false
+      },
+      "sections": {
+        ".site-header": {
+          "x": 0,
+          "y": 0,
+          "width": 844,
+          "height": 66
+        },
+        ".top-navigation": {
+          "x": 238.21875,
+          "y": 8.5,
+          "width": 489.28125,
+          "height": 46
+        },
+        ".ba3d-world": {
+          "x": 0,
+          "y": 66,
+          "width": 844,
+          "height": 324
+        },
+        ".ba3d-render-host": {
+          "x": 0,
+          "y": 116,
+          "width": 844,
+          "height": 119
+        },
+        ".ba3d-hero-title": {
+          "x": 24,
+          "y": 74,
+          "width": 548.59375,
+          "height": 25.296875
+        },
+        ".ba3d-anchors": {
+          "x": 12,
+          "y": 228,
+          "width": 820,
+          "height": 109
+        },
+        ".ba3d-shortcuts": {
+          "x": 24,
+          "y": 341,
+          "width": 349.3125,
+          "height": 44
+        },
+        ".ba3d-render-controls": {
+          "x": 630.15625,
+          "y": 71,
+          "width": 198.84375,
+          "height": 36
+        }
+      },
+      "controls": [
+        {
+          "text": "🏠 Thế giới game",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 238.21875,
+            "y": 8.5,
+            "width": 158.421875,
+            "height": 46
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": false
+        },
+        {
+          "text": "📊 Góc phụ huynh",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 403.640625,
+            "y": 8.5,
+            "width": 158.4375,
+            "height": 46
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": false
+        },
+        {
+          "text": "📚 Xưởng học liệu",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 569.078125,
+            "y": 8.5,
+            "width": 158.421875,
+            "height": 46
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": false
+        },
+        {
+          "text": "Xem đảo Đảo Toán Học",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 20,
+            "y": 236,
+            "width": 252,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Toán 3 · Phép tính vui · Toán",
+          "tag": "SELECT",
+          "rect": {
+            "x": 20,
+            "y": 285,
+            "width": 163,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Bắt đầu ▶",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 188,
+            "y": 285,
+            "width": 84,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Xem đảo Khu Rừng Trí Nhớ",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 296,
+            "y": 236,
+            "width": 252,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Tiếng Anh · Gia đình · Tiếng AnhToán · Phép nhân · ToánTiếng Việt · Từ trái nghĩa · Tiếng Việt",
+          "tag": "SELECT",
+          "rect": {
+            "x": 296,
+            "y": 285,
+            "width": 163,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Bắt đầu ▶",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 464,
+            "y": 285,
+            "width": 84,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Xem đảo Xưởng Ngôn Từ",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 572,
+            "y": 236,
+            "width": 252,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Tiếng Anh · Ghép câu đơn giản · Tiếng Anh",
+          "tag": "SELECT",
+          "rect": {
+            "x": 572,
+            "y": 285,
+            "width": 163,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Bắt đầu ▶",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 740,
+            "y": 285,
+            "width": 84,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        }
+      ],
+      "engine": "three-webgl",
+      "state": "ready",
+      "gameControlCounts": {
+        "focus": 3,
+        "pack": 3,
+        "start": 3
+      },
+      "diagnostics": {
+        "engine": "three-webgl",
+        "frames": 468,
+        "fpsMedian": 59.9,
+        "fpsP95FrameMs": 17,
+        "tier": "balanced",
+        "dpr": 1,
+        "drawCalls": 88,
+        "triangles": 122732,
+        "textureBytesEstimate": 9437183.999999998,
+        "assetErrors": [],
+        "readyAssets": [
+          "math-world",
+          "fox-guide"
+        ],
+        "animationClips": [
+          "Idle",
+          "Cheer",
+          "Victory"
+        ],
+        "skeletalMeshes": 10,
+        "bones": 14,
+        "animationTime": 7.833800000000017,
+        "activeClip": "Idle",
+        "motion": true,
+        "paused": false
+      },
+      "renderer": "ANGLE (Intel, Intel(R) Arc(TM) Graphics (0x00007D55) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "runtimeSamples": [
+        {
+          "engine": "three-webgl",
+          "frames": 229,
+          "fpsMedian": 59.9,
+          "fpsP95FrameMs": 17,
+          "tier": "balanced",
+          "dpr": 1,
+          "drawCalls": 88,
+          "triangles": 122732,
+          "textureBytesEstimate": 9437183.999999998,
+          "assetErrors": [],
+          "readyAssets": [
+            "math-world",
+            "fox-guide"
+          ],
+          "animationClips": [
+            "Idle",
+            "Cheer",
+            "Victory"
+          ],
+          "skeletalMeshes": 10,
+          "bones": 14,
+          "animationTime": 3.850300000000001,
+          "activeClip": "Idle",
+          "motion": true,
+          "paused": false
+        },
+        {
+          "engine": "three-webgl",
+          "frames": 288,
+          "fpsMedian": 59.9,
+          "fpsP95FrameMs": 17,
+          "tier": "balanced",
+          "dpr": 1,
+          "drawCalls": 88,
+          "triangles": 122732,
+          "textureBytesEstimate": 9437183.999999998,
+          "assetErrors": [],
+          "readyAssets": [
+            "math-world",
+            "fox-guide"
+          ],
+          "animationClips": [
+            "Idle",
+            "Cheer",
+            "Victory"
+          ],
+          "skeletalMeshes": 10,
+          "bones": 14,
+          "animationTime": 4.833600000000004,
+          "activeClip": "Idle",
+          "motion": true,
+          "paused": false
+        },
+        {
+          "engine": "three-webgl",
+          "frames": 349,
+          "fpsMedian": 59.9,
+          "fpsP95FrameMs": 17,
+          "tier": "balanced",
+          "dpr": 1,
+          "drawCalls": 88,
+          "triangles": 122732,
+          "textureBytesEstimate": 9437183.999999998,
+          "assetErrors": [],
+          "readyAssets": [
+            "math-world",
+            "fox-guide"
+          ],
+          "animationClips": [
+            "Idle",
+            "Cheer",
+            "Victory"
+          ],
+          "skeletalMeshes": 10,
+          "bones": 14,
+          "animationTime": 5.850200000000009,
+          "activeClip": "Idle",
+          "motion": true,
+          "paused": false
+        },
+        {
+          "engine": "three-webgl",
+          "frames": 409,
+          "fpsMedian": 59.9,
+          "fpsP95FrameMs": 17,
+          "tier": "balanced",
+          "dpr": 1,
+          "drawCalls": 88,
+          "triangles": 122732,
+          "textureBytesEstimate": 9437183.999999998,
+          "assetErrors": [],
+          "readyAssets": [
+            "math-world",
+            "fox-guide"
+          ],
+          "animationClips": [
+            "Idle",
+            "Cheer",
+            "Victory"
+          ],
+          "skeletalMeshes": 10,
+          "bones": 14,
+          "animationTime": 6.850400000000015,
+          "activeClip": "Idle",
+          "motion": true,
+          "paused": false
+        }
+      ],
+      "errors": []
+    },
+    {
+      "name": "depth-math-844x390",
+      "focus": "math",
+      "emulatedTouch": true,
+      "screenshot": "depth-math-844x390.png",
+      "viewport": {
+        "width": 844,
+        "height": 390,
+        "dpr": 1
+      },
+      "horizontalOverflow": {
+        "root": 844,
+        "body": 844,
+        "exceedsViewport": false
+      },
+      "sections": {
+        ".site-header": {
+          "x": 0,
+          "y": 0,
+          "width": 844,
+          "height": 66
+        },
+        ".top-navigation": {
+          "x": 238.21875,
+          "y": 8.5,
+          "width": 489.28125,
+          "height": 46
+        },
+        ".ba3d-world": {
+          "x": 0,
+          "y": 66,
+          "width": 844,
+          "height": 324
+        },
+        ".ba3d-render-host": {
+          "x": 0,
+          "y": 116,
+          "width": 844,
+          "height": 119
+        },
+        ".ba3d-hero-title": {
+          "x": 24,
+          "y": 74,
+          "width": 548.59375,
+          "height": 25.296875
+        },
+        ".ba3d-anchors": {
+          "x": 12,
+          "y": 228,
+          "width": 820,
+          "height": 109
+        },
+        ".ba3d-shortcuts": {
+          "x": 24,
+          "y": 341,
+          "width": 349.3125,
+          "height": 44
+        },
+        ".ba3d-render-controls": {
+          "x": 630.15625,
+          "y": 71,
+          "width": 198.84375,
+          "height": 36
+        }
+      },
+      "controls": [
+        {
+          "text": "🏠 Thế giới game",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 238.21875,
+            "y": 8.5,
+            "width": 158.421875,
+            "height": 46
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": false
+        },
+        {
+          "text": "📊 Góc phụ huynh",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 403.640625,
+            "y": 8.5,
+            "width": 158.4375,
+            "height": 46
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": false
+        },
+        {
+          "text": "📚 Xưởng học liệu",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 569.078125,
+            "y": 8.5,
+            "width": 158.421875,
+            "height": 46
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": false
+        },
+        {
+          "text": "Xem đảo Đảo Toán Học",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 20,
+            "y": 233,
+            "width": 252,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Toán 3 · Phép tính vui · Toán",
+          "tag": "SELECT",
+          "rect": {
+            "x": 20,
+            "y": 282,
+            "width": 163,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Bắt đầu ▶",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 188,
+            "y": 282,
+            "width": 84,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Xem đảo Khu Rừng Trí Nhớ",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 296,
+            "y": 236,
+            "width": 252,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Tiếng Anh · Gia đình · Tiếng AnhToán · Phép nhân · ToánTiếng Việt · Từ trái nghĩa · Tiếng Việt",
+          "tag": "SELECT",
+          "rect": {
+            "x": 296,
+            "y": 285,
+            "width": 163,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Bắt đầu ▶",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 464,
+            "y": 285,
+            "width": 84,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Xem đảo Xưởng Ngôn Từ",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 572,
+            "y": 236,
+            "width": 252,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Tiếng Anh · Ghép câu đơn giản · Tiếng Anh",
+          "tag": "SELECT",
+          "rect": {
+            "x": 572,
+            "y": 285,
+            "width": 163,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Bắt đầu ▶",
+          "tag": "BUTTON",
+          "rect": {
+            "x": 740,
+            "y": 285,
+            "width": 84,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        }
+      ],
+      "engine": "three-webgl",
+      "state": "ready",
+      "gameControlCounts": {
+        "focus": 3,
+        "pack": 3,
+        "start": 3
+      },
+      "diagnostics": {
+        "engine": "three-webgl",
+        "frames": 589,
+        "fpsMedian": 59.9,
+        "fpsP95FrameMs": 17,
+        "tier": "balanced",
+        "dpr": 1,
+        "drawCalls": 88,
+        "triangles": 122732,
+        "textureBytesEstimate": 9437183.999999998,
+        "assetErrors": [],
+        "readyAssets": [
+          "math-world",
+          "fox-guide"
+        ],
+        "animationClips": [
+          "Idle",
+          "Cheer",
+          "Victory"
+        ],
+        "skeletalMeshes": 10,
+        "bones": 14,
+        "animationTime": 9.850100000000014,
+        "activeClip": "Cheer",
+        "motion": true,
+        "paused": false
+      },
+      "renderer": "ANGLE (Intel, Intel(R) Arc(TM) Graphics (0x00007D55) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "errors": []
+    }
+  ],
+  "errors": []
+}

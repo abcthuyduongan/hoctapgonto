@@ -16,10 +16,10 @@ interface Props {
   worldActive: boolean;
   motionOn: boolean;
 }
-const themes:Record<string,{world:string,icon:string,num:string,description:string}>= {
-  'math-quest': {world:'Đảo Toán Học',icon:'✦',num:'01',description:'Vượt thử thách toán học'},
-  'memory-match': {world:'Khu Rừng Trí Nhớ',icon:'❀',num:'02',description:'Tìm cặp thẻ bí mật'},
-  'sentence-builder': {world:'Xưởng Ngôn Từ',icon:'✿',num:'03',description:'Ghép câu thông minh'}
+const themes:Record<string,{world:string,icon:string,symbol:string,num:string,description:string}>= {
+  'math-quest': {world:'Đảo Toán Học',icon:'✦',symbol:'∑',num:'01',description:'Từng phép tính, một khám phá mới'},
+  'memory-match': {world:'Khu Rừng Trí Nhớ',icon:'❀',symbol:'◇',num:'02',description:'Quan sát tinh mắt, ghi nhớ thật lâu'},
+  'sentence-builder': {world:'Xưởng Ngôn Từ',icon:'✿',symbol:'Aa',num:'03',description:'Ghép những từ nhỏ thành câu hay'}
 };
 export default function StudentScreen({packs,sessions,onPlay,starting,onOpenMini,worldActive,motionOn}:Props){
   const [chosen,setChosen]=useState<Record<string,string>>({});
@@ -31,7 +31,7 @@ export default function StudentScreen({packs,sessions,onPlay,starting,onOpenMini
   const [quality,setQuality]=useState<QualityChoice>('auto');
   const completed=sessions.filter(s=>s.status==='completed').length;
   const stars=Math.min(completed*3,999);
-  return <div className="ba3d-home" id="home">
+  return <div className={`ba3d-home${premium3DEnabled?' premium-world':''}`} id="home">
     <section className="ba3d-world" aria-label="Bảo An Learning: thế giới game 3D tương tác">
       <div className="ba3d-sky" aria-hidden="true" />
       <WorldCanvas selected={focused} onSelect={setFocused} active={worldActive} motionOn={motionOn}
@@ -47,9 +47,9 @@ export default function StudentScreen({packs,sessions,onPlay,starting,onOpenMini
       <div className="ba3d-softlight" aria-hidden="true" />
       <div className="ba3d-greeter" aria-label="Lời chào của nhân vật đồng hành"><span className="ba3d-hello">Chào nhà thám hiểm!</span><span>Ba thế giới đang đợi con khám phá ✨</span></div>
       <div className="ba3d-hero-title">
-        <span className="ba3d-edition">✦ {premium3DEnabled?'V3.7 · 3D THỬ NGHIỆM · PR02':'REAL 3D GAME WORLD · V3.7 RC1'} ✦</span>
-        <h1>Khám phá <span>Thế giới học tập</span></h1>
-        <p>Học qua trò chơi · Khám phá tri thức · Lớn lên mỗi ngày</p>
+        <span className="ba3d-edition">{premium3DEnabled?'MỖI NGÀY MỘT KHÁM PHÁ':'✦ REAL 3D GAME WORLD · V3.7 RC1 ✦'}</span>
+        <h1>{premium3DEnabled?<span className="ba3d-title-lead">Khám phá </span>:<>Khám phá </>}<span>Thế giới học tập</span></h1>
+        <p>{premium3DEnabled?'Ba miền tri thức. Một hành trình lớn lên cùng con.':'Học qua trò chơi · Khám phá tri thức · Lớn lên mỗi ngày'}</p>
       </div>
       <aside className="ba3d-achievement" aria-label="Tiến độ học tập">
         <div className="ba3d-wood-head">⭐ Hành trình của con</div>
@@ -64,8 +64,9 @@ export default function StudentScreen({packs,sessions,onPlay,starting,onOpenMini
           return <article className={`ba3d-island-control ba3d-${game.id} ${focused===game.id?'ba3d-selected':''}`} key={game.id}
             onMouseEnter={()=>{if(motionOn)setFocused(game.id as WorldId)}} onMouseLeave={()=>setFocused(null)}>
             <button type="button" className="ba3d-world-name" onClick={()=>setFocused(game.id as WorldId)} aria-label={`Xem đảo ${theme.world}`}>
-              <span className="ba3d-world-number">{theme.icon} {theme.num}</span><strong>{game.label}</strong><small>{theme.world}</small>
+              <span className="ba3d-world-number">{premium3DEnabled?<><span className="ba3d-world-symbol" aria-hidden="true">{theme.symbol}</span><span className="ba3d-world-index">{theme.num}</span></>:<>{theme.icon} {theme.num}</>}</span><strong>{game.label}</strong><small>{theme.world}</small>
             </button>
+            {premium3DEnabled&&<p className="ba3d-world-description">{theme.description}</p>}
             <label className="ba3d-sr-only" htmlFor={`ba3d-pack-${game.id}`}>Chọn bộ học liệu cho {game.label}</label>
             <select id={`ba3d-pack-${game.id}`} value={pack?`${pack.id}@${pack.version}`:''} disabled={!pack||starting}
               onChange={e=>setChosen(prev=>({...prev,[game.id]:e.target.value}))}>

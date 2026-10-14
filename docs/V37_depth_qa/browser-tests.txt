@@ -1,0 +1,39 @@
+
+> bao-an-learning-v3-6-3d@3.7.0-rc.1 test:premium
+> playwright test --config=playwright.v37.config.ts
+
+[WebServer] (node:38860) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 26 tests using 1 worker
+
+(node:37248) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok  1 [edge-production] › tests\visual\gameplay-regression.spec.ts:61:1 › Math Quest completes all 8 answers once, including rapid answer/next clicks, and persists after refresh (3.1s)
+  ok  2 [edge-production] › tests\visual\gameplay-regression.spec.ts:81:1 › Memory Match recovers from rapid mismatched taps, completes 6 pairs and preserves exactly 7 attempts (3.5s)
+  ok  3 [edge-production] › tests\visual\gameplay-regression.spec.ts:106:1 › Sentence Builder completes the actual 6-sentence seed, rejects invalid drag indices and persists (3.8s)
+  ok  4 [edge-production] › tests\visual\gameplay-regression.spec.ts:129:1 › Refreshing an active game abandons its session without losing the recorded answer (1.5s)
+  ok  5 [edge-production] › tests\visual\gameplay-regression.spec.ts:146:1 › Closing and reopening a tab on the same origin preserves the answer and abandons the interrupted session (1.8s)
+  ok  6 [edge-production] › tests\visual\gameplay-regression.spec.ts:164:1 › A new teacher JSON pack imports through the UI, plays fully and survives refresh without overwriting (2.6s)
+  ok  7 [edge-production] › tests\visual\mobile-ui-lock.spec.ts:42:3 › Premium DOM controls and answer layouts remain usable at 1920×1080 (3.8s)
+  ok  8 [edge-production] › tests\visual\mobile-ui-lock.spec.ts:42:3 › Premium DOM controls and answer layouts remain usable at 1440×900 (3.0s)
+  ok  9 [edge-production] › tests\visual\mobile-ui-lock.spec.ts:42:3 › Premium DOM controls and answer layouts remain usable at 1366×768 (2.9s)
+  ok 10 [edge-production] › tests\visual\mobile-ui-lock.spec.ts:42:3 › Premium DOM controls and answer layouts remain usable at 1024×768 (2.5s)
+  ok 11 [edge-production] › tests\visual\mobile-ui-lock.spec.ts:42:3 › Premium DOM controls and answer layouts remain usable at 768×1024 (2.9s)
+  ok 12 [edge-production] › tests\visual\mobile-ui-lock.spec.ts:42:3 › Premium DOM controls and answer layouts remain usable at 390×844 (3.3s)
+  ok 13 [edge-production] › tests\visual\mobile-ui-lock.spec.ts:42:3 › Premium DOM controls and answer layouts remain usable at 375×812 (2.6s)
+  ok 14 [edge-production] › tests\visual\mobile-ui-lock.spec.ts:42:3 › Premium DOM controls and answer layouts remain usable at 320×640 (2.2s)
+  ok 15 [edge-production] › tests\visual\mobile-ui-lock.spec.ts:85:1 › Touch input opens a game and submits Math and Sentence answers on a mobile viewport (3.0s)
+  ok 16 [edge-production] › tests\visual\mobile-ui-lock.spec.ts:105:1 › Keyboard navigation activates DOM game controls, answers and returns focus to the start button (1.4s)
+  ok 17 [edge-production] › tests\visual\mobile-ui-lock.spec.ts:128:1 › Reduced motion freezes the skeletal mixer and still permits focus, quality changes and play (4.0s)
+  ok 18 [edge-production] › tests\visual\mobile-ui-lock.spec.ts:153:1 › Mobile landscape keeps primary controls within the short viewport (1.1s)
+  ok 19 [edge-production] › tests\visual\premium-world.spec.ts:18:1 › Production flag defaults to legacy and premium loads actual textured GLBs, rig and running clips (9.2s)
+  ok 20 [edge-production] › tests\visual\premium-world.spec.ts:74:1 › All three decoded skeletal clips deform bones in the actual production renderer (2.0s)
+  ok 21 [edge-production] › tests\visual\premium-world.spec.ts:127:1 › Game controls work before delayed premium models finish, and the world pauses behind the game (3.8s)
+  ok 22 [edge-production] › tests\visual\premium-world.spec.ts:161:1 › Missing required GLB falls back to a new legacy canvas while DOM gameplay stays available (1.2s)
+  ok 23 [edge-production] › tests\visual\premium-world.spec.ts:173:1 › A real texture decode failure falls back instead of showing untextured premium models (1.2s)
+  ok 24 [edge-production] › tests\visual\premium-world.spec.ts:192:1 › Without any WebGL context, Canvas fallback still opens all three games through DOM controls (2.9s)
+  ok 25 [edge-production] › tests\visual\premium-world.spec.ts:210:1 › Actual WEBGL_lose_context replaces the premium canvas and keeps gameplay usable (1.4s)
+  ok 26 [edge-production] › tests\visual\premium-world.spec.ts:229:1 › Twenty home/parent transitions release canvas listeners and every renderer RAF (7.0s)
+
+  26 passed (1.3m)

@@ -5,6 +5,7 @@
 - Chạy `MO_V37_PREMIUM_WINDOWS.bat`, rồi mở `http://localhost:5178/?premium3d=1` để xem lát cắt mới. Hoặc dùng `npm ci`, `npm run build`, `npm run preview -- --port 5178`.
 - Mặc định giữ renderer cũ; nút **Thử cảnh 3D mới** bật bản xem thử. `?premium3d=0` hoặc `VITE_PREMIUM_3D_ENABLED=false` quay về renderer cũ. Cấu hình này không thay đổi dữ liệu học tập.
 - Báo cáo, ảnh trong browser và tình trạng nghiệm thu: [docs/QA_V37_PREMIUM.md](docs/QA_V37_PREMIUM.md). Nguồn model: [docs/ASSET_LICENSES_V37.md](docs/ASSET_LICENSES_V37.md).
+- Lần chỉnh sau phản hồi “thiếu chiều sâu”: Math/cáo lớn ở tiền cảnh, hai đảo lùi sau, nền đồi/mây có lớp, vách đá và công trình nhiều chi tiết; giao diện kem/teal gọn hơn. [Ảnh và nhận xét trước/sau](docs/V37_depth_qa/visual-review.md), [kiểm thử lần chỉnh](docs/V37_depth_qa/browser-tests.txt). Vẫn thuộc PR02, chưa phải nghiệm thu premium.
 - Kiểm tra code: `npm run typecheck`, `npm run test:core`, `npm run test:content`, `npm run test:guide-animation`, `npm run test:renderer`. Sau build chạy `npm run test:premium` (Edge) và `npm run test:visual` (Chrome).
 - `npm run gate:premium-art` **vẫn FAIL** do chưa có ba model còn lại và chưa duyệt mỹ thuật/điện thoại thật. Không giảm gate để gắn nhãn FINAL.
 - Hai tệp HTML offline V3.6.2 giữ nguyên renderer/localStorage riêng, không có renderer Three.js mới.

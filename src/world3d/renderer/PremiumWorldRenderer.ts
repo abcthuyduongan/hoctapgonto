@@ -7,12 +7,12 @@ import { disposeScene, estimateTextureBytes } from './disposeScene';
 import { PerformanceMetrics } from './performanceMetrics';
 import { QualityManager, QUALITY } from './qualityManager';
 import { buildWorld } from '../scenes/buildWorld';
-import { WORLD_LAYOUT, MASCOT_POSITION } from '../scenes/worldLayout';
+import { WORLD_LAYOUT, MOBILE_WORLD_LAYOUT, MASCOT_POSITION } from '../scenes/worldLayout';
 import { MascotController } from '../scenes/mascotController';
 
 class PremiumWorldRenderer implements WorldRenderer {
   private world = buildWorld();
-  private camera = new PerspectiveCamera(36, 1, .1, 150);
+  private camera = new PerspectiveCamera(32, 1, .1, 150);
   private renderer?: WebGLRenderer;
   private loader: AssetLoader;
   private controller = new AbortController();
@@ -21,8 +21,8 @@ class PremiumWorldRenderer implements WorldRenderer {
   private mascot?: MascotController;
   private resizeObserver?: ResizeObserver;
   private raycaster = new Raycaster();
-  private target = new Vector3(0, .5, 0);
-  private focusTarget = new Vector3(0, .5, 0);
+  private target = new Vector3(0, .3, 0);
+  private focusTarget = new Vector3(0, .3, 0);
   private raf = 0;
   private lastTime = 0;
   private lastStats = 0;
@@ -106,8 +106,8 @@ class PremiumWorldRenderer implements WorldRenderer {
     // Attach both roots before validation so any subsequent failure cleans both.
     const group = this.world.worlds.get('math-quest')!;
     group.children.forEach(disposeScene); group.clear(); group.add(math.scene);
-    fox.scene.position.set(...MASCOT_POSITION); fox.scene.scale.setScalar(.85);
-    this.world.scene.add(fox.scene);
+    fox.scene.position.set(...MASCOT_POSITION); fox.scene.scale.setScalar(.9);
+    group.add(fox.scene);
     this.mascot = new MascotController(fox.scene, fox.animations);
     this.clips = fox.animations.map(clip => clip.name);
     fox.scene.traverse(node => {
@@ -129,9 +129,17 @@ class PremiumWorldRenderer implements WorldRenderer {
     const height = Math.max(1, this.opts.canvas.clientHeight);
     this.renderer.setSize(width, height, false);
     this.camera.aspect = width / height;
-    // Fit all three landmarks, including the guide, at every aspect ratio.
-    const distance = Math.max(11, 17 / (2 * Math.tan(36 * Math.PI / 360) * this.camera.aspect));
-    this.camera.position.set(0, distance * .32 + 2, distance);
+    const mobile = width <= 700;
+    const layout = mobile ? MOBILE_WORLD_LAYOUT : WORLD_LAYOUT;
+    for (const [id, root] of this.world.worlds) {
+      const placement = layout[id]; root.position.set(placement.x, placement.y, placement.z);
+      root.scale.setScalar(placement.scale);
+    }
+    // A foreground Math island and two rear landmarks replace the flat icon row.
+    // Portrait framing favors the guide while preserving the HTML routes to all games.
+    const span = mobile ? 7.8 : 17;
+    const distance = Math.max(mobile ? 12.8 : 12.5, span / (2 * Math.tan(32 * Math.PI / 360) * this.camera.aspect) + 1.7);
+    this.camera.position.set(.8, distance * .36 + 1, distance);
     this.camera.updateProjectionMatrix();
     this.camera.lookAt(this.target);
     this.invalidate();
@@ -171,7 +179,7 @@ class PremiumWorldRenderer implements WorldRenderer {
   focusOn(id: WorldId | null) {
     if (id === this.selected) return;
     this.selected = id;
-    this.focusTarget.set(id ? WORLD_LAYOUT[id].x * .16 : 0, .5, 0);
+    this.focusTarget.set(id ? this.world.worlds.get(id)!.position.x * .17 : 0, .3, 0);
     if (!this.motion) this.target.copy(this.focusTarget);
     else if (id) this.mascot?.play('Cheer');
     this.invalidate();

@@ -1,0 +1,25 @@
+
+> bao-an-learning-v3-6-3d@3.7.0-rc.1 build
+> tsc -b && vite build
+
+vite v7.3.7 building client environment for production...
+transforming...
+✓ 82 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                 0.61 kB │ gzip:   0.41 kB
+dist/assets/index-g5jn-MuG.css                201.90 kB │ gzip:  40.98 kB
+dist/assets/TimesTable-Cl96XDQS.js              1.56 kB │ gzip:   0.78 kB
+dist/assets/FeedbackEffects-2ofVNksi.js         3.21 kB │ gzip:   1.32 kB
+dist/assets/MathQuest-DXUA0MAx.js               4.92 kB │ gzip:   2.17 kB
+dist/assets/MemoryMatch-Bc0x9xTP.js             5.75 kB │ gzip:   2.34 kB
+dist/assets/SentenceBuilder-C6us_54j.js         6.38 kB │ gzip:   2.59 kB
+dist/assets/legacyAdapter-D0QQrofV.js          30.42 kB │ gzip:  12.65 kB
+dist/assets/index-DCCs8G6U.js                 274.83 kB │ gzip:  85.91 kB
+dist/assets/PremiumWorldRenderer-CHUM0ONR.js  653.89 kB │ gzip: 168.11 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 1.98s

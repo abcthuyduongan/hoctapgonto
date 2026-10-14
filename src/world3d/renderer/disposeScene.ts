@@ -1,4 +1,4 @@
-import { Material, Mesh, Texture, type Object3D } from 'three';
+import { InstancedMesh, Material, Mesh, Texture, type Object3D } from 'three';
 
 /** Resources can be shared by many meshes. Release each exactly once. */
 export function disposeScene(root: Object3D) {
@@ -15,6 +15,7 @@ export function disposeScene(root: Object3D) {
       for (const value of Object.values(material)) if (value instanceof Texture) textures.add(value);
     }
     if (mesh.skeleton) skeletons.add(mesh.skeleton);
+    if (mesh instanceof InstancedMesh) mesh.dispose();
   });
   geometries.forEach(value => value.dispose());
   materials.forEach(value => value.dispose());

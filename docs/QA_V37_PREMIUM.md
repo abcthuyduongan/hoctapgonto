@@ -2,6 +2,8 @@
 
 Ngày thực hiện: **14/10/2026**, múi giờ Việt Nam. Quyết định: **CONTINUE PR-02 / CHỜ DUYỆT**, chưa đủ điều kiện PR-03 hoặc FINAL.
 
+**Cập nhật sau phản hồi chất lượng:** đã chỉnh lại chiều sâu cảnh, tỷ lệ cáo/đảo Toán và giao diện. Báo cáo này lưu bằng chứng của bản PR02 đầu tiên; ảnh và số liệu mới nằm ở [V37_depth_qa/visual-review.md](V37_depth_qa/visual-review.md) và thư mục `V37_depth_qa/`. Không dùng số liệu/ảnh cũ dưới đây để đại diện cho cảnh đã sửa.
+
 Đã triển khai renderer premium thật trên nền React V3.6.2 RC2: cáo GLB có PBR, skin và ba clip xương; đảo Toán có lâu đài, đường đi và biểu tượng số. Hai đảo còn lại trong chế độ mới là landmark thủ tục để giữ bố cục, chưa phải asset premium. Không dùng ảnh concept làm tấm phẳng thay mô hình.
 
 ## Mở bản chạy thật
