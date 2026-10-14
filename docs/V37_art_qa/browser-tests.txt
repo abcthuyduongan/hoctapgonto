@@ -1,0 +1,144 @@
+
+> bao-an-learning-v3-6-3d@3.7.0-rc.1 test:premium
+> playwright test --config=playwright.v37.config.ts
+
+[WebServer] (node:5964) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 55 tests using 1 worker
+
+(node:30688) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok  1 [edge-production] › tests\visual\art-world.spec.ts:12:1 › All five actual production GLBs download in a two-request window with embedded PBR images and usable geometry (1.9s)
+  ok  2 [edge-production] › tests\visual\art-world.spec.ts:64:1 › The real production renderer imports textured Memory, Language and Environment volumes and retains decoded maps in each game (2.1s)
+  ok  3 [edge-production] › tests\visual\art-world.spec.ts:124:3 › Missing new memory-world GLB replaces the premium canvas safely while every game still opens (2.4s)
+  ok  4 [edge-production] › tests\visual\art-world.spec.ts:124:3 › Missing new language-world GLB replaces the premium canvas safely while every game still opens (1.7s)
+  ok  5 [edge-production] › tests\visual\art-world.spec.ts:124:3 › Missing new environment GLB replaces the premium canvas safely while every game still opens (2.3s)
+  ok  6 [edge-production] › tests\visual\art-world.spec.ts:138:1 › An actual embedded PNG decode failure in the new Memory model falls back safely and still records a Math answer (2.6s)
+  x   7 [edge-production] › tests\visual\art-world.spec.ts:155:1 › A decoded Math material-name validation failure closes every catalog bitmap exactly once before fallback (16.0s)
+(node:17448) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok  8 [edge-production] › tests\visual\game-scene.spec.ts:47:1 › All games reuse the home canvas, WebGL context and decoded GLBs, including answers, quality and return home (9.5s)
+  ok  9 [edge-production] › tests\visual\game-scene.spec.ts:143:3 › math-quest shows the same guide for waiting, retry, correct and completion through real gameplay (4.1s)
+  ok 10 [edge-production] › tests\visual\game-scene.spec.ts:143:3 › memory-match shows the same guide for waiting, retry, correct and completion through real gameplay (4.2s)
+  ok 11 [edge-production] › tests\visual\game-scene.spec.ts:143:3 › sentence-builder shows the same guide for waiting, retry, correct and completion through real gameplay (6.1s)
+  ok 12 [edge-production] › tests\visual\game-scene.spec.ts:184:1 › The live guide follows its DOM portrait window across responsive viewport changes (1.5s)
+  ok 13 [edge-production] › tests\visual\game-scene.spec.ts:207:1 › Repeated correct Memory pairs replay the guide cue without recreating the scene (1.6s)
+  ok 14 [edge-production] › tests\visual\game-scene.spec.ts:219:1 › Hidden-document lifecycle stops the game RAF and resumes the same scene on visibility (4.2s)
+  ok 15 [edge-production] › tests\visual\game-scene.spec.ts:234:1 › Reduced motion keeps a visible static game guide and feedback without a continuing RAF (2.9s)
+  ok 16 [edge-production] › tests\visual\game-scene.spec.ts:255:1 › Unavailable premium scene shows the same rendered fox fallback and all game controls remain usable (1.9s)
+  ok 17 [edge-production] › tests\visual\gameplay-regression.spec.ts:61:1 › Math Quest completes all 8 answers once, including rapid answer/next clicks, and persists after refresh (3.9s)
+  ok 18 [edge-production] › tests\visual\gameplay-regression.spec.ts:81:1 › Memory Match recovers from rapid mismatched taps, completes 6 pairs and preserves exactly 7 attempts (4.1s)
+  ok 19 [edge-production] › tests\visual\gameplay-regression.spec.ts:106:1 › Sentence Builder completes the actual 6-sentence seed, rejects invalid drag indices and persists (5.1s)
+  ok 20 [edge-production] › tests\visual\gameplay-regression.spec.ts:129:1 › Refreshing an active game abandons its session without losing the recorded answer (1.9s)
+  ok 21 [edge-production] › tests\visual\gameplay-regression.spec.ts:146:1 › Closing and reopening a tab on the same origin preserves the answer and abandons the interrupted session (1.9s)
+  ok 22 [edge-production] › tests\visual\gameplay-regression.spec.ts:164:1 › A new teacher JSON pack imports through the UI, plays fully and survives refresh without overwriting (3.5s)
+  ok 23 [edge-production] › tests\visual\island-carousel.spec.ts:70:5 › Initial carousel gives all islands equal standing and the guide waits at the left corner at 1440×900 (1.2s)
+  ok 24 [edge-production] › tests\visual\island-carousel.spec.ts:79:3 › Fox and waiting platform fit completely inside the left corner, initially and after overview, at 1440×900 (1.4s)
+  ok 25 [edge-production] › tests\visual\island-carousel.spec.ts:79:3 › Fox and waiting platform fit completely inside the left corner, initially and after overview, at 768×1024 (1.4s)
+  ok 26 [edge-production] › tests\visual\island-carousel.spec.ts:70:5 › Initial carousel gives all islands equal standing and the guide waits at the left corner at 390×844 (971ms)
+  ok 27 [edge-production] › tests\visual\island-carousel.spec.ts:79:3 › Fox and waiting platform fit completely inside the left corner, initially and after overview, at 390×844 (1.4s)
+  ok 28 [edge-production] › tests\visual\island-carousel.spec.ts:70:5 › Initial carousel gives all islands equal standing and the guide waits at the left corner at 320×640 (817ms)
+  ok 29 [edge-production] › tests\visual\island-carousel.spec.ts:79:3 › Fox and waiting platform fit completely inside the left corner, initially and after overview, at 320×640 (1.8s)
+  ok 30 [edge-production] › tests\visual\island-carousel.spec.ts:151:1 › Selecting each island rotates it forward, lands the guide there and survives leaving its control (10.6s)
+  ok 31 [edge-production] › tests\visual\island-carousel.spec.ts:172:1 › The actual built renderer rotates through intermediate positions and moves the guide along an airborne arc (2.9s)
+  ok 32 [edge-production] › tests\visual\island-carousel.spec.ts:216:1 › Rapid choices settle on the latest island without new model fetches or a stale arrival (5.0s)
+  ok 33 [edge-production] › tests\visual\island-carousel.spec.ts:229:1 › Overview explicitly returns the guide to its left waiting corner and restores the equal island row (5.3s)
+  ok 34 [edge-production] › tests\visual\island-carousel.spec.ts:249:1 › Quality and responsive resize preserve the chosen island and the guide arrival (5.0s)
+  ok 35 [edge-production] › tests\visual\island-carousel.spec.ts:266:1 › Reduced motion snaps selection and overview while leaving no continuing animation frame (7.6s)
+  ok 36 [edge-production] › tests\visual\mobile-ui-lock.spec.ts:42:3 › Premium DOM controls and answer layouts remain usable at 1920×1080 (3.2s)
+  ok 37 [edge-production] › tests\visual\mobile-ui-lock.spec.ts:42:3 › Premium DOM controls and answer layouts remain usable at 1440×900 (2.6s)
+  ok 38 [edge-production] › tests\visual\mobile-ui-lock.spec.ts:42:3 › Premium DOM controls and answer layouts remain usable at 1366×768 (2.5s)
+  ok 39 [edge-production] › tests\visual\mobile-ui-lock.spec.ts:42:3 › Premium DOM controls and answer layouts remain usable at 1024×768 (2.5s)
+  ok 40 [edge-production] › tests\visual\mobile-ui-lock.spec.ts:42:3 › Premium DOM controls and answer layouts remain usable at 768×1024 (2.3s)
+  ok 41 [edge-production] › tests\visual\mobile-ui-lock.spec.ts:42:3 › Premium DOM controls and answer layouts remain usable at 390×844 (2.1s)
+  ok 42 [edge-production] › tests\visual\mobile-ui-lock.spec.ts:42:3 › Premium DOM controls and answer layouts remain usable at 375×812 (2.9s)
+  ok 43 [edge-production] › tests\visual\mobile-ui-lock.spec.ts:42:3 › Premium DOM controls and answer layouts remain usable at 320×640 (2.4s)
+  ok 44 [edge-production] › tests\visual\mobile-ui-lock.spec.ts:85:1 › Touch input opens a game and submits Math and Sentence answers on a mobile viewport (2.3s)
+  ok 45 [edge-production] › tests\visual\mobile-ui-lock.spec.ts:105:1 › Keyboard navigation activates DOM game controls, answers and returns focus to the start button (1.4s)
+  ok 46 [edge-production] › tests\visual\mobile-ui-lock.spec.ts:128:1 › Reduced motion freezes the skeletal mixer and still permits focus, quality changes and play (5.6s)
+  ok 47 [edge-production] › tests\visual\mobile-ui-lock.spec.ts:153:1 › Mobile landscape keeps primary controls within the short viewport (1.2s)
+  ok 48 [edge-production] › tests\visual\premium-world.spec.ts:19:1 › Default home uses one premium scene with textured GLBs, rig and running clips (7.0s)
+  ok 49 [edge-production] › tests\visual\premium-world.spec.ts:83:1 › All three decoded skeletal clips deform bones in the actual production renderer (2.0s)
+  ok 50 [edge-production] › tests\visual\premium-world.spec.ts:136:1 › Game controls work before delayed models finish, then the same canvas renders the game scene (2.2s)
+  ok 51 [edge-production] › tests\visual\premium-world.spec.ts:175:1 › Missing required GLB falls back to a new legacy canvas while DOM gameplay stays available (1.9s)
+  ok 52 [edge-production] › tests\visual\premium-world.spec.ts:187:1 › A real texture decode failure falls back instead of showing untextured premium models (1.6s)
+  ok 53 [edge-production] › tests\visual\premium-world.spec.ts:206:1 › Without any WebGL context, Canvas fallback still opens all three games through DOM controls (2.1s)
+  ok 54 [edge-production] › tests\visual\premium-world.spec.ts:224:1 › Actual WEBGL_lose_context replaces the premium canvas and keeps gameplay usable (1.5s)
+  ok 55 [edge-production] › tests\visual\premium-world.spec.ts:243:1 › Twenty home/parent transitions release canvas listeners and every renderer RAF (13.6s)
+
+
+  1) [edge-production] › tests\visual\art-world.spec.ts:155:1 › A decoded Math material-name validation failure closes every catalog bitmap exactly once before fallback
+
+    Error: expect(locator).toHaveAttribute(expected) failed
+
+    Locator:  locator('.ba3d-render-host')
+    Expected: "fallback"
+    Received: "ready"
+    Timeout:  15000ms
+
+    Call log:
+      - Expect "toHaveAttribute" locator('.ba3d-render-host') with timeout 15000ms
+      - waiting for locator('.ba3d-render-host')
+        3 × locator resolved to <div data-premium="true" data-state="loading" class="ba3d-render-host">…</div>
+          - unexpected value "loading"
+        - locator resolved to <div data-premium="true" data-state="loading" class="ba3d-render-host" data-engine="three-webgl" data-diagnostics="{"engine":"three-webgl","frames":0,"tier":"balanced","selectedWorld":null,"carouselMoving":false,"rotation":0.5235987755982988,"islands":[{"id":"math-quest","x":-4.6,"y":0,"z":-1,"scale":1},{"id":"memory-match","x":0,"y":0,"z":-1,"scale":1},{"id":"sentence-builder","x":4.6,"y":0,"z":-1,"scale":1}],"mascotLocation":"waiting","mascotState":"waiting","mascotPosition":{"x":-7.4,"y":0.12,"z…>…</div>
+        - unexpected value "loading"
+        2 × locator resolved to <div data-state="ready" data-premium="true" class="ba3d-render-host" data-engine="three-webgl" data-diagnostics="{"engine":"three-webgl","frames":1,"fpsMedian":9,"fpsP95FrameMs":111.14799999999997,"tier":"balanced","selectedWorld":null,"carouselMoving":false,"rotation":0.5235987755982988,"islands":[{"id":"math-quest","x":-4.6,"y":0,"z":-1,"scale":1},{"id":"memory-match","x":0,"y":0,"z":-1,"scale":1},{"id":"sentence-builder","x":4.6,"y":0,"z":-1,"scale":1}],"mascotLocation":"waiting","mascotState":"…>…</div>
+          - unexpected value "ready"
+        2 × locator resolved to <div data-state="ready" data-premium="true" class="ba3d-render-host" data-engine="three-webgl" data-diagnostics="{"engine":"three-webgl","frames":36,"fpsMedian":57.1,"fpsP95FrameMs":18.100000000000136,"tier":"balanced","selectedWorld":null,"carouselMoving":false,"rotation":0.5235987755982988,"islands":[{"id":"math-quest","x":-4.6,"y":0,"z":-1,"scale":1},{"id":"memory-match","x":0,"y":0,"z":-1,"scale":1},{"id":"sentence-builder","x":4.6,"y":0,"z":-1,"scale":1}],"mascotLocation":"waiting","mascotStat…>…</div>
+          - unexpected value "ready"
+        - locator resolved to <div data-state="ready" data-premium="true" class="ba3d-render-host" data-engine="three-webgl" data-diagnostics="{"engine":"three-webgl","frames":93,"fpsMedian":57.8,"fpsP95FrameMs":18.09999999999991,"tier":"balanced","selectedWorld":null,"carouselMoving":false,"rotation":0.5235987755982988,"islands":[{"id":"math-quest","x":-4.6,"y":0,"z":-1,"scale":1},{"id":"memory-match","x":0,"y":0,"z":-1,"scale":1},{"id":"sentence-builder","x":4.6,"y":0,"z":-1,"scale":1}],"mascotLocation":"waiting","mascotState…>…</div>
+        2 × unexpected value "ready"
+          - locator resolved to <div data-state="ready" data-premium="true" class="ba3d-render-host" data-engine="three-webgl" data-diagnostics="{"engine":"three-webgl","frames":149,"fpsMedian":57.1,"fpsP95FrameMs":18.100000000000364,"tier":"balanced","selectedWorld":null,"carouselMoving":false,"rotation":0.5235987755982988,"islands":[{"id":"math-quest","x":-4.6,"y":0,"z":-1,"scale":1},{"id":"memory-match","x":0,"y":0,"z":-1,"scale":1},{"id":"sentence-builder","x":4.6,"y":0,"z":-1,"scale":1}],"mascotLocation":"waiting","mascotSta…>…</div>
+        2 × unexpected value "ready"
+          - locator resolved to <div data-state="ready" data-premium="true" class="ba3d-render-host" data-engine="three-webgl" data-diagnostics="{"engine":"three-webgl","frames":206,"fpsMedian":56.8,"fpsP95FrameMs":18.199999999999818,"tier":"balanced","selectedWorld":null,"carouselMoving":false,"rotation":0.5235987755982988,"islands":[{"id":"math-quest","x":-4.6,"y":0,"z":-1,"scale":1},{"id":"memory-match","x":0,"y":0,"z":-1,"scale":1},{"id":"sentence-builder","x":4.6,"y":0,"z":-1,"scale":1}],"mascotLocation":"waiting","mascotSta…>…</div>
+        2 × unexpected value "ready"
+          - locator resolved to <div data-state="ready" data-premium="true" class="ba3d-render-host" data-engine="three-webgl" data-diagnostics="{"engine":"three-webgl","frames":262,"fpsMedian":55.9,"fpsP95FrameMs":18.199999999999818,"tier":"balanced","selectedWorld":null,"carouselMoving":false,"rotation":0.5235987755982988,"islands":[{"id":"math-quest","x":-4.6,"y":0,"z":-1,"scale":1},{"id":"memory-match","x":0,"y":0,"z":-1,"scale":1},{"id":"sentence-builder","x":4.6,"y":0,"z":-1,"scale":1}],"mascotLocation":"waiting","mascotSta…>…</div>
+        2 × unexpected value "ready"
+          - locator resolved to <div data-state="ready" data-premium="true" class="ba3d-render-host" data-engine="three-webgl" data-diagnostics="{"engine":"three-webgl","frames":319,"fpsMedian":56.2,"fpsP95FrameMs":18.199999999999818,"tier":"balanced","selectedWorld":null,"carouselMoving":false,"rotation":0.5235987755982988,"islands":[{"id":"math-quest","x":-4.6,"y":0,"z":-1,"scale":1},{"id":"memory-match","x":0,"y":0,"z":-1,"scale":1},{"id":"sentence-builder","x":4.6,"y":0,"z":-1,"scale":1}],"mascotLocation":"waiting","mascotSta…>…</div>
+        2 × unexpected value "ready"
+          - locator resolved to <div data-state="ready" data-premium="true" class="ba3d-render-host" data-engine="three-webgl" data-diagnostics="{"engine":"three-webgl","frames":376,"fpsMedian":57.1,"fpsP95FrameMs":18.199999999999818,"tier":"balanced","selectedWorld":null,"carouselMoving":false,"rotation":0.5235987755982988,"islands":[{"id":"math-quest","x":-4.6,"y":0,"z":-1,"scale":1},{"id":"memory-match","x":0,"y":0,"z":-1,"scale":1},{"id":"sentence-builder","x":4.6,"y":0,"z":-1,"scale":1}],"mascotLocation":"waiting","mascotSta…>…</div>
+        2 × unexpected value "ready"
+          - locator resolved to <div data-state="ready" data-premium="true" class="ba3d-render-host" data-engine="three-webgl" data-diagnostics="{"engine":"three-webgl","frames":433,"fpsMedian":57.8,"fpsP95FrameMs":18.199999999999818,"tier":"balanced","selectedWorld":null,"carouselMoving":false,"rotation":0.5235987755982988,"islands":[{"id":"math-quest","x":-4.6,"y":0,"z":-1,"scale":1},{"id":"memory-match","x":0,"y":0,"z":-1,"scale":1},{"id":"sentence-builder","x":4.6,"y":0,"z":-1,"scale":1}],"mascotLocation":"waiting","mascotSta…>…</div>
+        2 × unexpected value "ready"
+          - locator resolved to <div data-state="ready" data-premium="true" class="ba3d-render-host" data-engine="three-webgl" data-diagnostics="{"engine":"three-webgl","frames":491,"fpsMedian":58.1,"fpsP95FrameMs":18.19999999999891,"tier":"balanced","selectedWorld":null,"carouselMoving":false,"rotation":0.5235987755982988,"islands":[{"id":"math-quest","x":-4.6,"y":0,"z":-1,"scale":1},{"id":"memory-match","x":0,"y":0,"z":-1,"scale":1},{"id":"sentence-builder","x":4.6,"y":0,"z":-1,"scale":1}],"mascotLocation":"waiting","mascotStat…>…</div>
+        2 × unexpected value "ready"
+          - locator resolved to <div data-state="ready" data-premium="true" class="ba3d-render-host" data-engine="three-webgl" data-diagnostics="{"engine":"three-webgl","frames":548,"fpsMedian":57.5,"fpsP95FrameMs":18.100000000000364,"tier":"balanced","selectedWorld":null,"carouselMoving":false,"rotation":0.5235987755982988,"islands":[{"id":"math-quest","x":-4.6,"y":0,"z":-1,"scale":1},{"id":"memory-match","x":0,"y":0,"z":-1,"scale":1},{"id":"sentence-builder","x":4.6,"y":0,"z":-1,"scale":1}],"mascotLocation":"waiting","mascotSta…>…</div>
+        2 × unexpected value "ready"
+          - locator resolved to <div data-state="ready" data-premium="true" class="ba3d-render-host" data-engine="three-webgl" data-diagnostics="{"engine":"three-webgl","frames":605,"fpsMedian":57.1,"fpsP95FrameMs":18.100000000000364,"tier":"balanced","selectedWorld":null,"carouselMoving":false,"rotation":0.5235987755982988,"islands":[{"id":"math-quest","x":-4.6,"y":0,"z":-1,"scale":1},{"id":"memory-match","x":0,"y":0,"z":-1,"scale":1},{"id":"sentence-builder","x":4.6,"y":0,"z":-1,"scale":1}],"mascotLocation":"waiting","mascotSta…>…</div>
+        2 × unexpected value "ready"
+          - locator resolved to <div data-state="ready" data-premium="true" class="ba3d-render-host" data-engine="three-webgl" data-diagnostics="{"engine":"three-webgl","frames":661,"fpsMedian":56.8,"fpsP95FrameMs":18.100000000000364,"tier":"balanced","selectedWorld":null,"carouselMoving":false,"rotation":0.5235987755982988,"islands":[{"id":"math-quest","x":-4.6,"y":0,"z":-1,"scale":1},{"id":"memory-match","x":0,"y":0,"z":-1,"scale":1},{"id":"sentence-builder","x":4.6,"y":0,"z":-1,"scale":1}],"mascotLocation":"waiting","mascotSta…>…</div>
+        2 × unexpected value "ready"
+          - locator resolved to <div data-state="ready" data-premium="true" class="ba3d-render-host" data-engine="three-webgl" data-diagnostics="{"engine":"three-webgl","frames":718,"fpsMedian":56.8,"fpsP95FrameMs":18.100000000000364,"tier":"balanced","selectedWorld":null,"carouselMoving":false,"rotation":0.5235987755982988,"islands":[{"id":"math-quest","x":-4.6,"y":0,"z":-1,"scale":1},{"id":"memory-match","x":0,"y":0,"z":-1,"scale":1},{"id":"sentence-builder","x":4.6,"y":0,"z":-1,"scale":1}],"mascotLocation":"waiting","mascotSta…>…</div>
+        2 × unexpected value "ready"
+          - locator resolved to <div data-state="ready" data-premium="true" class="ba3d-render-host" data-engine="three-webgl" data-diagnostics="{"engine":"three-webgl","frames":775,"fpsMedian":56.8,"fpsP95FrameMs":18.100000000000364,"tier":"balanced","selectedWorld":null,"carouselMoving":false,"rotation":0.5235987755982988,"islands":[{"id":"math-quest","x":-4.6,"y":0,"z":-1,"scale":1},{"id":"memory-match","x":0,"y":0,"z":-1,"scale":1},{"id":"sentence-builder","x":4.6,"y":0,"z":-1,"scale":1}],"mascotLocation":"waiting","mascotSta…>…</div>
+        - unexpected value "ready"
+
+
+      178 |   });
+      179 |   await page.goto('/');
+    > 180 |   await expect(page.locator('.ba3d-render-host')).toHaveAttribute('data-state', 'fallback');
+          |                                                   ^
+      181 |   await expect(page.locator('.ba3d-render-host')).toHaveAttribute('data-engine', /legacy-webgl2|canvas/);
+      182 |   await expect(page.locator('canvas.ba3d-canvas')).toHaveCount(1);
+      183 |   const probe = () => page.evaluate(() => (window as unknown as { __artBitmaps: () => { decoded: number; closes: number[] } }).__artBitmaps());
+        at D:\Phần mềm 2026\BAO_AN_LEARNING_lam lại\tests\visual\art-world.spec.ts:180:51
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\v37\art-world-A-decoded-Math-m-bef4c-xactly-once-before-fallback-edge-production\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\v37\art-world-A-decoded-Math-m-bef4c-xactly-once-before-fallback-edge-production\error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\v37\art-world-A-decoded-Math-m-bef4c-xactly-once-before-fallback-edge-production\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\v37\art-world-A-decoded-Math-m-bef4c-xactly-once-before-fallback-edge-production\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [edge-production] › tests\visual\art-world.spec.ts:155:1 › A decoded Math material-name validation failure closes every catalog bitmap exactly once before fallback
+  54 passed (3.3m)

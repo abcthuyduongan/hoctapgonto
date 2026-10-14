@@ -2,7 +2,7 @@
 
 **Tài liệu triển khai kỹ thuật | Baseline: V3.6.2 RC2 | Đích đề xuất: V3.7 Premium World → V3.8 Content & Gameplay**  
 **Ngày lập:** 13/10/2026  
-**Trạng thái:** Kế hoạch gốc; đã triển khai PR-00/01 và lát cắt PR-02. Bổ sung ưu tiên hoàn thiện khung cảnh trong bài test ngày 14/10/2026 tại [mục 13](#13-giai-đoạn-kế-tiếp-đồng-bộ-khung-cảnh-trong-các-bài-test). Chưa nghiệm thu V3.7 FINAL.
+**Trạng thái:** Kế hoạch gốc; đã triển khai PR-00/01, lát cắt PR-02, khung cảnh bài test ở mục 13 và asset PR-03 ở mục 14 theo quyết định tiếp tục của chủ dự án ngày 14/10/2026. Chưa nghiệm thu V3.7 FINAL.
 **Quy tắc:** Kế thừa mã nguồn V3.6.2; không làm lại ứng dụng; không xóa hoặc chuyển đổi dữ liệu cũ khi chưa có kế hoạch migration và backup.
 
 > **Định nghĩa “hoàn thành”:** Người dùng mở **ứng dụng chạy thật** trên máy tính và điện thoại, thấy mô hình 3D hoàn thiện theo concept đã chốt; ba game vận hành ổn định; kết quả lưu được; build, kiểm thử và nghiệm thu mỹ thuật đều đạt. Screenshot concept, ảnh nền đẹp hoặc bộ test unit xanh **không thay thế** kết quả nghiệm thu này.
@@ -469,6 +469,19 @@ Các điểm tích hợp: `src/App.tsx` (game host/chuyển màn), `src/games/Ga
 - [x] Giảm chuyển động, bàn phím, chạm và chỉ số kéo thả đã qua regression; lỗi renderer không chặn làm bài.
 - [x] Math 8 câu, Memory 6 cặp, Sentence 6 câu và nhập học liệu JSON chạy đúng; history/dữ liệu sau refresh giữ đúng. SDK và logic ghi học tập không đổi.
 - [x] Build, kiểm thử renderer/gameplay/responsive đạt qua lượt đầy đủ và lượt xác minh sau sửa; có ảnh/video desktop và viewport mobile giả lập, xem báo cáo để biết từng kết quả.
-- [ ] Đo Android/iPhone thật, đối chiếu concept và phê duyệt mỹ thuật. Hai landmark Trí nhớ/Ngôn từ và môi trường vẫn cần asset premium để đủ art gate V3.7 FINAL.
+- [ ] Đo Android/iPhone thật, đối chiếu concept và phê duyệt mỹ thuật. Asset Trí nhớ/Ngôn từ/môi trường đã được tạo ở mục 14; file gate và nghiệm thu thẩm mỹ/thiết bị là các bước riêng.
 
 Giai đoạn này hoàn thiện trải nghiệm hình ảnh trong bài test. Thêm câu hỏi, cấp độ, luật tính điểm hoặc đánh giá nhiều đáp án ngôn ngữ tiếp tục là phạm vi nội dung/gameplay riêng.
+
+## 14. Hoàn thiện ba đảo và môi trường chung
+
+**Chốt triển khai ngày 14/10/2026:** chủ dự án yêu cầu tiếp tục theo kế hoạch sau khi đã thống nhất cảnh bài học. Yêu cầu trực tiếp này cho phép sản xuất hai đảo còn lại và cảnh nền; không coi các điều kiện duyệt trong kế hoạch gốc là lý do dừng việc đã được giao. Phê duyệt mỹ thuật và đo điện thoại thật vẫn còn trong nghiệm thu cuối cùng.
+
+- [x] Thay landmark tạm của Rừng Trí Nhớ bằng GLB có cây phân nhánh/tán lá, cầu gỗ, hồ, đường đá, ký hiệu và hoa/nấm.
+- [x] Thay landmark tạm của Xưởng Ngôn Từ bằng GLB có kiến trúc, mái panel, cửa/cửa sổ sâu, kệ sách, sách mở và góc viết.
+- [x] Thêm môi trường GLB dùng chung: đảo xa, thác nước, mây; dùng lại vật liệu PBR của từng đảo cho cây/đường/tiền cảnh trong bài học.
+- [x] Giữ một canvas/renderer, tối đa hai GLB tải/giải mã đồng thời; cùng năm tài nguyên dùng lại khi chọn đảo, mở bài và trở về. Giữ logic ba game/SDK/storage.
+- [ ] Chủ dự án duyệt bố cục, nhân vật, chất liệu và chuyển động của bản chạy mới.
+- [ ] Đo Android tầm trung/Chrome và iPhone/Safari theo thiết bị mục tiêu; ghi CPU/GPU/RAM/OS/browser/chế độ pin và kết quả chơi/lưu dữ liệu.
+
+Source và provenance tại [ASSET_LICENSES_V37.md](ASSET_LICENSES_V37.md). Bằng chứng production trước/sau và kết quả kiểm tra tại `V37_art_qa/`. Cổng đủ năm file không thay thế nghiệm thu FINAL.

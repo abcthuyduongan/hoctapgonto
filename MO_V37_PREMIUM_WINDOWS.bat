@@ -17,7 +17,8 @@ if errorlevel 1 (
   pause
   exit /b 1
 )
-echo Mo http://localhost:5178/?premium3d=1 de xem cao va Dao Toan Hoc.
-echo Ban PR02 thu nghiem. Giu cua so nay mo khi su dung.
+echo Mo http://localhost:5178/ de xem ba dao va cac bai hoc.
+echo Ban V3.7 RC. Giu cua so nay mo khi su dung.
+echo Dien thoai cung Wi-Fi: dung dia chi Network do Vite in ben duoi.
 call npm run preview -- --host 0.0.0.0 --port 5178 --strictPort
 pause

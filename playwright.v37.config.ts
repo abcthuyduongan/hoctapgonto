@@ -5,7 +5,7 @@ import { defineConfig, devices } from '@playwright/test';
  */
 export default defineConfig({
   testDir: './tests/visual',
-  testMatch: /(?:premium-world|mobile-ui-lock|gameplay-regression|island-carousel|game-scene)\.spec\.ts/,
+  testMatch: /(?:premium-world|mobile-ui-lock|gameplay-regression|island-carousel|game-scene|art-world)\.spec\.ts/,
   timeout: 60_000,
   expect: { timeout: 15_000 },
   fullyParallel: false,

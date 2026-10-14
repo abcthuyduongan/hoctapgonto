@@ -1,0 +1,117 @@
+{
+  "generator": "tools/generate_v37_language_asset.mjs",
+  "status": "PR03 authored candidate, pending art approval",
+  "provenance": {
+    "provenance": "ORIGINAL_PROCEDURAL_V37_PR03",
+    "source": "tools/generate_v37_language_asset.mjs",
+    "acceptance": "candidate-not-art-approved",
+    "externalAssets": [],
+    "landmark": "Xưởng Ngôn Từ",
+    "landing": [
+      0.95,
+      0.04,
+      1.05
+    ]
+  },
+  "assets": [
+    {
+      "file": "language-world.glb",
+      "bytes": 1744044,
+      "meshes": 16,
+      "vertices": 27157,
+      "triangles": 25520,
+      "bones": 0,
+      "clips": [],
+      "embeddedImages": 24,
+      "bounds": [
+        [
+          -2.0428795864521776,
+          -1.493,
+          -2.0081730958825035
+        ],
+        [
+          2.0763714993739426,
+          2.8728094010767586,
+          2.0685698931729006
+        ]
+      ],
+      "sha256": "2556c2fa14a60608622dea42e52165da6e3d5821a345d39ce4aaac84a82e317a"
+    }
+  ],
+  "budgets": {
+    "triangles": 35000,
+    "bytes": 2097152,
+    "materials": 16
+  },
+  "materialNames": [
+    "Warm cream library masonry",
+    "Ivory bevelled plinth paths and carved frames",
+    "Warm weathered sandstone cliff",
+    "Deep layered ochre cliff strata",
+    "Sunlit pale cliff shelves",
+    "Soft meadow grass and rim moss",
+    "Sculpted jade canopy and garden leaves",
+    "Sunlit sage leaf tips",
+    "Walnut door planks shelves and quill desk",
+    "Deep door window and shelf recess",
+    "Individually glazed teal roof panels",
+    "Dark teal eaves and ridge caps",
+    "Warm ivory sculpted book paper",
+    "Dusty lavender book covers and blossoms",
+    "Muted honey brass letters and joinery",
+    "Soft turquoise glazing and inkpot"
+  ],
+  "textureKinds": [
+    "stone",
+    "rock",
+    "grass",
+    "wood",
+    "glaze",
+    "paper",
+    "fabric",
+    "satin"
+  ],
+  "embeddedPbr": {
+    "baseColorMaps": 16,
+    "normalMaps": 16,
+    "roughnessMaps": 16,
+    "externalUris": 0
+  },
+  "geometryFeatures": [
+    "Layered organic cliff",
+    "Panelled teal roof",
+    "Recessed arched windows",
+    "Walnut door plank joinery",
+    "Bookcase with individual books",
+    "Curved open-book page layers",
+    "Sculpted Aa letters",
+    "Quill writing desk"
+  ],
+  "landing": [
+    0.95,
+    0.04,
+    1.05
+  ],
+  "landingClearRadius": 0.46,
+  "unchangedAssets": {
+    "fox-guide.glb": true,
+    "math-world.glb": true
+  },
+  "validation": {
+    "budgetPass": true,
+    "selfContained": true,
+    "minRaisedVertexDistanceFromLanding": 0.547
+  },
+  "palette": {
+    "cream": "#EBCDA5",
+    "teal": "#4D99A0",
+    "sage": "#81BB84",
+    "walnut": "#805E45",
+    "brass": "#DFB669",
+    "lavender": "#9B88B1"
+  },
+  "notes": [
+    "Geometry, maps and glyph strokes authored in this generator; no external art or fonts.",
+    "Asset approval requires application visual QA and real device performance checks."
+  ]
+}

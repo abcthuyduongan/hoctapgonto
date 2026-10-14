@@ -5,6 +5,7 @@ import type { WorldId } from '../engine';
 import type { RendererInitOptions, RenderTier, RenderStats, WorldRenderer, QualityChoice,
   GuideMood, GuideViewport } from './types';
 import { AssetLoader } from './assetLoader';
+import { loadCatalog } from './loadCatalog';
 import { disposeScene, estimateTextureBytes } from './disposeScene';
 import { PerformanceMetrics } from './performanceMetrics';
 import { QualityManager, QUALITY } from './qualityManager';
@@ -101,31 +102,49 @@ class PremiumWorldRenderer implements WorldRenderer {
     this.resizeObserver.observe(this.opts.canvas);
     this.applyQuality();
     this.resize();
-    // One vertical slice first. Remaining islands are clearly provisional.
-    // Parallel fetch is bounded to two self-contained GLBs, reused on focus.
-    const results = await Promise.allSettled([
-      this.loader.load('/models/math-world.glb'), this.loader.load('/models/fox-guide.glb'),
-    ]);
+    // Every self-contained asset is decoded once, with at most two in flight.
+    const catalog = ['math-world', 'fox-guide', 'memory-world', 'language-world', 'environment'];
+    const results = await loadCatalog(catalog.map(id => `/models/${id}.glb`),
+      path => this.loader.load(path), this.controller.signal);
     if (this.disposed || this.opts.signal.aborted) {
       results.forEach(result => { if (result.status === 'fulfilled') result.value.scenes.forEach(disposeScene); });
       throw new DOMException('Cancelled', 'AbortError');
     }
     results.forEach((result, index) => {
-      if (result.status === 'rejected') this.errors.push(`${index === 0 ? 'math-world' : 'fox-guide'}: ${String(result.reason)}`);
+      if (result.status === 'rejected') this.errors.push(`${catalog[index]}: ${String(result.reason)}`);
     });
-    // Dispose successfully decoded assets if the other required asset failed.
+    // Dispose every successfully decoded asset if any required asset failed.
     if (this.errors.length) {
       results.forEach(result => { if (result.status === 'fulfilled') result.value.scenes.forEach(disposeScene); });
       throw new Error(this.errors.join('; '));
     }
-    const math = (results[0] as PromiseFulfilledResult<Awaited<ReturnType<AssetLoader['load']>>>).value;
-    const fox = (results[1] as PromiseFulfilledResult<Awaited<ReturnType<AssetLoader['load']>>>).value;
-    // Attach both roots before validation so any subsequent failure cleans both.
-    const group = this.world.worlds.get('math-quest')!;
-    group.children.forEach(disposeScene); group.clear(); group.add(math.scene);
+    const decoded = results.map(result => (result as PromiseFulfilledResult<Awaited<ReturnType<AssetLoader['load']>>>).value);
+    const [, fox, , , environment] = decoded;
+    for (const [id, index] of [['math-quest', 0], ['memory-match', 2], ['sentence-builder', 3]] as const) {
+      const group = this.world.worlds.get(id)!;
+      group.children.forEach(disposeScene); group.clear(); group.add(decoded[index].scene);
+    }
+    // Cloud geometry is part of the same authored environment; moving its nodes
+    // into an existing group allows subtle motion without rotating the landscape.
+    this.world.scenery.add(environment.scene);
+    const clouds: Object3D[] = [];
+    environment.scene.traverse(node => {
+      const mesh = node as Mesh;
+      if (!mesh.isMesh) return;
+      mesh.userData.noShadow = true;
+      const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+      if (materials.some(material => material.userData.baoAnRole === 'cloud')) clouds.push(mesh);
+    });
+    clouds.forEach(node => this.world.clouds.add(node));
     fox.scene.position.set(0, 0, 0); fox.scene.scale.setScalar(.9);
     this.guideBounds.setFromObject(fox.scene);
     this.guideAnchor.add(fox.scene); this.world.scene.add(this.guideAnchor);
+    // Adopt every decoded scene before a later validation can throw; disposal
+    // then reaches all resources, including assets not used by that validation.
+    for (const [id, index] of [['math-quest', 0], ['memory-match', 2], ['sentence-builder', 3]] as const) {
+      const { missing } = this.gameEnvironments.applyWorldMaterials(id, decoded[index].scene);
+      if (missing.length) throw new Error(`${id}: missing foreground materials ${missing.map(item => item.name).join(', ')}`);
+    }
     this.mascot = new MascotController(fox.scene, fox.animations);
     this.clips = fox.animations.map(clip => clip.name);
     this.sourceClips = fox.animations;
@@ -137,7 +156,7 @@ class PremiumWorldRenderer implements WorldRenderer {
       const mesh = node as Mesh;
       if (mesh.isMesh) { mesh.castShadow = !mesh.userData.noShadow; mesh.receiveShadow = !mesh.userData.noShadow; }
     });
-    this.readyAssets = ['math-world', 'fox-guide'];
+    this.readyAssets = catalog;
     this.textureBytes = estimateTextureBytes(this.world.scene);
     this.initialized = true;
     this.resize();
@@ -206,7 +225,7 @@ class PremiumWorldRenderer implements WorldRenderer {
       this.metrics.record(now);
       if (!this.gameWorld) this.carousel.advance(delta);
       this.mascot?.update(delta);
-      if (!this.gameWorld) this.world.clouds.rotation.y += delta * .003;
+      this.world.clouds.position.x = Math.sin(now * .00006) * .16;
       if (this.quality.observe(frameMs, now)) this.applyQuality();
     }
     this.camera.lookAt(this.target);
@@ -250,8 +269,17 @@ class PremiumWorldRenderer implements WorldRenderer {
     this.guideShadowFlags.forEach((castShadow, mesh) => { mesh.castShadow = castShadow; });
     this.guideShadowFlags.clear();
     this.gameEnvironments.setWorld(null);
+    this.frameShadowCamera(false);
     this.world.scene.fog?.color.setHex(0xd9eee9);
     this.carousel.configure(this.opts.canvas.clientWidth <= 700);
+  }
+  private frameShadowCamera(game: boolean) {
+    const camera = this.world.sunlight.shadow.camera;
+    // Interiors place their island landmark left of the DOM board. Expand the
+    // shadow coverage there while preserving the shared direction of the light.
+    Object.assign(camera, game ? { left: -24, right: 14, top: 14, bottom: -12 }
+      : { left: -12, right: 12, top: 11, bottom: -9 });
+    camera.updateProjectionMatrix();
   }
   setGameScene(id: WorldId | null) {
     if (id === this.gameWorld || (id && !this.world.worlds.has(id))) return;
@@ -278,9 +306,10 @@ class PremiumWorldRenderer implements WorldRenderer {
       // board occupies the center/right, so keep the island identity here.
       landmark.position.set(-12, .05, -10);
       landmark.scale.setScalar(id === 'math-quest' ? 1.8 : id === 'memory-match' ? 2 : 1.9);
-      this.world.waitingPlatform.visible = this.world.clouds.visible = this.world.scenery.visible = false;
+      this.world.waitingPlatform.visible = false;
       this.world.scene.fog?.color.setHex(0xe2e9d8);
       this.gameEnvironments.setWorld(id);
+      this.frameShadowCamera(true);
     }
     this.guideMood = 'idle'; this.guideCue = undefined; this.applyGuideMood();
     this.lastTime = 0; this.metrics.resetClock();
@@ -353,6 +382,7 @@ class PremiumWorldRenderer implements WorldRenderer {
     this.mascot?.dispose();
     this.guideShadowFlags.clear(); this.homeTransforms = [];
     this.world.sunlight.shadow.dispose();
+    this.gameEnvironments.dispose();
     disposeScene(this.world.scene);
     this.renderer?.dispose(); this.renderer?.forceContextLoss();
   }

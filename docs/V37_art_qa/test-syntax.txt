@@ -1,0 +1,5 @@
+
+> bao-an-learning-v3-6-3d@3.7.0-rc.1 test:syntax
+> node tests/check-tsx.mjs
+
+Syntax parsing: all src/*.ts and src/*.tsx files passed.

@@ -1,6 +1,6 @@
 # BẢO AN LEARNING V3.7 RC1 — báo cáo PR-00 / PR-01 / lát cắt PR-02
 
-Ngày thực hiện: **14/10/2026**, múi giờ Việt Nam. Quyết định: **CONTINUE PR-02 / CHỜ DUYỆT**, chưa đủ điều kiện PR-03 hoặc FINAL.
+Ngày thực hiện: **14/10/2026**, múi giờ Việt Nam. Báo cáo bên dưới lưu lịch sử PR-02. **Cập nhật mới nhất:** đã sản xuất và tích hợp asset PR-03 theo quyết định tiếp tục trực tiếp của chủ dự án; đủ năm GLB/PBR. [Nguồn và thông số](ASSET_LICENSES_V37.md), bằng chứng production trong `V37_art_qa/`. Chờ duyệt mỹ thuật và điện thoại thật, chưa FINAL.
 
 **Cập nhật sau phản hồi chất lượng:** đã chỉnh lại chiều sâu cảnh, tỷ lệ cáo/đảo Toán và giao diện. Báo cáo này lưu bằng chứng của bản PR02 đầu tiên; ảnh và số liệu mới nằm ở [V37_depth_qa/visual-review.md](V37_depth_qa/visual-review.md) và thư mục `V37_depth_qa/`. Không dùng số liệu/ảnh cũ dưới đây để đại diện cho cảnh đã sửa.
 

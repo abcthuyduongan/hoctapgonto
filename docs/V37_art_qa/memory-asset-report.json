@@ -1,0 +1,99 @@
+{
+  "generator": "tools/generate_v37_memory_asset.mjs",
+  "status": "PR03 authored candidate; visual approval pending",
+  "provenance": {
+    "provenance": "ORIGINAL_PROCEDURAL_V37_PR03",
+    "source": "tools/generate_v37_memory_asset.mjs",
+    "acceptance": "candidate-not-art-approved",
+    "externalAssets": [],
+    "landing": [
+      -0.95,
+      0.04,
+      1.25
+    ],
+    "features": [
+      "closed layered cliffs",
+      "4 branching trees",
+      "sculpted leaf canopies",
+      "arched wooden bridge",
+      "shallow textured pond",
+      "curving stepping path",
+      "2 pairs of raised memory symbols",
+      "flowers and mushrooms"
+    ]
+  },
+  "asset": {
+    "file": "memory-world.glb",
+    "bytes": 1855024,
+    "meshes": 15,
+    "vertices": 32108,
+    "triangles": 23768,
+    "bones": 0,
+    "clips": [],
+    "embeddedImages": 24,
+    "bounds": [
+      [
+        -2.037762949755718,
+        -1.49,
+        -1.9860442242176217
+      ],
+      [
+        2.071981740361392,
+        2.7009650712782167,
+        1.9719787727441611
+      ]
+    ],
+    "sha256": "8e13532de90cbfb5353e2aae22cf56da1a8bad859db2363de6dd5c2be8805a56"
+  },
+  "materials": 15,
+  "materialNames": [
+    "Forest weathered limestone cliff",
+    "Forest deep sediment seams",
+    "Forest pale exposed cliff faces",
+    "Forest grass and soft moss carpet",
+    "Forest deep moss roots and ground cover",
+    "Forest warm sculpted bark",
+    "Forest honey bridge planks",
+    "Forest deep jade leaf undersides",
+    "Forest sage leaf canopies",
+    "Forest sunlit lime leaf crowns",
+    "Forest ivory memory tablets and petals",
+    "Forest teal raised memory symbols",
+    "Forest warm gold symbols and flower centers",
+    "Forest coral mushrooms and blossoms",
+    "Forest shallow turquoise pond"
+  ],
+  "embeddedTextureFamilies": [
+    "rock",
+    "moss",
+    "bark",
+    "wood",
+    "leaf",
+    "stone",
+    "satin",
+    "water"
+  ],
+  "foxLanding": {
+    "position": [
+      -0.95,
+      0.04,
+      1.25
+    ],
+    "clearRadius": 0.45,
+    "groundY": 0
+  },
+  "preservedAssetHashes": {
+    "fox-guide.glb": "398382e919be69af9502cb103e3d1359147157e76ac852a30ad07cd60a23e9fc",
+    "math-world.glb": "dd7cacdfb62d86b0dc287b264d6cc71df5822a2b6943c48d73c5c84b3091d6cb"
+  },
+  "checks": {
+    "budgetsPass": true,
+    "boundsPass": true,
+    "selfContained": true,
+    "existingAssetsUnchanged": true,
+    "pbrChannelsOnEveryMaterial": true,
+    "attributesFinite": true,
+    "uvPairsMatchVertices": true,
+    "indicesInBounds": true
+  }
+}

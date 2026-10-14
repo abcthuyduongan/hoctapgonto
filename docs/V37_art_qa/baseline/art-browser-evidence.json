@@ -1,0 +1,6448 @@
+{
+  "date": "2026-10-14T05:23:46.313Z",
+  "target": "http://127.0.0.1:5180/",
+  "baseline": true,
+  "browser": "155.0.4283.45",
+  "os": "Windows_NT 10.0.26300",
+  "cpu": "Intel(R) Core(TM) Ultra 5 125H",
+  "note": "Production Edge, isolated contexts. Mobile viewport/touch emulation uses the desktop GPU. Renderer FPS is a rolling-window sample. Baseline preserves the previous two-GLB build before PR03 assets.",
+  "views": [
+    {
+      "name": "home-overview-1440x900",
+      "scenario": "home-overview",
+      "game": false,
+      "screenshot": "home-overview-1440x900.png",
+      "emulatedTouch": false,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "dpr": 1
+      },
+      "horizontalOverflow": false,
+      "controls": [
+        {
+          "text": "🏠 Thế giới game",
+          "rect": {
+            "x": 473.28125,
+            "y": 10.5,
+            "width": 154.46875,
+            "height": 52
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": false
+        },
+        {
+          "text": "📊 Góc phụ huynh",
+          "rect": {
+            "x": 634.75,
+            "y": 10.5,
+            "width": 160.09375,
+            "height": 52
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": false
+        },
+        {
+          "text": "📚 Xưởng học liệu",
+          "rect": {
+            "x": 801.84375,
+            "y": 10.5,
+            "width": 160.140625,
+            "height": 52
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": false
+        },
+        {
+          "text": "Xem đảo Đảo Toán Học",
+          "rect": {
+            "x": 145,
+            "y": 694,
+            "width": 352.65625,
+            "height": 52
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Toán 3 · Phép tính vui · Toán",
+          "rect": {
+            "x": 145,
+            "y": 778,
+            "width": 234.65625,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Bắt đầu ▶",
+          "rect": {
+            "x": 389.65625,
+            "y": 778,
+            "width": 108,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Xem đảo Khu Rừng Trí Nhớ",
+          "rect": {
+            "x": 543.65625,
+            "y": 694,
+            "width": 352.671875,
+            "height": 52
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Tiếng Anh · Gia đình · Tiếng AnhToán · Phép nhân · ToánTiếng Việt · Từ trái nghĩa · Tiếng Việt",
+          "rect": {
+            "x": 543.65625,
+            "y": 778,
+            "width": 234.671875,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Bắt đầu ▶",
+          "rect": {
+            "x": 788.328125,
+            "y": 778,
+            "width": 108,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Xem đảo Xưởng Ngôn Từ",
+          "rect": {
+            "x": 942.328125,
+            "y": 694,
+            "width": 352.65625,
+            "height": 52
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Tiếng Anh · Ghép câu đơn giản · Tiếng Anh",
+          "rect": {
+            "x": 942.328125,
+            "y": 778,
+            "width": 234.65625,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Bắt đầu ▶",
+          "rect": {
+            "x": 1186.984375,
+            "y": 778,
+            "width": 108,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        }
+      ],
+      "canvasCount": 1,
+      "canvasInGameSlot": false,
+      "engine": "three-webgl",
+      "state": "ready",
+      "diagnostics": {
+        "engine": "three-webgl",
+        "frames": 243,
+        "fpsMedian": 59.9,
+        "fpsP95FrameMs": 16.800000000000182,
+        "tier": "balanced",
+        "selectedWorld": null,
+        "carouselMoving": false,
+        "rotation": 0.5235987755982988,
+        "islands": [
+          {
+            "id": "math-quest",
+            "x": -4.6,
+            "y": 0,
+            "z": -1,
+            "scale": 1
+          },
+          {
+            "id": "memory-match",
+            "x": 0,
+            "y": 0,
+            "z": -1,
+            "scale": 1
+          },
+          {
+            "id": "sentence-builder",
+            "x": 4.6,
+            "y": 0,
+            "z": -1,
+            "scale": 1
+          }
+        ],
+        "mascotLocation": "waiting",
+        "mascotState": "waiting",
+        "mascotPosition": {
+          "x": -7.4,
+          "y": 0.12,
+          "z": 4.8
+        },
+        "jumpProgress": 1,
+        "dpr": 1,
+        "drawCalls": 94,
+        "triangles": 123980,
+        "textureBytesEstimate": 9437183.999999998,
+        "assetErrors": [],
+        "readyAssets": [
+          "math-world",
+          "fox-guide"
+        ],
+        "animationClips": [
+          "Idle",
+          "Cheer",
+          "Victory"
+        ],
+        "skeletalMeshes": 10,
+        "bones": 14,
+        "animationTime": 4.083400000000003,
+        "activeClip": "Idle",
+        "motion": true,
+        "paused": false,
+        "sceneMode": "home",
+        "gameWorld": null,
+        "guideMood": "idle",
+        "guideViewport": null,
+        "guideVisible": true
+      },
+      "renderer": "ANGLE (Intel, Intel(R) Arc(TM) Graphics (0x00007D55) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "sections": {
+        ".ba3d-render-host": {
+          "x": 0,
+          "y": 201,
+          "width": 1440,
+          "height": 484
+        },
+        ".ba3d-hero-title": {
+          "x": 295,
+          "y": 98,
+          "width": 850,
+          "height": 84.59375
+        },
+        ".ba3d-island-overview": {
+          "x": 638.375,
+          "y": 656.609375,
+          "width": 163.25,
+          "height": 15.390625
+        },
+        ".ba3d-anchors": {
+          "x": 130,
+          "y": 681,
+          "width": 1180,
+          "height": 154
+        },
+        ".immersive-dialog": null,
+        ".challenge-card": null,
+        ".forest-board": null,
+        ".sentence-scroll": null,
+        ".ba37-mascot-window": null
+      },
+      "errors": [],
+      "runtimeSamples": [
+        {
+          "engine": "three-webgl",
+          "frames": 121,
+          "fpsMedian": 59.9,
+          "fpsP95FrameMs": 16.800000000000182,
+          "tier": "balanced",
+          "selectedWorld": null,
+          "carouselMoving": false,
+          "rotation": 0.5235987755982988,
+          "islands": [
+            {
+              "id": "math-quest",
+              "x": -4.6,
+              "y": 0,
+              "z": -1,
+              "scale": 1
+            },
+            {
+              "id": "memory-match",
+              "x": 0,
+              "y": 0,
+              "z": -1,
+              "scale": 1
+            },
+            {
+              "id": "sentence-builder",
+              "x": 4.6,
+              "y": 0,
+              "z": -1,
+              "scale": 1
+            }
+          ],
+          "mascotLocation": "waiting",
+          "mascotState": "waiting",
+          "mascotPosition": {
+            "x": -7.4,
+            "y": 0.12,
+            "z": 4.8
+          },
+          "jumpProgress": 1,
+          "dpr": 1,
+          "drawCalls": 94,
+          "triangles": 123980,
+          "textureBytesEstimate": 9437183.999999998,
+          "assetErrors": [],
+          "readyAssets": [
+            "math-world",
+            "fox-guide"
+          ],
+          "animationClips": [
+            "Idle",
+            "Cheer",
+            "Victory"
+          ],
+          "skeletalMeshes": 10,
+          "bones": 14,
+          "animationTime": 2.0500999999999996,
+          "activeClip": "Idle",
+          "motion": true,
+          "paused": false,
+          "sceneMode": "home",
+          "gameWorld": null,
+          "guideMood": "idle",
+          "guideViewport": null,
+          "guideVisible": true
+        },
+        {
+          "engine": "three-webgl",
+          "frames": 182,
+          "fpsMedian": 59.9,
+          "fpsP95FrameMs": 16.799999999999955,
+          "tier": "balanced",
+          "selectedWorld": null,
+          "carouselMoving": false,
+          "rotation": 0.5235987755982988,
+          "islands": [
+            {
+              "id": "math-quest",
+              "x": -4.6,
+              "y": 0,
+              "z": -1,
+              "scale": 1
+            },
+            {
+              "id": "memory-match",
+              "x": 0,
+              "y": 0,
+              "z": -1,
+              "scale": 1
+            },
+            {
+              "id": "sentence-builder",
+              "x": 4.6,
+              "y": 0,
+              "z": -1,
+              "scale": 1
+            }
+          ],
+          "mascotLocation": "waiting",
+          "mascotState": "waiting",
+          "mascotPosition": {
+            "x": -7.4,
+            "y": 0.12,
+            "z": 4.8
+          },
+          "jumpProgress": 1,
+          "dpr": 1,
+          "drawCalls": 94,
+          "triangles": 123980,
+          "textureBytesEstimate": 9437183.999999998,
+          "assetErrors": [],
+          "readyAssets": [
+            "math-world",
+            "fox-guide"
+          ],
+          "animationClips": [
+            "Idle",
+            "Cheer",
+            "Victory"
+          ],
+          "skeletalMeshes": 10,
+          "bones": 14,
+          "animationTime": 3.0667999999999997,
+          "activeClip": "Idle",
+          "motion": true,
+          "paused": false,
+          "sceneMode": "home",
+          "gameWorld": null,
+          "guideMood": "idle",
+          "guideViewport": null,
+          "guideVisible": true
+        },
+        {
+          "engine": "three-webgl",
+          "frames": 182,
+          "fpsMedian": 59.9,
+          "fpsP95FrameMs": 16.799999999999955,
+          "tier": "balanced",
+          "selectedWorld": null,
+          "carouselMoving": false,
+          "rotation": 0.5235987755982988,
+          "islands": [
+            {
+              "id": "math-quest",
+              "x": -4.6,
+              "y": 0,
+              "z": -1,
+              "scale": 1
+            },
+            {
+              "id": "memory-match",
+              "x": 0,
+              "y": 0,
+              "z": -1,
+              "scale": 1
+            },
+            {
+              "id": "sentence-builder",
+              "x": 4.6,
+              "y": 0,
+              "z": -1,
+              "scale": 1
+            }
+          ],
+          "mascotLocation": "waiting",
+          "mascotState": "waiting",
+          "mascotPosition": {
+            "x": -7.4,
+            "y": 0.12,
+            "z": 4.8
+          },
+          "jumpProgress": 1,
+          "dpr": 1,
+          "drawCalls": 94,
+          "triangles": 123980,
+          "textureBytesEstimate": 9437183.999999998,
+          "assetErrors": [],
+          "readyAssets": [
+            "math-world",
+            "fox-guide"
+          ],
+          "animationClips": [
+            "Idle",
+            "Cheer",
+            "Victory"
+          ],
+          "skeletalMeshes": 10,
+          "bones": 14,
+          "animationTime": 3.0667999999999997,
+          "activeClip": "Idle",
+          "motion": true,
+          "paused": false,
+          "sceneMode": "home",
+          "gameWorld": null,
+          "guideMood": "idle",
+          "guideViewport": null,
+          "guideVisible": true
+        }
+      ],
+      "maxModelRequestsInFlight": 2
+    },
+    {
+      "name": "home-math-quest-1440x900",
+      "scenario": "home-math-quest",
+      "game": false,
+      "screenshot": "home-math-quest-1440x900.png",
+      "emulatedTouch": false,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "dpr": 1
+      },
+      "horizontalOverflow": false,
+      "controls": [
+        {
+          "text": "🏠 Thế giới game",
+          "rect": {
+            "x": 473.28125,
+            "y": 10.5,
+            "width": 154.46875,
+            "height": 52
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": false
+        },
+        {
+          "text": "📊 Góc phụ huynh",
+          "rect": {
+            "x": 634.75,
+            "y": 10.5,
+            "width": 160.09375,
+            "height": 52
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": false
+        },
+        {
+          "text": "📚 Xưởng học liệu",
+          "rect": {
+            "x": 801.84375,
+            "y": 10.5,
+            "width": 160.140625,
+            "height": 52
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": false
+        },
+        {
+          "text": "Xem tất cả các đảo ↻",
+          "rect": {
+            "x": 1275.03125,
+            "y": 188,
+            "width": 139.96875,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Xem đảo Đảo Toán Học",
+          "rect": {
+            "x": 145,
+            "y": 691,
+            "width": 352.65625,
+            "height": 52
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Toán 3 · Phép tính vui · Toán",
+          "rect": {
+            "x": 145,
+            "y": 775,
+            "width": 234.65625,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Bắt đầu ▶",
+          "rect": {
+            "x": 389.65625,
+            "y": 775,
+            "width": 108,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Xem đảo Khu Rừng Trí Nhớ",
+          "rect": {
+            "x": 543.65625,
+            "y": 694,
+            "width": 352.671875,
+            "height": 52
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Tiếng Anh · Gia đình · Tiếng AnhToán · Phép nhân · ToánTiếng Việt · Từ trái nghĩa · Tiếng Việt",
+          "rect": {
+            "x": 543.65625,
+            "y": 778,
+            "width": 234.671875,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Bắt đầu ▶",
+          "rect": {
+            "x": 788.328125,
+            "y": 778,
+            "width": 108,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Xem đảo Xưởng Ngôn Từ",
+          "rect": {
+            "x": 942.328125,
+            "y": 694,
+            "width": 352.65625,
+            "height": 52
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Tiếng Anh · Ghép câu đơn giản · Tiếng Anh",
+          "rect": {
+            "x": 942.328125,
+            "y": 778,
+            "width": 234.65625,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Bắt đầu ▶",
+          "rect": {
+            "x": 1186.984375,
+            "y": 778,
+            "width": 108,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        }
+      ],
+      "canvasCount": 1,
+      "canvasInGameSlot": false,
+      "engine": "three-webgl",
+      "state": "ready",
+      "diagnostics": {
+        "engine": "three-webgl",
+        "frames": 426,
+        "fpsMedian": 59.9,
+        "fpsP95FrameMs": 16.800000000000182,
+        "tier": "balanced",
+        "selectedWorld": "math-quest",
+        "carouselMoving": false,
+        "rotation": 5.551115123125783e-16,
+        "islands": [
+          {
+            "id": "math-quest",
+            "x": 2.55351295663786e-15,
+            "y": 0.1,
+            "z": 2.3,
+            "scale": 1.18
+          },
+          {
+            "id": "memory-match",
+            "x": 3.9837168574084165,
+            "y": 0,
+            "z": -2.8000000000000007,
+            "scale": 0.88
+          },
+          {
+            "id": "sentence-builder",
+            "x": -3.9837168574084183,
+            "y": 0,
+            "z": -2.799999999999999,
+            "scale": 0.88
+          }
+        ],
+        "mascotLocation": "math-quest",
+        "mascotState": "on-island",
+        "mascotPosition": {
+          "x": -1.345199999999997,
+          "y": 0.1472,
+          "z": 3.6216
+        },
+        "jumpProgress": 1,
+        "dpr": 1,
+        "drawCalls": 88,
+        "triangles": 122732,
+        "textureBytesEstimate": 9437183.999999998,
+        "assetErrors": [],
+        "readyAssets": [
+          "math-world",
+          "fox-guide"
+        ],
+        "animationClips": [
+          "Idle",
+          "Cheer",
+          "Victory"
+        ],
+        "skeletalMeshes": 10,
+        "bones": 14,
+        "animationTime": 7.133300000000035,
+        "activeClip": "Cheer",
+        "motion": true,
+        "paused": false,
+        "sceneMode": "home",
+        "gameWorld": null,
+        "guideMood": "idle",
+        "guideViewport": null,
+        "guideVisible": true
+      },
+      "renderer": "ANGLE (Intel, Intel(R) Arc(TM) Graphics (0x00007D55) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "sections": {
+        ".ba3d-render-host": {
+          "x": 0,
+          "y": 201,
+          "width": 1440,
+          "height": 484
+        },
+        ".ba3d-hero-title": {
+          "x": 295,
+          "y": 98,
+          "width": 850,
+          "height": 84.59375
+        },
+        ".ba3d-island-overview": {
+          "x": 1151.640625,
+          "y": 188,
+          "width": 263.359375,
+          "height": 44
+        },
+        ".ba3d-anchors": {
+          "x": 130,
+          "y": 681,
+          "width": 1180,
+          "height": 154
+        },
+        ".immersive-dialog": null,
+        ".challenge-card": null,
+        ".forest-board": null,
+        ".sentence-scroll": null,
+        ".ba37-mascot-window": null
+      },
+      "errors": [],
+      "maxModelRequestsInFlight": 2
+    },
+    {
+      "name": "home-memory-match-1440x900",
+      "scenario": "home-memory-match",
+      "game": false,
+      "screenshot": "home-memory-match-1440x900.png",
+      "emulatedTouch": false,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "dpr": 1
+      },
+      "horizontalOverflow": false,
+      "controls": [
+        {
+          "text": "🏠 Thế giới game",
+          "rect": {
+            "x": 473.28125,
+            "y": 10.5,
+            "width": 154.46875,
+            "height": 52
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": false
+        },
+        {
+          "text": "📊 Góc phụ huynh",
+          "rect": {
+            "x": 634.75,
+            "y": 10.5,
+            "width": 160.09375,
+            "height": 52
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": false
+        },
+        {
+          "text": "📚 Xưởng học liệu",
+          "rect": {
+            "x": 801.84375,
+            "y": 10.5,
+            "width": 160.140625,
+            "height": 52
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": false
+        },
+        {
+          "text": "Xem tất cả các đảo ↻",
+          "rect": {
+            "x": 1275.03125,
+            "y": 188,
+            "width": 139.96875,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Xem đảo Đảo Toán Học",
+          "rect": {
+            "x": 145,
+            "y": 694,
+            "width": 352.65625,
+            "height": 52
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Toán 3 · Phép tính vui · Toán",
+          "rect": {
+            "x": 145,
+            "y": 778,
+            "width": 234.65625,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Bắt đầu ▶",
+          "rect": {
+            "x": 389.65625,
+            "y": 778,
+            "width": 108,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Xem đảo Khu Rừng Trí Nhớ",
+          "rect": {
+            "x": 543.65625,
+            "y": 691,
+            "width": 352.671875,
+            "height": 52
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Tiếng Anh · Gia đình · Tiếng AnhToán · Phép nhân · ToánTiếng Việt · Từ trái nghĩa · Tiếng Việt",
+          "rect": {
+            "x": 543.65625,
+            "y": 775,
+            "width": 234.671875,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Bắt đầu ▶",
+          "rect": {
+            "x": 788.328125,
+            "y": 775,
+            "width": 108,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Xem đảo Xưởng Ngôn Từ",
+          "rect": {
+            "x": 942.328125,
+            "y": 694,
+            "width": 352.65625,
+            "height": 52
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Tiếng Anh · Ghép câu đơn giản · Tiếng Anh",
+          "rect": {
+            "x": 942.328125,
+            "y": 778,
+            "width": 234.65625,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Bắt đầu ▶",
+          "rect": {
+            "x": 1186.984375,
+            "y": 778,
+            "width": 108,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        }
+      ],
+      "canvasCount": 1,
+      "canvasInGameSlot": false,
+      "engine": "three-webgl",
+      "state": "ready",
+      "diagnostics": {
+        "engine": "three-webgl",
+        "frames": 547,
+        "fpsMedian": 59.9,
+        "fpsP95FrameMs": 16.799999999999272,
+        "tier": "balanced",
+        "selectedWorld": "memory-match",
+        "carouselMoving": false,
+        "rotation": -2.0943951023931953,
+        "islands": [
+          {
+            "id": "math-quest",
+            "x": -3.983716857408418,
+            "y": 0,
+            "z": -2.7999999999999994,
+            "scale": 0.88
+          },
+          {
+            "id": "memory-match",
+            "x": 0,
+            "y": 0.1,
+            "z": 2.3,
+            "scale": 1.18
+          },
+          {
+            "id": "sentence-builder",
+            "x": 3.983716857408418,
+            "y": 0,
+            "z": -2.7999999999999994,
+            "scale": 0.88
+          }
+        ],
+        "mascotLocation": "memory-match",
+        "mascotState": "on-island",
+        "mascotPosition": {
+          "x": -1.121,
+          "y": 0.1472,
+          "z": 3.7749999999999995
+        },
+        "jumpProgress": 1,
+        "dpr": 1,
+        "drawCalls": 88,
+        "triangles": 122732,
+        "textureBytesEstimate": 9437183.999999998,
+        "assetErrors": [],
+        "readyAssets": [
+          "math-world",
+          "fox-guide"
+        ],
+        "animationClips": [
+          "Idle",
+          "Cheer",
+          "Victory"
+        ],
+        "skeletalMeshes": 10,
+        "bones": 14,
+        "animationTime": 9.150000000000022,
+        "activeClip": "Cheer",
+        "motion": true,
+        "paused": false,
+        "sceneMode": "home",
+        "gameWorld": null,
+        "guideMood": "idle",
+        "guideViewport": null,
+        "guideVisible": true
+      },
+      "renderer": "ANGLE (Intel, Intel(R) Arc(TM) Graphics (0x00007D55) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "sections": {
+        ".ba3d-render-host": {
+          "x": 0,
+          "y": 201,
+          "width": 1440,
+          "height": 484
+        },
+        ".ba3d-hero-title": {
+          "x": 295,
+          "y": 98,
+          "width": 850,
+          "height": 84.59375
+        },
+        ".ba3d-island-overview": {
+          "x": 1133.78125,
+          "y": 188,
+          "width": 281.21875,
+          "height": 44
+        },
+        ".ba3d-anchors": {
+          "x": 130,
+          "y": 681,
+          "width": 1180,
+          "height": 154
+        },
+        ".immersive-dialog": null,
+        ".challenge-card": null,
+        ".forest-board": null,
+        ".sentence-scroll": null,
+        ".ba37-mascot-window": null
+      },
+      "errors": [],
+      "maxModelRequestsInFlight": 2
+    },
+    {
+      "name": "home-sentence-builder-1440x900",
+      "scenario": "home-sentence-builder",
+      "game": false,
+      "screenshot": "home-sentence-builder-1440x900.png",
+      "emulatedTouch": false,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "dpr": 1
+      },
+      "horizontalOverflow": false,
+      "controls": [
+        {
+          "text": "🏠 Thế giới game",
+          "rect": {
+            "x": 473.28125,
+            "y": 10.5,
+            "width": 154.46875,
+            "height": 52
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": false
+        },
+        {
+          "text": "📊 Góc phụ huynh",
+          "rect": {
+            "x": 634.75,
+            "y": 10.5,
+            "width": 160.09375,
+            "height": 52
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": false
+        },
+        {
+          "text": "📚 Xưởng học liệu",
+          "rect": {
+            "x": 801.84375,
+            "y": 10.5,
+            "width": 160.140625,
+            "height": 52
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": false
+        },
+        {
+          "text": "Xem tất cả các đảo ↻",
+          "rect": {
+            "x": 1275.03125,
+            "y": 188,
+            "width": 139.96875,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Xem đảo Đảo Toán Học",
+          "rect": {
+            "x": 145,
+            "y": 694,
+            "width": 352.65625,
+            "height": 52
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Toán 3 · Phép tính vui · Toán",
+          "rect": {
+            "x": 145,
+            "y": 778,
+            "width": 234.65625,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Bắt đầu ▶",
+          "rect": {
+            "x": 389.65625,
+            "y": 778,
+            "width": 108,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Xem đảo Khu Rừng Trí Nhớ",
+          "rect": {
+            "x": 543.65625,
+            "y": 694,
+            "width": 352.671875,
+            "height": 52
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Tiếng Anh · Gia đình · Tiếng AnhToán · Phép nhân · ToánTiếng Việt · Từ trái nghĩa · Tiếng Việt",
+          "rect": {
+            "x": 543.65625,
+            "y": 778,
+            "width": 234.671875,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Bắt đầu ▶",
+          "rect": {
+            "x": 788.328125,
+            "y": 778,
+            "width": 108,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Xem đảo Xưởng Ngôn Từ",
+          "rect": {
+            "x": 942.328125,
+            "y": 691,
+            "width": 352.65625,
+            "height": 52
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Tiếng Anh · Ghép câu đơn giản · Tiếng Anh",
+          "rect": {
+            "x": 942.328125,
+            "y": 775,
+            "width": 234.65625,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Bắt đầu ▶",
+          "rect": {
+            "x": 1186.984375,
+            "y": 775,
+            "width": 108,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        }
+      ],
+      "canvasCount": 1,
+      "canvasInGameSlot": false,
+      "engine": "three-webgl",
+      "state": "ready",
+      "diagnostics": {
+        "engine": "three-webgl",
+        "frames": 669,
+        "fpsMedian": 59.9,
+        "fpsP95FrameMs": 16.799999999999272,
+        "tier": "balanced",
+        "selectedWorld": "sentence-builder",
+        "carouselMoving": false,
+        "rotation": -4.18879020478639,
+        "islands": [
+          {
+            "id": "math-quest",
+            "x": 3.9837168574084143,
+            "y": 0,
+            "z": -2.8000000000000043,
+            "scale": 0.88
+          },
+          {
+            "id": "memory-match",
+            "x": -3.9837168574084196,
+            "y": 0,
+            "z": -2.799999999999997,
+            "scale": 0.88
+          },
+          {
+            "id": "sentence-builder",
+            "x": 4.085620730620576e-15,
+            "y": 0.1,
+            "z": 2.3,
+            "scale": 1.18
+          }
+        ],
+        "mascotLocation": "sentence-builder",
+        "mascotState": "on-island",
+        "mascotPosition": {
+          "x": 1.121000000000004,
+          "y": 0.1472,
+          "z": 3.5389999999999997
+        },
+        "jumpProgress": 1,
+        "dpr": 1,
+        "drawCalls": 88,
+        "triangles": 122732,
+        "textureBytesEstimate": 9437183.999999998,
+        "assetErrors": [],
+        "readyAssets": [
+          "math-world",
+          "fox-guide"
+        ],
+        "animationClips": [
+          "Idle",
+          "Cheer",
+          "Victory"
+        ],
+        "skeletalMeshes": 10,
+        "bones": 14,
+        "animationTime": 11.1834,
+        "activeClip": "Cheer",
+        "motion": true,
+        "paused": false,
+        "sceneMode": "home",
+        "gameWorld": null,
+        "guideMood": "idle",
+        "guideViewport": null,
+        "guideVisible": true
+      },
+      "renderer": "ANGLE (Intel, Intel(R) Arc(TM) Graphics (0x00007D55) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "sections": {
+        ".ba3d-render-host": {
+          "x": 0,
+          "y": 201,
+          "width": 1440,
+          "height": 484
+        },
+        ".ba3d-hero-title": {
+          "x": 295,
+          "y": 98,
+          "width": 850,
+          "height": 84.59375
+        },
+        ".ba3d-island-overview": {
+          "x": 1141.859375,
+          "y": 188,
+          "width": 273.140625,
+          "height": 44
+        },
+        ".ba3d-anchors": {
+          "x": 130,
+          "y": 681,
+          "width": 1180,
+          "height": 154
+        },
+        ".immersive-dialog": null,
+        ".challenge-card": null,
+        ".forest-board": null,
+        ".sentence-scroll": null,
+        ".ba37-mascot-window": null
+      },
+      "errors": [],
+      "maxModelRequestsInFlight": 2
+    },
+    {
+      "name": "game-math-quest-waiting-1440x900",
+      "scenario": "game-math-quest-waiting",
+      "game": true,
+      "screenshot": "game-math-quest-waiting-1440x900.png",
+      "emulatedTouch": false,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "dpr": 1
+      },
+      "horizontalOverflow": false,
+      "controls": [
+        {
+          "text": "← Thoát trò chơi",
+          "rect": {
+            "x": 1274.421875,
+            "y": 12.5,
+            "width": 123.578125,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "A42",
+          "rect": {
+            "x": 413.71875,
+            "y": 407,
+            "width": 443,
+            "height": 74
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "B41",
+          "rect": {
+            "x": 868.71875,
+            "y": 407,
+            "width": 443,
+            "height": 74
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "C32",
+          "rect": {
+            "x": 413.71875,
+            "y": 493,
+            "width": 443,
+            "height": 74
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "D43",
+          "rect": {
+            "x": 868.71875,
+            "y": 493,
+            "width": 443,
+            "height": 74
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "💡 Cần một gợi ý?",
+          "rect": {
+            "x": 784.046875,
+            "y": 623.75,
+            "width": 142.34375,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": false
+        }
+      ],
+      "canvasCount": 1,
+      "canvasInGameSlot": true,
+      "engine": "three-webgl",
+      "state": "ready",
+      "diagnostics": {
+        "engine": "three-webgl",
+        "frames": 797,
+        "fpsMedian": 59.9,
+        "fpsP95FrameMs": 16.799999999999272,
+        "tier": "balanced",
+        "selectedWorld": "math-quest",
+        "carouselMoving": false,
+        "rotation": -6.283185307179585,
+        "islands": [
+          {
+            "id": "math-quest",
+            "x": -12,
+            "y": 0.05,
+            "z": -10,
+            "scale": 1.8
+          },
+          {
+            "id": "memory-match",
+            "x": 3.9837168574084143,
+            "y": 0,
+            "z": -2.8000000000000043,
+            "scale": 0.88
+          },
+          {
+            "id": "sentence-builder",
+            "x": -3.9837168574084187,
+            "y": 0,
+            "z": -2.799999999999998,
+            "scale": 0.88
+          }
+        ],
+        "mascotLocation": "math-quest",
+        "mascotState": "on-island",
+        "mascotPosition": {
+          "x": -3.3462162362062555,
+          "y": 4.29173487380247,
+          "z": 13.320732268880375
+        },
+        "jumpProgress": 1,
+        "dpr": 1,
+        "drawCalls": 49,
+        "triangles": 85856,
+        "textureBytesEstimate": 9437183.999999998,
+        "assetErrors": [],
+        "readyAssets": [
+          "math-world",
+          "fox-guide"
+        ],
+        "animationClips": [
+          "Idle",
+          "Cheer",
+          "Victory"
+        ],
+        "skeletalMeshes": 10,
+        "bones": 14,
+        "animationTime": 13.316799999999972,
+        "activeClip": "Idle",
+        "motion": true,
+        "paused": false,
+        "sceneMode": "game",
+        "gameWorld": "math-quest",
+        "guideMood": "idle",
+        "guideCue": 1,
+        "guideViewport": {
+          "x": 73.609375,
+          "y": 225,
+          "width": 244.796875,
+          "height": 310
+        },
+        "guideVisible": true
+      },
+      "renderer": "ANGLE (Intel, Intel(R) Arc(TM) Graphics (0x00007D55) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "sections": {
+        ".ba3d-render-host": {
+          "x": 0,
+          "y": 70,
+          "width": 1440,
+          "height": 830
+        },
+        ".ba3d-hero-title": {
+          "x": 295,
+          "y": 98,
+          "width": 850,
+          "height": 84.59375
+        },
+        ".ba3d-island-overview": {
+          "x": 1151.640625,
+          "y": 188,
+          "width": 263.359375,
+          "height": 44
+        },
+        ".ba3d-anchors": {
+          "x": 130,
+          "y": 681,
+          "width": 1180,
+          "height": 154
+        },
+        ".immersive-dialog": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900
+        },
+        ".challenge-card": {
+          "x": 382.71875,
+          "y": 205,
+          "width": 960,
+          "height": 583
+        },
+        ".forest-board": null,
+        ".sentence-scroll": null,
+        ".ba37-mascot-window": {
+          "x": 73.609375,
+          "y": 295,
+          "width": 244.796875,
+          "height": 310
+        }
+      },
+      "errors": [],
+      "maxModelRequestsInFlight": 2
+    },
+    {
+      "name": "game-memory-match-waiting-1440x900",
+      "scenario": "game-memory-match-waiting",
+      "game": true,
+      "screenshot": "game-memory-match-waiting-1440x900.png",
+      "emulatedTouch": false,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "dpr": 1
+      },
+      "horizontalOverflow": false,
+      "controls": [
+        {
+          "text": "← Thoát trò chơi",
+          "rect": {
+            "x": 1274.421875,
+            "y": 12.5,
+            "width": 123.578125,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Thẻ úp, chọn để lật",
+          "rect": {
+            "x": 413.71875,
+            "y": 394,
+            "width": 215.5,
+            "height": 108
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Thẻ úp, chọn để lật",
+          "rect": {
+            "x": 641.21875,
+            "y": 394,
+            "width": 215.5,
+            "height": 108
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Thẻ úp, chọn để lật",
+          "rect": {
+            "x": 868.71875,
+            "y": 394,
+            "width": 215.5,
+            "height": 108
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Thẻ úp, chọn để lật",
+          "rect": {
+            "x": 1096.21875,
+            "y": 394,
+            "width": 215.5,
+            "height": 108
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Thẻ úp, chọn để lật",
+          "rect": {
+            "x": 413.71875,
+            "y": 514,
+            "width": 215.5,
+            "height": 108
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Thẻ úp, chọn để lật",
+          "rect": {
+            "x": 641.21875,
+            "y": 514,
+            "width": 215.5,
+            "height": 108
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Thẻ úp, chọn để lật",
+          "rect": {
+            "x": 868.71875,
+            "y": 514,
+            "width": 215.5,
+            "height": 108
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Thẻ úp, chọn để lật",
+          "rect": {
+            "x": 1096.21875,
+            "y": 514,
+            "width": 215.5,
+            "height": 108
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Thẻ úp, chọn để lật",
+          "rect": {
+            "x": 413.71875,
+            "y": 634,
+            "width": 215.5,
+            "height": 108
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Thẻ úp, chọn để lật",
+          "rect": {
+            "x": 641.21875,
+            "y": 634,
+            "width": 215.5,
+            "height": 108
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Thẻ úp, chọn để lật",
+          "rect": {
+            "x": 868.71875,
+            "y": 634,
+            "width": 215.5,
+            "height": 108
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Thẻ úp, chọn để lật",
+          "rect": {
+            "x": 1096.21875,
+            "y": 634,
+            "width": 215.5,
+            "height": 108
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        }
+      ],
+      "canvasCount": 1,
+      "canvasInGameSlot": true,
+      "engine": "three-webgl",
+      "state": "ready",
+      "diagnostics": {
+        "engine": "three-webgl",
+        "frames": 856,
+        "fpsMedian": 59.9,
+        "fpsP95FrameMs": 16.80000000000109,
+        "tier": "balanced",
+        "selectedWorld": "memory-match",
+        "carouselMoving": false,
+        "rotation": -8.377580409572781,
+        "islands": [
+          {
+            "id": "math-quest",
+            "x": -3.9837168574084196,
+            "y": 0,
+            "z": -2.799999999999997,
+            "scale": 0.88
+          },
+          {
+            "id": "memory-match",
+            "x": -12,
+            "y": 0.05,
+            "z": -10,
+            "scale": 2
+          },
+          {
+            "id": "sentence-builder",
+            "x": 3.983716857408416,
+            "y": 0,
+            "z": -2.8000000000000016,
+            "scale": 0.88
+          }
+        ],
+        "mascotLocation": "memory-match",
+        "mascotState": "on-island",
+        "mascotPosition": {
+          "x": -3.3462162362062546,
+          "y": 4.0316567773742396,
+          "z": 13.377741387617446
+        },
+        "jumpProgress": 1,
+        "dpr": 1,
+        "drawCalls": 32,
+        "triangles": 38628,
+        "textureBytesEstimate": 9437183.999999998,
+        "assetErrors": [],
+        "readyAssets": [
+          "math-world",
+          "fox-guide"
+        ],
+        "animationClips": [
+          "Idle",
+          "Cheer",
+          "Victory"
+        ],
+        "skeletalMeshes": 10,
+        "bones": 14,
+        "animationTime": 14.316799999999962,
+        "activeClip": "Idle",
+        "motion": true,
+        "paused": false,
+        "sceneMode": "game",
+        "gameWorld": "memory-match",
+        "guideMood": "idle",
+        "guideCue": 3,
+        "guideViewport": {
+          "x": 73.609375,
+          "y": 267,
+          "width": 244.796875,
+          "height": 310
+        },
+        "guideVisible": true
+      },
+      "renderer": "ANGLE (Intel, Intel(R) Arc(TM) Graphics (0x00007D55) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "sections": {
+        ".ba3d-render-host": {
+          "x": 0,
+          "y": 70,
+          "width": 1440,
+          "height": 830
+        },
+        ".ba3d-hero-title": {
+          "x": 295,
+          "y": 98,
+          "width": 850,
+          "height": 84.59375
+        },
+        ".ba3d-island-overview": {
+          "x": 1133.78125,
+          "y": 188,
+          "width": 281.21875,
+          "height": 44
+        },
+        ".ba3d-anchors": {
+          "x": 130,
+          "y": 681,
+          "width": 1180,
+          "height": 154
+        },
+        ".immersive-dialog": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900
+        },
+        ".challenge-card": null,
+        ".forest-board": {
+          "x": 382.71875,
+          "y": 304,
+          "width": 960,
+          "height": 469
+        },
+        ".sentence-scroll": null,
+        ".ba37-mascot-window": {
+          "x": 73.609375,
+          "y": 337,
+          "width": 244.796875,
+          "height": 310
+        }
+      },
+      "errors": [],
+      "maxModelRequestsInFlight": 2
+    },
+    {
+      "name": "game-sentence-builder-waiting-1440x900",
+      "scenario": "game-sentence-builder-waiting",
+      "game": true,
+      "screenshot": "game-sentence-builder-waiting-1440x900.png",
+      "emulatedTouch": false,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "dpr": 1
+      },
+      "horizontalOverflow": false,
+      "controls": [
+        {
+          "text": "← Thoát trò chơi",
+          "rect": {
+            "x": 1274.421875,
+            "y": 12.5,
+            "width": 123.578125,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "student.",
+          "rect": {
+            "x": 728.234375,
+            "y": 493.65625,
+            "width": 101.328125,
+            "height": 52
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "I",
+          "rect": {
+            "x": 837.5625,
+            "y": 493.65625,
+            "width": 44,
+            "height": 52
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "a",
+          "rect": {
+            "x": 889.5625,
+            "y": 493.65625,
+            "width": 44,
+            "height": 52
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "am",
+          "rect": {
+            "x": 941.5625,
+            "y": 493.65625,
+            "width": 55.640625,
+            "height": 52
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "💡 Gợi ý",
+          "rect": {
+            "x": 663.046875,
+            "y": 702.65625,
+            "width": 83.15625,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "↺ Xếp lại",
+          "rect": {
+            "x": 756.203125,
+            "y": 702.65625,
+            "width": 86.171875,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "✓ Kiểm tra câu",
+          "rect": {
+            "x": 852.375,
+            "y": 702.65625,
+            "width": 210,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        }
+      ],
+      "canvasCount": 1,
+      "canvasInGameSlot": true,
+      "engine": "three-webgl",
+      "state": "ready",
+      "diagnostics": {
+        "engine": "three-webgl",
+        "frames": 914,
+        "fpsMedian": 59.9,
+        "fpsP95FrameMs": 16.80000000000109,
+        "tier": "balanced",
+        "selectedWorld": "sentence-builder",
+        "carouselMoving": false,
+        "rotation": -10.471975511965976,
+        "islands": [
+          {
+            "id": "math-quest",
+            "x": 3.983716857408414,
+            "y": 0,
+            "z": -2.8000000000000043,
+            "scale": 0.88
+          },
+          {
+            "id": "memory-match",
+            "x": -3.9837168574084196,
+            "y": 0,
+            "z": -2.799999999999997,
+            "scale": 0.88
+          },
+          {
+            "id": "sentence-builder",
+            "x": -12,
+            "y": 0.05,
+            "z": -10,
+            "scale": 1.9
+          }
+        ],
+        "mascotLocation": "sentence-builder",
+        "mascotState": "on-island",
+        "mascotPosition": {
+          "x": -3.3462162362062555,
+          "y": 4.29173487380247,
+          "z": 13.320732268880375
+        },
+        "jumpProgress": 1,
+        "dpr": 1,
+        "drawCalls": 39,
+        "triangles": 29740,
+        "textureBytesEstimate": 9437183.999999998,
+        "assetErrors": [],
+        "readyAssets": [
+          "math-world",
+          "fox-guide"
+        ],
+        "animationClips": [
+          "Idle",
+          "Cheer",
+          "Victory"
+        ],
+        "skeletalMeshes": 10,
+        "bones": 14,
+        "animationTime": 15.28339999999995,
+        "activeClip": "Idle",
+        "motion": true,
+        "paused": false,
+        "sceneMode": "game",
+        "gameWorld": "sentence-builder",
+        "guideMood": "idle",
+        "guideCue": 5,
+        "guideViewport": {
+          "x": 73.609375,
+          "y": 225,
+          "width": 244.796875,
+          "height": 310
+        },
+        "guideVisible": true
+      },
+      "renderer": "ANGLE (Intel, Intel(R) Arc(TM) Graphics (0x00007D55) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "sections": {
+        ".ba3d-render-host": {
+          "x": 0,
+          "y": 70,
+          "width": 1440,
+          "height": 830
+        },
+        ".ba3d-hero-title": {
+          "x": 295,
+          "y": 98,
+          "width": 850,
+          "height": 84.59375
+        },
+        ".ba3d-island-overview": {
+          "x": 1141.859375,
+          "y": 188,
+          "width": 273.140625,
+          "height": 44
+        },
+        ".ba3d-anchors": {
+          "x": 130,
+          "y": 681,
+          "width": 1180,
+          "height": 154
+        },
+        ".immersive-dialog": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900
+        },
+        ".challenge-card": null,
+        ".forest-board": null,
+        ".sentence-scroll": {
+          "x": 382.71875,
+          "y": 181.34375,
+          "width": 960,
+          "height": 630.3125
+        },
+        ".ba37-mascot-window": {
+          "x": 73.609375,
+          "y": 295,
+          "width": 244.796875,
+          "height": 310
+        }
+      },
+      "errors": [],
+      "maxModelRequestsInFlight": 2
+    },
+    {
+      "name": "home-overview-390x844",
+      "scenario": "home-overview",
+      "game": false,
+      "screenshot": "home-overview-390x844.png",
+      "emulatedTouch": true,
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "horizontalOverflow": false,
+      "controls": [
+        {
+          "text": "🏠 Thế giới game",
+          "rect": {
+            "x": 9,
+            "y": 56.5,
+            "width": 120.65625,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": false
+        },
+        {
+          "text": "📊 Góc phụ huynh",
+          "rect": {
+            "x": 134.65625,
+            "y": 56.5,
+            "width": 120.671875,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": false
+        },
+        {
+          "text": "📚 Xưởng học liệu",
+          "rect": {
+            "x": 260.328125,
+            "y": 56.5,
+            "width": 120.65625,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": false
+        },
+        {
+          "text": "Xem đảo Đảo Toán Học",
+          "rect": {
+            "x": 18,
+            "y": 612,
+            "width": 134,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Toán 3 · Phép tính vui · Toán",
+          "rect": {
+            "x": 158,
+            "y": 612,
+            "width": 134,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Bắt đầu ▶",
+          "rect": {
+            "x": 298,
+            "y": 612,
+            "width": 74,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Xem đảo Khu Rừng Trí Nhớ",
+          "rect": {
+            "x": 18,
+            "y": 674,
+            "width": 134,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Tiếng Anh · Gia đình · Tiếng AnhToán · Phép nhân · ToánTiếng Việt · Từ trái nghĩa · Tiếng Việt",
+          "rect": {
+            "x": 158,
+            "y": 674,
+            "width": 134,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Bắt đầu ▶",
+          "rect": {
+            "x": 298,
+            "y": 674,
+            "width": 74,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Xem đảo Xưởng Ngôn Từ",
+          "rect": {
+            "x": 18,
+            "y": 736,
+            "width": 134,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Tiếng Anh · Ghép câu đơn giản · Tiếng Anh",
+          "rect": {
+            "x": 158,
+            "y": 736,
+            "width": 134,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Bắt đầu ▶",
+          "rect": {
+            "x": 298,
+            "y": 736,
+            "width": 74,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        }
+      ],
+      "canvasCount": 1,
+      "canvasInGameSlot": false,
+      "engine": "three-webgl",
+      "state": "ready",
+      "diagnostics": {
+        "engine": "three-webgl",
+        "frames": 265,
+        "fpsMedian": 59.9,
+        "fpsP95FrameMs": 16.800000000000182,
+        "tier": "low",
+        "selectedWorld": null,
+        "carouselMoving": false,
+        "rotation": 0.5235987755982988,
+        "islands": [
+          {
+            "id": "math-quest",
+            "x": -3.35,
+            "y": 0,
+            "z": -1,
+            "scale": 0.73
+          },
+          {
+            "id": "memory-match",
+            "x": 0,
+            "y": 0,
+            "z": -1,
+            "scale": 0.73
+          },
+          {
+            "id": "sentence-builder",
+            "x": 3.35,
+            "y": 0,
+            "z": -1,
+            "scale": 0.73
+          }
+        ],
+        "mascotLocation": "waiting",
+        "mascotState": "waiting",
+        "mascotPosition": {
+          "x": -3.7,
+          "y": 0.12,
+          "z": 4.2
+        },
+        "jumpProgress": 1,
+        "dpr": 1,
+        "drawCalls": 49,
+        "triangles": 65476,
+        "textureBytesEstimate": 9437183.999999998,
+        "assetErrors": [],
+        "readyAssets": [
+          "math-world",
+          "fox-guide"
+        ],
+        "animationClips": [
+          "Idle",
+          "Cheer",
+          "Victory"
+        ],
+        "skeletalMeshes": 10,
+        "bones": 14,
+        "animationTime": 4.450100000000001,
+        "activeClip": "Idle",
+        "motion": true,
+        "paused": false,
+        "sceneMode": "home",
+        "gameWorld": null,
+        "guideMood": "idle",
+        "guideViewport": null,
+        "guideVisible": true
+      },
+      "renderer": "ANGLE (Intel, Intel(R) Arc(TM) Graphics (0x00007D55) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "sections": {
+        ".ba3d-render-host": {
+          "x": 0,
+          "y": 220,
+          "width": 390,
+          "height": 382
+        },
+        ".ba3d-hero-title": {
+          "x": 12,
+          "y": 120,
+          "width": 366,
+          "height": 42.46875
+        },
+        ".ba3d-island-overview": {
+          "x": 120.796875,
+          "y": 591,
+          "width": 148.40625,
+          "height": 14
+        },
+        ".ba3d-anchors": {
+          "x": 10,
+          "y": 606,
+          "width": 370,
+          "height": 180
+        },
+        ".immersive-dialog": null,
+        ".challenge-card": null,
+        ".forest-board": null,
+        ".sentence-scroll": null,
+        ".ba37-mascot-window": null
+      },
+      "errors": [],
+      "runtimeSamples": [
+        {
+          "engine": "three-webgl",
+          "frames": 144,
+          "fpsMedian": 59.9,
+          "fpsP95FrameMs": 16.799999999999955,
+          "tier": "low",
+          "selectedWorld": null,
+          "carouselMoving": false,
+          "rotation": 0.5235987755982988,
+          "islands": [
+            {
+              "id": "math-quest",
+              "x": -3.35,
+              "y": 0,
+              "z": -1,
+              "scale": 0.73
+            },
+            {
+              "id": "memory-match",
+              "x": 0,
+              "y": 0,
+              "z": -1,
+              "scale": 0.73
+            },
+            {
+              "id": "sentence-builder",
+              "x": 3.35,
+              "y": 0,
+              "z": -1,
+              "scale": 0.73
+            }
+          ],
+          "mascotLocation": "waiting",
+          "mascotState": "waiting",
+          "mascotPosition": {
+            "x": -3.7,
+            "y": 0.12,
+            "z": 4.2
+          },
+          "jumpProgress": 1,
+          "dpr": 1,
+          "drawCalls": 49,
+          "triangles": 65476,
+          "textureBytesEstimate": 9437183.999999998,
+          "assetErrors": [],
+          "readyAssets": [
+            "math-world",
+            "fox-guide"
+          ],
+          "animationClips": [
+            "Idle",
+            "Cheer",
+            "Victory"
+          ],
+          "skeletalMeshes": 10,
+          "bones": 14,
+          "animationTime": 2.433299999999998,
+          "activeClip": "Idle",
+          "motion": true,
+          "paused": false,
+          "sceneMode": "home",
+          "gameWorld": null,
+          "guideMood": "idle",
+          "guideViewport": null,
+          "guideVisible": true
+        },
+        {
+          "engine": "three-webgl",
+          "frames": 144,
+          "fpsMedian": 59.9,
+          "fpsP95FrameMs": 16.799999999999955,
+          "tier": "low",
+          "selectedWorld": null,
+          "carouselMoving": false,
+          "rotation": 0.5235987755982988,
+          "islands": [
+            {
+              "id": "math-quest",
+              "x": -3.35,
+              "y": 0,
+              "z": -1,
+              "scale": 0.73
+            },
+            {
+              "id": "memory-match",
+              "x": 0,
+              "y": 0,
+              "z": -1,
+              "scale": 0.73
+            },
+            {
+              "id": "sentence-builder",
+              "x": 3.35,
+              "y": 0,
+              "z": -1,
+              "scale": 0.73
+            }
+          ],
+          "mascotLocation": "waiting",
+          "mascotState": "waiting",
+          "mascotPosition": {
+            "x": -3.7,
+            "y": 0.12,
+            "z": 4.2
+          },
+          "jumpProgress": 1,
+          "dpr": 1,
+          "drawCalls": 49,
+          "triangles": 65476,
+          "textureBytesEstimate": 9437183.999999998,
+          "assetErrors": [],
+          "readyAssets": [
+            "math-world",
+            "fox-guide"
+          ],
+          "animationClips": [
+            "Idle",
+            "Cheer",
+            "Victory"
+          ],
+          "skeletalMeshes": 10,
+          "bones": 14,
+          "animationTime": 2.433299999999998,
+          "activeClip": "Idle",
+          "motion": true,
+          "paused": false,
+          "sceneMode": "home",
+          "gameWorld": null,
+          "guideMood": "idle",
+          "guideViewport": null,
+          "guideVisible": true
+        },
+        {
+          "engine": "three-webgl",
+          "frames": 204,
+          "fpsMedian": 59.9,
+          "fpsP95FrameMs": 16.799999999999955,
+          "tier": "low",
+          "selectedWorld": null,
+          "carouselMoving": false,
+          "rotation": 0.5235987755982988,
+          "islands": [
+            {
+              "id": "math-quest",
+              "x": -3.35,
+              "y": 0,
+              "z": -1,
+              "scale": 0.73
+            },
+            {
+              "id": "memory-match",
+              "x": 0,
+              "y": 0,
+              "z": -1,
+              "scale": 0.73
+            },
+            {
+              "id": "sentence-builder",
+              "x": 3.35,
+              "y": 0,
+              "z": -1,
+              "scale": 0.73
+            }
+          ],
+          "mascotLocation": "waiting",
+          "mascotState": "waiting",
+          "mascotPosition": {
+            "x": -3.7,
+            "y": 0.12,
+            "z": 4.2
+          },
+          "jumpProgress": 1,
+          "dpr": 1,
+          "drawCalls": 49,
+          "triangles": 65476,
+          "textureBytesEstimate": 9437183.999999998,
+          "assetErrors": [],
+          "readyAssets": [
+            "math-world",
+            "fox-guide"
+          ],
+          "animationClips": [
+            "Idle",
+            "Cheer",
+            "Victory"
+          ],
+          "skeletalMeshes": 10,
+          "bones": 14,
+          "animationTime": 3.4333999999999967,
+          "activeClip": "Idle",
+          "motion": true,
+          "paused": false,
+          "sceneMode": "home",
+          "gameWorld": null,
+          "guideMood": "idle",
+          "guideViewport": null,
+          "guideVisible": true
+        }
+      ],
+      "maxModelRequestsInFlight": 2
+    },
+    {
+      "name": "home-math-quest-390x844",
+      "scenario": "home-math-quest",
+      "game": false,
+      "screenshot": "home-math-quest-390x844.png",
+      "emulatedTouch": true,
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "horizontalOverflow": false,
+      "controls": [
+        {
+          "text": "🏠 Thế giới game",
+          "rect": {
+            "x": 9,
+            "y": 56.5,
+            "width": 120.65625,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": false
+        },
+        {
+          "text": "📊 Góc phụ huynh",
+          "rect": {
+            "x": 134.65625,
+            "y": 56.5,
+            "width": 120.671875,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": false
+        },
+        {
+          "text": "📚 Xưởng học liệu",
+          "rect": {
+            "x": 260.328125,
+            "y": 56.5,
+            "width": 120.65625,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": false
+        },
+        {
+          "text": "Xem tất cả các đảo ↻",
+          "rect": {
+            "x": 131.828125,
+            "y": 561,
+            "width": 126.34375,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Xem đảo Đảo Toán Học",
+          "rect": {
+            "x": 18,
+            "y": 612,
+            "width": 134,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Toán 3 · Phép tính vui · Toán",
+          "rect": {
+            "x": 158,
+            "y": 612,
+            "width": 134,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Bắt đầu ▶",
+          "rect": {
+            "x": 298,
+            "y": 612,
+            "width": 74,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Xem đảo Khu Rừng Trí Nhớ",
+          "rect": {
+            "x": 18,
+            "y": 674,
+            "width": 134,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Tiếng Anh · Gia đình · Tiếng AnhToán · Phép nhân · ToánTiếng Việt · Từ trái nghĩa · Tiếng Việt",
+          "rect": {
+            "x": 158,
+            "y": 674,
+            "width": 134,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Bắt đầu ▶",
+          "rect": {
+            "x": 298,
+            "y": 674,
+            "width": 74,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Xem đảo Xưởng Ngôn Từ",
+          "rect": {
+            "x": 18,
+            "y": 736,
+            "width": 134,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Tiếng Anh · Ghép câu đơn giản · Tiếng Anh",
+          "rect": {
+            "x": 158,
+            "y": 736,
+            "width": 134,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Bắt đầu ▶",
+          "rect": {
+            "x": 298,
+            "y": 736,
+            "width": 74,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        }
+      ],
+      "canvasCount": 1,
+      "canvasInGameSlot": false,
+      "engine": "three-webgl",
+      "state": "ready",
+      "diagnostics": {
+        "engine": "three-webgl",
+        "frames": 386,
+        "fpsMedian": 59.9,
+        "fpsP95FrameMs": 16.800000000000182,
+        "tier": "low",
+        "selectedWorld": "math-quest",
+        "carouselMoving": false,
+        "rotation": 5.551115123125783e-16,
+        "islands": [
+          {
+            "id": "math-quest",
+            "x": 1.6853185513809876e-15,
+            "y": 0.1,
+            "z": 1.5499999999999998,
+            "scale": 1.04
+          },
+          {
+            "id": "memory-match",
+            "x": 2.629253125889555,
+            "y": 0,
+            "z": -2.4250000000000007,
+            "scale": 0.7
+          },
+          {
+            "id": "sentence-builder",
+            "x": -2.6292531258895564,
+            "y": 0,
+            "z": -2.424999999999999,
+            "scale": 0.7
+          }
+        ],
+        "mascotLocation": "math-quest",
+        "mascotState": "on-island",
+        "mascotPosition": {
+          "x": -1.1855999999999982,
+          "y": 0.1416,
+          "z": 2.7148
+        },
+        "jumpProgress": 1,
+        "dpr": 1,
+        "drawCalls": 46,
+        "triangles": 64852,
+        "textureBytesEstimate": 9437183.999999998,
+        "assetErrors": [],
+        "readyAssets": [
+          "math-world",
+          "fox-guide"
+        ],
+        "animationClips": [
+          "Idle",
+          "Cheer",
+          "Victory"
+        ],
+        "skeletalMeshes": 10,
+        "bones": 14,
+        "animationTime": 6.483400000000014,
+        "activeClip": "Cheer",
+        "motion": true,
+        "paused": false,
+        "sceneMode": "home",
+        "gameWorld": null,
+        "guideMood": "idle",
+        "guideViewport": null,
+        "guideVisible": true
+      },
+      "renderer": "ANGLE (Intel, Intel(R) Arc(TM) Graphics (0x00007D55) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "sections": {
+        ".ba3d-render-host": {
+          "x": 0,
+          "y": 220,
+          "width": 390,
+          "height": 382
+        },
+        ".ba3d-hero-title": {
+          "x": 12,
+          "y": 120,
+          "width": 366,
+          "height": 42.46875
+        },
+        ".ba3d-island-overview": {
+          "x": 131.828125,
+          "y": 561,
+          "width": 126.34375,
+          "height": 44
+        },
+        ".ba3d-anchors": {
+          "x": 10,
+          "y": 606,
+          "width": 370,
+          "height": 180
+        },
+        ".immersive-dialog": null,
+        ".challenge-card": null,
+        ".forest-board": null,
+        ".sentence-scroll": null,
+        ".ba37-mascot-window": null
+      },
+      "errors": [],
+      "maxModelRequestsInFlight": 2
+    },
+    {
+      "name": "home-memory-match-390x844",
+      "scenario": "home-memory-match",
+      "game": false,
+      "screenshot": "home-memory-match-390x844.png",
+      "emulatedTouch": true,
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "horizontalOverflow": false,
+      "controls": [
+        {
+          "text": "🏠 Thế giới game",
+          "rect": {
+            "x": 9,
+            "y": 56.5,
+            "width": 120.65625,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": false
+        },
+        {
+          "text": "📊 Góc phụ huynh",
+          "rect": {
+            "x": 134.65625,
+            "y": 56.5,
+            "width": 120.671875,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": false
+        },
+        {
+          "text": "📚 Xưởng học liệu",
+          "rect": {
+            "x": 260.328125,
+            "y": 56.5,
+            "width": 120.65625,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": false
+        },
+        {
+          "text": "Xem tất cả các đảo ↻",
+          "rect": {
+            "x": 131.828125,
+            "y": 561,
+            "width": 126.34375,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Xem đảo Đảo Toán Học",
+          "rect": {
+            "x": 18,
+            "y": 612,
+            "width": 134,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Toán 3 · Phép tính vui · Toán",
+          "rect": {
+            "x": 158,
+            "y": 612,
+            "width": 134,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Bắt đầu ▶",
+          "rect": {
+            "x": 298,
+            "y": 612,
+            "width": 74,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Xem đảo Khu Rừng Trí Nhớ",
+          "rect": {
+            "x": 18,
+            "y": 674,
+            "width": 134,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Tiếng Anh · Gia đình · Tiếng AnhToán · Phép nhân · ToánTiếng Việt · Từ trái nghĩa · Tiếng Việt",
+          "rect": {
+            "x": 158,
+            "y": 674,
+            "width": 134,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Bắt đầu ▶",
+          "rect": {
+            "x": 298,
+            "y": 674,
+            "width": 74,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Xem đảo Xưởng Ngôn Từ",
+          "rect": {
+            "x": 18,
+            "y": 736,
+            "width": 134,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Tiếng Anh · Ghép câu đơn giản · Tiếng Anh",
+          "rect": {
+            "x": 158,
+            "y": 736,
+            "width": 134,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Bắt đầu ▶",
+          "rect": {
+            "x": 298,
+            "y": 736,
+            "width": 74,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        }
+      ],
+      "canvasCount": 1,
+      "canvasInGameSlot": false,
+      "engine": "three-webgl",
+      "state": "ready",
+      "diagnostics": {
+        "engine": "three-webgl",
+        "frames": 508,
+        "fpsMedian": 59.9,
+        "fpsP95FrameMs": 16.800000000000182,
+        "tier": "low",
+        "selectedWorld": "memory-match",
+        "carouselMoving": false,
+        "rotation": -2.0943951023931953,
+        "islands": [
+          {
+            "id": "math-quest",
+            "x": -2.629253125889556,
+            "y": 0,
+            "z": -2.4249999999999994,
+            "scale": 0.7
+          },
+          {
+            "id": "memory-match",
+            "x": 0,
+            "y": 0.1,
+            "z": 1.5499999999999998,
+            "scale": 1.04
+          },
+          {
+            "id": "sentence-builder",
+            "x": 2.629253125889556,
+            "y": 0,
+            "z": -2.4249999999999994,
+            "scale": 0.7
+          }
+        ],
+        "mascotLocation": "memory-match",
+        "mascotState": "on-island",
+        "mascotPosition": {
+          "x": -0.988,
+          "y": 0.1416,
+          "z": 2.8499999999999996
+        },
+        "jumpProgress": 1,
+        "dpr": 1,
+        "drawCalls": 46,
+        "triangles": 64852,
+        "textureBytesEstimate": 9437183.999999998,
+        "assetErrors": [],
+        "readyAssets": [
+          "math-world",
+          "fox-guide"
+        ],
+        "animationClips": [
+          "Idle",
+          "Cheer",
+          "Victory"
+        ],
+        "skeletalMeshes": 10,
+        "bones": 14,
+        "animationTime": 8.516700000000018,
+        "activeClip": "Cheer",
+        "motion": true,
+        "paused": false,
+        "sceneMode": "home",
+        "gameWorld": null,
+        "guideMood": "idle",
+        "guideViewport": null,
+        "guideVisible": true
+      },
+      "renderer": "ANGLE (Intel, Intel(R) Arc(TM) Graphics (0x00007D55) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "sections": {
+        ".ba3d-render-host": {
+          "x": 0,
+          "y": 220,
+          "width": 390,
+          "height": 382
+        },
+        ".ba3d-hero-title": {
+          "x": 12,
+          "y": 120,
+          "width": 366,
+          "height": 42.46875
+        },
+        ".ba3d-island-overview": {
+          "x": 131.828125,
+          "y": 561,
+          "width": 126.34375,
+          "height": 44
+        },
+        ".ba3d-anchors": {
+          "x": 10,
+          "y": 606,
+          "width": 370,
+          "height": 180
+        },
+        ".immersive-dialog": null,
+        ".challenge-card": null,
+        ".forest-board": null,
+        ".sentence-scroll": null,
+        ".ba37-mascot-window": null
+      },
+      "errors": [],
+      "maxModelRequestsInFlight": 2
+    },
+    {
+      "name": "home-sentence-builder-390x844",
+      "scenario": "home-sentence-builder",
+      "game": false,
+      "screenshot": "home-sentence-builder-390x844.png",
+      "emulatedTouch": true,
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "horizontalOverflow": false,
+      "controls": [
+        {
+          "text": "🏠 Thế giới game",
+          "rect": {
+            "x": 9,
+            "y": 56.5,
+            "width": 120.65625,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": false
+        },
+        {
+          "text": "📊 Góc phụ huynh",
+          "rect": {
+            "x": 134.65625,
+            "y": 56.5,
+            "width": 120.671875,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": false
+        },
+        {
+          "text": "📚 Xưởng học liệu",
+          "rect": {
+            "x": 260.328125,
+            "y": 56.5,
+            "width": 120.65625,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": false
+        },
+        {
+          "text": "Xem tất cả các đảo ↻",
+          "rect": {
+            "x": 131.828125,
+            "y": 561,
+            "width": 126.34375,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Xem đảo Đảo Toán Học",
+          "rect": {
+            "x": 18,
+            "y": 612,
+            "width": 134,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Toán 3 · Phép tính vui · Toán",
+          "rect": {
+            "x": 158,
+            "y": 612,
+            "width": 134,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Bắt đầu ▶",
+          "rect": {
+            "x": 298,
+            "y": 612,
+            "width": 74,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Xem đảo Khu Rừng Trí Nhớ",
+          "rect": {
+            "x": 18,
+            "y": 674,
+            "width": 134,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Tiếng Anh · Gia đình · Tiếng AnhToán · Phép nhân · ToánTiếng Việt · Từ trái nghĩa · Tiếng Việt",
+          "rect": {
+            "x": 158,
+            "y": 674,
+            "width": 134,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Bắt đầu ▶",
+          "rect": {
+            "x": 298,
+            "y": 674,
+            "width": 74,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Xem đảo Xưởng Ngôn Từ",
+          "rect": {
+            "x": 18,
+            "y": 736,
+            "width": 134,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Tiếng Anh · Ghép câu đơn giản · Tiếng Anh",
+          "rect": {
+            "x": 158,
+            "y": 736,
+            "width": 134,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Bắt đầu ▶",
+          "rect": {
+            "x": 298,
+            "y": 736,
+            "width": 74,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        }
+      ],
+      "canvasCount": 1,
+      "canvasInGameSlot": false,
+      "engine": "three-webgl",
+      "state": "ready",
+      "diagnostics": {
+        "engine": "three-webgl",
+        "frames": 630,
+        "fpsMedian": 59.9,
+        "fpsP95FrameMs": 16.799999999999272,
+        "tier": "low",
+        "selectedWorld": "sentence-builder",
+        "carouselMoving": false,
+        "rotation": -4.18879020478639,
+        "islands": [
+          {
+            "id": "math-quest",
+            "x": 2.6292531258895537,
+            "y": 0,
+            "z": -2.4250000000000034,
+            "scale": 0.7
+          },
+          {
+            "id": "memory-match",
+            "x": -2.6292531258895573,
+            "y": 0,
+            "z": -2.4249999999999976,
+            "scale": 0.7
+          },
+          {
+            "id": "sentence-builder",
+            "x": 2.6965096822095802e-15,
+            "y": 0.1,
+            "z": 1.5499999999999998,
+            "scale": 1.04
+          }
+        ],
+        "mascotLocation": "sentence-builder",
+        "mascotState": "on-island",
+        "mascotPosition": {
+          "x": 0.9880000000000027,
+          "y": 0.1416,
+          "z": 2.642
+        },
+        "jumpProgress": 1,
+        "dpr": 1,
+        "drawCalls": 46,
+        "triangles": 64852,
+        "textureBytesEstimate": 9437183.999999998,
+        "assetErrors": [],
+        "readyAssets": [
+          "math-world",
+          "fox-guide"
+        ],
+        "animationClips": [
+          "Idle",
+          "Cheer",
+          "Victory"
+        ],
+        "skeletalMeshes": 10,
+        "bones": 14,
+        "animationTime": 10.550000000000002,
+        "activeClip": "Cheer",
+        "motion": true,
+        "paused": false,
+        "sceneMode": "home",
+        "gameWorld": null,
+        "guideMood": "idle",
+        "guideViewport": null,
+        "guideVisible": true
+      },
+      "renderer": "ANGLE (Intel, Intel(R) Arc(TM) Graphics (0x00007D55) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "sections": {
+        ".ba3d-render-host": {
+          "x": 0,
+          "y": 220,
+          "width": 390,
+          "height": 382
+        },
+        ".ba3d-hero-title": {
+          "x": 12,
+          "y": 120,
+          "width": 366,
+          "height": 42.46875
+        },
+        ".ba3d-island-overview": {
+          "x": 131.828125,
+          "y": 561,
+          "width": 126.34375,
+          "height": 44
+        },
+        ".ba3d-anchors": {
+          "x": 10,
+          "y": 606,
+          "width": 370,
+          "height": 180
+        },
+        ".immersive-dialog": null,
+        ".challenge-card": null,
+        ".forest-board": null,
+        ".sentence-scroll": null,
+        ".ba37-mascot-window": null
+      },
+      "errors": [],
+      "maxModelRequestsInFlight": 2
+    },
+    {
+      "name": "game-math-quest-waiting-390x844",
+      "scenario": "game-math-quest-waiting",
+      "game": true,
+      "screenshot": "game-math-quest-waiting-390x844.png",
+      "emulatedTouch": true,
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "horizontalOverflow": false,
+      "controls": [
+        {
+          "text": "← Thoát trò chơi",
+          "rect": {
+            "x": 280.015625,
+            "y": 8.5,
+            "width": 99.984375,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "A42",
+          "rect": {
+            "x": 23,
+            "y": 357,
+            "width": 167.5,
+            "height": 62
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "B41",
+          "rect": {
+            "x": 199.5,
+            "y": 357,
+            "width": 167.5,
+            "height": 62
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "C32",
+          "rect": {
+            "x": 23,
+            "y": 428,
+            "width": 167.5,
+            "height": 62
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "D43",
+          "rect": {
+            "x": 199.5,
+            "y": 428,
+            "width": 167.5,
+            "height": 62
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "💡 Cần một gợi ý?",
+          "rect": {
+            "x": 123.828125,
+            "y": 544.5,
+            "width": 142.34375,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": false
+        }
+      ],
+      "canvasCount": 1,
+      "canvasInGameSlot": true,
+      "engine": "three-webgl",
+      "state": "ready",
+      "diagnostics": {
+        "engine": "three-webgl",
+        "frames": 755,
+        "fpsMedian": 59.9,
+        "fpsP95FrameMs": 16.799999999999272,
+        "tier": "low",
+        "selectedWorld": "math-quest",
+        "carouselMoving": false,
+        "rotation": -6.283185307179585,
+        "islands": [
+          {
+            "id": "math-quest",
+            "x": -12,
+            "y": 0.05,
+            "z": -10,
+            "scale": 1.8
+          },
+          {
+            "id": "memory-match",
+            "x": 2.6292531258895537,
+            "y": 0,
+            "z": -2.4250000000000034,
+            "scale": 0.7
+          },
+          {
+            "id": "sentence-builder",
+            "x": -2.6292531258895564,
+            "y": 0,
+            "z": -2.4249999999999985,
+            "scale": 0.7
+          }
+        ],
+        "mascotLocation": "math-quest",
+        "mascotState": "on-island",
+        "mascotPosition": {
+          "x": -1.0763926156098549,
+          "y": 6.851272595502158,
+          "z": 13.837696563757257
+        },
+        "jumpProgress": 1,
+        "dpr": 1,
+        "drawCalls": 17,
+        "triangles": 25604,
+        "textureBytesEstimate": 9437183.999999998,
+        "assetErrors": [],
+        "readyAssets": [
+          "math-world",
+          "fox-guide"
+        ],
+        "animationClips": [
+          "Idle",
+          "Cheer",
+          "Victory"
+        ],
+        "skeletalMeshes": 10,
+        "bones": 14,
+        "animationTime": 12.650099999999979,
+        "activeClip": "Idle",
+        "motion": true,
+        "paused": false,
+        "sceneMode": "game",
+        "gameWorld": "math-quest",
+        "guideMood": "idle",
+        "guideCue": 1,
+        "guideViewport": {
+          "x": 10,
+          "y": 58,
+          "width": 56,
+          "height": 64
+        },
+        "guideVisible": true
+      },
+      "renderer": "ANGLE (Intel, Intel(R) Arc(TM) Graphics (0x00007D55) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "sections": {
+        ".ba3d-render-host": {
+          "x": 0,
+          "y": 62,
+          "width": 390,
+          "height": 782
+        },
+        ".ba3d-hero-title": {
+          "x": 12,
+          "y": 120,
+          "width": 366,
+          "height": 42.46875
+        },
+        ".ba3d-island-overview": {
+          "x": 131.828125,
+          "y": 561,
+          "width": 126.34375,
+          "height": 44
+        },
+        ".ba3d-anchors": {
+          "x": 10,
+          "y": 606,
+          "width": 370,
+          "height": 180
+        },
+        ".immersive-dialog": {
+          "x": 0,
+          "y": 0,
+          "width": 390,
+          "height": 844
+        },
+        ".challenge-card": {
+          "x": 10,
+          "y": 197,
+          "width": 370,
+          "height": 519
+        },
+        ".forest-board": null,
+        ".sentence-scroll": null,
+        ".ba37-mascot-window": {
+          "x": 10,
+          "y": 120,
+          "width": 56,
+          "height": 64
+        }
+      },
+      "errors": [],
+      "maxModelRequestsInFlight": 2
+    },
+    {
+      "name": "game-memory-match-waiting-390x844",
+      "scenario": "game-memory-match-waiting",
+      "game": true,
+      "screenshot": "game-memory-match-waiting-390x844.png",
+      "emulatedTouch": true,
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "horizontalOverflow": false,
+      "controls": [
+        {
+          "text": "← Thoát trò chơi",
+          "rect": {
+            "x": 280.015625,
+            "y": 8.5,
+            "width": 99.984375,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Thẻ úp, chọn để lật",
+          "rect": {
+            "x": 23,
+            "y": 361,
+            "width": 109.328125,
+            "height": 78
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Thẻ úp, chọn để lật",
+          "rect": {
+            "x": 140.328125,
+            "y": 361,
+            "width": 109.328125,
+            "height": 78
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Thẻ úp, chọn để lật",
+          "rect": {
+            "x": 257.65625,
+            "y": 361,
+            "width": 109.34375,
+            "height": 78
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Thẻ úp, chọn để lật",
+          "rect": {
+            "x": 23,
+            "y": 447,
+            "width": 109.328125,
+            "height": 78
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Thẻ úp, chọn để lật",
+          "rect": {
+            "x": 140.328125,
+            "y": 447,
+            "width": 109.328125,
+            "height": 78
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Thẻ úp, chọn để lật",
+          "rect": {
+            "x": 257.65625,
+            "y": 447,
+            "width": 109.34375,
+            "height": 78
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Thẻ úp, chọn để lật",
+          "rect": {
+            "x": 23,
+            "y": 533,
+            "width": 109.328125,
+            "height": 78
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Thẻ úp, chọn để lật",
+          "rect": {
+            "x": 140.328125,
+            "y": 533,
+            "width": 109.328125,
+            "height": 78
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Thẻ úp, chọn để lật",
+          "rect": {
+            "x": 257.65625,
+            "y": 533,
+            "width": 109.34375,
+            "height": 78
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Thẻ úp, chọn để lật",
+          "rect": {
+            "x": 23,
+            "y": 619,
+            "width": 109.328125,
+            "height": 78
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Thẻ úp, chọn để lật",
+          "rect": {
+            "x": 140.328125,
+            "y": 619,
+            "width": 109.328125,
+            "height": 78
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Thẻ úp, chọn để lật",
+          "rect": {
+            "x": 257.65625,
+            "y": 616,
+            "width": 109.34375,
+            "height": 78
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        }
+      ],
+      "canvasCount": 1,
+      "canvasInGameSlot": true,
+      "engine": "three-webgl",
+      "state": "ready",
+      "diagnostics": {
+        "engine": "three-webgl",
+        "frames": 807,
+        "fpsMedian": 59.9,
+        "fpsP95FrameMs": 16.799999999999272,
+        "tier": "low",
+        "selectedWorld": "memory-match",
+        "carouselMoving": false,
+        "rotation": -8.377580409572781,
+        "islands": [
+          {
+            "id": "math-quest",
+            "x": -2.6292531258895573,
+            "y": 0,
+            "z": -2.424999999999998,
+            "scale": 0.7
+          },
+          {
+            "id": "memory-match",
+            "x": -12,
+            "y": 0.05,
+            "z": -10,
+            "scale": 2
+          },
+          {
+            "id": "sentence-builder",
+            "x": 2.629253125889555,
+            "y": 0,
+            "z": -2.425000000000001,
+            "scale": 0.7
+          }
+        ],
+        "mascotLocation": "memory-match",
+        "mascotState": "on-island",
+        "mascotPosition": {
+          "x": -1.0752578650501592,
+          "y": 6.23253218212664,
+          "z": 13.97545010052254
+        },
+        "jumpProgress": 1,
+        "dpr": 1,
+        "drawCalls": 16,
+        "triangles": 26732,
+        "textureBytesEstimate": 9437183.999999998,
+        "assetErrors": [],
+        "readyAssets": [
+          "math-world",
+          "fox-guide"
+        ],
+        "animationClips": [
+          "Idle",
+          "Cheer",
+          "Victory"
+        ],
+        "skeletalMeshes": 10,
+        "bones": 14,
+        "animationTime": 13.516799999999964,
+        "activeClip": "Idle",
+        "motion": true,
+        "paused": false,
+        "sceneMode": "game",
+        "gameWorld": "memory-match",
+        "guideMood": "idle",
+        "guideCue": 3,
+        "guideViewport": {
+          "x": 10,
+          "y": 147,
+          "width": 56,
+          "height": 64
+        },
+        "guideVisible": true
+      },
+      "renderer": "ANGLE (Intel, Intel(R) Arc(TM) Graphics (0x00007D55) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "sections": {
+        ".ba3d-render-host": {
+          "x": 0,
+          "y": 62,
+          "width": 390,
+          "height": 782
+        },
+        ".ba3d-hero-title": {
+          "x": 12,
+          "y": 120,
+          "width": 366,
+          "height": 42.46875
+        },
+        ".ba3d-island-overview": {
+          "x": 131.828125,
+          "y": 561,
+          "width": 126.34375,
+          "height": 44
+        },
+        ".ba3d-anchors": {
+          "x": 10,
+          "y": 606,
+          "width": 370,
+          "height": 180
+        },
+        ".immersive-dialog": {
+          "x": 0,
+          "y": 0,
+          "width": 390,
+          "height": 844
+        },
+        ".challenge-card": null,
+        ".forest-board": {
+          "x": 10,
+          "y": 286,
+          "width": 370,
+          "height": 427
+        },
+        ".sentence-scroll": null,
+        ".ba37-mascot-window": {
+          "x": 10,
+          "y": 209,
+          "width": 56,
+          "height": 64
+        }
+      },
+      "errors": [],
+      "maxModelRequestsInFlight": 2
+    },
+    {
+      "name": "game-sentence-builder-waiting-390x844",
+      "scenario": "game-sentence-builder-waiting",
+      "game": true,
+      "screenshot": "game-sentence-builder-waiting-390x844.png",
+      "emulatedTouch": true,
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "horizontalOverflow": false,
+      "controls": [
+        {
+          "text": "← Thoát trò chơi",
+          "rect": {
+            "x": 280.015625,
+            "y": 8.5,
+            "width": 99.984375,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "student.",
+          "rect": {
+            "x": 77.796875,
+            "y": 479,
+            "width": 78.03125,
+            "height": 52
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "a",
+          "rect": {
+            "x": 163.828125,
+            "y": 479,
+            "width": 44,
+            "height": 52
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "am",
+          "rect": {
+            "x": 215.828125,
+            "y": 479,
+            "width": 44.359375,
+            "height": 52
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "I",
+          "rect": {
+            "x": 268.1875,
+            "y": 479,
+            "width": 44,
+            "height": 52
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "💡 Gợi ý",
+          "rect": {
+            "x": 26,
+            "y": 677,
+            "width": 164,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "↺ Xếp lại",
+          "rect": {
+            "x": 200,
+            "y": 677,
+            "width": 164,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "✓ Kiểm tra câu",
+          "rect": {
+            "x": 26,
+            "y": 731,
+            "width": 338,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        }
+      ],
+      "canvasCount": 1,
+      "canvasInGameSlot": true,
+      "engine": "three-webgl",
+      "state": "ready",
+      "diagnostics": {
+        "engine": "three-webgl",
+        "frames": 864,
+        "fpsMedian": 59.9,
+        "fpsP95FrameMs": 16.799999999999272,
+        "tier": "low",
+        "selectedWorld": "sentence-builder",
+        "carouselMoving": false,
+        "rotation": -10.471975511965976,
+        "islands": [
+          {
+            "id": "math-quest",
+            "x": 2.6292531258895533,
+            "y": 0,
+            "z": -2.4250000000000034,
+            "scale": 0.7
+          },
+          {
+            "id": "memory-match",
+            "x": -2.6292531258895573,
+            "y": 0,
+            "z": -2.424999999999998,
+            "scale": 0.7
+          },
+          {
+            "id": "sentence-builder",
+            "x": -12,
+            "y": 0.05,
+            "z": -10,
+            "scale": 1.9
+          }
+        ],
+        "mascotLocation": "sentence-builder",
+        "mascotState": "on-island",
+        "mascotPosition": {
+          "x": -1.0763926156098549,
+          "y": 6.851272595502158,
+          "z": 13.837696563757257
+        },
+        "jumpProgress": 1,
+        "dpr": 1,
+        "drawCalls": 17,
+        "triangles": 25664,
+        "textureBytesEstimate": 9437183.999999998,
+        "assetErrors": [],
+        "readyAssets": [
+          "math-world",
+          "fox-guide"
+        ],
+        "animationClips": [
+          "Idle",
+          "Cheer",
+          "Victory"
+        ],
+        "skeletalMeshes": 10,
+        "bones": 14,
+        "animationTime": 14.483699999999954,
+        "activeClip": "Idle",
+        "motion": true,
+        "paused": false,
+        "sceneMode": "game",
+        "gameWorld": "sentence-builder",
+        "guideMood": "idle",
+        "guideCue": 5,
+        "guideViewport": {
+          "x": 10,
+          "y": 58,
+          "width": 56,
+          "height": 64
+        },
+        "guideVisible": true
+      },
+      "renderer": "ANGLE (Intel, Intel(R) Arc(TM) Graphics (0x00007D55) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "sections": {
+        ".ba3d-render-host": {
+          "x": 0,
+          "y": 62,
+          "width": 390,
+          "height": 782
+        },
+        ".ba3d-hero-title": {
+          "x": 12,
+          "y": 120,
+          "width": 366,
+          "height": 42.46875
+        },
+        ".ba3d-island-overview": {
+          "x": 131.828125,
+          "y": 561,
+          "width": 126.34375,
+          "height": 44
+        },
+        ".ba3d-anchors": {
+          "x": 10,
+          "y": 606,
+          "width": 370,
+          "height": 180
+        },
+        ".immersive-dialog": {
+          "x": 0,
+          "y": 0,
+          "width": 390,
+          "height": 844
+        },
+        ".challenge-card": null,
+        ".forest-board": null,
+        ".sentence-scroll": {
+          "x": 10,
+          "y": 197,
+          "width": 370,
+          "height": 649
+        },
+        ".ba37-mascot-window": {
+          "x": 10,
+          "y": 120,
+          "width": 56,
+          "height": 64
+        }
+      },
+      "errors": [],
+      "maxModelRequestsInFlight": 2
+    },
+    {
+      "name": "home-overview-320x640",
+      "scenario": "home-overview",
+      "game": false,
+      "screenshot": "home-overview-320x640.png",
+      "emulatedTouch": true,
+      "viewport": {
+        "width": 320,
+        "height": 640,
+        "dpr": 1
+      },
+      "horizontalOverflow": false,
+      "controls": [
+        {
+          "text": "🏠 Thế giới game",
+          "rect": {
+            "x": 9,
+            "y": 56.5,
+            "width": 97.328125,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": false
+        },
+        {
+          "text": "📊 Góc phụ huynh",
+          "rect": {
+            "x": 111.328125,
+            "y": 56.5,
+            "width": 97.328125,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": false
+        },
+        {
+          "text": "📚 Xưởng học liệu",
+          "rect": {
+            "x": 213.65625,
+            "y": 56.5,
+            "width": 97.34375,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": false
+        },
+        {
+          "text": "Xem đảo Đảo Toán Học",
+          "rect": {
+            "x": 18,
+            "y": 408,
+            "width": 99,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Toán 3 · Phép tính vui · Toán",
+          "rect": {
+            "x": 123,
+            "y": 408,
+            "width": 99,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Bắt đầu ▶",
+          "rect": {
+            "x": 228,
+            "y": 408,
+            "width": 74,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Xem đảo Khu Rừng Trí Nhớ",
+          "rect": {
+            "x": 18,
+            "y": 470,
+            "width": 99,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Tiếng Anh · Gia đình · Tiếng AnhToán · Phép nhân · ToánTiếng Việt · Từ trái nghĩa · Tiếng Việt",
+          "rect": {
+            "x": 123,
+            "y": 470,
+            "width": 99,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Bắt đầu ▶",
+          "rect": {
+            "x": 228,
+            "y": 470,
+            "width": 74,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Xem đảo Xưởng Ngôn Từ",
+          "rect": {
+            "x": 18,
+            "y": 532,
+            "width": 99,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Tiếng Anh · Ghép câu đơn giản · Tiếng Anh",
+          "rect": {
+            "x": 123,
+            "y": 532,
+            "width": 99,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Bắt đầu ▶",
+          "rect": {
+            "x": 228,
+            "y": 532,
+            "width": 74,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        }
+      ],
+      "canvasCount": 1,
+      "canvasInGameSlot": false,
+      "engine": "three-webgl",
+      "state": "ready",
+      "diagnostics": {
+        "engine": "three-webgl",
+        "frames": 277,
+        "fpsMedian": 59.9,
+        "fpsP95FrameMs": 16.800000000000182,
+        "tier": "low",
+        "selectedWorld": null,
+        "carouselMoving": false,
+        "rotation": 0.5235987755982988,
+        "islands": [
+          {
+            "id": "math-quest",
+            "x": -3.35,
+            "y": 0,
+            "z": -1,
+            "scale": 0.73
+          },
+          {
+            "id": "memory-match",
+            "x": 0,
+            "y": 0,
+            "z": -1,
+            "scale": 0.73
+          },
+          {
+            "id": "sentence-builder",
+            "x": 3.35,
+            "y": 0,
+            "z": -1,
+            "scale": 0.73
+          }
+        ],
+        "mascotLocation": "waiting",
+        "mascotState": "waiting",
+        "mascotPosition": {
+          "x": -3.7,
+          "y": 0.12,
+          "z": 4.2
+        },
+        "jumpProgress": 1,
+        "dpr": 1,
+        "drawCalls": 49,
+        "triangles": 65476,
+        "textureBytesEstimate": 9437183.999999998,
+        "assetErrors": [],
+        "readyAssets": [
+          "math-world",
+          "fox-guide"
+        ],
+        "animationClips": [
+          "Idle",
+          "Cheer",
+          "Victory"
+        ],
+        "skeletalMeshes": 10,
+        "bones": 14,
+        "animationTime": 4.666700000000003,
+        "activeClip": "Idle",
+        "motion": true,
+        "paused": false,
+        "sceneMode": "home",
+        "gameWorld": null,
+        "guideMood": "idle",
+        "guideViewport": null,
+        "guideVisible": true
+      },
+      "renderer": "ANGLE (Intel, Intel(R) Arc(TM) Graphics (0x00007D55) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "sections": {
+        ".ba3d-render-host": {
+          "x": 0,
+          "y": 208,
+          "width": 320,
+          "height": 190
+        },
+        ".ba3d-hero-title": {
+          "x": 12,
+          "y": 116,
+          "width": 296,
+          "height": 42.09375
+        },
+        ".ba3d-island-overview": {
+          "x": 160,
+          "y": 401,
+          "width": 0,
+          "height": 0
+        },
+        ".ba3d-anchors": {
+          "x": 10,
+          "y": 402,
+          "width": 300,
+          "height": 180
+        },
+        ".immersive-dialog": null,
+        ".challenge-card": null,
+        ".forest-board": null,
+        ".sentence-scroll": null,
+        ".ba37-mascot-window": null
+      },
+      "errors": [],
+      "runtimeSamples": [
+        {
+          "engine": "three-webgl",
+          "frames": 157,
+          "fpsMedian": 59.9,
+          "fpsP95FrameMs": 16.799999999999955,
+          "tier": "low",
+          "selectedWorld": null,
+          "carouselMoving": false,
+          "rotation": 0.5235987755982988,
+          "islands": [
+            {
+              "id": "math-quest",
+              "x": -3.35,
+              "y": 0,
+              "z": -1,
+              "scale": 0.73
+            },
+            {
+              "id": "memory-match",
+              "x": 0,
+              "y": 0,
+              "z": -1,
+              "scale": 0.73
+            },
+            {
+              "id": "sentence-builder",
+              "x": 3.35,
+              "y": 0,
+              "z": -1,
+              "scale": 0.73
+            }
+          ],
+          "mascotLocation": "waiting",
+          "mascotState": "waiting",
+          "mascotPosition": {
+            "x": -3.7,
+            "y": 0.12,
+            "z": 4.2
+          },
+          "jumpProgress": 1,
+          "dpr": 1,
+          "drawCalls": 49,
+          "triangles": 65476,
+          "textureBytesEstimate": 9437183.999999998,
+          "assetErrors": [],
+          "readyAssets": [
+            "math-world",
+            "fox-guide"
+          ],
+          "animationClips": [
+            "Idle",
+            "Cheer",
+            "Victory"
+          ],
+          "skeletalMeshes": 10,
+          "bones": 14,
+          "animationTime": 2.649999999999998,
+          "activeClip": "Idle",
+          "motion": true,
+          "paused": false,
+          "sceneMode": "home",
+          "gameWorld": null,
+          "guideMood": "idle",
+          "guideViewport": null,
+          "guideVisible": true
+        },
+        {
+          "engine": "three-webgl",
+          "frames": 157,
+          "fpsMedian": 59.9,
+          "fpsP95FrameMs": 16.799999999999955,
+          "tier": "low",
+          "selectedWorld": null,
+          "carouselMoving": false,
+          "rotation": 0.5235987755982988,
+          "islands": [
+            {
+              "id": "math-quest",
+              "x": -3.35,
+              "y": 0,
+              "z": -1,
+              "scale": 0.73
+            },
+            {
+              "id": "memory-match",
+              "x": 0,
+              "y": 0,
+              "z": -1,
+              "scale": 0.73
+            },
+            {
+              "id": "sentence-builder",
+              "x": 3.35,
+              "y": 0,
+              "z": -1,
+              "scale": 0.73
+            }
+          ],
+          "mascotLocation": "waiting",
+          "mascotState": "waiting",
+          "mascotPosition": {
+            "x": -3.7,
+            "y": 0.12,
+            "z": 4.2
+          },
+          "jumpProgress": 1,
+          "dpr": 1,
+          "drawCalls": 49,
+          "triangles": 65476,
+          "textureBytesEstimate": 9437183.999999998,
+          "assetErrors": [],
+          "readyAssets": [
+            "math-world",
+            "fox-guide"
+          ],
+          "animationClips": [
+            "Idle",
+            "Cheer",
+            "Victory"
+          ],
+          "skeletalMeshes": 10,
+          "bones": 14,
+          "animationTime": 2.649999999999998,
+          "activeClip": "Idle",
+          "motion": true,
+          "paused": false,
+          "sceneMode": "home",
+          "gameWorld": null,
+          "guideMood": "idle",
+          "guideViewport": null,
+          "guideVisible": true
+        },
+        {
+          "engine": "three-webgl",
+          "frames": 217,
+          "fpsMedian": 59.9,
+          "fpsP95FrameMs": 16.800000000000182,
+          "tier": "low",
+          "selectedWorld": null,
+          "carouselMoving": false,
+          "rotation": 0.5235987755982988,
+          "islands": [
+            {
+              "id": "math-quest",
+              "x": -3.35,
+              "y": 0,
+              "z": -1,
+              "scale": 0.73
+            },
+            {
+              "id": "memory-match",
+              "x": 0,
+              "y": 0,
+              "z": -1,
+              "scale": 0.73
+            },
+            {
+              "id": "sentence-builder",
+              "x": 3.35,
+              "y": 0,
+              "z": -1,
+              "scale": 0.73
+            }
+          ],
+          "mascotLocation": "waiting",
+          "mascotState": "waiting",
+          "mascotPosition": {
+            "x": -3.7,
+            "y": 0.12,
+            "z": 4.2
+          },
+          "jumpProgress": 1,
+          "dpr": 1,
+          "drawCalls": 49,
+          "triangles": 65476,
+          "textureBytesEstimate": 9437183.999999998,
+          "assetErrors": [],
+          "readyAssets": [
+            "math-world",
+            "fox-guide"
+          ],
+          "animationClips": [
+            "Idle",
+            "Cheer",
+            "Victory"
+          ],
+          "skeletalMeshes": 10,
+          "bones": 14,
+          "animationTime": 3.6665999999999976,
+          "activeClip": "Idle",
+          "motion": true,
+          "paused": false,
+          "sceneMode": "home",
+          "gameWorld": null,
+          "guideMood": "idle",
+          "guideViewport": null,
+          "guideVisible": true
+        }
+      ],
+      "maxModelRequestsInFlight": 2
+    },
+    {
+      "name": "home-math-quest-320x640",
+      "scenario": "home-math-quest",
+      "game": false,
+      "screenshot": "home-math-quest-320x640.png",
+      "emulatedTouch": true,
+      "viewport": {
+        "width": 320,
+        "height": 640,
+        "dpr": 1
+      },
+      "horizontalOverflow": false,
+      "controls": [
+        {
+          "text": "🏠 Thế giới game",
+          "rect": {
+            "x": 9,
+            "y": 56.5,
+            "width": 97.328125,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": false
+        },
+        {
+          "text": "📊 Góc phụ huynh",
+          "rect": {
+            "x": 111.328125,
+            "y": 56.5,
+            "width": 97.328125,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": false
+        },
+        {
+          "text": "📚 Xưởng học liệu",
+          "rect": {
+            "x": 213.65625,
+            "y": 56.5,
+            "width": 97.34375,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": false
+        },
+        {
+          "text": "Xem tất cả các đảo ↻",
+          "rect": {
+            "x": 96.828125,
+            "y": 357,
+            "width": 126.34375,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Xem đảo Đảo Toán Học",
+          "rect": {
+            "x": 18,
+            "y": 408,
+            "width": 99,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Toán 3 · Phép tính vui · Toán",
+          "rect": {
+            "x": 123,
+            "y": 408,
+            "width": 99,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Bắt đầu ▶",
+          "rect": {
+            "x": 228,
+            "y": 408,
+            "width": 74,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Xem đảo Khu Rừng Trí Nhớ",
+          "rect": {
+            "x": 18,
+            "y": 470,
+            "width": 99,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Tiếng Anh · Gia đình · Tiếng AnhToán · Phép nhân · ToánTiếng Việt · Từ trái nghĩa · Tiếng Việt",
+          "rect": {
+            "x": 123,
+            "y": 470,
+            "width": 99,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Bắt đầu ▶",
+          "rect": {
+            "x": 228,
+            "y": 470,
+            "width": 74,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Xem đảo Xưởng Ngôn Từ",
+          "rect": {
+            "x": 18,
+            "y": 532,
+            "width": 99,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Tiếng Anh · Ghép câu đơn giản · Tiếng Anh",
+          "rect": {
+            "x": 123,
+            "y": 532,
+            "width": 99,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Bắt đầu ▶",
+          "rect": {
+            "x": 228,
+            "y": 532,
+            "width": 74,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        }
+      ],
+      "canvasCount": 1,
+      "canvasInGameSlot": false,
+      "engine": "three-webgl",
+      "state": "ready",
+      "diagnostics": {
+        "engine": "three-webgl",
+        "frames": 398,
+        "fpsMedian": 59.9,
+        "fpsP95FrameMs": 16.800000000000182,
+        "tier": "low",
+        "selectedWorld": "math-quest",
+        "carouselMoving": false,
+        "rotation": 5.551115123125783e-16,
+        "islands": [
+          {
+            "id": "math-quest",
+            "x": 1.6853185513809876e-15,
+            "y": 0.1,
+            "z": 1.5499999999999998,
+            "scale": 1.04
+          },
+          {
+            "id": "memory-match",
+            "x": 2.629253125889555,
+            "y": 0,
+            "z": -2.4250000000000007,
+            "scale": 0.7
+          },
+          {
+            "id": "sentence-builder",
+            "x": -2.6292531258895564,
+            "y": 0,
+            "z": -2.424999999999999,
+            "scale": 0.7
+          }
+        ],
+        "mascotLocation": "math-quest",
+        "mascotState": "on-island",
+        "mascotPosition": {
+          "x": -1.1855999999999982,
+          "y": 0.1416,
+          "z": 2.7148
+        },
+        "jumpProgress": 1,
+        "dpr": 1,
+        "drawCalls": 46,
+        "triangles": 64852,
+        "textureBytesEstimate": 9437183.999999998,
+        "assetErrors": [],
+        "readyAssets": [
+          "math-world",
+          "fox-guide"
+        ],
+        "animationClips": [
+          "Idle",
+          "Cheer",
+          "Victory"
+        ],
+        "skeletalMeshes": 10,
+        "bones": 14,
+        "animationTime": 6.683400000000023,
+        "activeClip": "Cheer",
+        "motion": true,
+        "paused": false,
+        "sceneMode": "home",
+        "gameWorld": null,
+        "guideMood": "idle",
+        "guideViewport": null,
+        "guideVisible": true
+      },
+      "renderer": "ANGLE (Intel, Intel(R) Arc(TM) Graphics (0x00007D55) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "sections": {
+        ".ba3d-render-host": {
+          "x": 0,
+          "y": 208,
+          "width": 320,
+          "height": 190
+        },
+        ".ba3d-hero-title": {
+          "x": 12,
+          "y": 116,
+          "width": 296,
+          "height": 42.09375
+        },
+        ".ba3d-island-overview": {
+          "x": 96.828125,
+          "y": 357,
+          "width": 126.34375,
+          "height": 44
+        },
+        ".ba3d-anchors": {
+          "x": 10,
+          "y": 402,
+          "width": 300,
+          "height": 180
+        },
+        ".immersive-dialog": null,
+        ".challenge-card": null,
+        ".forest-board": null,
+        ".sentence-scroll": null,
+        ".ba37-mascot-window": null
+      },
+      "errors": [],
+      "maxModelRequestsInFlight": 2
+    },
+    {
+      "name": "home-memory-match-320x640",
+      "scenario": "home-memory-match",
+      "game": false,
+      "screenshot": "home-memory-match-320x640.png",
+      "emulatedTouch": true,
+      "viewport": {
+        "width": 320,
+        "height": 640,
+        "dpr": 1
+      },
+      "horizontalOverflow": false,
+      "controls": [
+        {
+          "text": "🏠 Thế giới game",
+          "rect": {
+            "x": 9,
+            "y": 56.5,
+            "width": 97.328125,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": false
+        },
+        {
+          "text": "📊 Góc phụ huynh",
+          "rect": {
+            "x": 111.328125,
+            "y": 56.5,
+            "width": 97.328125,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": false
+        },
+        {
+          "text": "📚 Xưởng học liệu",
+          "rect": {
+            "x": 213.65625,
+            "y": 56.5,
+            "width": 97.34375,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": false
+        },
+        {
+          "text": "Xem tất cả các đảo ↻",
+          "rect": {
+            "x": 96.828125,
+            "y": 357,
+            "width": 126.34375,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Xem đảo Đảo Toán Học",
+          "rect": {
+            "x": 18,
+            "y": 408,
+            "width": 99,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Toán 3 · Phép tính vui · Toán",
+          "rect": {
+            "x": 123,
+            "y": 408,
+            "width": 99,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Bắt đầu ▶",
+          "rect": {
+            "x": 228,
+            "y": 408,
+            "width": 74,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Xem đảo Khu Rừng Trí Nhớ",
+          "rect": {
+            "x": 18,
+            "y": 470,
+            "width": 99,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Tiếng Anh · Gia đình · Tiếng AnhToán · Phép nhân · ToánTiếng Việt · Từ trái nghĩa · Tiếng Việt",
+          "rect": {
+            "x": 123,
+            "y": 470,
+            "width": 99,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Bắt đầu ▶",
+          "rect": {
+            "x": 228,
+            "y": 470,
+            "width": 74,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Xem đảo Xưởng Ngôn Từ",
+          "rect": {
+            "x": 18,
+            "y": 532,
+            "width": 99,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Tiếng Anh · Ghép câu đơn giản · Tiếng Anh",
+          "rect": {
+            "x": 123,
+            "y": 532,
+            "width": 99,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Bắt đầu ▶",
+          "rect": {
+            "x": 228,
+            "y": 532,
+            "width": 74,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        }
+      ],
+      "canvasCount": 1,
+      "canvasInGameSlot": false,
+      "engine": "three-webgl",
+      "state": "ready",
+      "diagnostics": {
+        "engine": "three-webgl",
+        "frames": 520,
+        "fpsMedian": 59.9,
+        "fpsP95FrameMs": 16.800000000000182,
+        "tier": "low",
+        "selectedWorld": "memory-match",
+        "carouselMoving": false,
+        "rotation": -2.0943951023931953,
+        "islands": [
+          {
+            "id": "math-quest",
+            "x": -2.629253125889556,
+            "y": 0,
+            "z": -2.4249999999999994,
+            "scale": 0.7
+          },
+          {
+            "id": "memory-match",
+            "x": 0,
+            "y": 0.1,
+            "z": 1.5499999999999998,
+            "scale": 1.04
+          },
+          {
+            "id": "sentence-builder",
+            "x": 2.629253125889556,
+            "y": 0,
+            "z": -2.4249999999999994,
+            "scale": 0.7
+          }
+        ],
+        "mascotLocation": "memory-match",
+        "mascotState": "on-island",
+        "mascotPosition": {
+          "x": -0.988,
+          "y": 0.1416,
+          "z": 2.8499999999999996
+        },
+        "jumpProgress": 1,
+        "dpr": 1,
+        "drawCalls": 46,
+        "triangles": 64852,
+        "textureBytesEstimate": 9437183.999999998,
+        "assetErrors": [],
+        "readyAssets": [
+          "math-world",
+          "fox-guide"
+        ],
+        "animationClips": [
+          "Idle",
+          "Cheer",
+          "Victory"
+        ],
+        "skeletalMeshes": 10,
+        "bones": 14,
+        "animationTime": 8.716700000000035,
+        "activeClip": "Cheer",
+        "motion": true,
+        "paused": false,
+        "sceneMode": "home",
+        "gameWorld": null,
+        "guideMood": "idle",
+        "guideViewport": null,
+        "guideVisible": true
+      },
+      "renderer": "ANGLE (Intel, Intel(R) Arc(TM) Graphics (0x00007D55) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "sections": {
+        ".ba3d-render-host": {
+          "x": 0,
+          "y": 208,
+          "width": 320,
+          "height": 190
+        },
+        ".ba3d-hero-title": {
+          "x": 12,
+          "y": 116,
+          "width": 296,
+          "height": 42.09375
+        },
+        ".ba3d-island-overview": {
+          "x": 96.828125,
+          "y": 357,
+          "width": 126.34375,
+          "height": 44
+        },
+        ".ba3d-anchors": {
+          "x": 10,
+          "y": 402,
+          "width": 300,
+          "height": 180
+        },
+        ".immersive-dialog": null,
+        ".challenge-card": null,
+        ".forest-board": null,
+        ".sentence-scroll": null,
+        ".ba37-mascot-window": null
+      },
+      "errors": [],
+      "maxModelRequestsInFlight": 2
+    },
+    {
+      "name": "home-sentence-builder-320x640",
+      "scenario": "home-sentence-builder",
+      "game": false,
+      "screenshot": "home-sentence-builder-320x640.png",
+      "emulatedTouch": true,
+      "viewport": {
+        "width": 320,
+        "height": 640,
+        "dpr": 1
+      },
+      "horizontalOverflow": false,
+      "controls": [
+        {
+          "text": "🏠 Thế giới game",
+          "rect": {
+            "x": 9,
+            "y": 56.5,
+            "width": 97.328125,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": false
+        },
+        {
+          "text": "📊 Góc phụ huynh",
+          "rect": {
+            "x": 111.328125,
+            "y": 56.5,
+            "width": 97.328125,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": false
+        },
+        {
+          "text": "📚 Xưởng học liệu",
+          "rect": {
+            "x": 213.65625,
+            "y": 56.5,
+            "width": 97.34375,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": false
+        },
+        {
+          "text": "Xem tất cả các đảo ↻",
+          "rect": {
+            "x": 96.828125,
+            "y": 357,
+            "width": 126.34375,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Xem đảo Đảo Toán Học",
+          "rect": {
+            "x": 18,
+            "y": 408,
+            "width": 99,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Toán 3 · Phép tính vui · Toán",
+          "rect": {
+            "x": 123,
+            "y": 408,
+            "width": 99,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Bắt đầu ▶",
+          "rect": {
+            "x": 228,
+            "y": 408,
+            "width": 74,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Xem đảo Khu Rừng Trí Nhớ",
+          "rect": {
+            "x": 18,
+            "y": 470,
+            "width": 99,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Tiếng Anh · Gia đình · Tiếng AnhToán · Phép nhân · ToánTiếng Việt · Từ trái nghĩa · Tiếng Việt",
+          "rect": {
+            "x": 123,
+            "y": 470,
+            "width": 99,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Bắt đầu ▶",
+          "rect": {
+            "x": 228,
+            "y": 470,
+            "width": 74,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Xem đảo Xưởng Ngôn Từ",
+          "rect": {
+            "x": 18,
+            "y": 532,
+            "width": 99,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Tiếng Anh · Ghép câu đơn giản · Tiếng Anh",
+          "rect": {
+            "x": 123,
+            "y": 532,
+            "width": 99,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Bắt đầu ▶",
+          "rect": {
+            "x": 228,
+            "y": 532,
+            "width": 74,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        }
+      ],
+      "canvasCount": 1,
+      "canvasInGameSlot": false,
+      "engine": "three-webgl",
+      "state": "ready",
+      "diagnostics": {
+        "engine": "three-webgl",
+        "frames": 641,
+        "fpsMedian": 59.9,
+        "fpsP95FrameMs": 16.799999999999272,
+        "tier": "low",
+        "selectedWorld": "sentence-builder",
+        "carouselMoving": false,
+        "rotation": -4.18879020478639,
+        "islands": [
+          {
+            "id": "math-quest",
+            "x": 2.6292531258895537,
+            "y": 0,
+            "z": -2.4250000000000034,
+            "scale": 0.7
+          },
+          {
+            "id": "memory-match",
+            "x": -2.6292531258895573,
+            "y": 0,
+            "z": -2.4249999999999976,
+            "scale": 0.7
+          },
+          {
+            "id": "sentence-builder",
+            "x": 2.6965096822095802e-15,
+            "y": 0.1,
+            "z": 1.5499999999999998,
+            "scale": 1.04
+          }
+        ],
+        "mascotLocation": "sentence-builder",
+        "mascotState": "on-island",
+        "mascotPosition": {
+          "x": 0.9880000000000027,
+          "y": 0.1416,
+          "z": 2.642
+        },
+        "jumpProgress": 1,
+        "dpr": 1,
+        "drawCalls": 46,
+        "triangles": 64852,
+        "textureBytesEstimate": 9437183.999999998,
+        "assetErrors": [],
+        "readyAssets": [
+          "math-world",
+          "fox-guide"
+        ],
+        "animationClips": [
+          "Idle",
+          "Cheer",
+          "Victory"
+        ],
+        "skeletalMeshes": 10,
+        "bones": 14,
+        "animationTime": 10.733400000000017,
+        "activeClip": "Cheer",
+        "motion": true,
+        "paused": false,
+        "sceneMode": "home",
+        "gameWorld": null,
+        "guideMood": "idle",
+        "guideViewport": null,
+        "guideVisible": true
+      },
+      "renderer": "ANGLE (Intel, Intel(R) Arc(TM) Graphics (0x00007D55) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "sections": {
+        ".ba3d-render-host": {
+          "x": 0,
+          "y": 208,
+          "width": 320,
+          "height": 190
+        },
+        ".ba3d-hero-title": {
+          "x": 12,
+          "y": 116,
+          "width": 296,
+          "height": 42.09375
+        },
+        ".ba3d-island-overview": {
+          "x": 96.828125,
+          "y": 357,
+          "width": 126.34375,
+          "height": 44
+        },
+        ".ba3d-anchors": {
+          "x": 10,
+          "y": 402,
+          "width": 300,
+          "height": 180
+        },
+        ".immersive-dialog": null,
+        ".challenge-card": null,
+        ".forest-board": null,
+        ".sentence-scroll": null,
+        ".ba37-mascot-window": null
+      },
+      "errors": [],
+      "maxModelRequestsInFlight": 2
+    },
+    {
+      "name": "game-math-quest-waiting-320x640",
+      "scenario": "game-math-quest-waiting",
+      "game": true,
+      "screenshot": "game-math-quest-waiting-320x640.png",
+      "emulatedTouch": true,
+      "viewport": {
+        "width": 320,
+        "height": 640,
+        "dpr": 1
+      },
+      "horizontalOverflow": false,
+      "controls": [
+        {
+          "text": "← Thoát trò chơi",
+          "rect": {
+            "x": 210.015625,
+            "y": 4.5,
+            "width": 99.984375,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "A42",
+          "rect": {
+            "x": 21,
+            "y": 262,
+            "width": 135,
+            "height": 52
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "B41",
+          "rect": {
+            "x": 164,
+            "y": 262,
+            "width": 135,
+            "height": 52
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "C32",
+          "rect": {
+            "x": 21,
+            "y": 322,
+            "width": 135,
+            "height": 52
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "D43",
+          "rect": {
+            "x": 164,
+            "y": 322,
+            "width": 135,
+            "height": 52
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "💡 Cần một gợi ý?",
+          "rect": {
+            "x": 88.828125,
+            "y": 401.5625,
+            "width": 142.34375,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": false
+        }
+      ],
+      "canvasCount": 1,
+      "canvasInGameSlot": true,
+      "engine": "three-webgl",
+      "state": "ready",
+      "diagnostics": {
+        "engine": "three-webgl",
+        "frames": 767,
+        "fpsMedian": 59.9,
+        "fpsP95FrameMs": 16.799999999999272,
+        "tier": "low",
+        "selectedWorld": "math-quest",
+        "carouselMoving": false,
+        "rotation": -6.283185307179585,
+        "islands": [
+          {
+            "id": "math-quest",
+            "x": -12,
+            "y": 0.05,
+            "z": -10,
+            "scale": 1.8
+          },
+          {
+            "id": "memory-match",
+            "x": 2.6292531258895537,
+            "y": 0,
+            "z": -2.4250000000000034,
+            "scale": 0.7
+          },
+          {
+            "id": "sentence-builder",
+            "x": -2.6292531258895564,
+            "y": 0,
+            "z": -2.4249999999999985,
+            "scale": 0.7
+          }
+        ],
+        "mascotLocation": "math-quest",
+        "mascotState": "on-island",
+        "mascotPosition": {
+          "x": -1.1494246046497563,
+          "y": 6.504547645211262,
+          "z": 12.79957316694616
+        },
+        "jumpProgress": 1,
+        "dpr": 1,
+        "drawCalls": 17,
+        "triangles": 25604,
+        "textureBytesEstimate": 9437183.999999998,
+        "assetErrors": [],
+        "readyAssets": [
+          "math-world",
+          "fox-guide"
+        ],
+        "animationClips": [
+          "Idle",
+          "Cheer",
+          "Victory"
+        ],
+        "skeletalMeshes": 10,
+        "bones": 14,
+        "animationTime": 12.849899999999993,
+        "activeClip": "Idle",
+        "motion": true,
+        "paused": false,
+        "sceneMode": "game",
+        "gameWorld": "math-quest",
+        "guideMood": "idle",
+        "guideCue": 1,
+        "guideViewport": {
+          "x": 10,
+          "y": 44,
+          "width": 48,
+          "height": 56
+        },
+        "guideVisible": true
+      },
+      "renderer": "ANGLE (Intel, Intel(R) Arc(TM) Graphics (0x00007D55) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "sections": {
+        ".ba3d-render-host": {
+          "x": 0,
+          "y": 54,
+          "width": 320,
+          "height": 586
+        },
+        ".ba3d-hero-title": {
+          "x": 12,
+          "y": 116,
+          "width": 296,
+          "height": 42.09375
+        },
+        ".ba3d-island-overview": {
+          "x": 96.828125,
+          "y": 357,
+          "width": 126.34375,
+          "height": 44
+        },
+        ".ba3d-anchors": {
+          "x": 10,
+          "y": 402,
+          "width": 300,
+          "height": 180
+        },
+        ".immersive-dialog": {
+          "x": 0,
+          "y": 0,
+          "width": 320,
+          "height": 640
+        },
+        ".challenge-card": {
+          "x": 10,
+          "y": 160,
+          "width": 300,
+          "height": 379
+        },
+        ".forest-board": null,
+        ".sentence-scroll": null,
+        ".ba37-mascot-window": {
+          "x": 10,
+          "y": 98,
+          "width": 48,
+          "height": 56
+        }
+      },
+      "errors": [],
+      "maxModelRequestsInFlight": 2
+    },
+    {
+      "name": "game-memory-match-waiting-320x640",
+      "scenario": "game-memory-match-waiting",
+      "game": true,
+      "screenshot": "game-memory-match-waiting-320x640.png",
+      "emulatedTouch": true,
+      "viewport": {
+        "width": 320,
+        "height": 640,
+        "dpr": 1
+      },
+      "horizontalOverflow": false,
+      "controls": [
+        {
+          "text": "← Thoát trò chơi",
+          "rect": {
+            "x": 210.015625,
+            "y": 4.5,
+            "width": 99.984375,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Thẻ úp, chọn để lật",
+          "rect": {
+            "x": 21,
+            "y": 319,
+            "width": 87.328125,
+            "height": 74
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Thẻ úp, chọn để lật",
+          "rect": {
+            "x": 116.328125,
+            "y": 319,
+            "width": 87.328125,
+            "height": 74
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Thẻ úp, chọn để lật",
+          "rect": {
+            "x": 211.65625,
+            "y": 319,
+            "width": 87.34375,
+            "height": 74
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Thẻ úp, chọn để lật",
+          "rect": {
+            "x": 21,
+            "y": 401,
+            "width": 87.328125,
+            "height": 74
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Thẻ úp, chọn để lật",
+          "rect": {
+            "x": 116.328125,
+            "y": 401,
+            "width": 87.328125,
+            "height": 74
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Thẻ úp, chọn để lật",
+          "rect": {
+            "x": 211.65625,
+            "y": 401,
+            "width": 87.34375,
+            "height": 74
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Thẻ úp, chọn để lật",
+          "rect": {
+            "x": 21,
+            "y": 483,
+            "width": 87.328125,
+            "height": 74
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Thẻ úp, chọn để lật",
+          "rect": {
+            "x": 116.328125,
+            "y": 483,
+            "width": 87.328125,
+            "height": 74
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Thẻ úp, chọn để lật",
+          "rect": {
+            "x": 211.65625,
+            "y": 480,
+            "width": 87.34375,
+            "height": 74
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Thẻ úp, chọn để lật",
+          "rect": {
+            "x": 21,
+            "y": 565,
+            "width": 87.328125,
+            "height": 74
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Thẻ úp, chọn để lật",
+          "rect": {
+            "x": 116.328125,
+            "y": 565,
+            "width": 87.328125,
+            "height": 74
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "Thẻ úp, chọn để lật",
+          "rect": {
+            "x": 211.65625,
+            "y": 565,
+            "width": 87.34375,
+            "height": 74
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        }
+      ],
+      "canvasCount": 1,
+      "canvasInGameSlot": true,
+      "engine": "three-webgl",
+      "state": "ready",
+      "diagnostics": {
+        "engine": "three-webgl",
+        "frames": 819,
+        "fpsMedian": 59.9,
+        "fpsP95FrameMs": 16.799999999999272,
+        "tier": "low",
+        "selectedWorld": "memory-match",
+        "carouselMoving": false,
+        "rotation": -8.377580409572781,
+        "islands": [
+          {
+            "id": "math-quest",
+            "x": -2.6292531258895573,
+            "y": 0,
+            "z": -2.424999999999998,
+            "scale": 0.7
+          },
+          {
+            "id": "memory-match",
+            "x": -12,
+            "y": 0.05,
+            "z": -10,
+            "scale": 2
+          },
+          {
+            "id": "sentence-builder",
+            "x": 2.629253125889555,
+            "y": 0,
+            "z": -2.425000000000001,
+            "scale": 0.7
+          }
+        ],
+        "mascotLocation": "memory-match",
+        "mascotState": "on-island",
+        "mascotPosition": {
+          "x": -1.148397753153838,
+          "y": 5.681362281702302,
+          "z": 12.980558451489227
+        },
+        "jumpProgress": 1,
+        "dpr": 1,
+        "drawCalls": 16,
+        "triangles": 26732,
+        "textureBytesEstimate": 9437183.999999998,
+        "assetErrors": [],
+        "readyAssets": [
+          "math-world",
+          "fox-guide"
+        ],
+        "animationClips": [
+          "Idle",
+          "Cheer",
+          "Victory"
+        ],
+        "skeletalMeshes": 10,
+        "bones": 14,
+        "animationTime": 13.716499999999982,
+        "activeClip": "Idle",
+        "motion": true,
+        "paused": false,
+        "sceneMode": "game",
+        "gameWorld": "memory-match",
+        "guideMood": "idle",
+        "guideCue": 3,
+        "guideViewport": {
+          "x": 10,
+          "y": 133,
+          "width": 48,
+          "height": 56
+        },
+        "guideVisible": true
+      },
+      "renderer": "ANGLE (Intel, Intel(R) Arc(TM) Graphics (0x00007D55) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "sections": {
+        ".ba3d-render-host": {
+          "x": 0,
+          "y": 54,
+          "width": 320,
+          "height": 586
+        },
+        ".ba3d-hero-title": {
+          "x": 12,
+          "y": 116,
+          "width": 296,
+          "height": 42.09375
+        },
+        ".ba3d-island-overview": {
+          "x": 96.828125,
+          "y": 357,
+          "width": 126.34375,
+          "height": 44
+        },
+        ".ba3d-anchors": {
+          "x": 10,
+          "y": 402,
+          "width": 300,
+          "height": 180
+        },
+        ".immersive-dialog": {
+          "x": 0,
+          "y": 0,
+          "width": 320,
+          "height": 640
+        },
+        ".challenge-card": null,
+        ".forest-board": {
+          "x": 10,
+          "y": 249,
+          "width": 300,
+          "height": 401
+        },
+        ".sentence-scroll": null,
+        ".ba37-mascot-window": {
+          "x": 10,
+          "y": 187,
+          "width": 48,
+          "height": 56
+        }
+      },
+      "errors": [],
+      "maxModelRequestsInFlight": 2
+    },
+    {
+      "name": "game-sentence-builder-waiting-320x640",
+      "scenario": "game-sentence-builder-waiting",
+      "game": true,
+      "screenshot": "game-sentence-builder-waiting-320x640.png",
+      "emulatedTouch": true,
+      "viewport": {
+        "width": 320,
+        "height": 640,
+        "dpr": 1
+      },
+      "horizontalOverflow": false,
+      "controls": [
+        {
+          "text": "← Thoát trò chơi",
+          "rect": {
+            "x": 210.015625,
+            "y": 4.5,
+            "width": 99.984375,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "am",
+          "rect": {
+            "x": 48.984375,
+            "y": 381,
+            "width": 44,
+            "height": 46
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "I",
+          "rect": {
+            "x": 98.984375,
+            "y": 381,
+            "width": 44,
+            "height": 46
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "student.",
+          "rect": {
+            "x": 148.984375,
+            "y": 381,
+            "width": 72.03125,
+            "height": 46
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "a",
+          "rect": {
+            "x": 227.015625,
+            "y": 381,
+            "width": 44,
+            "height": 46
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "💡 Gợi ý",
+          "rect": {
+            "x": 24,
+            "y": 538,
+            "width": 131,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "↺ Xếp lại",
+          "rect": {
+            "x": 165,
+            "y": 538,
+            "width": 131,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        },
+        {
+          "text": "✓ Kiểm tra câu",
+          "rect": {
+            "x": 24,
+            "y": 592,
+            "width": 272,
+            "height": 44
+          },
+          "shown": true,
+          "outsideViewport": false,
+          "receivesPointer": true,
+          "primaryTouchTarget": true
+        }
+      ],
+      "canvasCount": 1,
+      "canvasInGameSlot": true,
+      "engine": "three-webgl",
+      "state": "ready",
+      "diagnostics": {
+        "engine": "three-webgl",
+        "frames": 877,
+        "fpsMedian": 59.9,
+        "fpsP95FrameMs": 16.799999999999272,
+        "tier": "low",
+        "selectedWorld": "sentence-builder",
+        "carouselMoving": false,
+        "rotation": -10.471975511965976,
+        "islands": [
+          {
+            "id": "math-quest",
+            "x": 2.6292531258895533,
+            "y": 0,
+            "z": -2.4250000000000034,
+            "scale": 0.7
+          },
+          {
+            "id": "memory-match",
+            "x": -2.6292531258895573,
+            "y": 0,
+            "z": -2.424999999999998,
+            "scale": 0.7
+          },
+          {
+            "id": "sentence-builder",
+            "x": -12,
+            "y": 0.05,
+            "z": -10,
+            "scale": 1.9
+          }
+        ],
+        "mascotLocation": "sentence-builder",
+        "mascotState": "on-island",
+        "mascotPosition": {
+          "x": -1.1494246046497563,
+          "y": 6.504547645211262,
+          "z": 12.79957316694616
+        },
+        "jumpProgress": 1,
+        "dpr": 1,
+        "drawCalls": 17,
+        "triangles": 25664,
+        "textureBytesEstimate": 9437183.999999998,
+        "assetErrors": [],
+        "readyAssets": [
+          "math-world",
+          "fox-guide"
+        ],
+        "animationClips": [
+          "Idle",
+          "Cheer",
+          "Victory"
+        ],
+        "skeletalMeshes": 10,
+        "bones": 14,
+        "animationTime": 14.699899999999976,
+        "activeClip": "Idle",
+        "motion": true,
+        "paused": false,
+        "sceneMode": "game",
+        "gameWorld": "sentence-builder",
+        "guideMood": "idle",
+        "guideCue": 5,
+        "guideViewport": {
+          "x": 10,
+          "y": 44,
+          "width": 48,
+          "height": 56
+        },
+        "guideVisible": true
+      },
+      "renderer": "ANGLE (Intel, Intel(R) Arc(TM) Graphics (0x00007D55) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "sections": {
+        ".ba3d-render-host": {
+          "x": 0,
+          "y": 54,
+          "width": 320,
+          "height": 586
+        },
+        ".ba3d-hero-title": {
+          "x": 12,
+          "y": 116,
+          "width": 296,
+          "height": 42.09375
+        },
+        ".ba3d-island-overview": {
+          "x": 96.828125,
+          "y": 357,
+          "width": 126.34375,
+          "height": 44
+        },
+        ".ba3d-anchors": {
+          "x": 10,
+          "y": 402,
+          "width": 300,
+          "height": 180
+        },
+        ".immersive-dialog": {
+          "x": 0,
+          "y": 0,
+          "width": 320,
+          "height": 640
+        },
+        ".challenge-card": null,
+        ".forest-board": null,
+        ".sentence-scroll": {
+          "x": 10,
+          "y": 160,
+          "width": 300,
+          "height": 537
+        },
+        ".ba37-mascot-window": {
+          "x": 10,
+          "y": 98,
+          "width": 48,
+          "height": 56
+        }
+      },
+      "errors": [],
+      "maxModelRequestsInFlight": 2
+    }
+  ],
+  "requests": [
+    {
+      "viewport": 1440,
+      "url": "http://127.0.0.1:5180/models/math-world.glb"
+    },
+    {
+      "viewport": 1440,
+      "url": "http://127.0.0.1:5180/models/fox-guide.glb"
+    },
+    {
+      "viewport": 390,
+      "url": "http://127.0.0.1:5180/models/math-world.glb"
+    },
+    {
+      "viewport": 390,
+      "url": "http://127.0.0.1:5180/models/fox-guide.glb"
+    },
+    {
+      "viewport": 320,
+      "url": "http://127.0.0.1:5180/models/math-world.glb"
+    },
+    {
+      "viewport": 320,
+      "url": "http://127.0.0.1:5180/models/fox-guide.glb"
+    }
+  ],
+  "bundles": [
+    {
+      "viewport": 1440,
+      "url": "http://127.0.0.1:5180/assets/index-CWcVMOt_.js"
+    },
+    {
+      "viewport": 1440,
+      "url": "http://127.0.0.1:5180/assets/PremiumWorldRenderer-DmB5MhIG.js"
+    },
+    {
+      "viewport": 1440,
+      "url": "http://127.0.0.1:5180/assets/MathQuest-fBn_pRWP.js"
+    },
+    {
+      "viewport": 1440,
+      "url": "http://127.0.0.1:5180/assets/FeedbackEffects-DL082d7W.js"
+    },
+    {
+      "viewport": 1440,
+      "url": "http://127.0.0.1:5180/assets/MemoryMatch-GF9gqRqX.js"
+    },
+    {
+      "viewport": 1440,
+      "url": "http://127.0.0.1:5180/assets/SentenceBuilder-DKjZFc7B.js"
+    },
+    {
+      "viewport": 390,
+      "url": "http://127.0.0.1:5180/assets/index-CWcVMOt_.js"
+    },
+    {
+      "viewport": 390,
+      "url": "http://127.0.0.1:5180/assets/PremiumWorldRenderer-DmB5MhIG.js"
+    },
+    {
+      "viewport": 390,
+      "url": "http://127.0.0.1:5180/assets/MathQuest-fBn_pRWP.js"
+    },
+    {
+      "viewport": 390,
+      "url": "http://127.0.0.1:5180/assets/FeedbackEffects-DL082d7W.js"
+    },
+    {
+      "viewport": 390,
+      "url": "http://127.0.0.1:5180/assets/MemoryMatch-GF9gqRqX.js"
+    },
+    {
+      "viewport": 390,
+      "url": "http://127.0.0.1:5180/assets/SentenceBuilder-DKjZFc7B.js"
+    },
+    {
+      "viewport": 320,
+      "url": "http://127.0.0.1:5180/assets/index-CWcVMOt_.js"
+    },
+    {
+      "viewport": 320,
+      "url": "http://127.0.0.1:5180/assets/PremiumWorldRenderer-DmB5MhIG.js"
+    },
+    {
+      "viewport": 320,
+      "url": "http://127.0.0.1:5180/assets/MathQuest-fBn_pRWP.js"
+    },
+    {
+      "viewport": 320,
+      "url": "http://127.0.0.1:5180/assets/FeedbackEffects-DL082d7W.js"
+    },
+    {
+      "viewport": 320,
+      "url": "http://127.0.0.1:5180/assets/MemoryMatch-GF9gqRqX.js"
+    },
+    {
+      "viewport": 320,
+      "url": "http://127.0.0.1:5180/assets/SentenceBuilder-DKjZFc7B.js"
+    }
+  ],
+  "errors": [],
+  "video": {
+    "file": "art-world-demo.webm",
+    "bytes": 4479652,
+    "mimeType": "video/webm;codecs=vp9",
+    "note": "Canvas only: entrance, three rotating selections, each game scene and return. HTML controls are shown in screenshots."
+  }
+}

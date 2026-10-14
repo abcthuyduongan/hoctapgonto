@@ -1,6 +1,6 @@
-# Nguồn tài nguyên V3.7 — mẫu PR-02
+# Nguồn tài nguyên V3.7 — PR-02 và PR-03
 
-Hai tệp dưới đây là **candidate tự tạo cho lát cắt PR-02 (cáo + Đảo Toán Học)**. Chúng chưa được chủ dự án duyệt mỹ thuật; việc có texture, rig và clip hoặc vượt kiểm thử cấu trúc không chứng minh đã đạt concept premium. Ba model còn lại chưa được sản xuất trong đợt này, nên cổng phát hành đủ năm model vẫn phải báo chưa sẵn sàng.
+Đã có đủ năm GLB gốc: lát cắt PR-02 (cáo + Đảo Toán Học) và PR-03 (Rừng Trí Nhớ, Xưởng Ngôn Từ, môi trường chung), sau khi chủ dự án chốt tiếp tục thực hiện kế hoạch ngày 14/10/2026. Tất cả còn là **candidate chờ duyệt mỹ thuật**; việc có texture, rig và clip hoặc vượt kiểm thử cấu trúc không chứng minh đã đạt concept premium hay nghiệm thu thiết bị thật.
 
 ## Nguồn và quyền sử dụng
 
@@ -8,13 +8,16 @@ Hai tệp dưới đây là **candidate tự tạo cho lát cắt PR-02 (cáo + 
 |---|---|---|
 | `public/models/fox-guide.glb` | Tạo riêng trong dự án bằng `tools/generate_v37_slice_assets.mjs`, có hỗ trợ lập trình của Codex. Hình học, UV, texture PNG thủ tục, bộ xương và mọi keyframe đều được định nghĩa trong mã nguồn này. | `OWNED: original project-authored PR02 candidate; docs/ASSET_LICENSES_V37.md` |
 | `public/models/math-world.glb` | Tạo riêng trong dự án bằng cùng generator. Lâu đài, đảo đá phân tầng thuôn sâu, vách đá góc cạnh, mép cỏ/khóm cỏ, cửa/cửa sổ vòm, chỉ mái, cờ, đường lát đá/lan can, cây, hoa và các số/ký hiệu là hình học thật. Texture được tính từ các hàm tuần hoàn, không tải ảnh bên ngoài. | `OWNED: original project-authored PR02 candidate; docs/ASSET_LICENSES_V37.md` |
+| `public/models/memory-world.glb` | `tools/generate_v37_memory_asset.mjs`: vách đá kín nhiều lớp, bốn cây phân nhánh, tán lá điêu khắc, cầu gỗ vòm, hồ nông, đường đá, hai cặp ký hiệu nổi, hoa/nấm. Texture đá/rêu/vỏ cây/lá/nước tự tạo; không có mesh hoặc ảnh ngoài. | `OWNED: original project-authored PR03 candidate; docs/ASSET_LICENSES_V37.md` |
+| `public/models/language-world.glb` | `tools/generate_v37_language_asset.mjs`: xưởng sách với mái men teal từng panel, cửa vòm, cửa sổ sâu, kệ sách, ban công, sách mở nhiều lớp trang cong, chữ Aa và bàn bút lông. Các chữ là hình học do generator định nghĩa, không dùng phông chữ ngoài. | `OWNED: original project-authored PR03 candidate; docs/ASSET_LICENSES_V37.md` |
+| `public/models/environment.glb` | `tools/generate_v37_environment_asset.mjs`: đảo đá xa với mặt rêu, thác nước có dải bọt và sáu cụm mây hình học. Texture và hình học được định nghĩa trong source, dùng chung giữa trang đảo và bài học. | `OWNED: original project-authored PR03 candidate; docs/ASSET_LICENSES_V37.md` |
 | `public/art/fox-guide-common.webp` | Render trực tiếp từ `fox-guide.glb` bằng Three renderer thật, Idle tại 0,35 giây, nền trong suốt. Dùng cho cảnh dự phòng trong bài test; cùng nhân vật với trang chủ. 640×768 px, 29.358 byte. | Cùng nguồn dự án của model cáo; không tải ảnh ngoài hoặc tạo nhân vật thứ hai. |
 
 `OWNED` là nhãn provenance nội bộ của tài nguyên gốc tạo cho dự án, không phải giấy phép CC0/CC-BY của một kho model. Không sử dụng mesh, rig, texture, phông chữ, ảnh concept hay keyframe của bên thứ ba; không có gói tài nguyên cần mua hoặc nguồn tải ngoài để ghi attribution. Mã generator được bàn giao cùng dự án để sửa, tạo lại và sử dụng trong Bảo An Learning. Generator chỉ sử dụng thư viện chuẩn Node.js (`fs`, `path`, `url`, `zlib`, `crypto`); thư viện runtime Three.js được khai báo riêng trong dependency của ứng dụng.
 
-Metadata `asset.extras` trong mỗi GLB ghi `provenance=ORIGINAL_PROCEDURAL_V37_PR02`, `source=tools/generate_v37_slice_assets.mjs`, `acceptance=candidate-not-art-approved`, `externalAssets=[]`. Không dùng nhãn provenance này để thay thế việc duyệt chất lượng hình ảnh trong ứng dụng thật.
+Metadata `asset.extras` ghi `provenance=ORIGINAL_PROCEDURAL_V37_PR02` cho cáo/Toán và `ORIGINAL_PROCEDURAL_V37_PR03` cho ba asset mới, `source` trỏ đúng generator, `acceptance=candidate-not-art-approved`, `externalAssets=[]`. Không dùng nhãn provenance này để thay thế việc duyệt chất lượng hình ảnh trong ứng dụng thật.
 
-Ảnh cáo dự phòng có SHA-256 `257ca7360cb2d016b1b73a316b6f3c6f320be9458e88fedca1aa52cf9a2d2feb`; dữ liệu xuất và kiểm tra alpha trong `docs/V37_games_qa/fox-portrait-provenance.json`. Lệnh tái xuất: `node tools/capture_v37_games.mjs --fox-only` với preview đang chạy. Phong cảnh trong bài test được dựng bằng geometry/vật liệu thủ tục trong `src/world3d/scenes/gameEnvironments.ts`; dùng chung model đảo và cáo đã tải, không có model thương mại hoặc texture bên ngoài mới.
+Ảnh cáo dự phòng có SHA-256 `257ca7360cb2d016b1b73a316b6f3c6f320be9458e88fedca1aa52cf9a2d2feb`; dữ liệu xuất và kiểm tra alpha trong `docs/V37_games_qa/fox-portrait-provenance.json`. Lệnh tái xuất: `node tools/capture_v37_games.mjs --fox-only` với preview đang chạy. Phong cảnh trong bài test được dựng bằng geometry instancing trong `src/world3d/scenes/gameEnvironments.ts`, dùng chung vật liệu PBR/texture từ các đảo đã tải. Không có model thương mại hoặc texture bên ngoài.
 
 ## Thông số xuất
 
@@ -52,11 +55,26 @@ SHA-256 bản bàn giao:
 ```text
 fox-guide.glb  398382e919be69af9502cb103e3d1359147157e76ac852a30ad07cd60a23e9fc
 math-world.glb dd7cacdfb62d86b0dc287b264d6cc71df5822a2b6943c48d73c5c84b3091d6cb
+memory-world.glb 8e13532de90cbfb5353e2aae22cf56da1a8bad859db2363de6dd5c2be8805a56
+language-world.glb 2556c2fa14a60608622dea42e52165da6e3d5821a345d39ce4aaac84a82e317a
+environment.glb 66379fb5ec01f7905f52744f973446b9b52f4842501236407b203a658128f45c
 ```
+
+Ba asset PR-03 dùng lại writer GLB gốc qua import không có tác dụng phụ. `npm run assets:premium-catalog` tạo lại riêng ba file này, không ghi lại cáo/Toán. Báo cáo đầy đủ tại `docs/V37_art_qa/{memory,language,environment}-asset-report.json`.
+
+| Thuộc tính PR-03 | Rừng Trí Nhớ | Xưởng Ngôn Từ | Môi trường chung |
+|---|---:|---:|---:|
+| Byte | 1.855.024 | 1.744.044 | 713.036 |
+| Tam giác | 23.768 | 25.520 | 8.976 |
+| Mesh / material batch | 15 / 15 | 16 / 16 | 6 / 6 |
+| PNG nhúng | 24 | 24 | 12 |
+| Xương / clip | 0 / 0 | 0 / 0 | 0 / 0 |
+
+Ba file có POSITION/NORMAL/UV và baseColor/normal/roughness PBR, không có URI phụ. Tổng năm GLB là 7.271.708 byte (6,93 MiB), tải/giải mã tối đa hai file đồng thời, một lần trong mỗi vòng đời renderer; chuyển đảo hoặc vào bài học không tải lại. Có duy nhất một canvas/renderer hoạt động. Dự phòng được dựng sau khi renderer lỗi đã dọn tài nguyên. Địa hình nền có sống đồi/đường viền bất quy tắc, thay khối cầu sau khi xem ảnh production.
 
 ## Giới hạn nghiệm thu
 
-- Đây là bước tạo model có texture/rig/clip và nguồn có thể truy vết cho PR-02. Chưa ghi nhận artist phê duyệt hoặc chủ dự án duyệt concept.
-- Chưa có model `memory-world.glb`, `language-world.glb`, `environment.glb` trong đợt này; không điền giấy phép cho tài nguyên chưa có.
+- Đã có model/texture/rig/clip và nguồn có thể truy vết cho PR-02/03. Chưa ghi nhận artist phê duyệt hoặc chủ dự án duyệt concept cuối cùng.
+- Manifest chỉ khai báo nguồn cho năm tài nguyên thực tế có trong dự án; file gate không thay thế nghiệm thu hình ảnh và thiết bị.
 - Chưa xuất LOD/mobile riêng, chưa đo FPS trên GPU/điện thoại thực. Số tam giác và dung lượng không thay thế phép đo hiệu năng.
 - Cần xem texture, skin và clip qua `GLTFLoader`/`AnimationMixer` trong browser, chụp desktop/mobile, duyệt bố cục và màu trước khi xác nhận mỹ thuật. Báo cáo runtime/QA của dự án là bằng chứng tách biệt với provenance này.

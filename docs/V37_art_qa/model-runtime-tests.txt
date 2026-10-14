@@ -1,0 +1,82 @@
+TAP version 13
+# Subtest: fox-guide: self-contained candidate asset loads real 3D geometry and embedded PBR textures
+ok 1 - fox-guide: self-contained candidate asset loads real 3D geometry and embedded PBR textures
+  ---
+  duration_ms: 175.7064
+  type: 'test'
+  ...
+# Subtest: math-world: self-contained candidate asset loads real 3D geometry and embedded PBR textures
+ok 2 - math-world: self-contained candidate asset loads real 3D geometry and embedded PBR textures
+  ---
+  duration_ms: 198.8986
+  type: 'test'
+  ...
+# Subtest: memory-world: self-contained candidate asset loads real 3D geometry and embedded PBR textures
+ok 3 - memory-world: self-contained candidate asset loads real 3D geometry and embedded PBR textures
+  ---
+  duration_ms: 177.9523
+  type: 'test'
+  ...
+# Subtest: language-world: self-contained candidate asset loads real 3D geometry and embedded PBR textures
+ok 4 - language-world: self-contained candidate asset loads real 3D geometry and embedded PBR textures
+  ---
+  duration_ms: 218.359
+  type: 'test'
+  ...
+# Subtest: environment: self-contained candidate asset loads real 3D geometry and embedded PBR textures
+ok 5 - environment: self-contained candidate asset loads real 3D geometry and embedded PBR textures
+  ---
+  duration_ms: 94.2602
+  type: 'test'
+  ...
+# Subtest: PR03 additions preserve the accepted Fox and Math GLB bytes
+ok 6 - PR03 additions preserve the accepted Fox and Math GLB bytes
+  ---
+  duration_ms: 3.6159
+  type: 'test'
+  ...
+# Subtest: fox: runtime skin has nontrivial bones, valid normalized weights, and bone clip channels
+ok 7 - fox: runtime skin has nontrivial bones, valid normalized weights, and bone clip channels
+  ---
+  duration_ms: 7.5427
+  type: 'test'
+  ...
+# Subtest: fox: AnimationMixer plays Idle, Cheer, and Victory and deforms skinned vertices
+ok 8 - fox: AnimationMixer plays Idle, Cheer, and Victory and deforms skinned vertices
+  ---
+  duration_ms: 22.2556
+  type: 'test'
+  ...
+# Subtest: premium manifest retains all five mandatory assets and fox texture/clip requirements
+ok 9 - premium manifest retains all five mandatory assets and fox texture/clip requirements
+  ---
+  duration_ms: 0.8364
+  type: 'test'
+  ...
+# Subtest: AssetLoader rejects a missing declared PBR map and disposes other successfully decoded resources
+ok 10 - AssetLoader rejects a missing declared PBR map and disposes other successfully decoded resources
+  ---
+  duration_ms: 45.6714
+  type: 'test'
+  ...
+# Subtest: AssetLoader abort after actual GLTF decoding disposes skins, textures, and bitmaps before rejecting
+ok 11 - AssetLoader abort after actual GLTF decoding disposes skins, textures, and bitmaps before rejecting
+  ---
+  duration_ms: 38.8403
+  type: 'test'
+  ...
+# Subtest: AssetLoader accepts correctly decoded PBR maps and shares one pending parse per asset path
+ok 12 - AssetLoader accepts correctly decoded PBR maps and shares one pending parse per asset path
+  ---
+  duration_ms: 33.204
+  type: 'test'
+  ...
+1..12
+# tests 12
+# suites 0
+# pass 12
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1215.6753

@@ -57,7 +57,7 @@ test('Default home uses one premium scene with textured GLBs, rig and running cl
   }
   await expect.poll(async () => (await diagnostics(page)).drawCalls).toBeGreaterThan(0);
   const initial = await diagnostics(page);
-  expect(initial.readyAssets).toEqual(expect.arrayContaining(['math-world', 'fox-guide']));
+  expect([...initial.readyAssets].sort()).toEqual(['environment', 'fox-guide', 'language-world', 'math-world', 'memory-world']);
   expect(initial.animationClips).toEqual(expect.arrayContaining(['Idle', 'Cheer', 'Victory']));
   expect(initial.skeletalMeshes).toBeGreaterThan(0);
   expect(initial.bones).toBeGreaterThan(0);

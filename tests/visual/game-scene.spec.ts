@@ -84,7 +84,10 @@ test('All games reuse the home canvas, WebGL context and decoded GLBs, including
   page.on('pageerror', error => errors.push(error.message));
   await home(page);
   const initialRequests = [...requests];
-  expect(initialRequests).toHaveLength(2);
+  expect(initialRequests).toHaveLength(5);
+  expect(initialRequests.map(url => new URL(url).pathname).sort()).toEqual([
+    '/models/environment.glb', '/models/fox-guide.glb', '/models/language-world.glb', '/models/math-world.glb', '/models/memory-world.glb',
+  ]);
   await page.locator('canvas.ba3d-canvas').evaluate(canvas => canvas.setAttribute('data-shared-scene', 'original'));
   const contextCount = () => page.evaluate(() => (window as unknown as { __gameContextCount: () => number }).__gameContextCount());
   const lifecycle = () => page.evaluate(() => (window as unknown as { __gameLifecycle: () => { pendingRaf: number; canvasListeners: number; globalListeners: number } }).__gameLifecycle());

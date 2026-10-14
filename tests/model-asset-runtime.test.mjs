@@ -2,6 +2,7 @@ import test, { after } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { inflateSync } from 'node:zlib';
+import { createHash } from 'node:crypto';
 import { AnimationMixer, Box3, Vector3, SRGBColorSpace, NoColorSpace } from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { AssetLoader } from '../src/world3d/renderer/assetLoader.ts';
@@ -75,7 +76,7 @@ async function fixture(name) {
       const binary = bytes.subarray(binHeader + 8);
       assert.equal(bytes.readUInt32LE(binHeader), binary.length);
       const arrayBuffer = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
-      return { json, binary, gltf: await new GLTFLoader().parseAsync(arrayBuffer, '') };
+      return { json, binary, byteLength: bytes.length, gltf: await new GLTFLoader().parseAsync(arrayBuffer, '') };
     })());
   }
   return fixtures.get(name);
@@ -102,14 +103,15 @@ function deformedVertices(scene) {
   return result;
 }
 
-for (const name of ['fox-guide', 'math-world']) {
+const pr03Assets = new Set(['memory-world', 'language-world', 'environment']);
+for (const name of ['fox-guide', 'math-world', ...pr03Assets]) {
   test(`${name}: self-contained candidate asset loads real 3D geometry and embedded PBR textures`, async () => {
-    const { json, binary, gltf } = await fixture(name);
+    const { json, binary, byteLength, gltf } = await fixture(name);
     assert.equal(json.asset.version, '2.0');
     assert.ok(binary.length > 0 && binary.length < 16 * 1024 * 1024);
     assert.ok(json.buffers.every(buffer => !buffer.uri));
     assert.ok(json.images.length >= 3 && json.images.every(image => image.bufferView !== undefined && !image.uri));
-    assert.equal(json.asset.extras.provenance, 'ORIGINAL_PROCEDURAL_V37_PR02');
+    assert.equal(json.asset.extras.provenance, pr03Assets.has(name) ? 'ORIGINAL_PROCEDURAL_V37_PR03' : 'ORIGINAL_PROCEDURAL_V37_PR02');
     assert.equal(json.asset.extras.acceptance, 'candidate-not-art-approved');
     const loaded = meshes(gltf.scene);
     assert.ok(loaded.length > 0);
@@ -123,13 +125,20 @@ for (const name of ['fox-guide', 'math-world']) {
       assert.ok([...position.array, ...normal.array, ...uv.array].every(Number.isFinite));
       assert.ok([...normal.array].some(value => Math.abs(value) > .1));
       assert.ok([...uv.array].some(value => value !== uv.array[0]), 'UVs cover more than one texel');
+      if (mesh.geometry.index) assert.ok([...mesh.geometry.index.array].every(index => Number.isInteger(index) && index >= 0 && index < position.count), `${mesh.name}: decoded indices reference valid vertices`);
+      assert.equal((mesh.geometry.index?.count ?? position.count) % 3, 0, 'triangle lists contain complete triangles');
       triangleCount += (mesh.geometry.index?.count ?? position.count) / 3;
     }
     assert.ok(triangleCount >= 500, `modeled volume has ${triangleCount} triangles`);
+    if (pr03Assets.has(name)) {
+      assert.ok(byteLength <= 2 * 1024 * 1024, `${name} must fit the 2 MiB authored-asset budget; received ${byteLength} bytes`);
+      assert.ok(triangleCount <= (name === 'environment' ? 20_000 : 35_000), `${name} contains ${triangleCount} triangles within its scene budget`);
+    }
     const size = new Box3().setFromObject(gltf.scene).getSize(new Vector3());
     assert.ok(size.x > .1 && size.y > .1 && size.z > .1, 'geometry has volume in all three axes');
     const loadedMaterials = [...materials(gltf.scene)];
     assert.ok(loadedMaterials.some(material => material.map && material.normalMap && material.roughnessMap));
+    if (pr03Assets.has(name)) assert.ok(loadedMaterials.every(material => material.map && material.normalMap && material.roughnessMap && material.metalnessMap), `${name}: every authored material has loaded base color, normal and ORM maps`);
     for (const material of loadedMaterials) {
       assert.ok(material.isMeshStandardMaterial, 'glTF PBR material survives runtime import');
       const materialIndex = gltf.parser.associations.get(material)?.materials;
@@ -151,10 +160,21 @@ for (const name of ['fox-guide', 'math-world']) {
       if (material.normalMap) assert.equal(material.normalMap.colorSpace, NoColorSpace);
       if (material.roughnessMap) assert.equal(material.roughnessMap.colorSpace, NoColorSpace);
       const pixels = material.map.image.data;
-      assert.ok(new Set(pixels).size > 4, 'base-color map contains actual surface variation');
+      assert.ok(new Set(pixels).size > 4, `${name}/${material.name}: base-color map contains actual surface variation (received ${new Set(pixels).size} distinct channel values)`);
     }
   });
 }
+
+test('PR03 additions preserve the existing Fox and Math GLB bytes', () => {
+  const expected = {
+    'fox-guide': '398382e919be69af9502cb103e3d1359147157e76ac852a30ad07cd60a23e9fc',
+    'math-world': 'dd7cacdfb62d86b0dc287b264d6cc71df5822a2b6943c48d73c5c84b3091d6cb',
+  };
+  for (const [name, hash] of Object.entries(expected)) {
+    const bytes = readFileSync(new URL(`../public/models/${name}.glb`, import.meta.url));
+    assert.equal(createHash('sha256').update(bytes).digest('hex'), hash, `${name} remains the existing PR02 asset`);
+  }
+});
 
 test('fox: runtime skin has nontrivial bones, valid normalized weights, and bone clip channels', async () => {
   const { json, gltf } = await fixture('fox-guide');

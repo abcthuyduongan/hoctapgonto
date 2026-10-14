@@ -255,7 +255,8 @@ class Model {
       const node = { name: `${this.name}_${this.gltf.materials[mat].name}`, mesh: id }; if (this.bones.length) node.skin = 0;
       this.gltf.scenes[0].nodes.push(this.gltf.nodes.length); this.gltf.nodes.push(node);
     }
-    this.gltf.scenes[0].extras = { groundY: 0, artStatus: 'PR02 candidate; requires visual approval', triangleCount: triangles };
+    const phase = this.gltf.asset.extras.provenance === 'ORIGINAL_PROCEDURAL_V37_PR03' ? 'PR03' : 'PR02';
+    this.gltf.scenes[0].extras = { groundY: 0, artStatus: `${phase} candidate; requires visual approval`, triangleCount: triangles };
     const bin = Buffer.concat(this.binary); this.gltf.buffers[0].byteLength = bin.length;
     const json = Buffer.from(JSON.stringify(this.gltf)); const padded = Buffer.alloc(Math.ceil(json.length / 4) * 4, 0x20); json.copy(padded);
     const header = Buffer.alloc(12); header.writeUInt32LE(0x46546c67); header.writeUInt32LE(2, 4); header.writeUInt32LE(12 + 8 + padded.length + 8 + bin.length, 8);
@@ -566,5 +567,8 @@ function mathWorld() {
   return m.finish();
 }
 
-const report = [fox(), mathWorld()];
-console.log(JSON.stringify({ generator: 'tools/generate_v37_slice_assets.mjs', status: 'PR02 authored candidate, pending art approval', assets: report }, null, 2));
+export { Model, TAU, add, sub, mul, dot, cross, norm, lerp, clamp, color, rotZ, quat, png };
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  const report = [fox(), mathWorld()];
+  console.log(JSON.stringify({ generator: 'tools/generate_v37_slice_assets.mjs', status: 'PR02 authored candidate, pending art approval', assets: report }, null, 2));
+}

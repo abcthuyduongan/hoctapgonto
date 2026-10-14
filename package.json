@@ -20,11 +20,12 @@
     "test:guide-model": "node --experimental-strip-types --test tests/glb-import.test.mjs tests/glb-guide-integration.test.mjs tests/glb-guide-runtime.test.mjs",
     "test:guide-animation": "node --experimental-strip-types --test tests/glb-animation.test.mjs tests/glb-import.test.mjs tests/glb-guide-integration.test.mjs tests/glb-guide-runtime.test.mjs",
     "test:content": "node --experimental-strip-types --test tests/content-import-v362.test.mjs",
-    "test:renderer": "node --experimental-strip-types --test tests/renderer-contract.test.mjs tests/quality-manager.test.mjs tests/model-asset-runtime.test.mjs tests/island-carousel.test.mjs tests/world-carousel-controller.test.mjs tests/guide-viewport.test.mjs",
+    "test:renderer": "node --experimental-strip-types --test tests/renderer-contract.test.mjs tests/quality-manager.test.mjs tests/model-asset-runtime.test.mjs tests/island-carousel.test.mjs tests/world-carousel-controller.test.mjs tests/guide-viewport.test.mjs tests/asset-catalog.test.mjs tests/game-environments.test.mjs",
     "test:premium": "playwright test --config=playwright.v37.config.ts",
     "test:offline-html": "node tools/check_offline_v37.mjs",
     "qa:capture": "node tools/capture_v37.mjs",
-    "assets:vertical-slice": "node tools/generate_v37_slice_assets.mjs"
+    "assets:vertical-slice": "node tools/generate_v37_slice_assets.mjs",
+    "assets:premium-catalog": "node tools/generate_v37_memory_asset.mjs && node tools/generate_v37_language_asset.mjs && node tools/generate_v37_environment_asset.mjs"
   },
   "dependencies": {
     "react": "^19.1.0",
