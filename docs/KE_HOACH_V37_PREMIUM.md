@@ -2,7 +2,7 @@
 
 **Tài liệu triển khai kỹ thuật | Baseline: V3.6.2 RC2 | Đích đề xuất: V3.7 Premium World → V3.8 Content & Gameplay**  
 **Ngày lập:** 13/10/2026  
-**Trạng thái:** KẾ HOẠCH — chưa triển khai các hạng mục trong tài liệu.  
+**Trạng thái:** Kế hoạch gốc; đã triển khai PR-00/01 và lát cắt PR-02. Bổ sung ưu tiên hoàn thiện khung cảnh trong bài test ngày 14/10/2026 tại [mục 13](#13-giai-đoạn-kế-tiếp-đồng-bộ-khung-cảnh-trong-các-bài-test). Chưa nghiệm thu V3.7 FINAL.
 **Quy tắc:** Kế thừa mã nguồn V3.6.2; không làm lại ứng dụng; không xóa hoặc chuyển đổi dữ liệu cũ khi chưa có kế hoạch migration và backup.
 
 > **Định nghĩa “hoàn thành”:** Người dùng mở **ứng dụng chạy thật** trên máy tính và điện thoại, thấy mô hình 3D hoàn thiện theo concept đã chốt; ba game vận hành ổn định; kết quả lưu được; build, kiểm thử và nghiệm thu mỹ thuật đều đạt. Screenshot concept, ảnh nền đẹp hoặc bộ test unit xanh **không thay thế** kết quả nghiệm thu này.
@@ -123,7 +123,7 @@ export interface WorldRenderer {
 | **PR-01: Renderer abstraction** | `types.ts`, `legacyAdapter.ts`, `rendererFactory.ts`; chuyển `WorldCanvas.tsx` sang factory với fallback và dispose. | 2–4 dev | UI/3 game y nguyên; renderer cũ chạy; test chuyển trang không rò bộ nhớ. |
 | **PR-02: Premium vertical slice** | `PremiumWorldRenderer.ts`, loader GLB, tone mapping, lights, camera, AnimationMixer; **một đảo Math + cáo** dựng đẹp thật trong browser. | 5–9 dev **+** 6–12 artist | Trên PC/điện thoại xem được model 3D/texture/clip thật, bấm Math Quest bình thường. |
 | **PR-03: Hai đảo còn lại** | Nạp `memory-world.glb`, `language-world.glb`, `environment.glb`; thống nhất scale/camera, bóng, màu và chuyển focus. | 3–6 dev **+** 7–14 artist | Ba đảo đồng nhất bố cục, asset gate đủ 5 model. |
-| **PR-04: Giao diện & motion** | Responsive/viewport, giữ UI trong một khung; animation giảm chuyển động; hiệu ứng kết quả đúng/sai liên kết cáo. | 3–5 dev | Không tràn/nhảy ở 320–1920 px; click/touch/keyboard chuẩn. |
+| **PR-04: Giao diện, khung cảnh bài test & motion** | Đồng bộ cảnh Math/Memory/Sentence với trang chọn đảo theo mục 13; responsive, phản hồi đúng/sai, nhân vật và màn hoàn thành dùng chung phong cách. | Ước lượng lại sau lát cắt Math | Không tràn/nhảy ở 320–1920 px; click/touch/keyboard chuẩn; cảnh trong bài và trang chủ cùng hệ mỹ thuật. |
 | **PR-05: Performance** | Adaptive quality, DPR cap, on-demand/pause, giảm draw calls, LOD, preload có giới hạn, telemetry phục vụ QA; tối ưu asset mobile. | 4–7 dev + 2–4 artist | Đạt ngân sách hiệu năng **đã đo trên máy thật**. |
 | **PR-06: Release gate** | Build React, E2E 3 game, kiểm tra persistence, refresh, lỗi WebGL, mobile Safari/Chrome, backup/rollback; ảnh chụp ứng dụng để duyệt. | 3–6 dev + thời gian nghiệm thu | Tất cả gate P0 đạt; chủ dự án duyệt thẩm mỹ. |
 | **V3.8: Gameplay & học liệu** | Mở rộng ngân hàng câu hỏi, level, feedback/pacing, bộ nội dung theo lớp/môn; không trộn vào PR renderer. | Lập kế hoạch riêng | Chỉ bắt đầu mở rộng lớn khi nền V3.7 đã ổn định. |
@@ -324,7 +324,7 @@ npm run test:visual
 
 - [ ] Math Quest chơi hết 8/8 câu mẫu (và một bộ JSON mới), không nhảy đôi câu, phản hồi không che nội dung.
 - [ ] Memory Match ghép đủ 6/6 cặp, spam click không bị kẹt, không có hai lượt ghi nhận cho một hành động.
-- [ ] Sentence Builder ghép đủ 5/5 câu, hỗ trợ chạm, không nhận sai chỉ số kéo thả.
+- [ ] Sentence Builder ghép đủ số câu trong học liệu (seed React hiện có 6 câu; HTML offline có 5), hỗ trợ chạm, không nhận sai chỉ số kéo thả.
 - [ ] Các phiên `completed`/`abandoned` và learning events được ghi đúng `sessionId`, `packId`, `contentVersion`.
 - [ ] Refresh giữa bài, đóng/mở tab và xuất/khôi phục dữ liệu hoạt động đúng theo giới hạn sản phẩm; lỗi lưu được hiển thị.
 - [ ] Test storage trên **origin thật** (localhost hoặc HTTPS được trình duyệt hỗ trợ), không dùng fake localStorage để kết luận độ bền dữ liệu.
@@ -345,7 +345,7 @@ npm run test:visual
 
 1. **Branch và backup:** tạo branch `feature/v37-premium-world`; sao lưu baseline V3.6.2 và hai nguồn dữ liệu mẫu; không chạy migration dữ liệu trong PR 3D.
 2. **PR nhỏ, có demo:** mỗi PR không sửa logic và mỹ thuật lẫn nhau; ghi screenshot/video từ ứng dụng chạy, test log, bundle size và điểm hồi quy.
-3. **Feature flag:** `premium3DEnabled` ở mức cấu hình cục bộ; rollback về renderer cũ không làm mất điểm hay câu hỏi.
+3. **Một giao diện chung:** theo yêu cầu ngày 14/10/2026, chỉ hiển thị giao diện mới; renderer cũ là dự phòng tải riêng khi lỗi. Không chạy hai phiên bản song song. Rollback bằng checkpoint Git trong thư mục riêng, không thay đổi điểm hay câu hỏi.
 4. **Bảo vệ tương tác:** click nút game đi trực tiếp từ DOM; scene chỉ trang trí/chọn focus; không cho scene resize game dialog khi có feedback.
 5. **Quản lý asset:** mỗi GLB có `source`, `author`, `license`, `modifiedBy`, `exportSettings`, `textureResolution`, `triangles`, `animationClips` trong `docs/ASSET_LICENSES_V37.md`.
 6. **Không thêm server lúc này:** nền tảng hiện dùng dữ liệu cục bộ; cloud auth, tài khoản trẻ em, đồng bộ nhiều thiết bị là công việc riêng, không gộp vào mục tiêu “đẹp như concept”.
@@ -423,4 +423,51 @@ npm run test:visual
 
 ### Kết luận điều hành
 
-**Ưu tiên duy nhất ngay lúc này:** xây một **vertical slice 3D premium thật** (`fox-guide.glb` + `math-world.glb`) trên React V3.6.2, đạt mỹ thuật và FPS, đồng thời bảo toàn cả ba game. Sau khi được duyệt, tái sử dụng hệ renderer và material cho hai đảo còn lại rồi mới chốt V3.7. **Không lấy việc có 5 file GLB hoặc có screenshot đẹp làm bằng chứng nghiệm thu đủ.** V3.8 sẽ tập trung câu hỏi, cấp độ và nội dung học tập sau khi nền V3.7 ổn định.
+Lát cắt cáo/đảo Toán và tương tác xoay đảo đã có trong ứng dụng. **Ưu tiên kế tiếp theo yêu cầu chủ dự án:** hoàn thiện khung cảnh bên trong ba bài test, đồng bộ với trang chọn đảo theo mục 13, bắt đầu bằng Math Quest. Việc duyệt mỹ thuật và hoàn thiện hai đảo còn lại vẫn thuộc V3.7; không lấy screenshot hoặc test xanh làm nghiệm thu FINAL. V3.8 phát triển câu hỏi/cấp độ sau khi nền V3.7 ổn định.
+
+## 13. Giai đoạn kế tiếp: đồng bộ khung cảnh trong các bài test
+
+**Bổ sung ngày 14/10/2026 theo yêu cầu chủ dự án. Trạng thái: đã đưa vào kế hoạch, chưa triển khai giai đoạn này.** “Bài test” ở đây là màn học/chơi Math Quest, Memory Match và Sentence Builder, gồm lúc làm bài, phản hồi, hoàn thành và trở về trang đảo.
+
+### 13.1. Mục tiêu hình ảnh
+
+Khi bấm Bắt đầu, người học có cảm giác bước vào chính hòn đảo vừa chọn. Trang chủ và bài test dùng cùng cáo, màu sắc, chất liệu, ánh sáng, tỷ lệ hình và cách chuyển động; khung câu hỏi vẫn rõ, dễ đọc và dễ thao tác.
+
+Hiện trang chủ dùng cáo/đảo Toán GLB thật, còn màn chơi dùng ảnh nền WebP và `GameMascot` lấy `/art/fox-scene-free.webp`. Khung, HUD và phần thưởng còn chịu nhiều lớp CSS cũ. Đây là các điểm cần đồng bộ, không phải thay lại logic học tập.
+
+| Bài test | Khung cảnh cần hoàn thiện | Vùng tương tác cần đồng bộ |
+|---|---|---|
+| Math Quest — Đảo Toán Học | Sân hoặc không gian học của lâu đài đang thấy trên đảo; đá, cây và biểu tượng số cùng chất liệu với trang chủ | Bảng câu hỏi và bốn đáp án màu kem/teal; tiến độ, gợi ý và giải thích trong vùng cố định; cáo đứng bên góc |
+| Memory Match — Khu Rừng Trí Nhớ | Khoảng rừng có chiều sâu, cây và ánh sáng theo cùng hệ mỹ thuật; vùng giữa đủ thoáng cho thẻ | Mặt trước, mặt sau và trạng thái ghép đúng phân biệt bằng màu/ký hiệu; lật thẻ nhẹ; giữ lưới 4 cột desktop, 3 cột mobile; cáo không che thẻ hoặc phản hồi |
+| Sentence Builder — Xưởng Ngôn Từ | Góc học trong xưởng/nhà sách, sách và ký hiệu chữ cùng phong cách với đảo; nền bớt rối phía sau câu | Ô ghép câu, kho từ, gợi ý và nút kiểm tra dùng chung chất liệu; chạm và kéo thả dễ dùng; giữ đủ chỗ cho câu dài |
+| Hoàn thành / quay về | Cùng cáo và phong cách phần thưởng; chuyển từ cảnh bài test về đúng đảo đã chọn | Điểm/tóm tắt đọc rõ; nút trở về dễ chạm; khôi phục focus hợp lý |
+
+### 13.2. Cách tổ chức để giữ ứng dụng nhẹ
+
+- Tạo bộ token chung cho nền kem, chữ đậm, màu nhấn, bo góc, khoảng cách, bóng và typography từ giao diện trang chủ. Đồng bộ cả header/Thoát, HUD và tiến độ; mỗi đảo có điểm nhấn riêng trong cùng hệ.
+- Một tầng dựng cảnh dùng chung trong `src/world3d/`, chuyển chế độ trang đảo/bài test theo hoạt động. Ưu tiên tái sử dụng renderer, model cáo, vật liệu và tài nguyên đã tải; không tạo ba engine riêng hoặc tải model lại theo từng câu.
+- Khi mở bài test, chỉ cảnh bài test được cập nhật/render; khi quay về chỉ cảnh trang đảo hoạt động. Nếu cần thay renderer, dọn renderer/context cũ trước. Kiểm tra cả số RAF và tài nguyên còn giữ, không chỉ nhìn FPS.
+- Chất lượng thấp và lỗi WebGL dùng cảnh tĩnh/dự phòng cùng phong cách. Nếu dùng ảnh cáo thay 3D, tạo ảnh từ chính model cáo chung để giữ đúng nhân vật. Thiếu asset không chặn làm bài.
+- Nút, thẻ, đáp án, gợi ý và ô ghép câu vẫn là DOM thật trên lớp cảnh. Cảnh trang trí không nhận pointer ở vùng làm bài; phản hồi không đẩy hoặc che nội dung.
+- Thu gom CSS màn chơi vào lớp theme rõ ràng, loại bỏ quy tắc cũ trùng nhau trong phạm vi đã kiểm chứng; không tiếp tục chất thêm nhiều lớp `!important`.
+
+### 13.3. Thứ tự thực hiện
+
+1. **Đo và chốt baseline:** chụp ba bài hiện tại ở desktop/390/320 px; liệt kê ảnh, CSS và UI dùng chung; đo tải tài nguyên và độ trễ khi mở bài.
+2. **Khung dùng chung:** tạo theme màn chơi, khung câu hỏi/tiến độ, lớp cảnh, vị trí cáo bên góc và phần thưởng thống nhất. Nối chế độ cảnh với game host, giữ nguyên các callback học tập.
+3. **Lát cắt Math hoàn chỉnh:** làm đủ vào bài → chờ trả lời → đúng/sai → gợi ý → câu tiếp → hoàn thành → trở về đảo. Kiểm tra chất lượng hình ảnh và thao tác trên máy thật trước khi nhân rộng.
+4. **Memory và Sentence:** tái sử dụng khung/renderer; hoàn thiện cảnh rừng, cảnh xưởng, thẻ và ô ghép từ theo đặc điểm từng game. Không sao chép bố cục bốn đáp án của Math sang các game khác.
+5. **Nghiệm thu toàn luồng:** chơi trọn ba bài, đổi đảo/bài nhiều lần, giảm chuyển động, chất lượng thấp, lỗi asset/context và dữ liệu sau refresh. Lưu ảnh/video từ build chạy thật.
+
+Các điểm tích hợp: `src/App.tsx` (game host/chuyển màn), `src/games/GameMascot.tsx`, `GameCompletion.tsx`, `FeedbackEffects.tsx`, phần JSX trình bày của ba game, `src/world3d/` và stylesheet màn chơi. Hàm chấm/ghi đáp án, khóa thao tác, `ContentPack`, SDK và schema IndexedDB giữ nguyên; chỉnh phần trình bày phải có regression để chứng minh hành vi học tập không đổi.
+
+### 13.4. Điều kiện hoàn thành giai đoạn
+
+- [ ] Ba cảnh nhận ra ngay là cùng thế giới với trang chủ; cùng cáo, màu, ánh sáng và vật liệu. Đọc rõ câu hỏi/đáp án, không để nền tranh sự chú ý với nội dung.
+- [ ] Cáo đứng bên góc, không che thao tác ở 320 px; mọi nút chạm chính tối thiểu 44 px. Không tràn ngang hoặc nhảy khung khi có phản hồi.
+- [ ] Không tải model theo từng câu; không có hai cảnh hoạt ảnh chạy đồng thời; mở/đóng bài nhiều lần không tích lũy RAF, listener, texture hoặc geometry.
+- [ ] Giảm chuyển động, bàn phím, chạm và kéo thả hoạt động; thông báo lỗi lưu/hoàn thành không bị trang trí che.
+- [ ] Math 8 câu, Memory 6 cặp, Sentence 6 câu theo seed React hiện tại hoàn thành đúng; học liệu JSON khác cũng chạy theo độ dài thực. Lịch sử và dữ liệu sau refresh giữ đúng.
+- [ ] Build, kiểm thử renderer/gameplay/responsive đạt; có ảnh/video desktop và mobile. Đo thiết bị điện thoại thật trước khi kết luận hiệu năng mobile.
+
+Giai đoạn này hoàn thiện trải nghiệm hình ảnh trong bài test. Thêm câu hỏi, cấp độ, luật tính điểm hoặc đánh giá nhiều đáp án ngôn ngữ tiếp tục là phạm vi nội dung/gameplay riêng.
