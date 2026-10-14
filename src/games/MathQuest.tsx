@@ -52,13 +52,13 @@ export default function MathQuest({pack,onAttempt,onComplete,onExit}:GameHostPro
   return <section className="play-panel math-panel world-stage world-math">
     <div className="stage-backdrop" aria-hidden="true"/>
     <div className="stage-overlay" aria-hidden="true"/>
-    <div className="world-hud"><span className="hud-label">🗺️ ĐẢO TOÁN HỌC</span><span className="hud-score">⭐ {correctCount} ngôi sao</span></div>
+    <div className="world-hud"><span className="hud-label"><span className="ba37-hud-symbol" aria-hidden="true">∑</span> ĐẢO TOÁN HỌC</span><span className="hud-score"><span aria-hidden="true">★</span> {correctCount} ngôi sao</span></div>
     <div className="math-adventure-layout">
       <aside className="world-guide"><div className="guide-figure"><GameMascot alt="Cáo nhỏ đồng hành" mood={selected===null?'idle':selected===question.correctIndex?'happy':'encourage'}/></div><div className="guide-speech">{selected===null ? "Con cứ suy nghĩ kỹ rồi chọn nhé! 🌟" : (selected===question.correctIndex ? "Cậu làm tốt lắm! 🎉" : "Sai cũng là một cách học nhé! 🌱")}</div></aside>
       <div className="challenge-card">
         <div className="quest-progress"><span>THỬ THÁCH {index+1} / {content.items.length}</span><span>{Math.round((index+(selected!==null?1:0))/content.items.length*100)}% hành trình</span></div>
         <div className="progress-track"><div style={{width:`${(index+(selected!==null?1:0))/content.items.length*100}%`}}/></div>
-        <div className="quest-scroll" key={question.id}><div className="quest-prompt-kicker">🧩 CÂU ĐỐ HÔM NAY</div><h2 className="quiz-question">{question.prompt}</h2></div>
+        <div className="quest-scroll" key={question.id}><div className="quest-prompt-kicker">CÂU ĐỐ HÔM NAY</div><h2 className="quiz-question">{question.prompt}</h2></div>
         {error && <div className="notice error" role="alert">{error} <button onClick={()=>setError('')}>Đóng</button></div>}
         <div className="answer-grid">
           {question.options.map((optionText,i) => <button key={i} className={`answer-option ${selected !== null && i === question.correctIndex ? 'correct':''} ${selected === i && i !== question.correctIndex?'incorrect':''}`} onClick={() => void answer(i)} disabled={selected !== null || busy || !!error}>

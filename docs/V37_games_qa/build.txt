@@ -1,0 +1,20 @@
+
+> bao-an-learning-v3-6-3d@3.7.0-rc.1 build
+> tsc -b && vite build
+
+vite v7.3.7 building client environment for production...
+transforming...
+✓ 89 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                 0.61 kB │ gzip:   0.41 kB
+dist/assets/index-CqsJkXTY.css                232.96 kB │ gzip:  45.39 kB
+dist/assets/TimesTable-DvOZIvYs.js              1.56 kB │ gzip:   0.78 kB
+dist/assets/FeedbackEffects-DL082d7W.js         3.54 kB │ gzip:   1.42 kB
+dist/assets/MathQuest-fBn_pRWP.js               5.04 kB │ gzip:   2.19 kB
+dist/assets/MemoryMatch-GF9gqRqX.js             5.90 kB │ gzip:   2.38 kB
+dist/assets/SentenceBuilder-DKjZFc7B.js         6.51 kB │ gzip:   2.62 kB
+dist/assets/legacyAdapter-D0QQrofV.js          30.42 kB │ gzip:  12.65 kB
+dist/assets/index-CWcVMOt_.js                 277.43 kB │ gzip:  86.70 kB
+dist/assets/PremiumWorldRenderer-DmB5MhIG.js  669.30 kB │ gzip: 172.96 kB
+✓ built in 1.83s

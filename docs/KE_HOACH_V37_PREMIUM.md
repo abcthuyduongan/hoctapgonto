@@ -427,7 +427,7 @@ Lát cắt cáo/đảo Toán và tương tác xoay đảo đã có trong ứng d
 
 ## 13. Giai đoạn kế tiếp: đồng bộ khung cảnh trong các bài test
 
-**Bổ sung ngày 14/10/2026 theo yêu cầu chủ dự án. Trạng thái: đã đưa vào kế hoạch, chưa triển khai giai đoạn này.** “Bài test” ở đây là màn học/chơi Math Quest, Memory Match và Sentence Builder, gồm lúc làm bài, phản hồi, hoàn thành và trở về trang đảo.
+**Bổ sung ngày 14/10/2026 theo yêu cầu chủ dự án. Đã triển khai bản dùng chung renderer và theme cho cả ba bài, kiểm thử production và 36 trạng thái hình ảnh; chưa nghiệm thu mỹ thuật hoặc điện thoại thật.** “Bài test” ở đây là màn học/chơi Math Quest, Memory Match và Sentence Builder, gồm lúc làm bài, phản hồi, hoàn thành và trở về trang đảo. [Bằng chứng và giới hạn kiểm tra](V37_games_qa/verification.md).
 
 ### 13.1. Mục tiêu hình ảnh
 
@@ -463,11 +463,12 @@ Các điểm tích hợp: `src/App.tsx` (game host/chuyển màn), `src/games/Ga
 
 ### 13.4. Điều kiện hoàn thành giai đoạn
 
-- [ ] Ba cảnh nhận ra ngay là cùng thế giới với trang chủ; cùng cáo, màu, ánh sáng và vật liệu. Đọc rõ câu hỏi/đáp án, không để nền tranh sự chú ý với nội dung.
-- [ ] Cáo đứng bên góc, không che thao tác ở 320 px; mọi nút chạm chính tối thiểu 44 px. Không tràn ngang hoặc nhảy khung khi có phản hồi.
-- [ ] Không tải model theo từng câu; không có hai cảnh hoạt ảnh chạy đồng thời; mở/đóng bài nhiều lần không tích lũy RAF, listener, texture hoặc geometry.
-- [ ] Giảm chuyển động, bàn phím, chạm và kéo thả hoạt động; thông báo lỗi lưu/hoàn thành không bị trang trí che.
-- [ ] Math 8 câu, Memory 6 cặp, Sentence 6 câu theo seed React hiện tại hoàn thành đúng; học liệu JSON khác cũng chạy theo độ dài thực. Lịch sử và dữ liệu sau refresh giữ đúng.
-- [ ] Build, kiểm thử renderer/gameplay/responsive đạt; có ảnh/video desktop và mobile. Đo thiết bị điện thoại thật trước khi kết luận hiệu năng mobile.
+- [x] Đã triển khai ba cảnh cùng cáo, màu, ánh sáng và vật liệu với trang chủ; khung nội dung rõ hơn. Có ảnh đối chiếu từ build thật; phê duyệt mỹ thuật chính thức còn riêng.
+- [x] Cáo có vùng bên góc, không che thao tác ở 320 px; nút chạm chính tối thiểu 44 px. Kiểm tra overflow và ổn định khung qua các viewport 320–1920 px.
+- [x] Cùng canvas/context/model và RAF; 20 vòng mở/đóng bài giữ số listener/RAF, không tải thêm GLB. Resource sharing/dispose được kiểm tra nguồn và renderer; chưa đo GPU memory peak bằng profiler.
+- [x] Giảm chuyển động, bàn phím, chạm và chỉ số kéo thả đã qua regression; lỗi renderer không chặn làm bài.
+- [x] Math 8 câu, Memory 6 cặp, Sentence 6 câu và nhập học liệu JSON chạy đúng; history/dữ liệu sau refresh giữ đúng. SDK và logic ghi học tập không đổi.
+- [x] Build, kiểm thử renderer/gameplay/responsive đạt qua lượt đầy đủ và lượt xác minh sau sửa; có ảnh/video desktop và viewport mobile giả lập, xem báo cáo để biết từng kết quả.
+- [ ] Đo Android/iPhone thật, đối chiếu concept và phê duyệt mỹ thuật. Hai landmark Trí nhớ/Ngôn từ và môi trường vẫn cần asset premium để đủ art gate V3.7 FINAL.
 
 Giai đoạn này hoàn thiện trải nghiệm hình ảnh trong bài test. Thêm câu hỏi, cấp độ, luật tính điểm hoặc đánh giá nhiều đáp án ngôn ngữ tiếp tục là phạm vi nội dung/gameplay riêng.

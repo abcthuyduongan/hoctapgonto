@@ -48,14 +48,14 @@
 .portal273-bottom-actions button,.portal273-bottom-actions a{display:inline-flex;flex:1;gap:7px;min-width:0;min-height:45px;padding:6px 12px;border-radius:14px;background:linear-gradient(#268cef,#085cb3);border:1px solid #93d7ff;color:#fff;font-weight:900;font-size:13px;white-space:normal;text-align:center;box-shadow:0 3px 0 #043876}
 .portal273-journey{position:relative;z-index:1;background:#eff9ff}
 /* Games: panoramic illustration with gentle, limited wash, and legible stable controls. */
-.immersive-dialog .world-math .stage-backdrop{background-image:url('/art/premium-math-cinematic.webp')!important}
-.immersive-dialog .world-memory .stage-backdrop{background-image:url('/art/premium-memory-cinematic.webp')!important}
-.immersive-dialog .world-sentence .stage-backdrop{background-image:url('/art/premium-sentence-cinematic.webp')!important}
-.immersive-dialog .world-math .stage-overlay{background:linear-gradient(90deg,#062f5c39,transparent 48%,#072f5c12),linear-gradient(0deg,#084b7670,transparent 21%)}
-.immersive-dialog .world-memory .stage-overlay{background:linear-gradient(90deg,#073b3d38,transparent 52%,#0b4b4940),linear-gradient(0deg,#063b3e55,transparent 20%)}
-.immersive-dialog .world-sentence .stage-overlay{background:linear-gradient(90deg,#53235f36,transparent 52%,#61215e30),linear-gradient(0deg,#41234c60,transparent 23%)}
-.immersive-dialog .world-guide .guide-figure img{object-fit:contain;width:100%;height:100%}
-.immersive-dialog .guide-speech{background:#fffaf0ed;border:2px solid #fff1c5;color:#68431b;box-shadow:0 5px 0 #e5bf80}
+.immersive-dialog:not(.premium-game) .world-math .stage-backdrop{background-image:url('/art/premium-math-cinematic.webp')!important}
+.immersive-dialog:not(.premium-game) .world-memory .stage-backdrop{background-image:url('/art/premium-memory-cinematic.webp')!important}
+.immersive-dialog:not(.premium-game) .world-sentence .stage-backdrop{background-image:url('/art/premium-sentence-cinematic.webp')!important}
+.immersive-dialog:not(.premium-game) .world-math .stage-overlay{background:linear-gradient(90deg,#062f5c39,transparent 48%,#072f5c12),linear-gradient(0deg,#084b7670,transparent 21%)}
+.immersive-dialog:not(.premium-game) .world-memory .stage-overlay{background:linear-gradient(90deg,#073b3d38,transparent 52%,#0b4b4940),linear-gradient(0deg,#063b3e55,transparent 20%)}
+.immersive-dialog:not(.premium-game) .world-sentence .stage-overlay{background:linear-gradient(90deg,#53235f36,transparent 52%,#61215e30),linear-gradient(0deg,#41234c60,transparent 23%)}
+.immersive-dialog:not(.premium-game) .world-guide .guide-figure img{object-fit:contain;width:100%;height:100%}
+.immersive-dialog:not(.premium-game) .guide-speech{background:#fffaf0ed;border:2px solid #fff1c5;color:#68431b;box-shadow:0 5px 0 #e5bf80}
 /* Tablet: move the side characters/badges out of the center, preserve three islands if space allows. */
 @media(max-width:1230px){
  .portal273-hero{grid-template-rows:auto auto auto auto;gap:9px;min-height:unset}

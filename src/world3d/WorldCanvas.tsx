@@ -1,23 +1,55 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import type { WorldId } from './engine';
-import type { QualityChoice, WorldRenderer } from './renderer/types';
+import type { GuideMood, GuideViewport, QualityChoice, RenderStats, WorldRenderer } from './renderer/types';
 import { createWorldRenderer } from './renderer/rendererFactory';
 
+export type SceneInfo = { state: 'loading' | 'ready' | 'fallback' | 'unavailable'; engine: RenderStats['engine'] | null };
 interface Props {
   selected: WorldId | null;
   onSelect: (id: WorldId) => void;
   active: boolean;
   motionOn: boolean;
   quality?: QualityChoice;
+  gameWorld?: WorldId | null;
+  guideMood?: GuideMood;
+  guideCue?: number;
+  onSceneChange?: (info: SceneInfo) => void;
 }
 
-export default function WorldCanvas({ selected, onSelect, active, motionOn, quality = 'auto' }: Props) {
+export default function WorldCanvas({ selected, onSelect, active, motionOn, quality = 'auto',
+  gameWorld = null, guideMood = 'idle', guideCue = 0, onSceneChange }: Props) {
+  const homeMount = useRef<HTMLDivElement>(null);
   const host = useRef<HTMLDivElement>(null);
+  // Keep one portal root, canvas, context and loaded asset set across modes.
+  const [portalRoot] = useState(() => {
+    const container = document.createElement('div');
+    container.className = 'ba3d-render-portal'; container.style.display = 'contents';
+    return container;
+  });
   const runtime = useRef<WorldRenderer | null>(null);
-  const current = useRef({ selected, onSelect, active, motionOn, quality });
-  current.current = { selected, onSelect, active, motionOn, quality };
-  const [state, setState] = useState<'loading' | 'ready' | 'fallback' | 'unavailable'>('loading');
+  const current = useRef({ selected, onSelect, active, motionOn, quality, gameWorld, guideMood, guideCue, onSceneChange });
+  current.current = { selected, onSelect, active, motionOn, quality, gameWorld, guideMood, guideCue, onSceneChange };
+  const [state, setState] = useState<SceneInfo['state']>('loading');
   const [recovery, setRecovery] = useState(0);
+  const updateDiagnostics = useCallback(() => {
+    const stats = runtime.current?.getDiagnostics();
+    if (stats && host.current) {
+      host.current.dataset.engine = stats.engine;
+      host.current.dataset.diagnostics = JSON.stringify(stats);
+    }
+  }, []);
+
+  useLayoutEffect(() => {
+    const destination = gameWorld ? document.getElementById('ba37-game-scene-slot') : homeMount.current;
+    destination?.appendChild(portalRoot);
+    runtime.current?.setGameScene?.(gameWorld);
+    if (gameWorld) runtime.current?.setGuideMood?.(guideMood, guideCue);
+    else runtime.current?.focusOn(selected);
+    updateDiagnostics();
+  }, [gameWorld, portalRoot, updateDiagnostics]);
+  useEffect(() => () => { portalRoot.remove(); }, [portalRoot]);
+
   useEffect(() => {
     const container = host.current;
     if (!container) return;
@@ -36,15 +68,12 @@ export default function WorldCanvas({ selected, onSelect, active, motionOn, qual
     const sync = () => {
       const settings = current.current;
       runtime.current?.setMotion(settings.motionOn && !media.matches);
-      runtime.current?.setPaused(!settings.active || document.hidden);
-      runtime.current?.focusOn(settings.selected);
-    };
-    const updateDiagnostics = () => {
-      const stats = runtime.current?.getDiagnostics();
-      if (stats) {
-        container.dataset.engine = stats.engine;
-        container.dataset.diagnostics = JSON.stringify(stats);
-      }
+      runtime.current?.setGameScene?.(settings.gameWorld);
+      if (settings.gameWorld) runtime.current?.setGuideMood?.(settings.guideMood, settings.guideCue);
+      else runtime.current?.focusOn(settings.selected);
+      // A legacy fallback has no in-game scene: pause that hidden canvas.
+      const gameSupported = !settings.gameWorld || !!runtime.current?.setGameScene;
+      runtime.current?.setPaused(!settings.active || document.hidden || !gameSupported);
     };
     const canvas = replaceCanvas();
     setState('loading');
@@ -60,8 +89,7 @@ export default function WorldCanvas({ selected, onSelect, active, motionOn, qual
       runtime.current = renderer;
       renderer.setQualityChoice?.(current.current.quality);
       sync(); updateDiagnostics();
-      const engine = renderer.getDiagnostics().engine;
-      setState(engine === 'three-webgl' ? 'ready' : 'fallback');
+      setState(renderer.getDiagnostics().engine === 'three-webgl' ? 'ready' : 'fallback');
     }).catch(error => {
       if (!cancelled) { console.warn('Bảo An: cảnh 3D không khả dụng', error); setState('unavailable'); }
     });
@@ -76,18 +104,66 @@ export default function WorldCanvas({ selected, onSelect, active, motionOn, qual
       window.clearInterval(diagnosticsTimer);
       container.replaceChildren();
     };
-  }, [recovery]);
-  useEffect(() => { runtime.current?.focusOn(selected); }, [selected]);
-  useEffect(() => { runtime.current?.setPaused(!active || document.hidden); }, [active]);
+  }, [recovery, updateDiagnostics]);
+
+  useEffect(() => {
+    onSceneChange?.({ state, engine: runtime.current?.getDiagnostics().engine ?? null });
+  }, [state, onSceneChange]);
+  useEffect(() => { if (!gameWorld) runtime.current?.focusOn(selected); }, [selected, gameWorld]);
+  useEffect(() => {
+    runtime.current?.setPaused(!active || document.hidden || (!!gameWorld && !runtime.current?.setGameScene));
+  }, [active, gameWorld, state]);
   useEffect(() => {
     runtime.current?.setMotion(motionOn && !window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   }, [motionOn]);
   useEffect(() => { runtime.current?.setQualityChoice?.(quality); }, [quality]);
-  return <>
-    <div ref={host} className="ba3d-render-host" data-state={state} data-premium="true" />
-    {state === 'loading' && <div className="ba3d-render-status" role="status">Đang mở thế giới 3D… Con có thể bắt đầu chơi ngay.</div>}
-    {(state === 'fallback' || state === 'unavailable') && <div className="ba3d-render-status" role="status">
-      {state === 'fallback' ? 'Đang dùng cảnh dự phòng.' : 'Cảnh 3D không khả dụng.'} Chọn trò chơi bằng các nút Bắt đầu.
-    </div>}
+  useEffect(() => {
+    if (gameWorld) runtime.current?.setGuideMood?.(guideMood, guideCue);
+    updateDiagnostics();
+  }, [guideMood, guideCue, gameWorld, state, updateDiagnostics]);
+
+  useEffect(() => {
+    if (!gameWorld || state !== 'ready') return;
+    const sceneSlot = document.getElementById('ba37-game-scene-slot');
+    const dialog = sceneSlot?.closest('.premium-game');
+    if (!dialog) return;
+    let guide: Element | null = null;
+    let last = '';
+    const update = () => {
+      const next = dialog.querySelector('.ba37-mascot-window');
+      if (guide !== next) {
+        if (guide) observer.unobserve(guide);
+        guide = next; if (guide) observer.observe(guide);
+      }
+      const canvas = host.current?.querySelector('canvas');
+      const visibleBox = guide?.getBoundingClientRect();
+      const canvasBox = canvas?.getBoundingClientRect();
+      const box: GuideViewport | null = visibleBox && canvasBox && visibleBox.width > 0 && visibleBox.height > 0
+        ? { x: visibleBox.x - canvasBox.x, y: visibleBox.y - canvasBox.y, width: visibleBox.width, height: visibleBox.height } : null;
+      const key = JSON.stringify(box);
+      if (key !== last) { last = key; runtime.current?.setGuideViewport?.(box); }
+    };
+    const observer = new ResizeObserver(update);
+    observer.observe(dialog);
+    const mutation = new MutationObserver(update);
+    mutation.observe(dialog, { childList: true, subtree: true });
+    dialog.addEventListener('scroll', update, true);
+    window.addEventListener('resize', update);
+    update();
+    return () => {
+      observer.disconnect(); mutation.disconnect();
+      dialog.removeEventListener('scroll', update, true);
+      window.removeEventListener('resize', update);
+    };
+  }, [gameWorld, state]);
+
+  return <><div ref={homeMount} className="ba3d-world-mount" style={{ display: 'contents' }}/>
+    {createPortal(<>
+      <div ref={host} className="ba3d-render-host" data-state={state} data-premium="true" />
+      {!gameWorld && state === 'loading' && <div className="ba3d-render-status" role="status">Đang mở thế giới 3D… Con có thể bắt đầu chơi ngay.</div>}
+      {!gameWorld && (state === 'fallback' || state === 'unavailable') && <div className="ba3d-render-status" role="status">
+        {state === 'fallback' ? 'Đang dùng cảnh dự phòng.' : 'Cảnh 3D không khả dụng.'} Chọn trò chơi bằng các nút Bắt đầu.
+      </div>}
+    </>, portalRoot)}
   </>;
 }

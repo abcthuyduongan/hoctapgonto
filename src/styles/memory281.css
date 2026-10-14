@@ -1,43 +1,43 @@
 /* Alpha 2.8.1: Memory Match polished board.
    Purely presentational; game logic and saved events remain untouched.
    Composited transforms only. Does not shift board on feedback changes. */
-.immersive-dialog .world-memory {
+.immersive-dialog:not(.premium-game) .world-memory {
   --forest-gold:#ffe09b;
   --forest-mint:#b6ffe9;
   background:linear-gradient(145deg,#073b54,#0d6a73);
 }
-.immersive-dialog .world-memory .stage-backdrop {
+.immersive-dialog:not(.premium-game) .world-memory .stage-backdrop {
   background-image:url('/art/premium-memory-cinematic.webp') !important;
   background-size:cover;
   background-position:center 47%;
   opacity:1;
   filter:saturate(1.17) contrast(1.06);
 }
-.immersive-dialog .world-memory .stage-overlay {
+.immersive-dialog:not(.premium-game) .world-memory .stage-overlay {
   background:
     radial-gradient(ellipse at 57% 42%,transparent 8%,#063a3e44 75%,#07333e77 100%),
     linear-gradient(90deg,#032d38b0 0%,#063d3966 21%,#03454f10 46%,#032b3a52 100%),
     linear-gradient(0deg,#052c39bb,transparent 58%);
   pointer-events:none;
 }
-.immersive-dialog .world-memory .world-hud {
+.immersive-dialog:not(.premium-game) .world-memory .world-hud {
   position:relative;
   margin-bottom:10px;
 }
-.immersive-dialog .world-memory .hud-label {
+.immersive-dialog:not(.premium-game) .world-memory .hud-label {
   border:2px solid #c7eade;
   background:linear-gradient(160deg,#075c60ed,#063748ec);
   box-shadow:0 5px 0 #06303a,0 9px 19px #001d3573;
   color:#f0fff3;
 }
-.immersive-dialog .world-memory .hud-score {
+.immersive-dialog:not(.premium-game) .world-memory .hud-score {
   background:linear-gradient(180deg,#fff7c8,#ffdb73);
   box-shadow:0 5px 0 #a37636;
   border:2px solid #fff4b4;
   color:#75470f;
   font-weight:1000;
 }
-.immersive-dialog .memory-feedback-slot {
+.immersive-dialog:not(.premium-game) .memory-feedback-slot {
   max-width:1120px;
   min-height:65px;
   height:65px;
@@ -54,12 +54,12 @@
   color:#f2ffdf;
   text-align:center;
 }
-.immersive-dialog .memory-feedback-message {
+.immersive-dialog:not(.premium-game) .memory-feedback-message {
   font-weight:900;
   font-size:clamp(12px,1.2vw,17px);
   line-height:1.3;
 }
-.immersive-dialog .memory-adventure-layout {
+.immersive-dialog:not(.premium-game) .memory-adventure-layout {
   width:min(100%,1410px);
   max-width:1410px;
   display:grid;
@@ -69,14 +69,14 @@
   align-items:center;
   margin:auto;
 }
-.immersive-dialog .world-memory .forest-guide {
+.immersive-dialog:not(.premium-game) .world-memory .forest-guide {
   display:flex;
   align-items:center;
   align-self:center;
   gap:15px;
   padding:0;
 }
-.immersive-dialog .world-memory .forest-mascot {
+.immersive-dialog:not(.premium-game) .world-memory .forest-mascot {
   width:clamp(145px,15vw,230px);
   height:clamp(165px,19vw,275px);
   border:0;
@@ -87,7 +87,7 @@
   box-shadow:none;
   filter:drop-shadow(0 18px 18px #00263099);
 }
-.immersive-dialog .world-memory .forest-speech {
+.immersive-dialog:not(.premium-game) .world-memory .forest-speech {
   max-width:230px;
   border-radius:23px 23px 23px 7px;
   padding:15px;
@@ -98,7 +98,7 @@
   font-size:clamp(13px,1.1vw,16px);
   box-shadow:0 6px 0 #a5cda1,0 15px 24px #00262c7d;
 }
-.immersive-dialog .world-memory .forest-board {
+.immersive-dialog:not(.premium-game) .world-memory .forest-board {
   width:100%;
   max-width:990px;
   min-width:0;
@@ -109,7 +109,7 @@
   padding:clamp(15px,2vw,30px);
   box-shadow:0 9px 0 #095355,0 25px 55px #00292eaa,inset 0 2px 0 #ffffff22;
 }
-.immersive-dialog .world-memory .memory-topline {
+.immersive-dialog:not(.premium-game) .world-memory .memory-topline {
   display:flex;
   flex-wrap:wrap;
   justify-content:space-between;
@@ -119,48 +119,48 @@
   color:#d9ffd8;
   letter-spacing:.06em;
 }
-.immersive-dialog .world-memory .memory-topline strong {
+.immersive-dialog:not(.premium-game) .world-memory .memory-topline strong {
   color:#ffe59b;
   font-size:clamp(12px,1.1vw,15px);
 }
-.immersive-dialog .world-memory .memory-board-subline {
+.immersive-dialog:not(.premium-game) .world-memory .memory-board-subline {
   margin-top:6px;
   min-height:20px;
   font-size:clamp(11px,.95vw,14px);
   color:#d7eee6;
   font-weight:750;
 }
-.immersive-dialog .world-memory .memory-grid {
+.immersive-dialog:not(.premium-game) .world-memory .memory-grid {
   display:grid;
   grid-template-columns:repeat(4,minmax(0,1fr));
   gap:clamp(9px,1.05vw,16px);
   margin-top:17px;
 }
-.immersive-dialog .world-memory .memory-card {
+.immersive-dialog:not(.premium-game) .world-memory .memory-card {
   min-width:0;
   height:clamp(84px,11.8vh,125px);
   border-radius:20px;
   transform:translateZ(0);
   -webkit-tap-highlight-color:transparent;
 }
-.immersive-dialog .world-memory .memory-inner {
+.immersive-dialog:not(.premium-game) .world-memory .memory-inner {
   transition:transform .42s cubic-bezier(.22,.74,.22,1);
 }
-.immersive-dialog .world-memory .memory-face {
+.immersive-dialog:not(.premium-game) .world-memory .memory-face {
   border-radius:18px;
   box-shadow:0 5px 0 #053b37,0 10px 16px #001e2488;
 }
-.immersive-dialog .world-memory .memory-back {
+.immersive-dialog:not(.premium-game) .world-memory .memory-back {
   border:4px solid #96f4d5;
   color:#d7fff0;
   background:linear-gradient(145deg,#258e93 0%,#08777d 57%,#075f6d 100%);
   font-size:36px;
 }
-.immersive-dialog .world-memory .memory-back::before {
+.immersive-dialog:not(.premium-game) .world-memory .memory-back::before {
   content:'✿'; position:absolute;inset:0;
   display:grid;place-items:center;font-size:35px;opacity:.18;
 }
-.immersive-dialog .world-memory .memory-front {
+.immersive-dialog:not(.premium-game) .world-memory .memory-front {
   border:4px solid #ffe3a3;
   background:linear-gradient(160deg,#fffdf4,#e5f9ff);
   color:#285074;
@@ -169,41 +169,41 @@
   font-weight:950;
   padding:10px;
 }
-.immersive-dialog .world-memory .memory-card.found .memory-front {
+.immersive-dialog:not(.premium-game) .world-memory .memory-card.found .memory-front {
   background:linear-gradient(160deg,#edffdf,#bcf7ce);
   border-color:#ffd970;
   color:#19684b;
   box-shadow:0 0 0 3px #ffd97070,0 9px 18px #001d2775;
 }
-.immersive-dialog .world-memory .memory-card:disabled:not(.found) {cursor:wait}
-.immersive-dialog .world-memory .memory-card.found {cursor:default}
-.immersive-dialog .world-memory .memory-card:not(:disabled):hover{transform:translateY(-2px)}
-.immersive-dialog .world-memory .memory-card:focus-visible{outline:4px solid #fff293;outline-offset:4px}
+.immersive-dialog:not(.premium-game) .world-memory .memory-card:disabled:not(.found) {cursor:wait}
+.immersive-dialog:not(.premium-game) .world-memory .memory-card.found {cursor:default}
+.immersive-dialog:not(.premium-game) .world-memory .memory-card:not(:disabled):hover{transform:translateY(-2px)}
+.immersive-dialog:not(.premium-game) .world-memory .memory-card:focus-visible{outline:4px solid #fff293;outline-offset:4px}
 @media(max-width:950px){
- .immersive-dialog .world-memory .memory-adventure-layout{grid-template-columns:1fr;max-width:760px}
- .immersive-dialog .world-memory .forest-guide{display:none}
+ .immersive-dialog:not(.premium-game) .world-memory .memory-adventure-layout{grid-template-columns:1fr;max-width:760px}
+ .immersive-dialog:not(.premium-game) .world-memory .forest-guide{display:none}
 }
 @media(max-width:760px){
- .immersive-dialog .world-memory .memory-feedback-slot{height:77px;min-height:77px;margin-bottom:10px;padding:8px}
- .immersive-dialog .world-memory .forest-board{padding:12px;border-width:3px;border-radius:20px}
- .immersive-dialog .world-memory .memory-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
- .immersive-dialog .world-memory .memory-card{height:clamp(72px,21vw,111px)}
- .immersive-dialog .world-memory .memory-back{font-size:29px}
- .immersive-dialog .world-memory .memory-front{font-size:clamp(11px,3.5vw,16px);padding:6px}
- .immersive-dialog .world-memory .memory-topline{font-size:12px}
- .immersive-dialog .world-memory .memory-board-subline{min-height:32px;font-size:11px}
+ .immersive-dialog:not(.premium-game) .world-memory .memory-feedback-slot{height:77px;min-height:77px;margin-bottom:10px;padding:8px}
+ .immersive-dialog:not(.premium-game) .world-memory .forest-board{padding:12px;border-width:3px;border-radius:20px}
+ .immersive-dialog:not(.premium-game) .world-memory .memory-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+ .immersive-dialog:not(.premium-game) .world-memory .memory-card{height:clamp(72px,21vw,111px)}
+ .immersive-dialog:not(.premium-game) .world-memory .memory-back{font-size:29px}
+ .immersive-dialog:not(.premium-game) .world-memory .memory-front{font-size:clamp(11px,3.5vw,16px);padding:6px}
+ .immersive-dialog:not(.premium-game) .world-memory .memory-topline{font-size:12px}
+ .immersive-dialog:not(.premium-game) .world-memory .memory-board-subline{min-height:32px;font-size:11px}
 }
 @media(max-width:360px){
- .immersive-dialog .world-memory .memory-card{height:76px}
- .immersive-dialog .world-memory .memory-grid{gap:7px}
- .immersive-dialog .world-memory .forest-board{padding:10px}
+ .immersive-dialog:not(.premium-game) .world-memory .memory-card{height:76px}
+ .immersive-dialog:not(.premium-game) .world-memory .memory-grid{gap:7px}
+ .immersive-dialog:not(.premium-game) .world-memory .forest-board{padding:10px}
 }
 @media(prefers-reduced-motion:reduce){
  .immersive-dialog .world-memory .memory-inner{transition:none!important}
 }
 html[data-motion='off'] .immersive-dialog .world-memory .memory-inner{transition:none!important}
 /* Dedicated hand-authored SVG back: crisp on high-density screens, no fake UI text. */
-.immersive-dialog .world-memory .memory-back{
+.immersive-dialog:not(.premium-game) .world-memory .memory-back{
  background-image:linear-gradient(150deg,#075b6970,#042f4a6a),url('/art/memory-card-back.svg');
  background-size:cover;
  background-position:center;
@@ -211,4 +211,4 @@ html[data-motion='off'] .immersive-dialog .world-memory .memory-inner{transition
  border-color:#a8ffe2;
  box-shadow:inset 0 1px 8px #eaffd855,0 6px 0 #064b52,0 12px 18px #001f2b70;
 }
-.immersive-dialog .world-memory .memory-back::before{display:none}
+.immersive-dialog:not(.premium-game) .world-memory .memory-back::before{display:none}

@@ -6,6 +6,8 @@ Ngày thực hiện: **14/10/2026**, múi giờ Việt Nam. Quyết định: **C
 
 **Cập nhật tương tác và thống nhất giao diện:** các đảo ban đầu ngang hàng, cáo chờ ở góc trái rồi nhảy sang đảo được chọn, vòng đảo quay đưa lựa chọn ra trước. Chỉ còn giao diện 3D mới; renderer cũ là dự phòng tự tải khi lỗi, không chạy song song. Bằng chứng hiện tại nằm trong [V37_carousel_qa/visual-review.md](V37_carousel_qa/visual-review.md); các số liệu dưới đây lưu lịch sử PR02 đầu tiên.
 
+**Cập nhật khung cảnh trong bài test:** đã đồng bộ Math/Memory/Sentence với trang chủ, dùng lại cùng renderer/canvas/GLB và cáo, thêm cảnh trong đảo, theme bảng học và phản ứng/phần thưởng chung. [Báo cáo và kết quả mới](V37_games_qa/verification.md), [ảnh trước/sau](V37_games_qa/visual-review.md). Việc mở bài nay chuyển canvas trang chủ thành cảnh game thay vì chỉ pause sau overlay; dữ liệu/logic học tập vẫn giữ nguyên.
+
 Đã triển khai renderer premium thật trên nền React V3.6.2 RC2: cáo GLB có PBR, skin và ba clip xương; đảo Toán có lâu đài, đường đi và biểu tượng số. Hai đảo còn lại trong chế độ mới là landmark thủ tục để giữ bố cục, chưa phải asset premium. Không dùng ảnh concept làm tấm phẳng thay mô hình.
 
 ## Mở bản chạy thật

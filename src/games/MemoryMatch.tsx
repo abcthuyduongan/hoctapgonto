@@ -103,7 +103,7 @@ export default function MemoryMatch({pack, onAttempt, onComplete, onExit}: GameH
 
   return <section className="play-panel memory-panel world-stage world-memory">
     <div className="stage-backdrop" aria-hidden="true"/><div className="stage-overlay" aria-hidden="true"/>
-    <div className="world-hud"><span className="hud-label">🌲 KHU RỪNG TRÍ NHỚ</span><span className="hud-score">⭐ {matched.length}/{content.items.length} cặp</span></div>
+    <div className="world-hud"><span className="hud-label"><span className="ba37-hud-symbol" aria-hidden="true">◇</span> KHU RỪNG TRÍ NHỚ</span><span className="hud-score"><span aria-hidden="true">★</span> {matched.length}/{content.items.length} cặp</span></div>
     <div className="memory-feedback-slot" aria-live="polite">
       <FeedbackEffects result={lastOutcome===null?null:lastOutcome==='correct'?'success':'retry'} eventKey={`memory-${moves}`}/>
       {error ? <div className="notice error" role="alert">{error} <button type="button" onClick={()=>setError('')}>Đóng</button>{matched.length===content.items.length && <button type="button" onClick={()=>void retryCompletion()} disabled={finishing}>Thử lưu lại</button>}</div>
@@ -111,7 +111,7 @@ export default function MemoryMatch({pack, onAttempt, onComplete, onExit}: GameH
       {matched.length===content.items.length && status!=='done' && <button type="button" className="button primary memory-finish-button" disabled={finishing} onClick={()=>void retryCompletion()}>{finishing?'Đang lưu…':'⭐ Thử hoàn tất'}</button>}
     </div>
     <div className="memory-adventure-layout">
-      <aside className="forest-guide"><GameMascot alt="Bạn đồng hành khu rừng" className="forest-mascot" mood={lastOutcome==='correct'?'happy':lastOutcome==='retry'?'encourage':'idle'}/><div className="forest-speech">Mỗi lần lật là thêm một cơ hội ghi nhớ! 🦉</div></aside>
+      <aside className="forest-guide"><GameMascot alt="Cáo nhỏ đồng hành khu rừng" className="forest-mascot" mood={lastOutcome==='correct'?'happy':lastOutcome==='retry'?'encourage':'idle'} reactionKey={matched.length}/><div className="forest-speech">Mỗi lần lật là thêm một cơ hội ghi nhớ!</div></aside>
       <div className="forest-board">
         <div className="memory-topline"><span>✦ BẢNG THẺ THẦN KỲ</span><strong>{moves} lượt thử</strong></div>
         <div className="memory-board-subline" aria-live="polite">{saving ? 'Đang ghi kết quả…' : locked ? 'Đang xem cặp thẻ…' : first ? 'Chọn thêm một thẻ để kiểm tra cặp nhé!' : 'Lật hai thẻ để tìm cặp tương ứng'}</div>

@@ -9,6 +9,9 @@ import { newId } from './core/utils';
 import StudentScreen from './screens/StudentScreen';
 import ParentScreen from './screens/ParentScreen';
 import CreatorScreen from './screens/CreatorScreen';
+import { GameSceneContext } from './world3d/GameSceneContext';
+import type { GuideMood } from './world3d/renderer/types';
+import type { SceneInfo } from './world3d/WorldCanvas';
 
 import { GAME_COMPONENTS } from './games/loaders';
 const TimesTable = lazy(() => import('./miniapps/TimesTable'));
@@ -34,6 +37,13 @@ export default function App() {
   const [loading,setLoading] = useState(true);
   const [starting,setStarting] = useState(false);
   const [error,setError] = useState('');
+  const [guideReaction,setGuideReaction] = useState<{ sessionId: string | null; mood: GuideMood; cue: number }>({ sessionId: null, mood: 'idle', cue: 0 });
+  const [sceneInfo,setSceneInfo] = useState<SceneInfo>({ state: 'loading', engine: null });
+  const scenePresentation = useMemo(() => ({ setMood: (mood: GuideMood) => {
+    setGuideReaction(previous => ({ sessionId: active?.session.sessionId ?? null, mood, cue: previous.cue + 1 }));
+  } }), [active?.session.sessionId]);
+  const guideMood = guideReaction.sessionId === active?.session.sessionId ? guideReaction.mood : 'idle';
+  const guideCue = guideReaction.sessionId === active?.session.sessionId ? guideReaction.cue : 0;
   const completionFlag = useRef(false);
   const closing = useRef(false);
   const previousFocus = useRef<HTMLElement|null>(null);
@@ -157,7 +167,7 @@ export default function App() {
     <main className={`site-main ${page === 'student' ? 'site-main-gameworld' : ''}`}>
       {error && <div className="notice error global-error" role="alert"><strong>Thông báo:</strong> {error}<button onClick={()=>setError('')} aria-label="Đóng thông báo">×</button></div>}
       {loading ? <div className="loading-state">Đang mở không gian học tập…</div> : <>
-        {page==='student'&&<StudentScreen packs={packs} sessions={sessions} onPlay={startGame} onOpenMini={()=>setMiniOpen(true)} starting={starting||!!active||miniOpen||!!error} worldActive={!active&&!miniOpen&&page==='student'} motionOn={motionOn}/>}
+        {page==='student'&&<StudentScreen packs={packs} sessions={sessions} onPlay={startGame} onOpenMini={()=>setMiniOpen(true)} starting={starting||!!active||miniOpen||!!error} worldActive={!miniOpen&&page==='student'} motionOn={motionOn} gameWorld={active?.session.moduleId ?? null} guideMood={guideMood} guideCue={guideCue} onSceneChange={setSceneInfo}/>}
         {page==='parent'&&<ParentScreen events={events} sessions={sessions}/>}
         {page==='creator'&&<CreatorScreen packs={packs} onPublish={publish} onImport={importContentPacks}/>}
       </>}
@@ -167,11 +177,12 @@ export default function App() {
       <div className="game-dialog-head"><div><span className="eyebrow">MINI APP CENTER</span><h2>Ứng dụng Toán học</h2></div><button className="button outline" onClick={()=>setMiniOpen(false)}>← Thoát ứng dụng</button></div>
       <Suspense fallback={<div className="loading-state">Đang tải ứng dụng nhỏ…</div>}><TimesTable onExit={()=>setMiniOpen(false)}/></Suspense>
     </div></div>}
-    {active && gameProps && GameComponent && <div className="overlay immersive-overlay" role="presentation"><div className={`game-dialog adventure-dialog immersive-dialog dialog-${active.session.moduleId}`} ref={gameDialog} tabIndex={-1} role="dialog" aria-modal="true" aria-label={`Đang chơi ${activeTitle}`}>
-      <div className="game-dialog-head"><div><span className="eyebrow">✦ GAME WORLD / {active.session.moduleId.toUpperCase()}</span><h2>{activeTitle}</h2></div><button className="button outline" onClick={()=>void leaveGame()}>← Thoát trò chơi</button></div>
-      <Suspense fallback={<div className="loading-state">Đang tải trò chơi…</div>}>
+    {active && gameProps && GameComponent && <div className="overlay immersive-overlay" role="presentation"><div className={`game-dialog adventure-dialog immersive-dialog premium-game dialog-${active.session.moduleId}`} data-scene-engine={sceneInfo.engine ?? 'loading'} data-scene-state={sceneInfo.state} ref={gameDialog} tabIndex={-1} role="dialog" aria-modal="true" aria-label={`Đang chơi ${activeTitle}`}>
+      <div id="ba37-game-scene-slot" className="ba37-game-scene-slot" aria-hidden="true"/>
+      <div className="game-dialog-head"><div><span className="eyebrow">HÀNH TRÌNH HỌC TẬP</span><h2>{activeTitle}</h2></div><button className="button outline" onClick={()=>void leaveGame()}>← Thoát trò chơi</button></div>
+      <GameSceneContext.Provider value={scenePresentation}><Suspense fallback={<div className="loading-state">Đang tải trò chơi…</div>}>
         <GameComponent key={active.session.sessionId} {...gameProps}/>
-      </Suspense>
+      </Suspense></GameSceneContext.Provider>
     </div></div>}
   </div>;
 }

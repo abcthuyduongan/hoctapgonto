@@ -5,6 +5,7 @@ type Diagnostics = {
   drawCalls: number; triangles: number; textureBytesEstimate: number; frames: number;
   skeletalMeshes: number; bones: number; animationTime: number;
   motion: boolean; paused: boolean; tier: string; dpr: number;
+  sceneMode: 'home' | 'game'; gameWorld: string | null;
 };
 async function diagnostics(page: Page): Promise<Diagnostics> {
   const raw = await page.locator('.ba3d-render-host').getAttribute('data-diagnostics');
@@ -132,7 +133,7 @@ test('All three decoded skeletal clips deform bones in the actual production ren
   await testInfo.attach('actual-bone-clip-playback', { body: JSON.stringify(clips, null, 2), contentType: 'application/json' });
 });
 
-test('Game controls work before delayed premium models finish, and the world pauses behind the game', async ({ page }) => {
+test('Game controls work before delayed models finish, then the same canvas renders the game scene', async ({ page }) => {
   await page.addInitScript(() => {
     let drawCalls = 0;
     const originalElements = WebGL2RenderingContext.prototype.drawElements;
@@ -148,21 +149,26 @@ test('Game controls work before delayed premium models finish, and the world pau
   try {
     await page.goto('/?premium3d=1');
     await expect(page.locator('.ba3d-render-host')).toHaveAttribute('data-state', 'loading');
+    await page.locator('canvas.ba3d-canvas').evaluate(canvas => canvas.setAttribute('data-loading-canvas', 'yes'));
     expect(await drawCalls(), 'Do not draw incomplete models during initialization').toBe(0);
     await page.locator('.ba3d-math-quest .ba3d-play').click();
     await expect(page.locator('.quiz-question')).toBeVisible();
     expect(await drawCalls(), 'Opening a game while GLBs are pending must not start a world RAF').toBe(0);
     releaseModels();
     await ready(page);
-    await expect.poll(async () => (await diagnostics(page)).paused).toBe(true);
-    const pausedTime = (await diagnostics(page)).animationTime;
-    await page.waitForTimeout(1200);
-    expect((await diagnostics(page)).animationTime).toBe(pausedTime);
-    expect(await drawCalls(), 'No world draws after models finish behind the game').toBe(0);
-    await page.getByRole('button', { name: /Thoát trò chơi/ }).click();
-    await expect.poll(async () => (await diagnostics(page)).paused).toBe(false);
-    await expect.poll(async () => (await diagnostics(page)).animationTime).toBeGreaterThan(pausedTime);
+    await expect(page.locator('canvas.ba3d-canvas')).toHaveCount(1);
+    await expect(page.locator('.ba37-game-scene-slot canvas[data-loading-canvas="yes"]')).toHaveCount(1);
+    await expect.poll(async () => {
+      const value = await diagnostics(page);
+      return { mode: value.sceneMode, world: value.gameWorld, paused: value.paused };
+    }).toEqual({ mode: 'game', world: 'math-quest', paused: false });
     await expect.poll(drawCalls).toBeGreaterThan(0);
+    const gameTime = (await diagnostics(page)).animationTime;
+    await expect.poll(async () => (await diagnostics(page)).animationTime).toBeGreaterThan(gameTime);
+    await page.getByRole('button', { name: /Thoát trò chơi/ }).click();
+    await expect(page.locator('canvas[data-loading-canvas="yes"]')).toHaveCount(1);
+    await expect(page.locator('.ba37-game-scene-slot')).toHaveCount(0);
+    await expect.poll(async () => (await diagnostics(page)).sceneMode).toBe('home');
   } finally { releaseModels(); }
 });
 

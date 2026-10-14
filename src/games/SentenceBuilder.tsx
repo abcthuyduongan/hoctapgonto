@@ -65,7 +65,7 @@ export default function SentenceBuilder({pack,onAttempt,onComplete,onExit}: Game
   }
   return <section className="play-panel sentence-panel world-stage world-sentence">
     <div className="stage-backdrop" aria-hidden="true"/><div className="stage-overlay" aria-hidden="true"/>
-    <div className="world-hud"><span className="hud-label">📚 XƯỞNG NGÔN TỪ</span><span className="hud-score">⭐ {firstTry} câu đúng lần đầu</span></div>
+    <div className="world-hud"><span className="hud-label"><span className="ba37-hud-symbol" aria-hidden="true">Aa</span> XƯỞNG NGÔN TỪ</span><span className="hud-score"><span aria-hidden="true">★</span> {firstTry} câu đúng lần đầu</span></div>
     <div className="sentence-adventure-layout"><aside className="sentence-guide"><GameMascot alt="Cáo nhỏ dẫn đường" mood={feedback==='correct'?'happy':feedback==='retry'?'encourage':'idle'}/><div className="guide-speech">Chạm hoặc kéo từ vào ô để tạo câu nhé! ✨</div></aside>
       <div className="sentence-scroll">
         <div className="quest-progress"><span>CÂU {index+1}/{content.items.length}</span><span>✎ GHÉP CÂU VUI</span></div>

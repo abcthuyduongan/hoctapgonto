@@ -224,18 +224,18 @@ html[data-motion="off"] .portal273-world,html[data-motion="off"] .portal273-isla
 .portal273-world::before {opacity:.42;filter:blur(6px)}
 .portal273-world-body {background:linear-gradient(180deg,rgba(109,59,22,.96),rgba(73,37,18,.97));border-color:#ffe19a}
 /* Math / memory / word-game landscapes use the premium illustrated world assets. */
-.world-math .stage-backdrop {background-image:url('/art/premium-game-math.webp')!important;background-size:cover;background-position:center 52%;filter:saturate(1.12) contrast(1.04)}
-.world-memory .stage-backdrop {background-image:url('/art/premium-game-memory.webp')!important;background-size:cover;background-position:center 52%;filter:saturate(1.1)}
-.world-sentence .stage-backdrop {background-image:url('/art/premium-game-sentence.webp')!important;background-size:cover;background-position:center 52%;filter:saturate(1.1)}
-.immersive-dialog .world-math .stage-overlay {background:linear-gradient(90deg,rgba(4,47,88,.24) 0%,transparent 34%,rgba(3,48,91,.08) 66%,rgba(2,49,94,.30) 100%),linear-gradient(0deg,rgba(2,62,104,.27),transparent 26%)}
-.immersive-dialog .world-memory .stage-overlay {background:linear-gradient(90deg,rgba(8,58,73,.29),transparent 57%,rgba(4,44,84,.22)),linear-gradient(0deg,rgba(4,57,77,.34),transparent 28%)}
-.immersive-dialog .world-sentence .stage-overlay {background:linear-gradient(90deg,rgba(64,39,85,.24),transparent 56%,rgba(49,25,71,.17)),linear-gradient(0deg,rgba(51,28,77,.28),transparent 25%)}
+.adventure-dialog:not(.premium-game) .world-math .stage-backdrop {background-image:url('/art/premium-game-math.webp')!important;background-size:cover;background-position:center 52%;filter:saturate(1.12) contrast(1.04)}
+.adventure-dialog:not(.premium-game) .world-memory .stage-backdrop {background-image:url('/art/premium-game-memory.webp')!important;background-size:cover;background-position:center 52%;filter:saturate(1.1)}
+.adventure-dialog:not(.premium-game) .world-sentence .stage-backdrop {background-image:url('/art/premium-game-sentence.webp')!important;background-size:cover;background-position:center 52%;filter:saturate(1.1)}
+.immersive-dialog:not(.premium-game) .world-math .stage-overlay {background:linear-gradient(90deg,rgba(4,47,88,.24) 0%,transparent 34%,rgba(3,48,91,.08) 66%,rgba(2,49,94,.30) 100%),linear-gradient(0deg,rgba(2,62,104,.27),transparent 26%)}
+.immersive-dialog:not(.premium-game) .world-memory .stage-overlay {background:linear-gradient(90deg,rgba(8,58,73,.29),transparent 57%,rgba(4,44,84,.22)),linear-gradient(0deg,rgba(4,57,77,.34),transparent 28%)}
+.immersive-dialog:not(.premium-game) .world-sentence .stage-overlay {background:linear-gradient(90deg,rgba(64,39,85,.24),transparent 56%,rgba(49,25,71,.17)),linear-gradient(0deg,rgba(51,28,77,.28),transparent 25%)}
 /* Remove the turquoise image frame that exposed a missing image icon in Alpha 2.7.4. */
-.immersive-dialog .world-guide .guide-figure {width:clamp(165px,19vw,268px);height:clamp(200px,24vw,306px);padding:0;border:0;box-shadow:none;background:none;overflow:visible;border-radius:0;filter:drop-shadow(0 13px 13px rgba(3,52,82,.63));animation:gw-float 5s ease-in-out infinite}
-.immersive-dialog .world-guide .guide-figure img {display:block;width:100%;height:100%;object-fit:contain;object-position:center;transform:none}
-.immersive-dialog .world-guide .guide-figure .mascot-fallback {width:100%;height:100%;display:grid;place-items:center;font-size:clamp(86px,10vw,140px)}
-.immersive-dialog .sentence-guide img,.immersive-dialog .sentence-guide .mascot-fallback,
-.immersive-dialog .forest-guide img,.immersive-dialog .forest-guide .mascot-fallback {
+.immersive-dialog:not(.premium-game) .world-guide .guide-figure {width:clamp(165px,19vw,268px);height:clamp(200px,24vw,306px);padding:0;border:0;box-shadow:none;background:none;overflow:visible;border-radius:0;filter:drop-shadow(0 13px 13px rgba(3,52,82,.63));animation:gw-float 5s ease-in-out infinite}
+.immersive-dialog:not(.premium-game) .world-guide .guide-figure img {display:block;width:100%;height:100%;object-fit:contain;object-position:center;transform:none}
+.immersive-dialog:not(.premium-game) .world-guide .guide-figure .mascot-fallback {width:100%;height:100%;display:grid;place-items:center;font-size:clamp(86px,10vw,140px)}
+.immersive-dialog:not(.premium-game) .sentence-guide img,.immersive-dialog:not(.premium-game) .sentence-guide .mascot-fallback,
+.immersive-dialog:not(.premium-game) .forest-guide img,.immersive-dialog:not(.premium-game) .forest-guide .mascot-fallback {
  object-fit:contain;background:transparent;border:0;box-shadow:none;border-radius:0;filter:drop-shadow(0 12px 11px rgba(5,52,78,.53));
 }
 .mascot-fallback{display:inline-grid;place-items:center;font-size:75px;line-height:1}
@@ -246,8 +246,8 @@ html[data-motion="off"] .portal273-world,html[data-motion="off"] .portal273-isla
  .portal273-island-art img{filter:drop-shadow(0 8px 10px #063a6455)}
 }
 @media(max-width:760px){
- .immersive-dialog .world-math .stage-backdrop{background-position:29% center}
- .immersive-dialog .world-sentence .stage-backdrop,.immersive-dialog .world-memory .stage-backdrop{background-position:36% center}
+ .immersive-dialog:not(.premium-game) .world-math .stage-backdrop{background-position:29% center}
+ .immersive-dialog:not(.premium-game) .world-sentence .stage-backdrop,.immersive-dialog:not(.premium-game) .world-memory .stage-backdrop{background-position:36% center}
 }
 @media(prefers-reduced-motion:reduce){.immersive-dialog .world-guide .guide-figure{animation:none}}
 html[data-motion="off"] .immersive-dialog .world-guide .guide-figure{animation:none}

@@ -1,0 +1,103 @@
+{
+  "baseline": "d2cca6c",
+  "date": "2026-10-14T04:43:13.093Z",
+  "checks": 19,
+  "changed": [],
+  "reports": [
+    {
+      "file": "src/games/MathQuest.tsx",
+      "scope": "imports, state, effects and callbacks before presentation JSX",
+      "unchanged": true
+    },
+    {
+      "file": "src/games/MemoryMatch.tsx",
+      "scope": "imports, state, effects and callbacks before presentation JSX",
+      "unchanged": true
+    },
+    {
+      "file": "src/games/SentenceBuilder.tsx",
+      "scope": "imports, state, effects and callbacks before presentation JSX",
+      "unchanged": true
+    },
+    {
+      "file": "src/App.tsx",
+      "scope": "startGame",
+      "unchanged": true
+    },
+    {
+      "file": "src/App.tsx",
+      "scope": "recordAttempt",
+      "unchanged": true
+    },
+    {
+      "file": "src/App.tsx",
+      "scope": "completeSession",
+      "unchanged": true
+    },
+    {
+      "file": "src/App.tsx",
+      "scope": "leaveGame",
+      "unchanged": true
+    },
+    {
+      "file": "src/App.tsx",
+      "scope": "importContentPacks",
+      "unchanged": true
+    },
+    {
+      "file": "src/App.tsx",
+      "scope": "publish",
+      "unchanged": true
+    },
+    {
+      "file": "src\\core\\content-io.ts",
+      "scope": "whole source",
+      "unchanged": true
+    },
+    {
+      "file": "src\\core\\contracts.ts",
+      "scope": "whole source",
+      "unchanged": true
+    },
+    {
+      "file": "src\\core\\experience.ts",
+      "scope": "whole source",
+      "unchanged": true
+    },
+    {
+      "file": "src\\core\\registry.ts",
+      "scope": "whole source",
+      "unchanged": true
+    },
+    {
+      "file": "src\\core\\reports.ts",
+      "scope": "whole source",
+      "unchanged": true
+    },
+    {
+      "file": "src\\core\\sdk.ts",
+      "scope": "whole source",
+      "unchanged": true
+    },
+    {
+      "file": "src\\core\\seed.ts",
+      "scope": "whole source",
+      "unchanged": true
+    },
+    {
+      "file": "src\\core\\storage.ts",
+      "scope": "whole source",
+      "unchanged": true
+    },
+    {
+      "file": "src\\core\\utils.ts",
+      "scope": "whole source",
+      "unchanged": true
+    },
+    {
+      "file": "src\\core\\validation.ts",
+      "scope": "whole source",
+      "unchanged": true
+    }
+  ]
+}

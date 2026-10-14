@@ -1,0 +1,20 @@
+
+> bao-an-learning-v3-6-3d@3.7.0-rc.1 test:premium
+> playwright test --config=playwright.v37.config.ts --grep game-scene|Reduced motion
+
+
+Running 11 tests using 1 worker
+
+  ok  1 [edge-production] › tests\visual\game-scene.spec.ts:47:1 › All games reuse the home canvas, WebGL context and decoded GLBs, including answers, quality and return home (8.4s)
+  ok  2 [edge-production] › tests\visual\game-scene.spec.ts:140:3 › math-quest shows the same guide for waiting, retry, correct and completion through real gameplay (3.1s)
+  ok  3 [edge-production] › tests\visual\game-scene.spec.ts:140:3 › memory-match shows the same guide for waiting, retry, correct and completion through real gameplay (3.5s)
+  ok  4 [edge-production] › tests\visual\game-scene.spec.ts:140:3 › sentence-builder shows the same guide for waiting, retry, correct and completion through real gameplay (6.0s)
+  ok  5 [edge-production] › tests\visual\game-scene.spec.ts:181:1 › The live guide follows its DOM portrait window across responsive viewport changes (928ms)
+  ok  6 [edge-production] › tests\visual\game-scene.spec.ts:204:1 › Repeated correct Memory pairs replay the guide cue without recreating the scene (1.3s)
+  ok  7 [edge-production] › tests\visual\game-scene.spec.ts:216:1 › Hidden-document lifecycle stops the game RAF and resumes the same scene on visibility (4.0s)
+  ok  8 [edge-production] › tests\visual\game-scene.spec.ts:231:1 › Reduced motion keeps a visible static game guide and feedback without a continuing RAF (2.2s)
+  ok  9 [edge-production] › tests\visual\game-scene.spec.ts:252:1 › Unavailable premium scene shows the same rendered fox fallback and all game controls remain usable (2.1s)
+  ok 10 [edge-production] › tests\visual\island-carousel.spec.ts:266:1 › Reduced motion snaps selection and overview while leaving no continuing animation frame (7.7s)
+  ok 11 [edge-production] › tests\visual\mobile-ui-lock.spec.ts:128:1 › Reduced motion freezes the skeletal mixer and still permits focus, quality changes and play (4.0s)
+
+  11 passed (45.7s)

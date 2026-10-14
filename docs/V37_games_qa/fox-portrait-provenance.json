@@ -1,0 +1,25 @@
+{
+  "date": "2026-10-14T02:53:40.869Z",
+  "source": "public/models/fox-guide.glb",
+  "sourceSha256": "398382e919be69af9502cb103e3d1359147157e76ac852a30ad07cd60a23e9fc",
+  "output": "public/art/fox-guide-common.webp",
+  "outputSha256": "257ca7360cb2d016b1b73a316b6f3c6f320be9458e88fedca1aa52cf9a2d2feb",
+  "bytes": 29358,
+  "width": 640,
+  "height": 768,
+  "alphaBounds": {
+    "left": 79,
+    "top": 134,
+    "right": 498,
+    "bottom": 640
+  },
+  "cornerAlpha": [
+    0,
+    0,
+    0,
+    0
+  ],
+  "opaquePixels": 111900,
+  "animation": "Idle at 0.35s",
+  "renderer": "http://127.0.0.1:5180/assets/PremiumWorldRenderer-jEhZ5ih1.js"
+}

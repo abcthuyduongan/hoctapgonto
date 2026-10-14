@@ -2,6 +2,9 @@ import type { WorldId } from '../engine';
 
 export type RenderTier = 'low' | 'balanced' | 'high';
 export type QualityChoice = RenderTier | 'auto';
+export type GuideMood = 'idle' | 'happy' | 'encourage' | 'victory';
+/** Pixel coordinates relative to the single world canvas. */
+export interface GuideViewport { x: number; y: number; width: number; height: number }
 export interface RenderStats {
   engine: 'three-webgl' | 'legacy-webgl2' | 'canvas';
   fpsMedian?: number;
@@ -30,6 +33,12 @@ export interface RenderStats {
   mascotState?: 'waiting' | 'jumping' | 'on-island';
   mascotPosition?: { x: number; y: number; z: number };
   jumpProgress?: number;
+  sceneMode?: 'home' | 'game';
+  gameWorld?: WorldId | null;
+  guideMood?: GuideMood;
+  guideCue?: number;
+  guideViewport?: GuideViewport | null;
+  guideVisible?: boolean;
 }
 export interface WorldRenderer {
   focusOn(id: WorldId | null): void;
@@ -37,6 +46,9 @@ export interface WorldRenderer {
   setMotion(enabled: boolean): void;
   setQuality(tier: RenderTier): void;
   setQualityChoice?(choice: QualityChoice): void;
+  setGameScene?(id: WorldId | null): void;
+  setGuideMood?(mood: GuideMood, cue?: number): void;
+  setGuideViewport?(box: GuideViewport | null): void;
   getDiagnostics(): RenderStats;
   dispose(): void;
 }

@@ -1,0 +1,809 @@
+/* The game playfields share the home scene's materials and guide.
+   Legacy game themes explicitly exclude .premium-game, keeping this theme independent.
+   Learning controls remain DOM content above the one shared scene canvas. */
+.immersive-dialog.premium-game {
+  --game-ink: #203e50;
+  --game-muted: #55717b;
+  --game-accent: #237487;
+  --game-soft: #e4eff0;
+  --game-edge: #b9d4d9;
+  --game-paper: #fffdf5;
+  --game-head: 70px;
+  color: var(--game-ink);
+}
+.game-dialog.adventure-dialog.immersive-dialog.premium-game { background: #c7e0e7; }
+.premium-game.dialog-memory-match {
+  --game-accent: #447d69;
+  --game-soft: #e5efe6;
+  --game-edge: #bed5c6;
+}
+.premium-game.dialog-sentence-builder {
+  --game-accent: #746b98;
+  --game-soft: #ece8f2;
+  --game-edge: #cdc6df;
+}
+.premium-game .ba37-game-scene-slot {
+  position: absolute;
+  inset: var(--game-head) 0 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.premium-game:not([data-scene-engine='three-webgl']) .ba37-game-scene-slot { visibility: hidden; }
+.premium-game .ba37-game-scene-slot .ba3d-render-host {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.premium-game .ba37-game-scene-slot .ba3d-canvas { cursor: default; }
+.immersive-dialog.premium-game .game-dialog-head {
+  position: relative;
+  z-index: 9;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex: 0 0 var(--game-head);
+  min-height: var(--game-head);
+  padding: 10px clamp(16px, 3vw, 42px);
+  gap: 18px;
+  background: #fffdf5f2;
+  border-bottom: 1px solid #d2e3e4;
+  box-shadow: 0 2px 16px #4772800a;
+  color: var(--game-ink);
+}
+.premium-game .game-dialog-head > div:first-child { min-width: 0; flex: 1 1 0; }
+.premium-game .game-dialog-head .eyebrow {
+  display: block;
+  color: var(--game-accent);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .13em;
+  line-height: 1.3;
+}
+.premium-game .game-dialog-head h2 {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  margin: 3px 0 0;
+  color: var(--game-ink);
+  font-size: clamp(17px, 1.7vw, 24px);
+  font-weight: 800;
+  letter-spacing: -.025em;
+}
+.immersive-dialog.premium-game .game-dialog-head .button {
+  flex-shrink: 0;
+  min-height: 44px;
+  max-width: none;
+  padding: 10px 14px;
+  border: 1px solid var(--game-edge);
+  border-radius: 12px;
+  background: #f3f5ef;
+  box-shadow: none;
+  color: var(--game-ink);
+  font-size: 12px;
+  font-weight: 650;
+}
+.immersive-dialog.premium-game .world-stage {
+  position: relative;
+  z-index: 1;
+  isolation: isolate;
+  background: transparent;
+  padding: 18px clamp(16px, 3vw, 42px) 14px;
+  justify-content: flex-start;
+}
+.immersive-dialog.premium-game .stage-backdrop {
+  background-image: radial-gradient(ellipse at 18% 0%, #fffbedad, transparent 65%),
+    linear-gradient(180deg, #d4e7ee, #badbe4 60%, #dce9df);
+  background-position: center;
+  filter: none;
+  overflow: hidden;
+}
+.premium-game .stage-backdrop::before,
+.premium-game .stage-backdrop::after {
+  content: '';
+  position: absolute;
+  width: 110%;
+  height: 42%;
+  bottom: -24%;
+  left: -24%;
+  border-radius: 50%;
+  background: #8eb7b18c;
+  box-shadow: 38vw -7vh 0 1vh #adc7bf80;
+  transform: rotate(-5deg);
+}
+.premium-game .stage-backdrop::after {
+  left: 48%;
+  bottom: -33%;
+  height: 40%;
+  background: #779f956b;
+  box-shadow: none;
+}
+.immersive-dialog.premium-game[data-scene-state='ready'] .stage-backdrop { display: none; }
+.immersive-dialog.premium-game .world-stage .stage-overlay {
+  background: linear-gradient(180deg, #f2f9ed1a, transparent 20%, transparent 80%, #e6efe640);
+  pointer-events: none;
+}
+.premium-game .world-hud {
+  max-width: 1320px;
+  margin: 0 auto 14px;
+  gap: 12px;
+}
+.immersive-dialog.premium-game .world-hud .hud-label,
+.immersive-dialog.premium-game .world-hud .hud-score {
+  min-height: 38px;
+  padding: 8px 12px;
+  border: 1px solid #fffdf5e6;
+  border-radius: 12px;
+  box-shadow: 0 3px 12px #446a7310;
+  background: #fffdf3e8;
+  color: var(--game-ink);
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: .02em;
+  gap: 7px;
+}
+.premium-game .ba37-hud-symbol {
+  color: var(--game-accent);
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1;
+}
+.premium-game .hud-score > span { color: #ab812f; }
+.immersive-dialog.premium-game .math-adventure-layout,
+.immersive-dialog.premium-game .memory-adventure-layout,
+.immersive-dialog.premium-game .sentence-adventure-layout {
+  display: grid;
+  grid-template-columns: minmax(190px, .29fr) minmax(0, 1fr);
+  align-items: center;
+  width: min(100%, 1320px);
+  max-width: 1320px;
+  gap: clamp(20px, 3vw, 50px);
+  margin: auto;
+  flex: 0 0 auto;
+}
+.immersive-dialog.premium-game .world-guide,
+.immersive-dialog.premium-game .forest-guide,
+.immersive-dialog.premium-game .sentence-guide {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  min-width: 0;
+  gap: 15px;
+  padding: 0;
+}
+.immersive-dialog.premium-game .world-guide .guide-figure {
+  width: clamp(170px, 17vw, 260px);
+  height: clamp(210px, 22vw, 310px);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  overflow: visible;
+  box-shadow: none;
+  animation: none;
+}
+.immersive-dialog.premium-game .world-guide .guide-figure img,
+.immersive-dialog.premium-game .forest-guide img,
+.immersive-dialog.premium-game .sentence-guide img {
+  width: clamp(170px, 17vw, 260px);
+  height: clamp(210px, 22vw, 310px);
+  max-width: 100%;
+  object-fit: contain;
+  object-position: center bottom;
+  filter: drop-shadow(0 10px 12px #365e651e);
+  animation: none;
+  transform: none;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.immersive-dialog.premium-game .world-guide .guide-figure img { width: 100%; height: 100%; }
+.premium-game .ba37-mascot-window {
+  display: block;
+  position: relative;
+  flex: none;
+  width: clamp(170px, 17vw, 260px);
+  height: clamp(210px, 22vw, 310px);
+  max-width: 100%;
+  background: transparent;
+}
+.immersive-dialog.premium-game .ba37-mascot-window img,
+.immersive-dialog.premium-game .ba37-mascot-window .mascot-fallback {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+}
+.immersive-dialog.premium-game .ba37-mascot-window .mascot-fallback {
+  display: grid;
+  place-items: center;
+  font-size: 100px;
+}
+.premium-game[data-scene-engine='three-webgl'] .ba37-mascot-fallback,
+.premium-game[data-scene-engine='three-webgl'] .mascot-fallback { visibility: hidden; }
+.immersive-dialog.premium-game .guide-speech,
+.immersive-dialog.premium-game .forest-speech {
+  max-width: 255px;
+  min-height: 78px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 12px 15px;
+  background: #fffdf3e6;
+  border: 1px solid #fffef8;
+  border-radius: 17px;
+  box-shadow: 0 5px 20px #3c647519;
+  color: var(--game-muted);
+  font-size: 13px;
+  font-weight: 550;
+  line-height: 1.55;
+}
+.immersive-dialog.premium-game .challenge-card,
+.immersive-dialog.premium-game .sentence-scroll,
+.immersive-dialog.premium-game .world-memory .forest-board {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  max-width: 960px;
+  padding: clamp(18px, 2.2vw, 30px);
+  border: 1px solid #fffef8;
+  border-radius: 24px;
+  background: #fffdf5f5;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: 0 12px 35px #31596c20, inset 0 1px 0 #fff;
+  color: var(--game-ink);
+}
+.premium-game .world-memory .forest-board::before { display: none; }
+.immersive-dialog.premium-game .world-stage .quest-progress {
+  color: var(--game-muted);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .055em;
+  gap: 10px;
+}
+.premium-game .world-stage .progress-track {
+  height: 6px;
+  border: 0;
+  background: var(--game-soft);
+  margin: 11px 0 18px;
+}
+.premium-game .world-stage .progress-track > div {
+  background: var(--game-accent);
+  box-shadow: none;
+}
+.immersive-dialog.premium-game .quest-scroll,
+.immersive-dialog.premium-game .sentence-prompt {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  color: var(--game-ink);
+}
+.premium-game .world-stage .quest-scroll {
+  min-height: 105px;
+  margin: 0 0 17px;
+  padding: 8px 6px;
+}
+.premium-game .quest-prompt-kicker {
+  color: var(--game-accent);
+  font-size: 9px;
+  font-weight: 650;
+  letter-spacing: .14em;
+}
+.premium-game .world-math .quiz-question {
+  color: var(--game-ink);
+  font-size: clamp(27px, 3.2vw, 47px);
+  font-weight: 800;
+  margin: 10px 0 4px;
+  line-height: 1.25;
+}
+.premium-game .world-stage .answer-grid { gap: 12px; }
+.immersive-dialog.premium-game .world-stage .answer-option {
+  min-height: 74px;
+  padding: 12px;
+  border: 1px solid #d4e3e1;
+  border-radius: 14px;
+  background: #f4f7f2;
+  box-shadow: 0 3px 0 #dce6df;
+  color: var(--game-ink);
+  font-size: clamp(18px, 2vw, 27px);
+  font-weight: 750;
+  text-shadow: none;
+  transition: background .16s, border-color .16s, transform .16s;
+}
+.immersive-dialog.premium-game .answer-option:hover:not(:disabled) {
+  transform: translateY(-2px);
+  background: #e9f1eb;
+  filter: none;
+}
+.premium-game .answer-index {
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 10px;
+  background: #e0ebe8;
+  color: var(--game-accent);
+  font-size: 12px;
+  font-weight: 700;
+}
+.premium-game .answer-option > span:last-child { min-width: 0; overflow-wrap: anywhere; }
+.immersive-dialog.premium-game .answer-option.correct {
+  opacity: 1;
+  border-color: #76ac86;
+  background: #e5f2dc;
+  box-shadow: 0 3px 0 #aecb9f;
+  color: #35593e;
+}
+.immersive-dialog.premium-game .answer-option.incorrect {
+  opacity: 1;
+  border-color: #d1a69b;
+  background: #f8e8df;
+  box-shadow: 0 3px 0 #e2c8b9;
+  color: #834e42;
+}
+.premium-game .world-math .stable-response-zone {
+  height: 170px;
+  min-height: 170px;
+  margin-top: 20px;
+  background: #f0f4ee;
+  border: 1px solid #dce5dc;
+  border-radius: 16px;
+  box-shadow: none;
+}
+.premium-game .world-math .stable-response-body { padding: 10px; }
+.premium-game .world-stage .answer-feedback {
+  background: #ebf4e8;
+  border: 1px solid #c1d9bb;
+  border-radius: 12px;
+  box-shadow: none;
+  color: #315f43;
+}
+.premium-game .world-stage .answer-feedback.feedback-retry {
+  background: #f7f0df;
+  border-color: #e0d2ad;
+  color: #79603c;
+}
+.premium-game .world-stage .answer-feedback p { color: var(--game-muted); }
+.premium-game .world-stage .game-help .hint-text {
+  background: transparent;
+  border: 0;
+  color: var(--game-muted);
+  font-weight: 500;
+}
+.immersive-dialog.premium-game .world-stage .button {
+  min-height: 44px;
+  padding: 10px 14px;
+  border-radius: 11px;
+  font-size: 13px;
+  font-weight: 650;
+  text-shadow: none;
+  box-shadow: none;
+}
+.immersive-dialog.premium-game .button.primary {
+  border: 1px solid var(--game-accent);
+  background: var(--game-accent);
+  color: #fffdf5;
+}
+.immersive-dialog.premium-game .world-stage .button.outline,
+.immersive-dialog.premium-game .world-stage .text-button {
+  border: 1px solid var(--game-edge);
+  background: #fffdf5;
+  color: var(--game-accent);
+}
+.premium-game .world-stage .notice.error {
+  color: #8d463c;
+  background: #fcefe9;
+  border: 1px solid #e6c8bb;
+}
+.premium-game .notice.error button { min-height: 44px; }
+.immersive-dialog.premium-game .world-memory .memory-feedback-slot {
+  width: min(100%, 1320px);
+  max-width: 1320px;
+  height: 68px;
+  min-height: 68px;
+  padding: 10px 16px;
+  margin: 0 auto 16px;
+  border: 1px solid #fffdf5;
+  border-radius: 16px;
+  background: #fffdf3ed;
+  box-shadow: 0 4px 16px #446a7312;
+  color: var(--game-muted);
+}
+.premium-game .memory-feedback-message { font-size: 13px; font-weight: 550; line-height: 1.45; }
+.immersive-dialog.premium-game .world-memory .memory-topline,
+.immersive-dialog.premium-game .world-memory .memory-topline strong {
+  color: var(--game-ink);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .04em;
+}
+.immersive-dialog.premium-game .memory-board-subline {
+  min-height: 22px;
+  color: var(--game-muted);
+  font-size: 12px;
+  font-weight: 500;
+  margin-top: 7px;
+}
+.premium-game .world-memory .memory-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-top: 15px;
+  gap: 12px;
+}
+.immersive-dialog.premium-game .world-memory .memory-card {
+  height: clamp(92px, 12vh, 126px);
+  min-height: 44px;
+  border-radius: 15px;
+}
+.immersive-dialog.premium-game .world-memory .memory-face {
+  border-radius: 14px;
+  box-shadow: 0 3px 0 #bbd0c1, 0 6px 12px #31596c12;
+}
+.immersive-dialog.premium-game .world-memory .memory-back {
+  border: 1px solid #c9dfcc;
+  background: linear-gradient(155deg, #5e9681, #407964);
+  color: #e5f4dc;
+  text-shadow: none;
+  font-size: 28px;
+}
+.premium-game .world-memory .memory-back::before {
+  content: '';
+  display: block;
+  inset: 8px;
+  border: 1px solid #c4ddbe70;
+  border-radius: 9px;
+  background: none;
+}
+.immersive-dialog.premium-game .world-memory .memory-front {
+  border: 1px solid #d4ddd0;
+  background: #fbfcf1;
+  color: var(--game-ink);
+  font-size: clamp(13px, 1.3vw, 19px);
+  font-weight: 700;
+  line-height: 1.3;
+  padding: 9px;
+}
+.immersive-dialog.premium-game .world-memory .memory-card.found .memory-front {
+  opacity: 1;
+  background: #e4f0d9;
+  border-color: #7daf7c;
+  color: #386b43;
+  box-shadow: 0 3px 0 #a8c29a, inset 0 0 0 1px #91ba8e;
+}
+.premium-game .world-memory .memory-card:disabled { opacity: 1; }
+.premium-game .world-sentence .sentence-prompt {
+  margin: 14px 0 12px;
+  font-size: clamp(20px, 2vw, 29px);
+  font-weight: 750;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+.premium-game .sentence-instruction {
+  color: var(--game-muted);
+  font-size: 12px;
+  font-weight: 500;
+  margin: 0 0 16px;
+}
+.immersive-dialog.premium-game .world-sentence .sentence-drop {
+  min-height: 94px;
+  padding: 12px;
+  gap: 8px;
+  background: #f8f7fb;
+  border: 1px dashed #b6abc9;
+  border-radius: 14px;
+  box-shadow: none;
+}
+.premium-game .sentence-placeholder { color: #766d8d; font-size: 13px; }
+.premium-game .bank-label { margin-top: 18px; color: var(--game-accent); font-size: 10px; font-weight: 700; }
+.immersive-dialog.premium-game .world-sentence .sentence-bank {
+  min-height: 78px;
+  margin-top: 9px;
+  padding: 12px;
+  gap: 8px;
+  border: 1px solid #ddd6e9;
+  border-radius: 14px;
+  background: #f0edf5;
+}
+.immersive-dialog.premium-game .world-sentence .word-tile {
+  min-height: 44px;
+  min-width: 44px;
+  max-width: 100%;
+  padding: 10px 13px;
+  border: 1px solid #cdc3df;
+  border-radius: 10px;
+  background: #fffdf7;
+  box-shadow: 0 3px 0 #d4cce0;
+  color: #514766;
+  font-size: clamp(14px, 1.35vw, 19px);
+  font-weight: 650;
+  overflow-wrap: anywhere;
+}
+.immersive-dialog.premium-game .world-sentence .word-tile.selected {
+  background: #e8e0f1;
+  border-color: #b7a5cf;
+  box-shadow: 0 3px 0 #c6b5da;
+  color: #5b4676;
+}
+.premium-game .world-sentence .sentence-result-reserve {
+  height: 113px;
+  min-height: 113px;
+  padding: 10px 12px;
+  border: 1px solid #ddd6e9;
+  border-radius: 14px;
+  background: #f7f5f9;
+  margin: 13px 0 11px;
+}
+.premium-game .world-sentence .sentence-result-reserve .sentence-hint {
+  color: #665578;
+  border: 0;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 500;
+}
+.premium-game .world-sentence .stable-sentence-actions {
+  min-height: 58px;
+  height: auto;
+  padding: 0;
+}
+.premium-game .world-sentence .small-note {
+  margin: 12px 0 0;
+  color: #746b7e;
+  font-size: 10px;
+  line-height: 1.5;
+}
+.premium-game .world-stage-bottom {
+  max-width: 1320px;
+  color: #456771;
+  text-shadow: 0 1px 4px #fff;
+  font-size: 10px;
+  font-weight: 500;
+  margin-top: 16px;
+}
+.premium-game .world-particles { display: none; }
+.premium-game .game-reaction-halo {
+  background: radial-gradient(circle, #bddfc64d, #bddfc61a 32%, transparent 66%);
+}
+.premium-game .game-reaction-particle { background: #d9bc7d; border-color: #fff9e5; box-shadow: none; }
+.premium-game .game-reaction-retry .game-reaction-particle { background: #a9c8cf; border-color: #f4fcff; box-shadow: none; }
+.premium-game .reward-scrim { background: #254d6373; backdrop-filter: blur(5px); }
+.premium-game .reward-panel {
+  width: min(490px, 100%);
+  border: 1px solid #fffef7;
+  outline: 0;
+  border-radius: 27px;
+  background: #fffdf3;
+  padding: 28px 27px;
+  box-shadow: 0 24px 80px #24435440;
+  color: var(--game-ink);
+}
+.premium-game .reward-crest {
+  width: 78px;
+  height: 78px;
+  margin: 0 auto;
+  border: 1px solid #ead7a8;
+  border-radius: 24px;
+  display: grid;
+  place-items: center;
+  background: #f6e9c9;
+  color: #a7823b;
+  font-size: 42px;
+  filter: none;
+}
+.premium-game .reward-eyebrow { color: var(--game-accent); font-size: 10px; font-weight: 700; letter-spacing: .13em; }
+.premium-game .reward-panel h2 { color: var(--game-ink); font-size: clamp(25px, 5vw, 32px); font-weight: 800; }
+.premium-game .reward-panel p { color: var(--game-muted); font-size: 14px; line-height: 1.65; margin-bottom: 19px; }
+.premium-game .premium-reward-note { color: var(--game-muted); font-size: 12px; font-weight: 500; }
+.premium-game .premium-reward-stars { color: #cca453; text-shadow: 0 2px 0 #f4dfb0; font-size: 34px; }
+.premium-game .premium-reward-rays { opacity: .4; }
+.immersive-dialog.premium-game .reward-home {
+  width: 100%;
+  min-height: 48px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  border-radius: 12px;
+  box-shadow: none;
+}
+.immersive-dialog.premium-game button:focus-visible,
+.immersive-dialog.premium-game [draggable]:focus-visible {
+  outline: 3px solid #225b78;
+  outline-offset: 3px;
+}
+@media (max-width: 1000px) {
+  .immersive-dialog.premium-game .math-adventure-layout,
+  .immersive-dialog.premium-game .memory-adventure-layout,
+  .immersive-dialog.premium-game .sentence-adventure-layout {
+    display: flex;
+    flex-direction: column;
+    width: min(100%, 840px);
+    margin: 0 auto;
+    gap: 13px;
+  }
+  .immersive-dialog.premium-game .world-guide,
+  .immersive-dialog.premium-game .forest-guide,
+  .immersive-dialog.premium-game .sentence-guide {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 12px;
+  }
+  .immersive-dialog.premium-game .world-guide .guide-figure,
+  .immersive-dialog.premium-game .forest-guide img,
+  .immersive-dialog.premium-game .sentence-guide img {
+    width: 72px;
+    height: 78px;
+    min-width: 72px;
+  }
+  .immersive-dialog.premium-game .world-guide .guide-figure img { width: 100%; height: 100%; }
+  .premium-game .ba37-mascot-window { width: 72px; height: 78px; min-width: 72px; }
+  .immersive-dialog.premium-game .ba37-mascot-window img { width: 100%; height: 100%; min-width: 0; }
+  .immersive-dialog.premium-game .guide-speech,
+  .immersive-dialog.premium-game .forest-speech {
+    flex: 1;
+    min-height: 52px;
+    max-width: 100%;
+    padding: 9px 12px;
+    text-align: left;
+    justify-content: flex-start;
+    font-size: 12px;
+  }
+}
+@media (max-width: 700px) {
+  .immersive-dialog.premium-game { --game-head: 62px; }
+  .immersive-dialog.premium-game .game-dialog-head { padding: 7px 10px; gap: 8px; }
+  .premium-game .game-dialog-head .eyebrow { font-size: 8px; }
+  .premium-game .game-dialog-head h2 { font-size: 14px; }
+  .immersive-dialog.premium-game .game-dialog-head .button { padding: 9px 10px; font-size: 10px; }
+  .immersive-dialog.premium-game .world-stage { padding: 12px 10px 16px; }
+  .premium-game .world-hud { margin-bottom: 12px; gap: 6px; align-items: center; }
+  .immersive-dialog.premium-game .world-hud .hud-label,
+  .immersive-dialog.premium-game .world-hud .hud-score {
+    min-height: 34px;
+    font-size: 8px;
+    padding: 7px 8px;
+    border-radius: 10px;
+    letter-spacing: 0;
+    gap: 5px;
+  }
+  .premium-game .ba37-hud-symbol { font-size: 14px; }
+  .immersive-dialog.premium-game .world-guide .guide-figure,
+  .immersive-dialog.premium-game .forest-guide img,
+  .immersive-dialog.premium-game .sentence-guide img { width: 56px; height: 64px; min-width: 56px; }
+  .immersive-dialog.premium-game .world-guide .guide-figure { height: 64px; }
+  .immersive-dialog.premium-game .world-guide .guide-figure img { width: 100%; height: 100%; }
+  .premium-game .ba37-mascot-window { width: 56px; height: 64px; min-width: 56px; }
+  .immersive-dialog.premium-game .ba37-mascot-window img { width: 100%; height: 100%; min-width: 0; }
+  .immersive-dialog.premium-game .ba37-mascot-window .mascot-fallback { font-size: 48px; }
+  .immersive-dialog.premium-game .guide-speech,
+  .immersive-dialog.premium-game .forest-speech { min-height: 48px; font-size: 11px; line-height: 1.4; border-radius: 13px; }
+  .immersive-dialog.premium-game .challenge-card,
+  .immersive-dialog.premium-game .sentence-scroll,
+  .immersive-dialog.premium-game .world-memory .forest-board { padding: 15px 12px; border-radius: 18px; }
+  .premium-game .world-stage .quest-scroll { min-height: 82px; margin-bottom: 13px; }
+  .premium-game .world-math .quiz-question { font-size: clamp(24px, 7vw, 34px); }
+  .premium-game .world-stage .answer-grid { gap: 9px; }
+  .immersive-dialog.premium-game .world-stage .answer-option { min-height: 62px; padding: 9px 7px; gap: 7px; font-size: 18px; }
+  .premium-game .answer-index { width: 27px; height: 27px; font-size: 10px; border-radius: 8px; }
+  .premium-game .world-math .stable-response-zone { height: 195px; min-height: 195px; margin-top: 15px; }
+  .premium-game .world-math .stable-response-zone .answer-feedback { padding: 10px; gap: 9px; }
+  .premium-game .world-math .stable-response-zone .answer-feedback strong { font-size: 13px; }
+  .premium-game .world-math .stable-response-zone .answer-feedback p { font-size: 12px; }
+  .immersive-dialog.premium-game .world-memory .memory-feedback-slot { height: 77px; min-height: 77px; padding: 9px; margin-bottom: 12px; }
+  .premium-game .memory-feedback-message { font-size: 11px; }
+  .premium-game .world-memory .memory-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .immersive-dialog.premium-game .world-memory .memory-card { height: clamp(74px, 20vw, 112px); border-radius: 12px; }
+  .immersive-dialog.premium-game .world-memory .memory-face { border-radius: 11px; }
+  .immersive-dialog.premium-game .world-memory .memory-front { padding: 6px; font-size: 12px; }
+  .premium-game .world-sentence .sentence-prompt { font-size: 20px; margin: 9px 0 12px; }
+  .premium-game .world-sentence .sentence-result-reserve { height: 96px; min-height: 96px; }
+  .premium-game .world-sentence .sentence-result-reserve .answer-feedback { padding: 8px 10px; max-height: 100%; overflow-y: auto; }
+  .premium-game .world-sentence .sentence-result-reserve .answer-feedback strong { font-size: 14px; line-height: 1.3; }
+  .premium-game .world-sentence .sentence-result-reserve .answer-feedback p { font-size: 12px; line-height: 1.4; max-height: 34px; overflow-y: auto; }
+  .premium-game .sentence-instruction { font-size: 11px; }
+  .immersive-dialog.premium-game .world-sentence .sentence-drop { padding: 10px; min-height: 92px; }
+  .immersive-dialog.premium-game .world-sentence .word-tile { font-size: 14px; padding: 9px 11px; }
+  .premium-game .world-sentence .stable-sentence-actions {
+    /* Normal flow keeps every word selectable; a sticky bar can cover the bank. */
+    position: static;
+    z-index: 8;
+    height: 124px;
+    min-height: 124px;
+    margin: 7px -3px 0;
+    padding: 10px 5px;
+    border: 1px solid #ded6e9;
+    border-radius: 13px;
+    background: #fffdf5f5;
+    box-shadow: 0 -4px 15px #5b4e7812;
+  }
+  .premium-game .world-sentence .stable-sentence-actions .button.outline {
+    flex: 1 1 40%;
+    min-width: 80px;
+    white-space: nowrap;
+  }
+  .premium-game .world-sentence .stable-sentence-actions .sentence-main-action {
+    flex: 1 1 100%;
+    min-width: 0;
+  }
+  .premium-game .world-stage-bottom { font-size: 9px; gap: 8px; margin-top: 13px; }
+  .premium-game .world-stage-bottom span:last-child { display: none; }
+  .premium-game .reward-panel { padding: 25px 19px; border-radius: 23px; }
+}
+@media (max-height: 520px) and (orientation: landscape) {
+  .immersive-dialog.premium-game { --game-head: 54px; }
+  .premium-game .game-dialog-head .eyebrow { display: none; }
+  .premium-game .game-dialog-head h2 { margin: 0; }
+  .immersive-dialog.premium-game .world-stage { padding-top: 10px; }
+  .immersive-dialog.premium-game .world-guide,
+  .immersive-dialog.premium-game .forest-guide,
+  .immersive-dialog.premium-game .sentence-guide { display: none; }
+  .premium-game .world-hud { margin-bottom: 9px; }
+}
+/* Short phones retain the guide and all answer actions within the first view. */
+@media (max-width: 370px) and (max-height: 740px) {
+  .immersive-dialog.premium-game { --game-head: 54px; }
+  .immersive-dialog.premium-game .game-dialog-head { padding: 4px 10px; }
+  .premium-game .game-dialog-head .eyebrow { font-size: 7px; }
+  .premium-game .game-dialog-head h2 { font-size: 13px; margin-top: 2px; }
+  .immersive-dialog.premium-game .world-stage { padding: 8px 10px 10px; }
+  .premium-game .world-hud { margin-bottom: 6px; }
+  .immersive-dialog.premium-game .world-hud .hud-label,
+  .immersive-dialog.premium-game .world-hud .hud-score { min-height: 30px; padding: 5px 8px; }
+  .immersive-dialog.premium-game .math-adventure-layout,
+  .immersive-dialog.premium-game .memory-adventure-layout,
+  .immersive-dialog.premium-game .sentence-adventure-layout { gap: 6px; }
+  .immersive-dialog.premium-game .world-guide,
+  .immersive-dialog.premium-game .forest-guide,
+  .immersive-dialog.premium-game .sentence-guide { gap: 8px; }
+  .immersive-dialog.premium-game .world-guide .guide-figure { width: 48px; min-width: 48px; height: 56px; }
+  .premium-game .ba37-mascot-window { width: 48px; min-width: 48px; height: 56px; }
+  .immersive-dialog.premium-game .ba37-mascot-window img { width: 100%; min-width: 0; height: 100%; }
+  .immersive-dialog.premium-game .guide-speech,
+  .immersive-dialog.premium-game .forest-speech { min-height: 44px; padding: 8px 10px; font-size: 10.5px; }
+  .immersive-dialog.premium-game .challenge-card,
+  .immersive-dialog.premium-game .sentence-scroll,
+  .immersive-dialog.premium-game .world-memory .forest-board { padding: 10px; }
+  .premium-game .world-stage .quest-progress { font-size: 9px; line-height: 1.3; }
+  .premium-game .world-stage .progress-track { height: 5px; margin: 6px 0; }
+  .premium-game .world-stage .quest-scroll { min-height: 54px; padding: 0; margin-bottom: 7px; }
+  .premium-game .quest-prompt-kicker { font-size: 8px; line-height: 12px; }
+  .premium-game .world-math .quiz-question { font-size: 25px; line-height: 1.2; margin: 6px 0 2px; }
+  .premium-game .world-stage .answer-grid { gap: 8px; }
+  .immersive-dialog.premium-game .world-stage .answer-option { min-height: 52px; padding: 8px 7px; }
+  .premium-game .answer-index { width: 24px; height: 24px; }
+  .premium-game .world-math .stable-response-zone { height: 146px; min-height: 146px; margin-top: 8px; }
+  .premium-game .world-math .stable-response-body { padding: 7px; }
+  .premium-game .world-math .stable-response-zone .answer-feedback { min-height: 0; padding: 8px; gap: 7px; }
+  .premium-game .world-math .stable-response-zone .answer-feedback strong { font-size: 12px; line-height: 1.3; }
+  .premium-game .world-math .stable-response-zone .answer-feedback p {
+    max-height: 36px;
+    overflow-y: auto;
+    font-size: 11.5px;
+    line-height: 1.45;
+    margin-top: 5px;
+  }
+  .premium-game .world-math .stable-response-zone .game-help .hint-text { font-size: 11px; line-height: 1.45; margin-top: 7px; }
+  .premium-game .world-math .stable-response-zone .result-next { min-height: 44px; padding: 8px 10px; font-size: 12px; }
+  .premium-game .world-sentence .sentence-prompt { min-height: 44px; margin: 8px 0; font-size: 18px; line-height: 1.25; }
+  .premium-game .sentence-instruction { font-size: 10px; line-height: 1.4; margin-bottom: 8px; }
+  .immersive-dialog.premium-game .world-sentence .sentence-drop { min-height: 64px; padding: 8px; gap: 6px; }
+  .premium-game .sentence-placeholder { font-size: 11px; }
+  .premium-game .bank-label { margin-top: 12px; font-size: 9px; }
+  .immersive-dialog.premium-game .world-sentence .sentence-bank { min-height: 64px; padding: 8px; gap: 6px; margin-top: 6px; }
+  .immersive-dialog.premium-game .world-sentence .word-tile { min-height: 44px; padding: 8px; font-size: 14px; }
+  .premium-game .world-sentence .sentence-result-reserve { height: 76px; min-height: 76px; margin: 10px 0 8px; padding: 7px 8px; }
+  .premium-game .world-sentence .sentence-result-reserve .answer-feedback { padding: 7px 8px; flex-shrink: 0; max-height: 100%; overflow-y: auto; }
+  .premium-game .world-sentence .sentence-result-reserve .answer-feedback strong { display: block; font-size: 12px; line-height: 1.3; }
+  .premium-game .world-sentence .sentence-result-reserve .answer-feedback p { font-size: 11.5px; line-height: 1.4; max-height: 32px; overflow-y: auto; margin: 5px 0 0; }
+  .premium-game .world-sentence .stable-sentence-actions { height: 114px; min-height: 114px; padding: 8px 5px; }
+  .premium-game .world-stage-bottom { margin-top: 9px; }
+}

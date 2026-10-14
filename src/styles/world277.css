@@ -104,11 +104,11 @@
   50%{transform:translate3d(0,-8px,0)}
 }
 /* Game feedback is purely composited and leaves the question card in place. */
-.immersive-dialog .world-stage{background-color:#0d80c2}
-.immersive-dialog .answer-option:focus-visible,.immersive-dialog .word-tile:focus-visible,.immersive-dialog .memory-card:focus-visible{outline:4px solid #ffeb88;outline-offset:4px}
-.immersive-dialog .world-math .stage-overlay{background:linear-gradient(90deg,#024a8180,transparent 40%,#044b7a38),linear-gradient(0deg,#064e8155,transparent 35%)}
-.immersive-dialog .world-memory .stage-overlay{background:linear-gradient(90deg,#073d3566,transparent 42%,#074c3a44),linear-gradient(0deg,#064b3961,transparent 36%)}
-.immersive-dialog .world-sentence .stage-overlay{background:linear-gradient(90deg,#5b356b55,transparent 42%,#57356644),linear-gradient(0deg,#49276766,transparent 36%)}
+.immersive-dialog:not(.premium-game) .world-stage{background-color:#0d80c2}
+.immersive-dialog:not(.premium-game) .answer-option:focus-visible,.immersive-dialog:not(.premium-game) .word-tile:focus-visible,.immersive-dialog:not(.premium-game) .memory-card:focus-visible{outline:4px solid #ffeb88;outline-offset:4px}
+.immersive-dialog:not(.premium-game) .world-math .stage-overlay{background:linear-gradient(90deg,#024a8180,transparent 40%,#044b7a38),linear-gradient(0deg,#064e8155,transparent 35%)}
+.immersive-dialog:not(.premium-game) .world-memory .stage-overlay{background:linear-gradient(90deg,#073d3566,transparent 42%,#074c3a44),linear-gradient(0deg,#064b3961,transparent 36%)}
+.immersive-dialog:not(.premium-game) .world-sentence .stage-overlay{background:linear-gradient(90deg,#5b356b55,transparent 42%,#57356644),linear-gradient(0deg,#49276766,transparent 36%)}
 .immersive-dialog .answer-option.correct{animation:world277-correct .48s ease-out both}
 .immersive-dialog .answer-option.incorrect{animation:world277-wrong .3s ease-out both}
 @keyframes world277-correct{0%{filter:brightness(1)}48%{filter:brightness(1.2) drop-shadow(0 0 15px #ffdc74)}100%{filter:brightness(1)}}

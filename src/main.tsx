@@ -27,3 +27,5 @@ import './styles/unified-frame.css';
 import './styles/real3d31.css';
 
 import './styles/premium-world37.css';
+
+import './styles/premium-games37.css';

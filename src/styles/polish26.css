@@ -148,7 +148,7 @@ body{background:radial-gradient(ellipse at 80% 4%,#c7eeff 0%,transparent 37%),li
  .brand-words strong{font-size:15px}.brand-words small{font-size:9px}.brand-mark{height:38px;width:38px}
  .world-hero h1{font-size:29px}.world-hero .hero-tags span{padding:7px 9px}
  .world-stage .answer-option{min-height:65px;gap:5px}.world-stage .answer-index{width:29px;height:29px}
- .world-memory .memory-card{height:74px}.hud-label,.hud-score{padding:7px!important;font-size:9px!important}
+ .world-memory .memory-card{height:74px}.adventure-dialog:not(.premium-game) .hud-label,.adventure-dialog:not(.premium-game) .hud-score{padding:7px!important;font-size:9px!important}
 }
 @media(prefers-reduced-motion:reduce){
  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}

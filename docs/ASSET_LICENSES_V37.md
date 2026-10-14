@@ -8,10 +8,13 @@ Hai tệp dưới đây là **candidate tự tạo cho lát cắt PR-02 (cáo + 
 |---|---|---|
 | `public/models/fox-guide.glb` | Tạo riêng trong dự án bằng `tools/generate_v37_slice_assets.mjs`, có hỗ trợ lập trình của Codex. Hình học, UV, texture PNG thủ tục, bộ xương và mọi keyframe đều được định nghĩa trong mã nguồn này. | `OWNED: original project-authored PR02 candidate; docs/ASSET_LICENSES_V37.md` |
 | `public/models/math-world.glb` | Tạo riêng trong dự án bằng cùng generator. Lâu đài, đảo đá phân tầng thuôn sâu, vách đá góc cạnh, mép cỏ/khóm cỏ, cửa/cửa sổ vòm, chỉ mái, cờ, đường lát đá/lan can, cây, hoa và các số/ký hiệu là hình học thật. Texture được tính từ các hàm tuần hoàn, không tải ảnh bên ngoài. | `OWNED: original project-authored PR02 candidate; docs/ASSET_LICENSES_V37.md` |
+| `public/art/fox-guide-common.webp` | Render trực tiếp từ `fox-guide.glb` bằng Three renderer thật, Idle tại 0,35 giây, nền trong suốt. Dùng cho cảnh dự phòng trong bài test; cùng nhân vật với trang chủ. 640×768 px, 29.358 byte. | Cùng nguồn dự án của model cáo; không tải ảnh ngoài hoặc tạo nhân vật thứ hai. |
 
 `OWNED` là nhãn provenance nội bộ của tài nguyên gốc tạo cho dự án, không phải giấy phép CC0/CC-BY của một kho model. Không sử dụng mesh, rig, texture, phông chữ, ảnh concept hay keyframe của bên thứ ba; không có gói tài nguyên cần mua hoặc nguồn tải ngoài để ghi attribution. Mã generator được bàn giao cùng dự án để sửa, tạo lại và sử dụng trong Bảo An Learning. Generator chỉ sử dụng thư viện chuẩn Node.js (`fs`, `path`, `url`, `zlib`, `crypto`); thư viện runtime Three.js được khai báo riêng trong dependency của ứng dụng.
 
 Metadata `asset.extras` trong mỗi GLB ghi `provenance=ORIGINAL_PROCEDURAL_V37_PR02`, `source=tools/generate_v37_slice_assets.mjs`, `acceptance=candidate-not-art-approved`, `externalAssets=[]`. Không dùng nhãn provenance này để thay thế việc duyệt chất lượng hình ảnh trong ứng dụng thật.
+
+Ảnh cáo dự phòng có SHA-256 `257ca7360cb2d016b1b73a316b6f3c6f320be9458e88fedca1aa52cf9a2d2feb`; dữ liệu xuất và kiểm tra alpha trong `docs/V37_games_qa/fox-portrait-provenance.json`. Lệnh tái xuất: `node tools/capture_v37_games.mjs --fox-only` với preview đang chạy. Phong cảnh trong bài test được dựng bằng geometry/vật liệu thủ tục trong `src/world3d/scenes/gameEnvironments.ts`; dùng chung model đảo và cáo đã tải, không có model thương mại hoặc texture bên ngoài mới.
 
 ## Thông số xuất
 

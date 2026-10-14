@@ -1,11 +1,11 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { ContentPack, ModuleId, PlaySession } from '../core/contracts';
 import { GAME_REGISTRY } from '../core/registry';
 import { titleSubject } from '../core/utils';
 import { compatible } from '../core/validation';
-import WorldCanvas from '../world3d/WorldCanvas';
+import WorldCanvas, { type SceneInfo } from '../world3d/WorldCanvas';
 import type { WorldId } from '../world3d/engine';
-import type { QualityChoice } from '../world3d/renderer/types';
+import type { GuideMood, QualityChoice } from '../world3d/renderer/types';
 
 interface Props {
   packs: ContentPack[];
@@ -15,16 +15,21 @@ interface Props {
   onOpenMini: () => void;
   worldActive: boolean;
   motionOn: boolean;
+  gameWorld: WorldId | null;
+  guideMood: GuideMood;
+  guideCue: number;
+  onSceneChange: (info: SceneInfo) => void;
 }
 const themes:Record<string,{world:string,symbol:string,num:string,description:string}>= {
   'math-quest': {world:'Đảo Toán Học',symbol:'∑',num:'01',description:'Từng phép tính, một khám phá mới'},
   'memory-match': {world:'Khu Rừng Trí Nhớ',symbol:'◇',num:'02',description:'Quan sát tinh mắt, ghi nhớ thật lâu'},
   'sentence-builder': {world:'Xưởng Ngôn Từ',symbol:'Aa',num:'03',description:'Ghép những từ nhỏ thành câu hay'}
 };
-export default function StudentScreen({packs,sessions,onPlay,starting,onOpenMini,worldActive,motionOn}:Props){
+export default function StudentScreen({packs,sessions,onPlay,starting,onOpenMini,worldActive,motionOn,gameWorld,guideMood,guideCue,onSceneChange}:Props){
   const [chosen,setChosen]=useState<Record<string,string>>({});
   const [focused,setFocused]=useState<WorldId|null>(null);
   const overview = useRef<HTMLDivElement>(null);
+  useEffect(() => { if (gameWorld) setFocused(gameWorld); }, [gameWorld]);
   const [quality,setQuality]=useState<QualityChoice>('auto');
   const completed=sessions.filter(s=>s.status==='completed').length;
   const stars=Math.min(completed*3,999);
@@ -32,7 +37,7 @@ export default function StudentScreen({packs,sessions,onPlay,starting,onOpenMini
     <section className="ba3d-world" aria-label="Bảo An Learning: thế giới game 3D tương tác">
       <div className="ba3d-sky" aria-hidden="true" />
       <WorldCanvas selected={focused} onSelect={setFocused} active={worldActive} motionOn={motionOn}
-        quality={quality}/>
+        quality={quality} gameWorld={gameWorld} guideMood={guideMood} guideCue={guideCue} onSceneChange={onSceneChange}/>
       <div className="ba3d-render-controls" aria-label="Cài đặt cảnh 3D">
         <label>Chất lượng <select aria-label="Chất lượng cảnh 3D" value={quality} onChange={event=>setQuality(event.target.value as QualityChoice)}>
           <option value="auto">Tự động</option><option value="low">Nhẹ</option><option value="balanced">Cân bằng</option><option value="high">Cao</option>

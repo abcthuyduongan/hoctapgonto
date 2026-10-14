@@ -132,42 +132,42 @@ button:focus-visible,a:focus-visible,select:focus-visible{outline:4px solid #ffc
 }
 @keyframes ba-island-drift{0%,100%{transform:translate3d(0,0,0)}50%{transform:translate3d(0,-6px,0)}}
 /* PREMIUM GAME PLAYFIELDS — art reaches edges, controls are real buttons */
-.immersive-dialog .game-dialog-head{background:linear-gradient(105deg,#063774,#0960b3 63%,#0879c4)!important;box-shadow:0 5px 15px #0a315c66!important}
-.immersive-dialog .world-stage{position:relative!important;isolation:isolate!important;background:#57bce7!important}
-.immersive-dialog .world-stage .stage-backdrop{opacity:1!important;filter:saturate(1.22) contrast(1.14)!important;background-size:cover!important;background-position:center!important}
-.immersive-dialog .world-math .stage-backdrop{background-image:url('/art/premium-math-cinematic.webp')!important}
-.immersive-dialog .world-memory .stage-backdrop{background-image:url('/art/premium-memory-cinematic.webp')!important}
-.immersive-dialog .world-sentence .stage-backdrop{background-image:url('/art/premium-sentence-cinematic.webp')!important}
-.immersive-dialog .world-stage .stage-overlay{background:linear-gradient(90deg,#073d6170 0%,transparent 31%,transparent 72%,#07497135 100%),linear-gradient(180deg,#70d9ed10 0%,transparent 45%,#063e6759 100%)!important}
-.immersive-dialog .world-hud{max-width:1500px!important}
-.immersive-dialog .hud-label{color:#fff!important;background:linear-gradient(180deg,#1668b2,#0a447f)!important;border:2px solid #b9edff!important;box-shadow:0 4px 0 #082f62,0 10px 18px #073c6c5c!important;border-radius:999px!important}
-.immersive-dialog .hud-score{background:linear-gradient(180deg,#fff6bd,#ffd365)!important;border:2px solid #fff5d1!important;box-shadow:0 4px 0 #ca8528!important;color:#734716!important;border-radius:999px!important}
-.immersive-dialog .world-math .challenge-card,.immersive-dialog .world-sentence .sentence-scroll{
+.immersive-dialog:not(.premium-game) .game-dialog-head{background:linear-gradient(105deg,#063774,#0960b3 63%,#0879c4)!important;box-shadow:0 5px 15px #0a315c66!important}
+.immersive-dialog:not(.premium-game) .world-stage{position:relative!important;isolation:isolate!important;background:#57bce7!important}
+.immersive-dialog:not(.premium-game) .world-stage .stage-backdrop{opacity:1!important;filter:saturate(1.22) contrast(1.14)!important;background-size:cover!important;background-position:center!important}
+.immersive-dialog:not(.premium-game) .world-math .stage-backdrop{background-image:url('/art/premium-math-cinematic.webp')!important}
+.immersive-dialog:not(.premium-game) .world-memory .stage-backdrop{background-image:url('/art/premium-memory-cinematic.webp')!important}
+.immersive-dialog:not(.premium-game) .world-sentence .stage-backdrop{background-image:url('/art/premium-sentence-cinematic.webp')!important}
+.immersive-dialog:not(.premium-game) .world-stage .stage-overlay{background:linear-gradient(90deg,#073d6170 0%,transparent 31%,transparent 72%,#07497135 100%),linear-gradient(180deg,#70d9ed10 0%,transparent 45%,#063e6759 100%)!important}
+.immersive-dialog:not(.premium-game) .world-hud{max-width:1500px!important}
+.immersive-dialog:not(.premium-game) .hud-label{color:#fff!important;background:linear-gradient(180deg,#1668b2,#0a447f)!important;border:2px solid #b9edff!important;box-shadow:0 4px 0 #082f62,0 10px 18px #073c6c5c!important;border-radius:999px!important}
+.immersive-dialog:not(.premium-game) .hud-score{background:linear-gradient(180deg,#fff6bd,#ffd365)!important;border:2px solid #fff5d1!important;box-shadow:0 4px 0 #ca8528!important;color:#734716!important;border-radius:999px!important}
+.immersive-dialog:not(.premium-game) .world-math .challenge-card,.immersive-dialog:not(.premium-game) .world-sentence .sentence-scroll{
  border:4px solid #f9df9c!important;border-radius:27px!important;background:linear-gradient(160deg,#fffdf5f8,#fff5dbfa)!important;
  box-shadow:0 9px 0 #bb8a4b,0 22px 38px #10395e99,inset 0 2px 0 #fff!important;
 }
-.immersive-dialog .quest-scroll,.immersive-dialog .sentence-prompt{background:linear-gradient(180deg,#fff4d4,#ffe9b2)!important;border:2px solid #efc77b!important;border-radius:20px!important;box-shadow:0 4px 0 #e4b66d!important;color:#684222!important}
-.immersive-dialog .answer-option{border-radius:19px!important;border:3px solid #b9e2ff!important;background:linear-gradient(180deg,#fff,#e7f4ff)!important;box-shadow:0 6px 0 #7db6d7,0 10px 14px #07487331!important;color:#174d8d!important;transition:filter .15s ease,transform .15s ease!important}
-.immersive-dialog .answer-option:hover:not(:disabled){transform:translateY(-3px)!important;filter:brightness(1.03)}
-.immersive-dialog .answer-option.correct{background:linear-gradient(#efffda,#acf37e)!important;border-color:#6fcf6b!important;box-shadow:0 5px 0 #369a4e!important}
-.immersive-dialog .answer-option.incorrect{background:linear-gradient(#fff4ed,#ffc6bf)!important;border-color:#fa9f90!important;box-shadow:0 5px 0 #ce7671!important}
-.immersive-dialog .guide-speech,.immersive-dialog .forest-speech{background:#fffaf0!important;border:3px solid #fff!important;color:#694221!important;border-radius:22px!important;box-shadow:0 6px 0 #e7b86d,0 14px 23px #043d6b65!important}
-.immersive-dialog .world-guide .guide-figure img,.immersive-dialog .forest-mascot,.immersive-dialog .sentence-guide img{filter:drop-shadow(0 17px 15px #043d6266)!important}
+.immersive-dialog:not(.premium-game) .quest-scroll,.immersive-dialog:not(.premium-game) .sentence-prompt{background:linear-gradient(180deg,#fff4d4,#ffe9b2)!important;border:2px solid #efc77b!important;border-radius:20px!important;box-shadow:0 4px 0 #e4b66d!important;color:#684222!important}
+.immersive-dialog:not(.premium-game) .answer-option{border-radius:19px!important;border:3px solid #b9e2ff!important;background:linear-gradient(180deg,#fff,#e7f4ff)!important;box-shadow:0 6px 0 #7db6d7,0 10px 14px #07487331!important;color:#174d8d!important;transition:filter .15s ease,transform .15s ease!important}
+.immersive-dialog:not(.premium-game) .answer-option:hover:not(:disabled){transform:translateY(-3px)!important;filter:brightness(1.03)}
+.immersive-dialog:not(.premium-game) .answer-option.correct{background:linear-gradient(#efffda,#acf37e)!important;border-color:#6fcf6b!important;box-shadow:0 5px 0 #369a4e!important}
+.immersive-dialog:not(.premium-game) .answer-option.incorrect{background:linear-gradient(#fff4ed,#ffc6bf)!important;border-color:#fa9f90!important;box-shadow:0 5px 0 #ce7671!important}
+.immersive-dialog:not(.premium-game) .guide-speech,.immersive-dialog:not(.premium-game) .forest-speech{background:#fffaf0!important;border:3px solid #fff!important;color:#694221!important;border-radius:22px!important;box-shadow:0 6px 0 #e7b86d,0 14px 23px #043d6b65!important}
+.immersive-dialog:not(.premium-game) .world-guide .guide-figure img,.immersive-dialog:not(.premium-game) .forest-mascot,.immersive-dialog:not(.premium-game) .sentence-guide img{filter:drop-shadow(0 17px 15px #043d6266)!important}
 /* Memory Match: vibrant fantasy board and cards, no layout changes between flips. */
-.immersive-dialog .world-memory{background:#176c8c!important}
-.immersive-dialog .world-memory .memory-feedback-slot{background:linear-gradient(110deg,#07568bde,#0b7d91d7)!important;border:2px solid #cefbff!important;border-radius:21px!important;box-shadow:0 5px 0 #064c7a,0 14px 26px #0636536c!important;color:#fff!important}
-.immersive-dialog .world-memory .forest-board{border:4px solid #e6d8a3!important;background:linear-gradient(150deg,#1b5b75e8,#074c61f2 75%,#073a55ee)!important;box-shadow:0 8px 0 #a57a40,0 24px 45px #002e5a91!important;border-radius:32px!important}
-.immersive-dialog .world-memory .memory-card{border-radius:18px!important;overflow:visible!important}
-.immersive-dialog .world-memory .memory-back{background:linear-gradient(140deg,#2c9cc8,#0878af 58%,#0862a2)!important;border:3px solid #90e1ff!important;border-radius:16px!important;box-shadow:0 5px 0 #064e89,0 10px 14px #073a5d7a!important;color:#b7ffff!important;font-size:30px!important}
-.immersive-dialog .world-memory .memory-front{background:linear-gradient(160deg,#fffcef,#f7e5b3)!important;border:3px solid #ffdf8e!important;border-radius:16px!important;box-shadow:0 5px 0 #c68c3b,0 10px 14px #073d526b!important;color:#63431e!important;font-weight:1000!important}
-.immersive-dialog .world-memory .memory-card.found .memory-front{background:linear-gradient(160deg,#f1ffe1,#baf1a3)!important;border-color:#76df8d!important}
-.immersive-dialog .memory-board-subline{color:#f5fbe8!important}
-.immersive-dialog .memory-topline{color:#fff5cc!important}
+.immersive-dialog:not(.premium-game) .world-memory{background:#176c8c!important}
+.immersive-dialog:not(.premium-game) .world-memory .memory-feedback-slot{background:linear-gradient(110deg,#07568bde,#0b7d91d7)!important;border:2px solid #cefbff!important;border-radius:21px!important;box-shadow:0 5px 0 #064c7a,0 14px 26px #0636536c!important;color:#fff!important}
+.immersive-dialog:not(.premium-game) .world-memory .forest-board{border:4px solid #e6d8a3!important;background:linear-gradient(150deg,#1b5b75e8,#074c61f2 75%,#073a55ee)!important;box-shadow:0 8px 0 #a57a40,0 24px 45px #002e5a91!important;border-radius:32px!important}
+.immersive-dialog:not(.premium-game) .world-memory .memory-card{border-radius:18px!important;overflow:visible!important}
+.immersive-dialog:not(.premium-game) .world-memory .memory-back{background:linear-gradient(140deg,#2c9cc8,#0878af 58%,#0862a2)!important;border:3px solid #90e1ff!important;border-radius:16px!important;box-shadow:0 5px 0 #064e89,0 10px 14px #073a5d7a!important;color:#b7ffff!important;font-size:30px!important}
+.immersive-dialog:not(.premium-game) .world-memory .memory-front{background:linear-gradient(160deg,#fffcef,#f7e5b3)!important;border:3px solid #ffdf8e!important;border-radius:16px!important;box-shadow:0 5px 0 #c68c3b,0 10px 14px #073d526b!important;color:#63431e!important;font-weight:1000!important}
+.immersive-dialog:not(.premium-game) .world-memory .memory-card.found .memory-front{background:linear-gradient(160deg,#f1ffe1,#baf1a3)!important;border-color:#76df8d!important}
+.immersive-dialog:not(.premium-game) .memory-board-subline{color:#f5fbe8!important}
+.immersive-dialog:not(.premium-game) .memory-topline{color:#fff5cc!important}
 /* Sentence Builder: colorful raised tactile word tiles. */
-.immersive-dialog .world-sentence .sentence-drop{background:linear-gradient(180deg,#fffdf3,#fff1d8)!important;border:3px dashed #eead60!important;border-radius:18px!important}
-.immersive-dialog .world-sentence .sentence-bank{border-radius:20px!important;background:linear-gradient(145deg,#d4ecff,#e9d5ff)!important;border:3px solid #b4d5ff!important}
-.immersive-dialog .world-sentence .word-tile{border-radius:13px!important;background:linear-gradient(180deg,#fff,#d9eeff)!important;border:2px solid #80b8e6!important;color:#214d87!important;box-shadow:0 5px 0 #6ca2d6!important}
-.immersive-dialog .world-sentence .word-tile.selected{background:linear-gradient(180deg,#fff8cd,#ffdb8f)!important;border-color:#ecb15f!important;box-shadow:0 4px 0 #d39b3a!important}
+.immersive-dialog:not(.premium-game) .world-sentence .sentence-drop{background:linear-gradient(180deg,#fffdf3,#fff1d8)!important;border:3px dashed #eead60!important;border-radius:18px!important}
+.immersive-dialog:not(.premium-game) .world-sentence .sentence-bank{border-radius:20px!important;background:linear-gradient(145deg,#d4ecff,#e9d5ff)!important;border:3px solid #b4d5ff!important}
+.immersive-dialog:not(.premium-game) .world-sentence .word-tile{border-radius:13px!important;background:linear-gradient(180deg,#fff,#d9eeff)!important;border:2px solid #80b8e6!important;color:#214d87!important;box-shadow:0 5px 0 #6ca2d6!important}
+.immersive-dialog:not(.premium-game) .world-sentence .word-tile.selected{background:linear-gradient(180deg,#fff8cd,#ffdb8f)!important;border-color:#ecb15f!important;box-shadow:0 4px 0 #d39b3a!important}
 /* Parent and Creator are clean workspace surfaces, unlike the playful gameplay. */
 .parent-workspace,.creator-workspace{background:linear-gradient(180deg,#edf8ff,#fff);border-radius:27px;padding:clamp(16px,2.3vw,34px)}
 .parent-workspace .heading-block,.creator-workspace .heading-block{padding:23px 26px;border-radius:23px;background:linear-gradient(100deg,#0d4d9c,#117bb8);color:#fff;box-shadow:0 7px 0 #073a79,0 13px 26px #0a4c872d}
@@ -175,49 +175,49 @@ button:focus-visible,a:focus-visible,select:focus-visible{outline:4px solid #ffc
 .parent-workspace .panel,.creator-workspace .panel,.parent-workspace .stat-card{border:1px solid #cbe5f9!important;border-radius:23px!important;background:#fff!important;box-shadow:0 8px 22px #0c5a9e18!important}
 /* Responsive gameplay without squeezing interactive card targets. */
 @media(max-width:760px){
- .immersive-dialog .world-stage{padding:10px 10px 16px!important}
- .immersive-dialog .world-memory .forest-board{padding:14px 10px!important}
- .immersive-dialog .world-memory .memory-grid{gap:8px!important}
- .immersive-dialog .world-memory .memory-card{min-height:70px!important}
- .immersive-dialog .world-memory .memory-feedback-slot{height:75px!important;min-height:75px!important;margin-bottom:12px!important;padding:7px 9px!important}
- .immersive-dialog .world-math .challenge-card,.immersive-dialog .world-sentence .sentence-scroll{padding:15px 13px!important}
+ .immersive-dialog:not(.premium-game) .world-stage{padding:10px 10px 16px!important}
+ .immersive-dialog:not(.premium-game) .world-memory .forest-board{padding:14px 10px!important}
+ .immersive-dialog:not(.premium-game) .world-memory .memory-grid{gap:8px!important}
+ .immersive-dialog:not(.premium-game) .world-memory .memory-card{min-height:70px!important}
+ .immersive-dialog:not(.premium-game) .world-memory .memory-feedback-slot{height:75px!important;min-height:75px!important;margin-bottom:12px!important;padding:7px 9px!important}
+ .immersive-dialog:not(.premium-game) .world-math .challenge-card,.immersive-dialog:not(.premium-game) .world-sentence .sentence-scroll{padding:15px 13px!important}
  .parent-workspace,.creator-workspace{padding:14px!important;border-radius:14px}
  .parent-workspace .heading-block,.creator-workspace .heading-block{padding:17px!important}
 }
 @media(prefers-reduced-motion:reduce){.portal273-island-art,.portal273-world,.portal273-start{animation:none!important;transition:none!important}}
 html[data-motion="off"] .portal273-island-art,html[data-motion="off"] .portal273-world,html[data-motion="off"] .portal273-start{animation:none!important;transition:none!important}
 /* Art direction correction from visual review: warm forest/wood, mint leaf-backed cards. */
-.immersive-dialog .world-memory .forest-board{
+.immersive-dialog:not(.premium-game) .world-memory .forest-board{
  background:linear-gradient(135deg,#966334ef 0%,#70421fee 56%,#593019f4 100%)!important;
  border:6px solid #d6a86b!important;border-radius:31px!important;
  box-shadow:inset 0 4px 0 #ffe6a2aa,inset 0 -7px 0 #3b210a55,0 10px 0 #4b2b16,0 23px 35px #002f2a9c!important;
 }
-.immersive-dialog .world-memory .forest-board::before{content:"";position:absolute;inset:8px;pointer-events:none;border:2px dashed #ffde9d50;border-radius:22px}
-.immersive-dialog .world-memory .forest-board{position:relative}
-.immersive-dialog .world-memory .memory-back{
+.immersive-dialog:not(.premium-game) .world-memory .forest-board::before{content:"";position:absolute;inset:8px;pointer-events:none;border:2px dashed #ffde9d50;border-radius:22px}
+.immersive-dialog:not(.premium-game) .world-memory .forest-board{position:relative}
+.immersive-dialog:not(.premium-game) .world-memory .memory-back{
  background:#107451 url('/art/memory-card-back.svg') center/cover no-repeat!important;
  border:4px solid #e8c77a!important;border-radius:18px!important;
  box-shadow:0 5px 0 #84552c,0 10px 15px #102f2c99!important;
  color:transparent!important;text-shadow:none!important;font-size:0!important;
 }
-.immersive-dialog .world-memory .memory-front{
+.immersive-dialog:not(.premium-game) .world-memory .memory-front{
  background:linear-gradient(180deg,#fffaf0,#ffedcb)!important;
  border:4px solid #ebbc75!important;border-radius:18px!important;
  color:#5d3b1b!important;font-size:clamp(14px,1.5vw,24px)!important;
  box-shadow:0 5px 0 #a26a37,0 11px 17px #153a3c94!important;
 }
-.immersive-dialog .world-memory .memory-topline{color:#fff2be!important;font-size:clamp(14px,1.2vw,19px)!important}
-.immersive-dialog .world-memory .memory-board-subline{color:#fff3c9!important}
-.immersive-dialog .world-memory .memory-feedback-slot{background:linear-gradient(125deg,#75451dda,#945f28ec)!important;border-color:#f0d1a1!important;box-shadow:0 5px 0 #623b1b,0 10px 21px #002b3691!important}
-.immersive-dialog .world-memory .hud-label{background:linear-gradient(#8d5d29,#613513)!important;border-color:#f4d5a4!important;box-shadow:0 4px 0 #573411,0 9px 16px #092d4d7a!important}
+.immersive-dialog:not(.premium-game) .world-memory .memory-topline{color:#fff2be!important;font-size:clamp(14px,1.2vw,19px)!important}
+.immersive-dialog:not(.premium-game) .world-memory .memory-board-subline{color:#fff3c9!important}
+.immersive-dialog:not(.premium-game) .world-memory .memory-feedback-slot{background:linear-gradient(125deg,#75451dda,#945f28ec)!important;border-color:#f0d1a1!important;box-shadow:0 5px 0 #623b1b,0 10px 21px #002b3691!important}
+.immersive-dialog:not(.premium-game) .world-memory .hud-label{background:linear-gradient(#8d5d29,#613513)!important;border-color:#f4d5a4!important;box-shadow:0 4px 0 #573411,0 9px 16px #092d4d7a!important}
 /* Protect the top bar of full-screen games on narrow phones. */
-.immersive-dialog .game-dialog-head>div:first-child{min-width:0;flex:1 1 0}
-.immersive-dialog .game-dialog-head h2{overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
-.immersive-dialog .game-dialog-head .button{flex-shrink:0}
+.immersive-dialog:not(.premium-game) .game-dialog-head>div:first-child{min-width:0;flex:1 1 0}
+.immersive-dialog:not(.premium-game) .game-dialog-head h2{overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.immersive-dialog:not(.premium-game) .game-dialog-head .button{flex-shrink:0}
 @media(max-width:420px){
- .immersive-dialog .game-dialog-head{gap:6px!important;padding:7px 9px!important}
- .immersive-dialog .game-dialog-head .eyebrow{display:none!important}
- .immersive-dialog .game-dialog-head h2{font-size:14px!important;max-width:none!important}
- .immersive-dialog .game-dialog-head .button{font-size:11px!important;padding:8px 9px!important;max-width:128px!important;min-height:40px!important}
- .immersive-dialog .world-memory .memory-front{font-size:14px!important}
+ .immersive-dialog:not(.premium-game) .game-dialog-head{gap:6px!important;padding:7px 9px!important}
+ .immersive-dialog:not(.premium-game) .game-dialog-head .eyebrow{display:none!important}
+ .immersive-dialog:not(.premium-game) .game-dialog-head h2{font-size:14px!important;max-width:none!important}
+ .immersive-dialog:not(.premium-game) .game-dialog-head .button{font-size:11px!important;padding:8px 9px!important;max-width:128px!important;min-height:40px!important}
+ .immersive-dialog:not(.premium-game) .world-memory .memory-front{font-size:14px!important}
 }
