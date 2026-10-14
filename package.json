@@ -20,7 +20,7 @@
     "test:guide-model": "node --experimental-strip-types --test tests/glb-import.test.mjs tests/glb-guide-integration.test.mjs tests/glb-guide-runtime.test.mjs",
     "test:guide-animation": "node --experimental-strip-types --test tests/glb-animation.test.mjs tests/glb-import.test.mjs tests/glb-guide-integration.test.mjs tests/glb-guide-runtime.test.mjs",
     "test:content": "node --experimental-strip-types --test tests/content-import-v362.test.mjs",
-    "test:renderer": "node --experimental-strip-types --test tests/renderer-contract.test.mjs tests/quality-manager.test.mjs tests/model-asset-runtime.test.mjs",
+    "test:renderer": "node --experimental-strip-types --test tests/renderer-contract.test.mjs tests/quality-manager.test.mjs tests/model-asset-runtime.test.mjs tests/island-carousel.test.mjs tests/world-carousel-controller.test.mjs",
     "test:premium": "playwright test --config=playwright.v37.config.ts",
     "test:offline-html": "node tools/check_offline_v37.mjs",
     "qa:capture": "node tools/capture_v37.mjs",

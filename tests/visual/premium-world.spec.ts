@@ -15,15 +15,21 @@ async function ready(page: Page, engine = 'three-webgl') {
   await expect(page.locator('.ba3d-render-host')).toHaveAttribute('data-state', engine === 'three-webgl' ? 'ready' : 'fallback');
 }
 
-test('Production flag defaults to legacy and premium loads actual textured GLBs, rig and running clips', async ({ page }, testInfo) => {
+test('Default home uses one premium scene with textured GLBs, rig and running clips', async ({ page }, testInfo) => {
   const errors: string[] = [];
+  const legacyRequests: string[] = [];
   page.on('pageerror', error => errors.push(error.message));
-  await page.goto('/?premium3d=0');
-  await expect(page.locator('.ba3d-render-host')).toHaveAttribute('data-engine', /legacy-webgl2|canvas/);
+  page.on('request', request => {
+    if (/legacyAdapter/.test(request.url())) legacyRequests.push(request.url());
+  });
   const foxResponse = page.waitForResponse(response => response.url().endsWith('/models/fox-guide.glb') && response.status() === 200);
   const mathResponse = page.waitForResponse(response => response.url().endsWith('/models/math-world.glb') && response.status() === 200);
-  await page.getByRole('button', { name: 'Thử cảnh 3D mới', exact: true }).click();
+  await page.goto('/');
   await ready(page);
+  await expect(page.locator('.ba3d-render-host')).toHaveCount(1);
+  await expect(page.locator('.ba3d-render-host canvas.ba3d-canvas')).toHaveCount(1);
+  await expect(page.getByRole('button', { name: /^(Thử cảnh 3D mới|3D mới · thử nghiệm)$/ })).toHaveCount(0);
+  expect(legacyRequests, 'Successful default premium initialization must not download a second renderer').toEqual([]);
   const parseGlb = (bytes: Buffer) => {
     expect(bytes.toString('ascii', 0, 4)).toBe('glTF');
     expect(bytes.readUInt32LE(4)).toBe(2);
@@ -68,6 +74,8 @@ test('Production flag defaults to legacy and premium loads actual textured GLBs,
   await expect.poll(async () => (await diagnostics(page)).tier).toBe('high');
   await testInfo.attach('premium-desktop-runtime', { body: await page.screenshot(), contentType: 'image/png' });
   await testInfo.attach('runtime-diagnostics', { body: JSON.stringify(await diagnostics(page), null, 2), contentType: 'application/json' });
+  await expect(page.locator('.ba3d-render-host canvas.ba3d-canvas')).toHaveCount(1);
+  expect(legacyRequests, 'Selection and quality changes must keep the same renderer').toEqual([]);
   expect(errors).toEqual([]);
 });
 

@@ -1,5 +1,4 @@
-/* V3.7 premium home: semantic controls frame the real 3D scene.
-   These rules apply only while the premium renderer is selected. */
+/* V3.7 home: semantic controls frame the shared 3D scene and its fallback. */
 .premium-world {
   --world-ink: #203e50;
   --world-muted: #5c7986;
@@ -152,6 +151,14 @@
   filter: none;
   box-shadow: 0 16px 34px #2e62752d, inset 0 1px 0 #fff;
   border-color: #9bbcc8;
+}
+.premium-world .ba3d-island-control.ba3d-selected {
+  border-color: var(--world-accent);
+  box-shadow: 0 16px 34px #2e62752d, inset 0 0 0 1px var(--world-accent), inset 0 1px 0 #fff;
+  background: #fffef7f5;
+}
+.premium-world .ba3d-island-control.ba3d-selected .ba3d-world-name strong {
+  color: var(--world-accent);
 }
 .premium-world .ba3d-world-name {
   grid-column: 1 / -1;
@@ -307,12 +314,54 @@
 }
 .premium-world .ba3d-world-name:focus-visible,
 .premium-world .ba3d-play:focus-visible,
+.premium-world .ba3d-overview-reset:focus-visible,
 .premium-world .ba3d-island-control select:focus-visible,
 .premium-world .ba3d-render-controls button:focus-visible,
 .premium-world .ba3d-render-controls select:focus-visible,
 .premium-world .ba3d-shortcuts button:focus-visible {
   outline: 3px solid #225b78;
   outline-offset: 3px;
+}
+
+.ba3d-island-overview {
+  position: absolute;
+  z-index: 3;
+  left: 50%;
+  bottom: 297px;
+  transform: translateX(-50%);
+  max-width: calc(100% - 24px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: #203e50;
+  font-size: 11px;
+  pointer-events: none;
+}
+.ba3d-island-status {
+  line-height: 1.4;
+  text-align: center;
+  text-shadow: 0 1px 5px #fff;
+}
+.ba3d-overview-reset {
+  pointer-events: auto;
+  min-height: 44px;
+  flex-shrink: 0;
+  padding: 9px 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #fffdf3;
+  border-radius: 12px;
+  background: #fffdf4e8;
+  color: #203e50;
+  box-shadow: 0 3px 12px #446a7315;
+  font: inherit;
+  font-weight: 650;
+  cursor: pointer;
+}
+.premium-world .ba3d-island-overview {
+  bottom: 228px;
 }
 
 /* The shared frame uses locked legacy declarations; only their palette is
@@ -542,6 +591,15 @@
   .premium-world .ba3d-shortcuts span:last-child {
     display: none;
   }
+  .ba3d-island-overview,
+  .premium-world .ba3d-island-overview {
+    bottom: 239px;
+    gap: 7px;
+    font-size: 10px;
+  }
+  .ba3d-overview-reset {
+    padding: 9px 10px;
+  }
   .ba-frame-shell:has(.premium-world) .nav-item {
     min-height: 44px !important;
   }
@@ -628,8 +686,14 @@
   .premium-world .ba3d-shortcuts {
     bottom: 5px;
   }
+  .ba3d-island-overview,
+  .premium-world .ba3d-island-overview {
+    bottom: 168px;
+    font-size: 10px;
+  }
 }
 @media (max-width: 370px) and (max-height: 740px) {
+  .premium-world .ba3d-island-status { display: none; }
   .premium-world .ba3d-render-host[data-premium='true'] {
     inset: 100px 0 242px;
   }
@@ -639,4 +703,13 @@
   .premium-world .ba3d-render-controls {
     top: 56px;
   }
+}
+@media (min-width: 701px) and (min-height: 521px) {
+  .premium-world .ba3d-island-overview.has-selection {
+    top: 112px; bottom: auto; right: 25px; left: auto; transform: none;
+  }
+}
+@media (max-width: 700px) {
+  .premium-world .ba3d-render-controls { justify-content: flex-end; }
+  .premium-world .ba3d-island-overview.has-selection .ba3d-island-status { display: none; }
 }

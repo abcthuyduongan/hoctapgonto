@@ -1,0 +1,290 @@
+
+> bao-an-learning-v3-6-3d@3.7.0-rc.1 test:renderer
+> node --experimental-strip-types --test tests/renderer-contract.test.mjs tests/quality-manager.test.mjs tests/model-asset-runtime.test.mjs tests/island-carousel.test.mjs tests/world-carousel-controller.test.mjs
+
+TAP version 13
+# Subtest: 2 islands enter as equally sized, centered peers
+ok 1 - 2 islands enter as equally sized, centered peers
+  ---
+  duration_ms: 1.1001
+  type: 'test'
+  ...
+# Subtest: 2 orbit slots are unique and each selected island reaches the front
+ok 2 - 2 orbit slots are unique and each selected island reaches the front
+  ---
+  duration_ms: 0.4728
+  type: 'test'
+  ...
+# Subtest: 3 islands enter as equally sized, centered peers
+ok 3 - 3 islands enter as equally sized, centered peers
+  ---
+  duration_ms: 0.1101
+  type: 'test'
+  ...
+# Subtest: 3 orbit slots are unique and each selected island reaches the front
+ok 4 - 3 orbit slots are unique and each selected island reaches the front
+  ---
+  duration_ms: 0.2732
+  type: 'test'
+  ...
+# Subtest: 5 islands enter as equally sized, centered peers
+ok 5 - 5 islands enter as equally sized, centered peers
+  ---
+  duration_ms: 0.18
+  type: 'test'
+  ...
+# Subtest: 5 orbit slots are unique and each selected island reaches the front
+ok 6 - 5 orbit slots are unique and each selected island reaches the front
+  ---
+  duration_ms: 0.1408
+  type: 'test'
+  ...
+# Subtest: target rotations take the shortest arc across zero and many full turns
+ok 7 - target rotations take the shortest arc across zero and many full turns
+  ---
+  duration_ms: 0.3386
+  type: 'test'
+  ...
+# Subtest: retargeting keeps the sampled current pose until the new transition advances
+ok 8 - retargeting keeps the sampled current pose until the new transition advances
+  ---
+  duration_ms: 0.7738
+  type: 'test'
+  ...
+# Subtest: empty and single-island configurations avoid invalid coordinates
+ok 9 - empty and single-island configurations avoid invalid coordinates
+  ---
+  duration_ms: 0.6416
+  type: 'test'
+  ...
+# Subtest: fox-guide: self-contained candidate asset loads real 3D geometry and embedded PBR textures
+ok 10 - fox-guide: self-contained candidate asset loads real 3D geometry and embedded PBR textures
+  ---
+  duration_ms: 156.4502
+  type: 'test'
+  ...
+# Subtest: math-world: self-contained candidate asset loads real 3D geometry and embedded PBR textures
+ok 11 - math-world: self-contained candidate asset loads real 3D geometry and embedded PBR textures
+  ---
+  duration_ms: 141.4223
+  type: 'test'
+  ...
+# Subtest: fox: runtime skin has nontrivial bones, valid normalized weights, and bone clip channels
+ok 12 - fox: runtime skin has nontrivial bones, valid normalized weights, and bone clip channels
+  ---
+  duration_ms: 6.5676
+  type: 'test'
+  ...
+# Subtest: fox: AnimationMixer plays Idle, Cheer, and Victory and deforms skinned vertices
+ok 13 - fox: AnimationMixer plays Idle, Cheer, and Victory and deforms skinned vertices
+  ---
+  duration_ms: 20.5086
+  type: 'test'
+  ...
+# Subtest: premium manifest retains all five mandatory assets and fox texture/clip requirements
+ok 14 - premium manifest retains all five mandatory assets and fox texture/clip requirements
+  ---
+  duration_ms: 0.6157
+  type: 'test'
+  ...
+# Subtest: AssetLoader rejects a missing declared PBR map and disposes other successfully decoded resources
+ok 15 - AssetLoader rejects a missing declared PBR map and disposes other successfully decoded resources
+  ---
+  duration_ms: 35.9565
+  type: 'test'
+  ...
+# Subtest: AssetLoader abort after actual GLTF decoding disposes skins, textures, and bitmaps before rejecting
+ok 16 - AssetLoader abort after actual GLTF decoding disposes skins, textures, and bitmaps before rejecting
+  ---
+  duration_ms: 40.7736
+  type: 'test'
+  ...
+# Subtest: AssetLoader accepts correctly decoded PBR maps and shares one pending parse per asset path
+ok 17 - AssetLoader accepts correctly decoded PBR maps and shares one pending parse per asset path
+  ---
+  duration_ms: 35.5486
+  type: 'test'
+  ...
+# Subtest: auto begins conservatively and manual tiers preserve the selected quality
+ok 18 - auto begins conservatively and manual tiers preserve the selected quality
+  ---
+  duration_ms: 2.5219
+  type: 'test'
+  ...
+# Subtest: auto degrades only after sustained slow frames and ignores a short spike
+ok 19 - auto degrades only after sustained slow frames and ignores a short spike
+  ---
+  duration_ms: 0.3977
+  type: 'test'
+  ...
+# Subtest: hysteresis requires enough fast samples, resets interrupted streaks, and caps automatic upgrades
+ok 20 - hysteresis requires enough fast samples, resets interrupted streaks, and caps automatic upgrades
+  ---
+  duration_ms: 0.4905
+  type: 'test'
+  ...
+# Subtest: quality changes observe the minimum cooldown even with sufficient samples
+ok 21 - quality changes observe the minimum cooldown even with sufficient samples
+  ---
+  duration_ms: 0.3437
+  type: 'test'
+  ...
+# Subtest: manual selection resets prior streaks before returning to auto
+ok 22 - manual selection resets prior streaks before returning to auto
+  ---
+  duration_ms: 0.5043
+  type: 'test'
+  ...
+# Subtest: invalid frame samples cannot trigger automatic changes
+ok 23 - invalid frame samples cannot trigger automatic changes
+  ---
+  duration_ms: 0.4983
+  type: 'test'
+  ...
+# Subtest: metrics calculate FPS from median duration and expose P95 as frame milliseconds
+ok 24 - metrics calculate FPS from median duration and expose P95 as frame milliseconds
+  ---
+  duration_ms: 1.8003
+  type: 'test'
+  ...
+# Subtest: metrics omit pause gaps and invalid intervals without losing valid frame history
+ok 25 - metrics omit pause gaps and invalid intervals without losing valid frame history
+  ---
+  duration_ms: 0.2996
+  type: 'test'
+  ...
+# Subtest: metrics use a bounded recent window while keeping the cumulative sample count
+ok 26 - metrics use a bounded recent window while keeping the cumulative sample count
+  ---
+  duration_ms: 0.5861
+  type: 'test'
+  ...
+# Subtest: premium success preserves the canvas and initialization options without constructing fallback
+ok 27 - premium success preserves the canvas and initialization options without constructing fallback
+  ---
+  duration_ms: 1.6594
+  type: 'test'
+  ...
+# Subtest: premium opt-out constructs only legacy on the original canvas
+ok 28 - premium opt-out constructs only legacy on the original canvas
+  ---
+  duration_ms: 0.3955
+  type: 'test'
+  ...
+# Subtest: premium failure cleans up before replacing canvas and initializes fallback on the new canvas
+ok 29 - premium failure cleans up before replacing canvas and initializes fallback on the new canvas
+  ---
+  duration_ms: 1.8899
+  type: 'test'
+  ...
+# Subtest: already aborted construction never starts either loader or replaces the canvas
+ok 30 - already aborted construction never starts either loader or replaces the canvas
+  ---
+  duration_ms: 0.504
+  type: 'test'
+  ...
+# Subtest: premium result resolving after abort is disposed once and never starts fallback
+ok 31 - premium result resolving after abort is disposed once and never starts fallback
+  ---
+  duration_ms: 0.2763
+  type: 'test'
+  ...
+# Subtest: premium rejection after abort propagates abort without fallback or warning
+ok 32 - premium rejection after abort propagates abort without fallback or warning
+  ---
+  duration_ms: 0.3181
+  type: 'test'
+  ...
+# Subtest: legacy result resolving after abort is disposed once
+ok 33 - legacy result resolving after abort is disposed once
+  ---
+  duration_ms: 0.2309
+  type: 'test'
+  ...
+# Subtest: abort during canvas replacement prevents fallback allocation
+ok 34 - abort during canvas replacement prevents fallback allocation
+  ---
+  duration_ms: 0.2829
+  type: 'test'
+  ...
+# Subtest: fallback errors remain visible to the host when both renderers fail
+ok 35 - fallback errors remain visible to the host when both renderers fail
+  ---
+  duration_ms: 0.3788
+  type: 'test'
+  ...
+# Subtest: entrance presents equal islands and the fox waits outside them
+ok 36 - entrance presents equal islands and the fox waits outside them
+  ---
+  duration_ms: 2.2168
+  type: 'test'
+  ...
+# Subtest: selection rises through a visible jump and lands precisely on the chosen island
+ok 37 - selection rises through a visible jump and lands precisely on the chosen island
+  ---
+  duration_ms: 1.4307
+  type: 'test'
+  ...
+# Subtest: moving from Memory to Language follows an arc and brings Language in front
+ok 38 - moving from Memory to Language follows an arc and brings Language in front
+  ---
+  duration_ms: 0.6826
+  type: 'test'
+  ...
+# Subtest: reselecting an island and choosing an unknown island do not restart motion
+ok 39 - reselecting an island and choosing an unknown island do not restart motion
+  ---
+  duration_ms: 1.9567
+  type: 'test'
+  ...
+# Subtest: twenty rapid retargets preserve every current position and land on the latest choice
+ok 40 - twenty rapid retargets preserve every current position and land on the latest choice
+  ---
+  duration_ms: 1.9686
+  type: 'test'
+  ...
+# Subtest: continuous frame-by-frame retargeting cannot accumulate airborne height
+ok 41 - continuous frame-by-frame retargeting cannot accumulate airborne height
+  ---
+  duration_ms: 6.03
+  type: 'test'
+  ...
+# Subtest: reduced motion and settling midflight land immediately without stale animation
+ok 42 - reduced motion and settling midflight land immediately without stale animation
+  ---
+  duration_ms: 0.3841
+  type: 'test'
+  ...
+# Subtest: responsive configuration preserves selection with valid feet coordinates
+ok 43 - responsive configuration preserves selection with valid feet coordinates
+  ---
+  duration_ms: 0.3152
+  type: 'test'
+  ...
+# Subtest: returning to the entrance restores peers and the waiting platform
+ok 44 - returning to the entrance restores peers and the waiting platform
+  ---
+  duration_ms: 0.8948
+  type: 'test'
+  ...
+# Subtest: five runtime islands each rotate to the front without hardcoded triplets
+ok 45 - five runtime islands each rotate to the front without hardcoded triplets
+  ---
+  duration_ms: 3.552
+  type: 'test'
+  ...
+# Subtest: additional islands grow both orbit axes with enough settled footprint clearance
+ok 46 - additional islands grow both orbit axes with enough settled footprint clearance
+  ---
+  duration_ms: 0.4125
+  type: 'test'
+  ...
+1..46
+# tests 46
+# suites 0
+# pass 46
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 654.5657

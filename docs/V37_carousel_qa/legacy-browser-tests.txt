@@ -1,0 +1,13 @@
+
+> bao-an-learning-v3-6-3d@3.7.0-rc.1 test:visual
+> playwright test --config=playwright.config.ts
+
+
+Running 4 tests using 1 worker
+
+  ok 1 [chrome-production] › tests\visual\real3d31.spec.ts:3:1 › Bảo An V3.1: scene canvas, three games, controls and no overflow (1.1s)
+  ok 2 [chrome-production] › tests\visual\real3d31.spec.ts:13:1 › Bảo An V3.1: navigate Math Quest and return (870ms)
+  ok 3 [chrome-production] › tests\visual\real3d31.spec.ts:21:1 › Bảo An V3.1: Memory Match remains clickable after selecting two cards (2.5s)
+  ok 4 [chrome-production] › tests\visual\real3d31.spec.ts:32:1 › Bảo An V3.1: mobile stays within viewport (579ms)
+
+  4 passed (7.3s)

@@ -8,12 +8,10 @@ interface Props {
   onSelect: (id: WorldId) => void;
   active: boolean;
   motionOn: boolean;
-  premium3DEnabled?: boolean;
   quality?: QualityChoice;
 }
 
-export default function WorldCanvas({ selected, onSelect, active, motionOn,
-  premium3DEnabled = false, quality = 'auto' }: Props) {
+export default function WorldCanvas({ selected, onSelect, active, motionOn, quality = 'auto' }: Props) {
   const host = useRef<HTMLDivElement>(null);
   const runtime = useRef<WorldRenderer | null>(null);
   const current = useRef({ selected, onSelect, active, motionOn, quality });
@@ -50,7 +48,7 @@ export default function WorldCanvas({ selected, onSelect, active, motionOn,
     };
     const canvas = replaceCanvas();
     setState('loading');
-    void createWorldRenderer({ canvas, premium3DEnabled: premium3DEnabled && recovery === 0,
+    void createWorldRenderer({ canvas, premium3DEnabled: recovery === 0,
       replaceCanvas, onSelect: id => current.current.onSelect(id),
       motionOn: current.current.motionOn && !media.matches,
       paused: !current.current.active || document.hidden, quality: current.current.quality,
@@ -63,7 +61,7 @@ export default function WorldCanvas({ selected, onSelect, active, motionOn,
       renderer.setQualityChoice?.(current.current.quality);
       sync(); updateDiagnostics();
       const engine = renderer.getDiagnostics().engine;
-      setState(engine === 'canvas' || (premium3DEnabled && engine !== 'three-webgl') ? 'fallback' : 'ready');
+      setState(engine === 'three-webgl' ? 'ready' : 'fallback');
     }).catch(error => {
       if (!cancelled) { console.warn('Bảo An: cảnh 3D không khả dụng', error); setState('unavailable'); }
     });
@@ -78,7 +76,7 @@ export default function WorldCanvas({ selected, onSelect, active, motionOn,
       window.clearInterval(diagnosticsTimer);
       container.replaceChildren();
     };
-  }, [premium3DEnabled, recovery]);
+  }, [recovery]);
   useEffect(() => { runtime.current?.focusOn(selected); }, [selected]);
   useEffect(() => { runtime.current?.setPaused(!active || document.hidden); }, [active]);
   useEffect(() => {
@@ -86,7 +84,7 @@ export default function WorldCanvas({ selected, onSelect, active, motionOn,
   }, [motionOn]);
   useEffect(() => { runtime.current?.setQualityChoice?.(quality); }, [quality]);
   return <>
-    <div ref={host} className="ba3d-render-host" data-state={state} data-premium={premium3DEnabled} />
+    <div ref={host} className="ba3d-render-host" data-state={state} data-premium="true" />
     {state === 'loading' && <div className="ba3d-render-status" role="status">Đang mở thế giới 3D… Con có thể bắt đầu chơi ngay.</div>}
     {(state === 'fallback' || state === 'unavailable') && <div className="ba3d-render-status" role="status">
       {state === 'fallback' ? 'Đang dùng cảnh dự phòng.' : 'Cảnh 3D không khả dụng.'} Chọn trò chơi bằng các nút Bắt đầu.

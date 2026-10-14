@@ -4,6 +4,8 @@ Ngày thực hiện: **14/10/2026**, múi giờ Việt Nam. Quyết định: **C
 
 **Cập nhật sau phản hồi chất lượng:** đã chỉnh lại chiều sâu cảnh, tỷ lệ cáo/đảo Toán và giao diện. Báo cáo này lưu bằng chứng của bản PR02 đầu tiên; ảnh và số liệu mới nằm ở [V37_depth_qa/visual-review.md](V37_depth_qa/visual-review.md) và thư mục `V37_depth_qa/`. Không dùng số liệu/ảnh cũ dưới đây để đại diện cho cảnh đã sửa.
 
+**Cập nhật tương tác và thống nhất giao diện:** các đảo ban đầu ngang hàng, cáo chờ ở góc trái rồi nhảy sang đảo được chọn, vòng đảo quay đưa lựa chọn ra trước. Chỉ còn giao diện 3D mới; renderer cũ là dự phòng tự tải khi lỗi, không chạy song song. Bằng chứng hiện tại nằm trong [V37_carousel_qa/visual-review.md](V37_carousel_qa/visual-review.md); các số liệu dưới đây lưu lịch sử PR02 đầu tiên.
+
 Đã triển khai renderer premium thật trên nền React V3.6.2 RC2: cáo GLB có PBR, skin và ba clip xương; đảo Toán có lâu đài, đường đi và biểu tượng số. Hai đảo còn lại trong chế độ mới là landmark thủ tục để giữ bố cục, chưa phải asset premium. Không dùng ảnh concept làm tấm phẳng thay mô hình.
 
 ## Mở bản chạy thật
@@ -16,9 +18,9 @@ npm run build
 npm run preview -- --port 5178
 ```
 
-URL `?premium3d=1` bật lát cắt PR-02; `?premium3d=0` hoặc nút cảnh 3D quay về renderer cũ. Mặc định vẫn là legacy cho đến khi được duyệt. Quality tự động/thủ công chỉ điều chỉnh hiển thị; không tải lại GLB khi chọn đảo hoặc đổi quality. Legacy chỉ có hai preset độ phân giải; low/balanced cùng ánh xạ balanced, không coi đó là ba tier đầy đủ.
+URL `/` mở cảnh mới. Không còn nút lựa chọn hai phiên bản; query `premium3d` và biến môi trường cũ không đổi renderer nữa. Khi cảnh mới tải thành công, chunk legacy không được tải; nếu lỗi, renderer mới được dọn trước khi dựng dự phòng trên canvas khác. Quality tự động/thủ công chỉ điều chỉnh hiển thị; không tải lại GLB khi chọn đảo hoặc đổi quality. Dự phòng chỉ có hai preset độ phân giải; low/balanced cùng ánh xạ balanced, không coi đó là ba tier đầy đủ.
 
-Preview ở cổng 5178 là origin khác `localhost:5173` hoặc `127.0.0.1:5173`. Trình duyệt không chia sẻ IndexedDB giữa các origin; điểm ở preview mới có thể bắt đầu từ 0 dù dữ liệu origin cũ vẫn còn. Để tiếp tục dùng dữ liệu React cũ, chạy mã mới qua `START_WINDOWS.bat` trên đúng hostname/cổng trước đây và bật nút xem thử; không có migration tự động giữa các origin hoặc với bản HTML.
+Preview ở cổng 5178 là origin khác `localhost:5173` hoặc `127.0.0.1:5173`. Trình duyệt không chia sẻ IndexedDB giữa các origin; điểm ở preview mới có thể bắt đầu từ 0 dù dữ liệu origin cũ vẫn còn. Để tiếp tục dùng dữ liệu React cũ, chạy mã mới qua `START_WINDOWS.bat` trên đúng hostname/cổng trước đây; không có migration tự động giữa các origin hoặc với bản HTML.
 
 ## Baseline và phạm vi bảo toàn
 
@@ -92,6 +94,6 @@ Baseline cùng viewport: `V37_qa/baseline-1440x900.png`, `baseline-390x844.png`,
 
 ## Rollback
 
-1. Tắt nút xem thử, dùng `?premium3d=0` hoặc cấu hình `VITE_PREMIUM_3D_ENABLED=false` rồi build lại. Ba game và IndexedDB giữ nguyên.
+1. Bản hiện tại dùng một giao diện mới với dự phòng tự động; nút/flag quay về bản cũ đã bỏ theo yêu cầu chủ dự án. Nếu cần quay lại bản có lựa chọn, dùng checkpoint Git `a84e881` trong thư mục riêng. Ba game và IndexedDB không đổi.
 2. Nếu cần hoàn nguyên code, checkout baseline trong một thư mục riêng hoặc giải nén snapshot vào thư mục mới. Không chép đè mù lên bản hiện tại.
 3. Không xóa IndexedDB/localStorage để rollback renderer. Hai nhánh React/HTML có dữ liệu riêng.

@@ -1,5 +1,5 @@
 import { WebGLRenderer, PerspectiveCamera, Vector2, Vector3, Raycaster,
-  ACESFilmicToneMapping, SRGBColorSpace, PCFSoftShadowMap, Mesh, type Object3D } from 'three';
+  ACESFilmicToneMapping, SRGBColorSpace, PCFSoftShadowMap, Mesh, Group, type Object3D } from 'three';
 import type { WorldId } from '../engine';
 import type { RendererInitOptions, RenderTier, RenderStats, WorldRenderer, QualityChoice } from './types';
 import { AssetLoader } from './assetLoader';
@@ -7,11 +7,14 @@ import { disposeScene, estimateTextureBytes } from './disposeScene';
 import { PerformanceMetrics } from './performanceMetrics';
 import { QualityManager, QUALITY } from './qualityManager';
 import { buildWorld } from '../scenes/buildWorld';
-import { WORLD_LAYOUT, MOBILE_WORLD_LAYOUT, MASCOT_POSITION } from '../scenes/worldLayout';
+import { carouselLayout, WORLD_IDS } from '../scenes/worldLayout';
+import { WorldCarouselController } from '../scenes/WorldCarouselController';
 import { MascotController } from '../scenes/mascotController';
 
 class PremiumWorldRenderer implements WorldRenderer {
   private world = buildWorld();
+  private guideAnchor = new Group();
+  private carousel = new WorldCarouselController(this.world.worlds, this.guideAnchor, this.world.waitingPlatform);
   private camera = new PerspectiveCamera(32, 1, .1, 150);
   private renderer?: WebGLRenderer;
   private loader: AssetLoader;
@@ -22,7 +25,6 @@ class PremiumWorldRenderer implements WorldRenderer {
   private resizeObserver?: ResizeObserver;
   private raycaster = new Raycaster();
   private target = new Vector3(0, .3, 0);
-  private focusTarget = new Vector3(0, .3, 0);
   private raf = 0;
   private lastTime = 0;
   private lastStats = 0;
@@ -30,7 +32,6 @@ class PremiumWorldRenderer implements WorldRenderer {
   private initialized = false;
   private paused: boolean;
   private motion: boolean;
-  private selected: WorldId | null = null;
   private pointerStart?: { x: number; y: number };
   private errors: string[] = [];
   private readyAssets: string[] = [];
@@ -106,8 +107,8 @@ class PremiumWorldRenderer implements WorldRenderer {
     // Attach both roots before validation so any subsequent failure cleans both.
     const group = this.world.worlds.get('math-quest')!;
     group.children.forEach(disposeScene); group.clear(); group.add(math.scene);
-    fox.scene.position.set(...MASCOT_POSITION); fox.scene.scale.setScalar(.9);
-    group.add(fox.scene);
+    fox.scene.position.set(0, 0, 0); fox.scene.scale.setScalar(.9);
+    this.guideAnchor.add(fox.scene); this.world.scene.add(this.guideAnchor);
     this.mascot = new MascotController(fox.scene, fox.animations);
     this.clips = fox.animations.map(clip => clip.name);
     fox.scene.traverse(node => {
@@ -130,18 +131,27 @@ class PremiumWorldRenderer implements WorldRenderer {
     this.renderer.setSize(width, height, false);
     this.camera.aspect = width / height;
     const mobile = width <= 700;
-    const layout = mobile ? MOBILE_WORLD_LAYOUT : WORLD_LAYOUT;
-    for (const [id, root] of this.world.worlds) {
-      const placement = layout[id]; root.position.set(placement.x, placement.y, placement.z);
-      root.scale.setScalar(placement.scale);
-    }
-    // A foreground Math island and two rear landmarks replace the flat icon row.
-    // Portrait framing favors the guide while preserving the HTML routes to all games.
-    const span = mobile ? 7.8 : 17;
-    const distance = Math.max(mobile ? 12.8 : 12.5, span / (2 * Math.tan(32 * Math.PI / 360) * this.camera.aspect) + 1.7);
-    this.camera.position.set(.8, distance * .36 + 1, distance);
+    this.carousel.configure(mobile);
+    const layout = carouselLayout(mobile, WORLD_IDS.length);
+    // Frame the full entrance row and the circle, including the waiting guide.
+    const span = Math.max((WORLD_IDS.length - 1) * layout.spacing + 4.5 * layout.neutralScale,
+      layout.radiusX * 2 + 4.5 * layout.frontScale,
+      2 * (Math.abs(layout.waiting.x) + 1.25));
+    let distance = Math.max(mobile ? 14 : 14.5, span / (2 * Math.tan(32 * Math.PI / 360) * this.camera.aspect) + 3);
     this.camera.updateProjectionMatrix();
-    this.camera.lookAt(this.target);
+    // The foreground perch is closer than the islands; fit its full volume,
+    // not just its center, so tablet portrait and landscape cannot crop the fox.
+    const waitingCorners = [-1.25, 1.25].flatMap(x => [-.4, 2.6].flatMap(y => [-1.15, 1.15].map(z =>
+      new Vector3(layout.waiting.x + x, layout.waiting.y + y, layout.waiting.z + z))));
+    for (let attempt = 0; attempt < 24; attempt++) {
+      this.camera.position.set(0, distance * .38 + 1, distance);
+      this.camera.lookAt(this.target); this.camera.updateMatrixWorld();
+      if (waitingCorners.every(corner => {
+        const projected = corner.clone().project(this.camera);
+        return Math.abs(projected.x) <= .94 && Math.abs(projected.y) <= .94;
+      })) break;
+      distance *= 1.035;
+    }
     this.invalidate();
   };
   private applyQuality() {
@@ -163,8 +173,8 @@ class PremiumWorldRenderer implements WorldRenderer {
     this.lastTime = now;
     if (this.motion) {
       this.metrics.record(now);
+      this.carousel.advance(delta);
       this.mascot?.update(delta);
-      this.target.lerp(this.focusTarget, 1 - Math.exp(-delta * 5));
       this.world.clouds.rotation.y += delta * .003;
       if (this.quality.observe(frameMs, now)) this.applyQuality();
     }
@@ -177,11 +187,8 @@ class PremiumWorldRenderer implements WorldRenderer {
     if (this.motion) this.invalidate();
   };
   focusOn(id: WorldId | null) {
-    if (id === this.selected) return;
-    this.selected = id;
-    this.focusTarget.set(id ? this.world.worlds.get(id)!.position.x * .17 : 0, .3, 0);
-    if (!this.motion) this.target.copy(this.focusTarget);
-    else if (id) this.mascot?.play('Cheer');
+    if (!this.carousel.select(id, this.motion)) return;
+    if (this.motion) this.mascot?.play('Cheer');
     this.invalidate();
   }
   setPaused(paused: boolean) {
@@ -193,7 +200,7 @@ class PremiumWorldRenderer implements WorldRenderer {
   setMotion(enabled: boolean) {
     this.motion = enabled; this.lastTime = 0; this.metrics.resetClock();
     if (!enabled) {
-      this.target.copy(this.focusTarget);
+      this.carousel.settle();
       this.mascot?.play('Idle', false);
       this.mascot?.mixer.setTime(0);
       cancelAnimationFrame(this.raf); this.raf = 0;
@@ -204,6 +211,7 @@ class PremiumWorldRenderer implements WorldRenderer {
   setQualityChoice(choice: QualityChoice) { this.quality.setChoice(choice); this.applyQuality(); this.invalidate(); }
   getDiagnostics(): RenderStats {
     return { engine: 'three-webgl', ...this.metrics.snapshot(), tier: this.quality.tier,
+      ...this.carousel.snapshot(),
       dpr: this.renderer?.getPixelRatio(), drawCalls: this.renderer?.info.render.calls,
       triangles: this.renderer?.info.render.triangles, textureBytesEstimate: this.textureBytes,
       assetErrors: [...this.errors], readyAssets: [...this.readyAssets],

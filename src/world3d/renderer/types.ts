@@ -22,6 +22,14 @@ export interface RenderStats {
   skeletalMeshes?: number;
   bones?: number;
   animationTime?: number;
+  selectedWorld?: WorldId | null;
+  carouselMoving?: boolean;
+  rotation?: number;
+  islands?: { id: WorldId; x: number; y: number; z: number; scale: number }[];
+  mascotLocation?: 'waiting' | WorldId;
+  mascotState?: 'waiting' | 'jumping' | 'on-island';
+  mascotPosition?: { x: number; y: number; z: number };
+  jumpProgress?: number;
 }
 export interface WorldRenderer {
   focusOn(id: WorldId | null): void;

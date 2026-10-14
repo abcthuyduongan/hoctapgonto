@@ -1,7 +1,7 @@
 import { Scene, Group, Mesh, MeshStandardMaterial, CylinderGeometry, SphereGeometry,
   ConeGeometry, BoxGeometry, HemisphereLight, DirectionalLight, Fog, BufferGeometry,
   Float32BufferAttribute, Color, IcosahedronGeometry, InstancedMesh, Object3D,
-  type Material } from 'three';
+  TorusGeometry, type Material } from 'three';
 import { WORLD_LAYOUT } from './worldLayout';
 import type { WorldId } from '../engine';
 
@@ -68,6 +68,18 @@ export function buildWorld() {
   const scenery = new Group(); scenery.name = 'Atmospheric depth layers';
   scenery.add(ridge(-35, -13, 0xa8c5c7, .9), ridge(-25, -10, 0x8fafb0, 2.1), ridge(-18, -8, 0x749895, .2));
   scene.add(scenery);
+  // A small waiting plinth is separate from every activity island.
+  const waitingPlatform = new Group(); waitingPlatform.name = 'Guide waiting platform';
+  const plinth = new Mesh(new CylinderGeometry(.86, .67, .38, 24),
+    new MeshStandardMaterial({ color: 0xe5d8b7, roughness: .82 }));
+  plinth.position.y = -.14; waitingPlatform.add(plinth);
+  const top = new Mesh(new CylinderGeometry(.83, .83, .08, 24),
+    new MeshStandardMaterial({ color: 0xf7f0dc, roughness: .75 }));
+  top.position.y = .06; waitingPlatform.add(top);
+  const trim = new Mesh(new TorusGeometry(.79, .035, 6, 36),
+    new MeshStandardMaterial({ color: 0xd6b26d, roughness: .5, metalness: .2 }));
+  trim.rotation.x = Math.PI / 2; trim.position.y = .105; waitingPlatform.add(trim);
+  scene.add(waitingPlatform);
   const worlds = new Map<WorldId, Group>();
   const leaf = new SphereGeometry(.5, 12, 8);
   const trunk = new CylinderGeometry(.1, .16, 1.1, 8);
@@ -135,5 +147,5 @@ export function buildWorld() {
   }
   clouds.add(instances(puff, cloudMaterial, cloudPuffs, false));
   scene.add(clouds);
-  return { scene, worlds, sunlight, clouds, scenery };
+  return { scene, worlds, sunlight, clouds, scenery, waitingPlatform };
 }
