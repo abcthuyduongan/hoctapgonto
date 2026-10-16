@@ -77,6 +77,7 @@ Không đưa `SUPABASE_MIGRATION_DB_URL`/`SUPABASE_MIGRATION_DB_CA` lên Netlify
 | Hiện tượng | Kiểm tra |
 |---|---|
 | `/api/online/status` trả `available:false`, HTTP 503 | Đã deploy Functions; biến có context Production và scope Functions/All scopes; chạy setup rồi check; đã redeploy sau đổi biến |
+| API báo `Thiếu biến` hoặc có `missingVariables` | Bổ sung đúng tên biến được liệt kê vào Netlify, context Production và scope Functions/All scopes, rồi redeploy. Thông báo chỉ chứa tên biến, không chứa giá trị. Ngoài ba biến Supabase cần `BAO_AN_PUBLIC_ORIGIN` là origin HTTPS của website; tạo thêm `BAO_AN_SETUP_TOKEN` ngẫu nhiên từ 24 ký tự để khởi tạo quản lý |
 | API trả HTML trang chủ | Đang deploy thiếu Function hoặc sai thư mục gốc; phải build từ toàn bộ repo, không kéo thả riêng `dist` |
 | Kết nối PostgreSQL thất bại | Dự án Supabase đang hoạt động; dùng đúng Transaction pooler, user/host/password; kiểm tra TLS/CA bằng `cloud:check` |
 | Không tạo được schema | URI migration có quyền DDL; không dùng khóa `anon`/publishable thay cho mật khẩu database |
