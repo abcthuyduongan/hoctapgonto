@@ -1,0 +1,38 @@
+
+> bao-an-learning-v3-6-3d@3.7.0-rc.1 test:content
+> node --experimental-strip-types --test tests/content-import-v362.test.mjs
+
+TAP version 13
+# Subtest: Xuất rồi nhập giữ đủ ba mẫu game và phiên bản học liệu
+ok 1 - Xuất rồi nhập giữ đủ ba mẫu game và phiên bản học liệu
+  ---
+  duration_ms: 5.3443
+  type: 'test'
+  ...
+# Subtest: Không cho import sai schema và dữ liệu ngoài phạm vi
+ok 2 - Không cho import sai schema và dữ liệu ngoài phạm vi
+  ---
+  duration_ms: 1.3296
+  type: 'test'
+  ...
+# Subtest: Không nhận dữ liệu có item thiếu, sai kiểu hoặc trùng ID/version
+ok 3 - Không nhận dữ liệu có item thiếu, sai kiểu hoặc trùng ID/version
+  ---
+  duration_ms: 0.6816
+  type: 'test'
+  ...
+# Subtest: Phương án HTML trong bộ học liệu được giữ như văn bản, không thực thi
+ok 4 - Phương án HTML trong bộ học liệu được giữ như văn bản, không thực thi
+  ---
+  duration_ms: 0.8971
+  type: 'test'
+  ...
+1..4
+# tests 4
+# suites 0
+# pass 4
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 143.79

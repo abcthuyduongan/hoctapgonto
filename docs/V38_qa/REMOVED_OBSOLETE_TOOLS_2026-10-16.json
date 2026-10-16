@@ -1,0 +1,138 @@
+[
+  {
+    "Path": "tools/audit_v37_game_logic.mjs",
+    "Bytes": 2803
+  },
+  {
+    "Path": "tools/browser_qa_v36.py",
+    "Bytes": 2904
+  },
+  {
+    "Path": "tools/browser_qa_v362.py",
+    "Bytes": 4545
+  },
+  {
+    "Path": "tools/build_grade3_pilot.mjs",
+    "Bytes": 15881
+  },
+  {
+    "Path": "tools/build_grade3_rich.mjs",
+    "Bytes": 9464
+  },
+  {
+    "Path": "tools/build_offline_release.py",
+    "Bytes": 12340
+  },
+  {
+    "Path": "tools/build_premium_art.py",
+    "Bytes": 3329
+  },
+  {
+    "Path": "tools/capture_v37.mjs",
+    "Bytes": 3692
+  },
+  {
+    "Path": "tools/capture_v37_art.mjs",
+    "Bytes": 11753
+  },
+  {
+    "Path": "tools/capture_v37_backup.mjs",
+    "Bytes": 5718
+  },
+  {
+    "Path": "tools/capture_v37_carousel.mjs",
+    "Bytes": 11282
+  },
+  {
+    "Path": "tools/capture_v37_depth.mjs",
+    "Bytes": 8073
+  },
+  {
+    "Path": "tools/capture_v37_games.mjs",
+    "Bytes": 20357
+  },
+  {
+    "Path": "tools/check_memory281_preview.py",
+    "Bytes": 2894
+  },
+  {
+    "Path": "tools/check_offline_v37.mjs",
+    "Bytes": 6736
+  },
+  {
+    "Path": "tools/check_panorama271.py",
+    "Bytes": 2537
+  },
+  {
+    "Path": "tools/check_stability27.py",
+    "Bytes": 3278
+  },
+  {
+    "Path": "tools/export_template_data.mjs",
+    "Bytes": 1450
+  },
+  {
+    "Path": "tools/full_flow_qa_v36.py",
+    "Bytes": 3273
+  },
+  {
+    "Path": "tools/generate_art.py",
+    "Bytes": 9002
+  },
+  {
+    "Path": "tools/generate_learning_audio.ps1",
+    "Bytes": 1401
+  },
+  {
+    "Path": "tools/make_delivery.py",
+    "Bytes": 1524
+  },
+  {
+    "Path": "tools/make_memory281_preview.py",
+    "Bytes": 5749
+  },
+  {
+    "Path": "tools/make_premium_preview.py",
+    "Bytes": 4329
+  },
+  {
+    "Path": "tools/patch_offline_v36.py",
+    "Bytes": 4791
+  },
+  {
+    "Path": "tools/prepare_covers.py",
+    "Bytes": 683
+  },
+  {
+    "Path": "tools/profile_v37_performance.mjs",
+    "Bytes": 22763
+  },
+  {
+    "Path": "tools/qa_v361_browser.py",
+    "Bytes": 5688
+  },
+  {
+    "Path": "tools/render280.py",
+    "Bytes": 3655
+  },
+  {
+    "Path": "tools/render_design290.py",
+    "Bytes": 2639
+  },
+  {
+    "Path": "tools/render_premium_inline.py",
+    "Bytes": 2360
+  },
+  {
+    "Path": "tools/render_preview.py",
+    "Bytes": 2363
+  },
+  {
+    "Path": "tools/review_content_catalog.mjs",
+    "Bytes": 13171
+  },
+  {
+    "Path": "tools/upgrade_code.py",
+    "Bytes": 8120
+  }
+]

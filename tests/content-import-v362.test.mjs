@@ -4,7 +4,7 @@ import {BUILTIN_PACKS} from '../src/core/seed.ts';
 import {MAX_IMPORT_BYTES,parseContentImport,serializeContentExport} from '../src/core/content-io.ts';
 const sample=BUILTIN_PACKS;
 test('Xuất rồi nhập giữ đủ ba mẫu game và phiên bản học liệu',()=>{
- const text=serializeContentExport([sample[0],sample[1],sample.at(-1)],'2026-10-13T00:00:00.000Z');
+ const text=serializeContentExport([sample[0],sample[1],sample.find(pack=>pack.id==='english3-sentences')],'2026-10-13T00:00:00.000Z');
  const restored=parseContentImport(text);
  assert.equal(restored.length,3);
  assert.deepEqual(restored.map(p=>p.kind),['quiz','pairs','sentences']);

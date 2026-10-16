@@ -1,0 +1,23 @@
+{
+  "probe": {
+    "writes": 2,
+    "firstSucceeded": false,
+    "aborted": true,
+    "observedStores": [
+      "events",
+      "packs",
+      "sessions"
+    ]
+  },
+  "beforeCounts": {
+    "packs": 1,
+    "sessions": 1,
+    "events": 1
+  },
+  "afterCounts": {
+    "packs": 1,
+    "sessions": 1,
+    "events": 1
+  },
+  "exactBytesUnchanged": true
+}

@@ -1,0 +1,82 @@
+[
+  {
+    "Path": "src\\App.tsx",
+    "Bytes": 24939
+  },
+  {
+    "Path": "src\\components\\LegacyWorkspaceNotice.tsx",
+    "Bytes": 805
+  },
+  {
+    "Path": "src\\screens\\LegacyArchiveScreen.tsx",
+    "Bytes": 8901
+  },
+  {
+    "Path": "src\\screens\\ParentScreen.tsx",
+    "Bytes": 6264
+  },
+  {
+    "Path": "src\\screens\\CreatorScreen.tsx",
+    "Bytes": 28153
+  },
+  {
+    "Path": "src\\screens\\ProfileModal.tsx",
+    "Bytes": 7898
+  },
+  {
+    "Path": "src\\screens\\LearningScreen.tsx",
+    "Bytes": 21174
+  },
+  {
+    "Path": "src\\screens\\LessonScreen.tsx",
+    "Bytes": 10099
+  },
+  {
+    "Path": "src\\screens\\ContestScreen.tsx",
+    "Bytes": 10753
+  },
+  {
+    "Path": "src\\screens\\AssessmentRunner.tsx",
+    "Bytes": 4076
+  },
+  {
+    "Path": "src\\screens\\LearningProfileBackup.tsx",
+    "Bytes": 8146
+  },
+  {
+    "Path": "src\\screens\\ParentGameJourney.tsx",
+    "Bytes": 7899
+  },
+  {
+    "Path": "src\\screens\\ParentGamePacks.tsx",
+    "Bytes": 4163
+  },
+  {
+    "Path": "src\\screens\\ParentLearningPanel.tsx",
+    "Bytes": 11984
+  },
+  {
+    "Path": "src\\screens\\QuestionPreviewTry.tsx",
+    "Bytes": 2119
+  },
+  {
+    "Path": "src\\screens\\QuestionTemplatePanel.tsx",
+    "Bytes": 14513
+  },
+  {
+    "Path": "src\\screens\\LessonAudio.tsx",
+    "Bytes": 2568
+  },
+  {
+    "Path": "src\\screens\\RewardWalletDialog.tsx",
+    "Bytes": 1041
+  },
+  {
+    "Path": "src\\screens\\RewardWalletPanel.tsx",
+    "Bytes": 10078
+  },
+  {
+    "Path": "src\\miniapps\\TimesTable.tsx",
+    "Bytes": 1928
+  }
+]

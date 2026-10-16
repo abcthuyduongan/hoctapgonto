@@ -1,18 +1,21 @@
-import { useEffect, useRef, useState } from 'react';
-import type { ContentPack, ModuleId, PlaySession } from '../core/contracts';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import type { ContentPack, ModuleId } from '../core/contracts';
 import { GAME_REGISTRY } from '../core/registry';
-import { titleSubject } from '../core/utils';
-import { compatible } from '../core/validation';
 import WorldCanvas, { type SceneInfo } from '../world3d/WorldCanvas';
 import type { WorldId } from '../world3d/engine';
+import { getSceneForModule } from '../world3d/scenes/sceneCatalog';
 import type { GuideMood, QualityChoice } from '../world3d/renderer/types';
+import { playClickSound, playIslandSelectSound } from '../core/sound';
+import { onlinePresentation } from '../core/online-exercises';
+import '../styles/student-assigned-games.css';
 
 interface Props {
-  packs: ContentPack[];
-  sessions: PlaySession[];
+  availableStars: number;
+  /** An online host supplies author-labelled content without a fixed subject curriculum. */
+  practiceContext:{title:string;detail:string;pack:ContentPack|null;complete:boolean};
   onPlay: (id:ModuleId,pack:ContentPack)=>Promise<void>;
   starting: boolean;
-  onOpenMini: () => void;
+  onOpenWallet: () => void;
   worldActive: boolean;
   motionOn: boolean;
   gameWorld: WorldId | null;
@@ -20,67 +23,92 @@ interface Props {
   guideCue: number;
   onSceneChange: (info: SceneInfo) => void;
 }
-const themes:Record<string,{world:string,symbol:string,num:string,description:string}>= {
-  'math-quest': {world:'Đảo Toán Học',symbol:'∑',num:'01',description:'Từng phép tính, một khám phá mới'},
-  'memory-match': {world:'Khu Rừng Trí Nhớ',symbol:'◇',num:'02',description:'Quan sát tinh mắt, ghi nhớ thật lâu'},
-  'sentence-builder': {world:'Xưởng Ngôn Từ',symbol:'Aa',num:'03',description:'Ghép những từ nhỏ thành câu hay'}
+const themes:Record<string,{world:string,symbol:string,short:string,intro:string}>= {
+  'math-quest': {world:'Đảo Toán Học',symbol:'∑',short:'Chọn đáp án',intro:'Vượt từng câu hỏi bằng cách chọn đáp án đúng.'},
+  'memory-match': {world:'Khu Rừng Trí Nhớ',symbol:'◇',short:'Trí nhớ',intro:'Lật thẻ, nhớ vị trí và tìm hai nội dung đi cùng nhau.'},
+  'sentence-builder': {world:'Xưởng Ghép Câu',symbol:'Aa',short:'Ghép câu',intro:'Xếp những từ bị đảo vị trí thành câu hoàn chỉnh.'},
+  'word-connect': {world:'Đảo Nối Từ',symbol:'🔗',short:'Nối từ',intro:'Quan sát hai cột rồi nối câu hỏi với câu trả lời phù hợp.'},
+  'sequence-trail': {world:'Bậc Thang Quy Luật',symbol:'▥',short:'Xếp thứ tự',intro:'Đặt các thẻ theo đúng thứ tự của câu hoặc dãy số.'}
 };
-export default function StudentScreen({packs,sessions,onPlay,starting,onOpenMini,worldActive,motionOn,gameWorld,guideMood,guideCue,onSceneChange}:Props){
-  const [chosen,setChosen]=useState<Record<string,string>>({});
+export default function StudentScreen({availableStars,practiceContext,onPlay,starting,onOpenWallet,worldActive,motionOn,gameWorld,guideMood,guideCue,onSceneChange}:Props){
   const [focused,setFocused]=useState<WorldId|null>(null);
+  const [simpleControls,setSimpleControls]=useState(()=>new URLSearchParams(window.location.search).get('controls')==='1');
+  const [sceneState,setSceneState]=useState<SceneInfo['state']>('loading');
   const overview = useRef<HTMLDivElement>(null);
   useEffect(() => { if (gameWorld) setFocused(gameWorld); }, [gameWorld]);
   const [quality,setQuality]=useState<QualityChoice>('auto');
-  const completed=sessions.filter(s=>s.status==='completed').length;
-  const stars=Math.min(completed*3,999);
-  return <div className="ba3d-home premium-world" id="home">
+  const assignedMode=true;
+  const currentPack=practiceContext.pack;
+  const canPlay=(gameId:ModuleId,pack:ContentPack)=>!!onlinePresentation(gameId,pack);
+  const worldName=(worldId:string)=>worldId==='math-quest'?'Đảo Câu Hỏi':themes[worldId].world;
+  const playable=currentPack?GAME_REGISTRY.filter(game=>canPlay(game.id,currentPack)):[];
+  const assignedFallback=!!practiceContext&&(sceneState==='fallback'||sceneState==='unavailable');
+  const selectIsland = (id: WorldId | null) => {
+    if (id && id !== focused) playIslandSelectSound();
+    setFocused(id);
+  };
+  const sceneChanged=useCallback((info:SceneInfo)=>{setSceneState(info.state);onSceneChange(info);},[onSceneChange]);
+  function packFor(gameId:ModuleId){return currentPack&&canPlay(gameId,currentPack)?currentPack:undefined;}
+  const enterWorld=(id:WorldId)=>{const game=GAME_REGISTRY.find(row=>getSceneForModule(row.id)===id);if(!game||starting)return;const pack=packFor(game.id);if(pack)void onPlay(game.id,pack);};
+  return <div className={`ba3d-home premium-world game-hub ${simpleControls?'':'immersive-world'} ${focused ? 'has-focused-island' : 'overview-mode'}`} id="home">
     <section className="ba3d-world" aria-label="Bảo An Learning: thế giới game 3D tương tác">
-      <div className="ba3d-sky" aria-hidden="true" />
-      <WorldCanvas selected={focused} onSelect={setFocused} active={worldActive} motionOn={motionOn}
-        quality={quality} gameWorld={gameWorld} guideMood={guideMood} guideCue={guideCue} onSceneChange={onSceneChange}/>
-      <div className="ba3d-render-controls" aria-label="Cài đặt cảnh 3D">
-        <label>Chất lượng <select aria-label="Chất lượng cảnh 3D" value={quality} onChange={event=>setQuality(event.target.value as QualityChoice)}>
-          <option value="auto">Tự động</option><option value="low">Nhẹ</option><option value="balanced">Cân bằng</option><option value="high">Cao</option>
-        </select></label>
+      <div className="game-hub-top">
+        <div className="game-journey-brief"><strong>{practiceContext.title}</strong><span>{practiceContext.detail}</span></div>
+        <button type="button" className="game-wallet-button" aria-label="Ví đổi sao" onClick={onOpenWallet} disabled={starting}><span aria-hidden="true">⭐</span><strong>{availableStars} sao</strong><span>Đổi thưởng →</span></button>
       </div>
-      <div className="ba3d-softlight" aria-hidden="true" />
-      <div className="ba3d-greeter" aria-label="Lời chào của nhân vật đồng hành"><span className="ba3d-hello">Chào nhà thám hiểm!</span><span>Chọn một đảo để cùng khám phá ✨</span></div>
-      <div className="ba3d-hero-title">
-        <span className="ba3d-edition">MỖI NGÀY MỘT KHÁM PHÁ</span>
-        <h1><span className="ba3d-title-lead">Khám phá </span><span>Thế giới học tập</span></h1>
-        <p>Ba miền tri thức. Một hành trình lớn lên cùng con.</p>
-      </div>
-      <aside className="ba3d-achievement" aria-label="Tiến độ học tập">
-        <div className="ba3d-wood-head">⭐ Hành trình của con</div>
-        <div className="ba3d-progress-track"><div style={{width:`${Math.min(100,stars/9*100)}%`}}/></div>
-        <strong>{stars} ngôi sao</strong><small>{completed} lượt chơi hoàn thành</small>
-      </aside>
-      <div ref={overview} tabIndex={-1} role="group" aria-label="Tổng quan các đảo" className={`ba3d-island-overview${focused?' has-selection':''}`}>
-        <span className="ba3d-island-status" role="status">{focused?`Đã chọn ${themes[focused].world}`:'Chọn một đảo để cùng khám phá'}</span>
-        {focused&&<button type="button" className="ba3d-overview-reset" onClick={()=>{setFocused(null);overview.current?.focus();}}>Xem tất cả các đảo <span aria-hidden="true">↻</span></button>}
-      </div>
-      <div className="ba3d-anchors" aria-label="Chọn trò chơi 3D">
-        {GAME_REGISTRY.map(game=>{
-          const options=packs.filter(p=>compatible(game.id,p));
-          const pack=options.find(p=>`${p.id}@${p.version}`===chosen[game.id])??options[0];
-          const theme=themes[game.id];
-          return <article className={`ba3d-island-control ba3d-${game.id} ${focused===game.id?'ba3d-selected':''}`} key={game.id}>
-            <button type="button" className="ba3d-world-name" onClick={()=>setFocused(game.id as WorldId)} onFocus={()=>setFocused(game.id as WorldId)} aria-pressed={focused===game.id} aria-label={`Xem đảo ${theme.world}`}>
-              <span className="ba3d-world-number"><span className="ba3d-world-symbol" aria-hidden="true">{theme.symbol}</span><span className="ba3d-world-index">{theme.num}</span></span><strong>{game.label}</strong><small>{theme.world}</small>
-            </button>
-            <p className="ba3d-world-description">{theme.description}</p>
-            <label className="ba3d-sr-only" htmlFor={`ba3d-pack-${game.id}`}>Chọn bộ học liệu cho {game.label}</label>
-            <select id={`ba3d-pack-${game.id}`} value={pack?`${pack.id}@${pack.version}`:''} disabled={!pack||starting}
-              onChange={e=>setChosen(prev=>({...prev,[game.id]:e.target.value}))}>
-              {!pack&&<option value="">Chưa có học liệu</option>}
-              {options.map(p=><option key={`${p.id}@${p.version}`} value={`${p.id}@${p.version}`}>{p.title} · {titleSubject(p.subject)}</option>)}
-            </select>
-            <button type="button" className="ba3d-play" disabled={!pack||starting} onClick={()=>pack&&void onPlay(game.id,pack)}>Bắt đầu <span aria-hidden="true">▶</span></button>
-          </article>;
+      {simpleControls&&<nav className="ba3d-island-picker" aria-label="Chọn đảo học tập">
+        {GAME_REGISTRY.map(game => {
+          const theme = themes[game.id];
+          const sceneId = getSceneForModule(game.id);
+          return <button type="button" key={game.id} className="ba3d-island-choice"
+            aria-label={`Chọn ${worldName(game.id)}`} aria-pressed={focused === sceneId} disabled={starting}
+            onClick={() => selectIsland(sceneId)}>
+            <span aria-hidden="true">{theme.symbol}</span><span>{theme.short}</span>
+          </button>;
         })}
+      </nav>}
+      <div className="game-hub-stage">
+        <WorldCanvas selected={focused} onSelect={selectIsland} active={worldActive} motionOn={motionOn}
+          quality={quality} gameWorld={gameWorld} guideMood={guideMood} guideCue={guideCue} onSceneChange={sceneChanged}
+          onEnterWorld={enterWorld} onOverview={()=>selectIsland(null)}/>
+        <div ref={overview} tabIndex={-1} role="group" aria-label="Tổng quan các đảo" className="ba3d-island-overview">
+          <span className="ba3d-sr-only" role="status">{focused?`Đã chọn ${worldName(focused)}`:'Chọn một trò ở phía trên hoặc chạm vào một đảo.'}</span>
+          {focused&&<button type="button" className="ba3d-overview-reset" aria-label="Xem tất cả các đảo" onClick={()=>{playClickSound();setFocused(null);overview.current?.focus();}}><span aria-hidden="true">↻</span> Tổng quan</button>}
+        </div>
+        {!simpleControls&&<div className="game-character-hint" role="status" aria-live="polite">
+          {focused&&<><strong>{worldName(focused)}</strong><span>{practiceContext&&focused==='math-quest'?'Đọc đề, xem hình hoặc nghe âm thanh rồi hoàn thành câu hỏi.':themes[focused].intro}</span></>}
+          <span>{assignedMode&&!currentPack?(practiceContext.complete?'Con đã hoàn thành học liệu được giao. Con xem lại hành trình hoặc chờ lớp giao bộ tiếp theo nhé.':'Chưa có bộ ôn được giao. Nhờ người lớn kiểm tra dữ liệu lớp nhé.'):
+            focused&&assignedMode&&!packFor(GAME_REGISTRY.find(game=>getSceneForModule(game.id)===focused)!.id)?`Bộ này chơi được ở: ${playable.map(game=>themes[game.id].short).join(', ')}. Hãy chọn đảo phù hợp nhé.`:
+            focused?'Khi Cáo tới đảo, bấm lại đảo hoặc nhấn Enter để vào chơi.':'Bấm vào một đảo để Cáo dẫn đường.'}</span>
+        </div>}
+        {assignedFallback&&<section className="assigned-game-fallback" aria-label="Trò chơi phù hợp bộ được giao"><strong>{currentPack?'Chọn trò để vào bộ được giao':practiceContext?.complete?'Con đã hoàn thành học liệu được giao':'Đang chờ học liệu từ lớp'}</strong>{currentPack&&<p>{currentPack.title}</p>}<div>{playable.map(game=><button key={game.id} type="button" disabled={starting} aria-label={`Chơi ${game.label} bằng bộ được giao`} onClick={()=>currentPack&&void onPlay(game.id,currentPack)}>{themes[game.id].symbol} {game.label} →</button>)}</div>{!currentPack&&<p>{practiceContext?.detail}</p>}</section>}
       </div>
-      <div className="ba3d-shortcuts"><button type="button" onClick={onOpenMini} disabled={starting}>🧩 Bảng cửu chương</button><span>⭐ {stars} sao đã nhận</span><span>🎮 {completed} lượt hoàn thành</span></div>
-      <p className="ba3d-footnote">Chọn một đảo · Chọn bộ học liệu và bắt đầu chơi</p>
+      {simpleControls&&<div className="game-hub-bottom">
+        {focused ? <div className="ba3d-anchors" aria-label="Chọn trò chơi 3D">
+          {GAME_REGISTRY.map(game=>{
+            if (focused !== getSceneForModule(game.id)) return null;
+            const options=packFor(game.id)?[packFor(game.id)!]:[];
+            const pack=packFor(game.id);
+            return <article className={`ba3d-island-control ba3d-${game.id} ba3d-selected`} key={game.id} aria-label={`Học liệu ${worldName(game.id)}`}>
+              <label htmlFor={`ba3d-pack-${game.id}`}>Bộ câu hỏi</label>
+              <select id={`ba3d-pack-${game.id}`} aria-label={`Chọn bộ học liệu cho ${game.label}`} value={pack?`${pack.id}@${pack.version}`:''} disabled={!pack||starting}
+                >
+                {!pack&&<option value="">{assignedMode?'Bộ ôn chưa phù hợp đảo này':'Chưa có học liệu'}</option>}
+                {options.map(p=><option key={`${p.id}@${p.version}`} value={`${p.id}@${p.version}`}>{p.title} · {p.items.length} câu</option>)}
+              </select>
+              <button type="button" className="ba3d-play" disabled={!pack||starting} onClick={()=>pack&&void onPlay(game.id,pack)}>{starting?'Đang mở…':'Bắt đầu'} <span aria-hidden="true">▶</span></button>
+            </article>;
+          })}
+        </div> : <p className="game-hub-prompt">Chọn một trò để bắt đầu nhé!</p>}
+        <div className="game-hub-tools">
+          <label>Hình ảnh <select aria-label="Chất lượng cảnh 3D" value={quality} onChange={event=>setQuality(event.target.value as QualityChoice)}><option value="auto">Tự động</option><option value="low">Nhẹ</option><option value="balanced">Cân bằng</option><option value="high">Cao</option></select></label>
+        </div>
+        <button type="button" className="game-return-character" onClick={()=>setSimpleControls(false)}>← Điều khiển bằng Cáo</button>
+      </div>}
+      {!simpleControls&&<div className="game-character-tools">
+        <details className="game-world-help"><summary>ⓘ Cách chơi</summary><p>Bấm vào đảo muốn khám phá. Khi Cáo đã tới, bấm lại đảo hoặc bấm Cáo để vào trò.</p><p>Bàn phím: bấm vào cảnh, dùng ← → để chọn đảo, Enter để chơi, Esc để về tổng quan. Bộ câu hỏi do giáo viên giao cho lớp.</p><button type="button" onClick={()=>setSimpleControls(true)}>Chọn trò bằng nút</button><label>Hình ảnh <select aria-label="Chất lượng cảnh 3D" value={quality} onChange={event=>setQuality(event.target.value as QualityChoice)}><option value="auto">Tự động</option><option value="low">Nhẹ</option><option value="balanced">Cân bằng</option><option value="high">Cao</option></select></label></details>
+        {(sceneState==='fallback'||sceneState==='unavailable')&&<button className="game-fallback-button" onClick={()=>setSimpleControls(true)}>Mở trò chơi bằng nút</button>}
+      </div>}
     </section>
-  </div>
+  </div>;
 }

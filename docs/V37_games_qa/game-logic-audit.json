@@ -1,6 +1,6 @@
 {
   "baseline": "d2cca6c",
-  "date": "2026-10-14T05:32:19.760Z",
+  "date": "2026-10-14T06:57:47.176Z",
   "checks": 19,
   "changed": [],
   "reports": [
@@ -86,7 +86,7 @@
     },
     {
       "file": "src\\core\\storage.ts",
-      "scope": "whole source",
+      "scope": "all original storage source; one explicit shared-database export allowed",
       "unchanged": true
     },
     {

@@ -2,7 +2,7 @@ import type { ContentPack } from './contracts.ts';
 import { packKey, validatePack } from './validation.ts';
 
 export const CONTENT_SCHEMA = 'baoan-learning-content';
-export const CONTENT_FORMAT_VERSION = 1;
+export const CONTENT_FORMAT_VERSION = 2;
 export const MAX_IMPORT_BYTES = 1024 * 1024;
 const MAX_PACKS = 40;
 const record = (v: unknown): v is Record<string, unknown> => !!v && typeof v === 'object' && !Array.isArray(v);
@@ -13,8 +13,8 @@ export function parseContentImport(raw: string): ContentPack[] {
   if (new TextEncoder().encode(raw).byteLength > MAX_IMPORT_BYTES) throw new Error('Tệp vượt quá giới hạn 1 MB.');
   let source: unknown;
   try {source = JSON.parse(raw);} catch {throw new Error('Tệp JSON không đọc được.');}
-  if (!record(source) || source.schema !== CONTENT_SCHEMA || source.formatVersion !== CONTENT_FORMAT_VERSION || !Array.isArray(source.packs)) {
-    throw new Error('Không đúng định dạng bộ học liệu Bảo An Learning phiên bản 1.');
+  if (!record(source) || source.schema !== CONTENT_SCHEMA || ![1,CONTENT_FORMAT_VERSION].includes(source.formatVersion as number) || !Array.isArray(source.packs)) {
+    throw new Error('Không đúng định dạng bộ học liệu Bảo An Learning phiên bản 1 hoặc 2.');
   }
   if (source.packs.length < 1 || source.packs.length > MAX_PACKS) throw new Error('Mỗi tệp cần từ 1–40 bộ học liệu.');
   const keys = new Set<string>();
@@ -25,6 +25,7 @@ export function parseContentImport(raw: string): ContentPack[] {
       throw new Error(`Bộ ${i + 1}: cấu trúc học liệu không hợp lệ.`);
     }
     const checked = {...row, source:'local', publishedAt:new Date().toISOString()} as ContentPack;
+    if(checked.kind==='learning'&&source.formatVersion!==2)throw new Error(`Bộ ${i+1}: dạng câu mở rộng cần tệp phiên bản 2.`);
     // validatePack is written for typed content; this precheck avoids property access errors on untrusted JSON.
     for (const entry of checked.items) {
       const item: Record<string,unknown> = entry;
@@ -49,6 +50,6 @@ export function serializeContentExport(packs: ContentPack[], exportedAt = new Da
     const issues = validatePack(pack);
     if (issues.length) throw new Error(`Bộ ${i+1}: ${issues[0]}`);
   });
-  return JSON.stringify({schema:CONTENT_SCHEMA,formatVersion:CONTENT_FORMAT_VERSION,exportedAt,
+  return JSON.stringify({schema:CONTENT_SCHEMA,formatVersion:packs.some(pack=>pack.kind==='learning')?CONTENT_FORMAT_VERSION:1,exportedAt,
     packs:packs.map(pack => ({...pack,source:'local'}))},null,2);
 }

@@ -1,0 +1,20 @@
+FROM node:22.22.2-bookworm-slim AS build
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+
+FROM node:22.22.2-bookworm-slim
+WORKDIR /app
+ENV NODE_ENV=production BAO_AN_DATA_DIR=/data BAO_AN_HOST=0.0.0.0 BAO_AN_PORT=4180
+COPY package.json package-lock.json ./
+RUN npm ci --omit=dev && npm cache clean --force
+COPY --from=build /app/dist ./dist
+COPY --from=build /app/src/core ./src/core
+COPY --from=build /app/server ./server
+RUN mkdir /data && chown node:node /data
+USER node
+VOLUME ["/data"]
+EXPOSE 4180
+CMD ["node","--experimental-strip-types","server/run-online.mjs"]

@@ -1,0 +1,296 @@
+{
+  "csp": "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; worker-src 'self' blob:; connect-src 'self' blob:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'",
+  "medium": {
+    "engine": "three-webgl",
+    "frames": 96,
+    "fpsMedian": 59.9,
+    "fpsP95FrameMs": 16.700000000000273,
+    "tier": "low",
+    "selectedWorld": null,
+    "carouselMoving": false,
+    "rotation": 0.6283185307179586,
+    "islands": [
+      {
+        "id": "math-quest",
+        "x": 1.9574999999999998,
+        "y": -0.05390438697653662,
+        "z": 1.5942676093223218,
+        "scale": 0.73
+      },
+      {
+        "id": "memory-match",
+        "x": 3.1673015329779193,
+        "y": -0.041572355278234364,
+        "z": -2.1291186519732035,
+        "scale": 0.73
+      },
+      {
+        "id": "sentence-builder",
+        "x": 4.0784386814423e-16,
+        "y": 0.028477328646149668,
+        "z": -4.430297914698237,
+        "scale": 0.73
+      },
+      {
+        "id": "word-connect",
+        "x": -3.167301532977919,
+        "y": 0.05899005248911031,
+        "z": -2.1291186519732044,
+        "scale": 0.73
+      },
+      {
+        "id": "sequence-trail",
+        "x": -1.9575000000000007,
+        "y": 0.007602982308435807,
+        "z": 1.5942676093223218,
+        "scale": 0.73
+      }
+    ],
+    "mascotLocation": "waiting",
+    "mascotState": "waiting",
+    "mascotPosition": {
+      "x": -6.8,
+      "y": 0.12,
+      "z": 4.2
+    },
+    "jumpProgress": 1,
+    "dpr": 1,
+    "drawCalls": 165,
+    "shadowUpdates": 0,
+    "gpuGeometries": 196,
+    "gpuTextures": 89,
+    "gpuPrograms": 14,
+    "shaderPreparationMs": 53.69999999925494,
+    "parallelShaderCompile": true,
+    "geometryDetail": "reduced",
+    "lodState": "ready",
+    "lodMasterTriangles": 152320,
+    "lodReducedTriangles": 84114,
+    "lodMeshes": 47,
+    "lodPreparationMs": 654.5999999996275,
+    "lodCpuPreparationMs": 283.20000000856817,
+    "lodMaxMeshPreparationMs": 20.299999998882413,
+    "triangles": 95008,
+    "textureBytesEstimate": 28573695.999999966,
+    "assetErrors": [],
+    "readyAssets": [
+      "math-world",
+      "fox-guide",
+      "memory-world",
+      "language-world",
+      "environment"
+    ],
+    "animationClips": [
+      "Idle",
+      "Cheer",
+      "Victory"
+    ],
+    "skeletalMeshes": 10,
+    "bones": 14,
+    "animationTime": 1.6332999999999993,
+    "activeClip": "Idle",
+    "motion": true,
+    "paused": false,
+    "sceneMode": "home",
+    "gameWorld": null,
+    "guideMood": "idle",
+    "guideViewport": null,
+    "guideVisible": true
+  },
+  "focused": {
+    "engine": "three-webgl",
+    "frames": 214,
+    "fpsMedian": 59.9,
+    "fpsP95FrameMs": 16.700000000000273,
+    "tier": "low",
+    "selectedWorld": "memory-match",
+    "carouselMoving": false,
+    "rotation": -1.2566370614359168,
+    "islands": [
+      {
+        "id": "math-quest",
+        "x": -3.1673015329779184,
+        "y": 0,
+        "z": -0.07088134802679447,
+        "scale": 0.7
+      },
+      {
+        "id": "memory-match",
+        "x": 1.478949369503651e-15,
+        "y": 0.1,
+        "z": 2.230297914698236,
+        "scale": 1.04
+      },
+      {
+        "id": "sentence-builder",
+        "x": 3.1673015329779193,
+        "y": 0,
+        "z": -0.07088134802679735,
+        "scale": 0.7
+      },
+      {
+        "id": "word-connect",
+        "x": 1.9574999999999987,
+        "y": 0,
+        "z": -3.794267609322323,
+        "scale": 0.7
+      },
+      {
+        "id": "sequence-trail",
+        "x": -1.9575000000000007,
+        "y": 0,
+        "z": -3.7942676093223215,
+        "scale": 0.7
+      }
+    ],
+    "mascotLocation": "memory-match",
+    "mascotState": "on-island",
+    "mascotPosition": {
+      "x": -0.9879999999999985,
+      "y": 0.1416,
+      "z": 3.5302979146982363
+    },
+    "jumpProgress": 1,
+    "dpr": 1,
+    "drawCalls": 162,
+    "shadowUpdates": 0,
+    "gpuGeometries": 196,
+    "gpuTextures": 89,
+    "gpuPrograms": 14,
+    "shaderPreparationMs": 53.69999999925494,
+    "parallelShaderCompile": true,
+    "geometryDetail": "reduced",
+    "lodState": "ready",
+    "lodMasterTriangles": 152320,
+    "lodReducedTriangles": 84114,
+    "lodMeshes": 47,
+    "lodPreparationMs": 654.5999999996275,
+    "lodCpuPreparationMs": 283.20000000856817,
+    "lodMaxMeshPreparationMs": 20.299999998882413,
+    "triangles": 94384,
+    "textureBytesEstimate": 28573695.999999966,
+    "assetErrors": [],
+    "readyAssets": [
+      "math-world",
+      "fox-guide",
+      "memory-world",
+      "language-world",
+      "environment"
+    ],
+    "animationClips": [
+      "Idle",
+      "Cheer",
+      "Victory"
+    ],
+    "skeletalMeshes": 10,
+    "bones": 14,
+    "animationTime": 3.633299999999995,
+    "activeClip": "Cheer",
+    "motion": true,
+    "paused": false,
+    "sceneMode": "home",
+    "gameWorld": null,
+    "guideMood": "idle",
+    "guideViewport": null,
+    "guideVisible": true
+  },
+  "desktop": {
+    "engine": "three-webgl",
+    "frames": 214,
+    "fpsMedian": 59.9,
+    "fpsP95FrameMs": 16.700000000000273,
+    "tier": "low",
+    "selectedWorld": "memory-match",
+    "carouselMoving": false,
+    "rotation": -1.2566370614359168,
+    "islands": [
+      {
+        "id": "math-quest",
+        "x": -3.1673015329779184,
+        "y": 0,
+        "z": -0.07088134802679447,
+        "scale": 0.7
+      },
+      {
+        "id": "memory-match",
+        "x": 1.478949369503651e-15,
+        "y": 0.1,
+        "z": 2.230297914698236,
+        "scale": 1.04
+      },
+      {
+        "id": "sentence-builder",
+        "x": 3.1673015329779193,
+        "y": 0,
+        "z": -0.07088134802679735,
+        "scale": 0.7
+      },
+      {
+        "id": "word-connect",
+        "x": 1.9574999999999987,
+        "y": 0,
+        "z": -3.794267609322323,
+        "scale": 0.7
+      },
+      {
+        "id": "sequence-trail",
+        "x": -1.9575000000000007,
+        "y": 0,
+        "z": -3.7942676093223215,
+        "scale": 0.7
+      }
+    ],
+    "mascotLocation": "memory-match",
+    "mascotState": "on-island",
+    "mascotPosition": {
+      "x": -0.9879999999999985,
+      "y": 0.1416,
+      "z": 3.5302979146982363
+    },
+    "jumpProgress": 1,
+    "dpr": 1,
+    "drawCalls": 162,
+    "shadowUpdates": 0,
+    "gpuGeometries": 196,
+    "gpuTextures": 89,
+    "gpuPrograms": 14,
+    "shaderPreparationMs": 53.69999999925494,
+    "parallelShaderCompile": true,
+    "geometryDetail": "reduced",
+    "lodState": "ready",
+    "lodMasterTriangles": 152320,
+    "lodReducedTriangles": 84114,
+    "lodMeshes": 47,
+    "lodPreparationMs": 654.5999999996275,
+    "lodCpuPreparationMs": 283.20000000856817,
+    "lodMaxMeshPreparationMs": 20.299999998882413,
+    "triangles": 94384,
+    "textureBytesEstimate": 28573695.999999966,
+    "assetErrors": [],
+    "readyAssets": [
+      "math-world",
+      "fox-guide",
+      "memory-world",
+      "language-world",
+      "environment"
+    ],
+    "animationClips": [
+      "Idle",
+      "Cheer",
+      "Victory"
+    ],
+    "skeletalMeshes": 10,
+    "bones": 14,
+    "animationTime": 3.633299999999995,
+    "activeClip": "Cheer",
+    "motion": true,
+    "paused": false,
+    "sceneMode": "home",
+    "gameWorld": null,
+    "guideMood": "idle",
+    "guideViewport": null,
+    "guideVisible": true
+  },
+  "issues": [],
+  "pageErrors": []
+}

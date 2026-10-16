@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import type { WorldId } from './engine';
 import type { GuideMood, GuideViewport, QualityChoice, RenderStats, WorldRenderer } from './renderer/types';
 import { createWorldRenderer } from './renderer/rendererFactory';
+import { ALL_WORLD_IDS } from './scenes/worldLayout';
 
 export type SceneInfo = { state: 'loading' | 'ready' | 'fallback' | 'unavailable'; engine: RenderStats['engine'] | null };
 interface Props {
@@ -15,10 +16,12 @@ interface Props {
   guideMood?: GuideMood;
   guideCue?: number;
   onSceneChange?: (info: SceneInfo) => void;
+  onEnterWorld?: (id:WorldId)=>void;
+  onOverview?:()=>void;
 }
 
 export default function WorldCanvas({ selected, onSelect, active, motionOn, quality = 'auto',
-  gameWorld = null, guideMood = 'idle', guideCue = 0, onSceneChange }: Props) {
+  gameWorld = null, guideMood = 'idle', guideCue = 0, onSceneChange, onEnterWorld, onOverview }: Props) {
   const homeMount = useRef<HTMLDivElement>(null);
   const host = useRef<HTMLDivElement>(null);
   // Keep one portal root, canvas, context and loaded asset set across modes.
@@ -28,8 +31,8 @@ export default function WorldCanvas({ selected, onSelect, active, motionOn, qual
     return container;
   });
   const runtime = useRef<WorldRenderer | null>(null);
-  const current = useRef({ selected, onSelect, active, motionOn, quality, gameWorld, guideMood, guideCue, onSceneChange });
-  current.current = { selected, onSelect, active, motionOn, quality, gameWorld, guideMood, guideCue, onSceneChange };
+  const current = useRef({ selected, onSelect, active, motionOn, quality, gameWorld, guideMood, guideCue, onSceneChange, onEnterWorld, onOverview });
+  current.current = { selected, onSelect, active, motionOn, quality, gameWorld, guideMood, guideCue, onSceneChange, onEnterWorld, onOverview };
   const [state, setState] = useState<SceneInfo['state']>('loading');
   const [recovery, setRecovery] = useState(0);
   const updateDiagnostics = useCallback(() => {
@@ -57,11 +60,25 @@ export default function WorldCanvas({ selected, onSelect, active, motionOn, qual
     let recovering = false;
     const abort = new AbortController();
     const media = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const keyboard=(event:KeyboardEvent)=>{
+      const settings=current.current;if(settings.gameWorld||!settings.active||event.repeat)return;
+      const key=event.key.toLowerCase(),index=ALL_WORLD_IDS.indexOf(settings.selected as WorldId);
+      if(['arrowleft','arrowup','a','w','arrowright','arrowdown','d','s'].includes(key)){
+        event.preventDefault();const direction=['arrowleft','arrowup','a','w'].includes(key)?-1:1;
+        const next=index<0?(direction>0?0:ALL_WORLD_IDS.length-1):(index+direction+ALL_WORLD_IDS.length)%ALL_WORLD_IDS.length;
+        settings.onSelect(ALL_WORLD_IDS[next]);
+      }else if(key==='enter'||key===' '){
+        event.preventDefault();const stats=runtime.current?.getDiagnostics();
+        if(settings.selected&&stats?.mascotState==='on-island'&&stats.selectedWorld===settings.selected)settings.onEnterWorld?.(settings.selected);
+        else if(!settings.selected)settings.onSelect(ALL_WORLD_IDS[0]);
+      }else if(key==='escape'){event.preventDefault();settings.onOverview?.();}
+    };
     const replaceCanvas = () => {
       const canvas = document.createElement('canvas');
       canvas.className = 'ba3d-canvas';
       canvas.setAttribute('role', 'img');
-      canvas.setAttribute('aria-label', 'Thế giới học tập 3D: Toán học, Trí nhớ và Ngôn từ');
+      canvas.setAttribute('aria-label', 'Điều khiển Cáo trong thế giới game: bấm đảo hoặc dùng phím mũi tên, Enter để chơi');
+      canvas.tabIndex=0;canvas.addEventListener('keydown',keyboard);
       container.replaceChildren(canvas);
       return canvas;
     };
@@ -79,6 +96,7 @@ export default function WorldCanvas({ selected, onSelect, active, motionOn, qual
     setState('loading');
     void createWorldRenderer({ canvas, premium3DEnabled: recovery === 0,
       replaceCanvas, onSelect: id => current.current.onSelect(id),
+      onEnterWorld:id=>current.current.onEnterWorld?.(id),
       motionOn: current.current.motionOn && !media.matches,
       paused: !current.current.active || document.hidden, quality: current.current.quality,
       signal: abort.signal, onContextLost: () => {

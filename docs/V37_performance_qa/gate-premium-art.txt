@@ -1,0 +1,10 @@
+
+> bao-an-learning-v3-6-3d@3.7.0-rc.1 gate:premium-art
+> node tests/release-3d-assets.mjs
+
+OK MODEL fox-guide meshes: 10 animations: 3
+OK MODEL math-world meshes: 16 animations: 0
+OK MODEL memory-world meshes: 15 animations: 0
+OK MODEL language-world meshes: 16 animations: 0
+OK MODEL environment meshes: 6 animations: 0
+PREMIUM ART FILE GATE passed. Still requires React, visual, mobile and gameplay acceptance.

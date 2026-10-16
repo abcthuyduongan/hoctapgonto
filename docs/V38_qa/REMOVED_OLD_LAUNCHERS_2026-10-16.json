@@ -1,0 +1,97 @@
+[
+  {
+    "Path": "BAO_AN_LEARNING_V3_6_2_PLAYABLE.html",
+    "Bytes": 396852,
+    "ReferenceAudit": "No references in active npm, CI, package or guide"
+  },
+  {
+    "Path": "BAO_AN_LEARNING_V3_6_PLAYABLE.html",
+    "Bytes": 396852,
+    "ReferenceAudit": "No references in active npm, CI, package or guide"
+  },
+  {
+    "Path": "MAU_HOC_LIEU_3_GAME.json",
+    "Bytes": 6899,
+    "ReferenceAudit": "No references in active npm, CI, package or guide"
+  },
+  {
+    "Path": "MO_NGAY_GAME_WINDOWS.bat",
+    "Bytes": 80,
+    "ReferenceAudit": "No references in active npm, CI, package or guide"
+  },
+  {
+    "Path": "MO_THU_3D_WINDOWS.bat",
+    "Bytes": 73,
+    "ReferenceAudit": "No references in active npm, CI, package or guide"
+  },
+  {
+    "Path": "MO_V37_PREMIUM_WINDOWS.bat",
+    "Bytes": 564,
+    "ReferenceAudit": "No references in active npm, CI, package or guide"
+  },
+  {
+    "Path": "START_WINDOWS.bat",
+    "Bytes": 542,
+    "ReferenceAudit": "No references in active npm, CI, package or guide"
+  },
+  {
+    "Path": "qa_real3d.py",
+    "Bytes": 4062,
+    "ReferenceAudit": "No references in active npm, CI, package or guide"
+  },
+  {
+    "Path": "qa32_quick.py",
+    "Bytes": 2955,
+    "ReferenceAudit": "No references in active npm, CI, package or guide"
+  },
+  {
+    "Path": "tools_generate_fox_glb_mobile.py",
+    "Bytes": 4016,
+    "ReferenceAudit": "No references in active npm, CI, package or guide"
+  },
+  {
+    "Path": "tools_generate_fox_glb.py",
+    "Bytes": 4012,
+    "ReferenceAudit": "No references in active npm, CI, package or guide"
+  },
+  {
+    "Path": "tools_make_preview.py",
+    "Bytes": 5259,
+    "ReferenceAudit": "No references in active npm, CI, package or guide"
+  },
+  {
+    "Path": "tools_render_fox_qa.py",
+    "Bytes": 1475,
+    "ReferenceAudit": "No references in active npm, CI, package or guide"
+  },
+  {
+    "Path": "tools_upgrade32.py",
+    "Bytes": 7100,
+    "ReferenceAudit": "No references in active npm, CI, package or guide"
+  },
+  {
+    "Path": "playwright.config.ts",
+    "Bytes": 671,
+    "ReferenceAudit": "No references in active npm, CI, package or guide"
+  },
+  {
+    "Path": "playwright.v37.config.ts",
+    "Bytes": 1412,
+    "ReferenceAudit": "No references in active npm, CI, package or guide"
+  },
+  {
+    "Path": "playwright.v37.chrome.config.ts",
+    "Bytes": 798,
+    "ReferenceAudit": "No references in active npm, CI, package or guide"
+  },
+  {
+    "Path": "tsconfig.core.json",
+    "Bytes": 284,
+    "ReferenceAudit": "No references in active npm, CI, package or guide"
+  },
+  {
+    "Path": "tools\\release-files\\MO_HO_SO_CU.cmd",
+    "Bytes": 446,
+    "ReferenceAudit": "No references in active npm, CI, package or guide"
+  }
+]

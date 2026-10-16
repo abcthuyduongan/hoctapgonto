@@ -26,8 +26,11 @@ test('Game stage is a stable internal scroller and the main page is locked',()=>
   assert.match(css,/overflow-anchor:none/);
   assert.match(css,/\.reward-curtain[\s\S]*?position:fixed/);
   assert.ok(app.includes("document.body.style.overflow = 'hidden'"));
-  assert.ok(app.includes('focus({preventScroll:true})'));
-  assert.ok(app.includes('gameDialog.current?.focus'));
+  assert.match(app,/const dialog = active \? gameDialog\.current : miniOpen \? miniDialog\.current : null;\s*dialog\?\.focus\(\{preventScroll:true\}\)/);
+  assert.match(app,/document\.addEventListener\('keydown', trapFocus\)/);
+  assert.match(app,/document\.removeEventListener\('keydown', trapFocus\)/);
+  assert.match(app,/scope\.contains\(document\.activeElement\)/);
+  assert.match(app,/previousFocus\.current\?\.isConnected[\s\S]*?previousFocus\.current\.focus\(\{preventScroll:true\}\)/);
 });
 test('Answer recording no longer refetches all content packs on every click',()=>{
   const app=file('src/App.tsx');

@@ -1,4 +1,9 @@
 import { expect, test, type Page } from '@playwright/test';
+import { getSceneTheme } from '../../src/world3d/scenes/sceneCatalog';
+import type { WorldId } from '../../src/world3d/engine';
+
+test.use({ serviceWorkers: 'block' });
+const selectWorld = (page: Page, id: string) => page.getByRole('button', { name: `Chọn ${getSceneTheme(id as WorldId).world}`, exact: true }).click();
 
 const assetIds = ['environment', 'fox-guide', 'language-world', 'math-world', 'memory-world'];
 const pr03Ids = ['memory-world', 'language-world', 'environment'];
@@ -25,7 +30,7 @@ test('All five actual production GLBs download in a two-request window with embe
     await route.continue();
   });
   const responses = assetIds.map(id => page.waitForResponse(response => response.url().endsWith(`/models/${id}.glb`) && response.status() === 200));
-  await page.goto('/'); await ready(page);
+  await page.goto('/?view=games&controls=1'); await ready(page);
   expect(requests.map(url => new URL(url).pathname).sort()).toEqual(assetIds.map(id => `/models/${id}.glb`));
   expect(maximum, 'GLB fetching remains bounded to two in flight').toBeLessThanOrEqual(2);
   expect(maximum).toBeGreaterThan(0);
@@ -64,11 +69,13 @@ test('All five actual production GLBs download in a two-request window with embe
 test('The real production renderer imports textured Memory, Language and Environment volumes and retains decoded maps in each game', async ({ page }, testInfo) => {
   let moduleUrl = '';
   page.on('response', response => { if (/\/assets\/PremiumWorldRenderer-[^/]+\.js$/.test(response.url())) moduleUrl = response.url(); });
-  await page.goto('/'); await ready(page); expect(moduleUrl).not.toBe('');
+  await page.goto('/?view=games&controls=1'); await ready(page); expect(moduleUrl).not.toBe('');
   await page.getByRole('button', { name: /Góc phụ huynh/ }).click();
   await expect(page.locator('.ba3d-render-host')).toHaveCount(0);
   const runtime = await page.evaluate(async productionModule => {
-    const { createPremiumRenderer } = await import(productionModule);
+    const exports = await import(productionModule);
+    const { createPremiumRenderer } = exports.createPremiumRenderer ? exports
+      : Object.values(exports).find((value: any) => typeof value?.createPremiumRenderer === 'function') as any;
     const canvas = document.createElement('canvas');
     canvas.style.cssText = 'position:fixed;left:-2000px;top:0;width:800px;height:600px;pointer-events:none'; document.body.append(canvas);
     const signal = new AbortController();
@@ -88,11 +95,11 @@ test('The real production renderer imports textured Memory, Language and Environ
     };
     try {
       await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-      const home = Object.fromEntries(['math-quest', 'memory-match', 'sentence-builder'].map(id => [id, inspect(renderer.world.worlds.get(id))]));
+      const home = Object.fromEntries(['math-quest', 'memory-match', 'sentence-builder', 'word-connect', 'sequence-trail'].map(id => [id, inspect(renderer.world.worlds.get(id))]));
       const environment = inspect(renderer.world.scenery);
       const clouds = inspect(renderer.world.clouds);
       const games = [];
-      for (const id of ['math-quest', 'memory-match', 'sentence-builder']) {
+      for (const id of ['math-quest', 'memory-match', 'sentence-builder', 'word-connect', 'sequence-trail']) {
         renderer.setGameScene(id); renderer.setGuideMood('happy');
         await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
         games.push({ id, stats: renderer.getDiagnostics(), visibleWorld: inspect(renderer.world.worlds.get(id), true), environment: inspect(renderer.gameEnvironments.root, true), texturesInGPU: renderer.renderer.info.memory.textures });
@@ -100,12 +107,21 @@ test('The real production renderer imports textured Memory, Language and Environ
       return { home, environment, clouds, games };
     } finally { renderer.dispose(); signal.abort(); canvas.remove(); }
   }, moduleUrl);
-  for (const id of ['memory-match', 'sentence-builder']) {
+  for (const id of ['memory-match', 'sentence-builder', 'word-connect', 'sequence-trail']) {
     const volume = runtime.home[id];
     expect(volume.meshes.length).toBeGreaterThan(10);
     expect(volume.triangles).toBeGreaterThan(500);
     expect(volume.triangles).toBeLessThanOrEqual(35_000);
-    expect(volume.meshes.every((mesh: { uvCount: number; pbrTextures: boolean; widths: number[] }) => mesh.uvCount > 0 && mesh.pbrTextures && mesh.widths.every(width => width > 0))).toBe(true);
+    if (id === 'memory-match' || id === 'sentence-builder') {
+      expect(volume.meshes.every((mesh: { uvCount: number; pbrTextures: boolean; widths: number[] }) => mesh.uvCount > 0 && mesh.pbrTextures && mesh.widths.every(width => width > 0))).toBe(true);
+    } else {
+      // These two scenes retain a decoded textured GLB base and add authored
+      // procedural landmarks whose solid-color materials do not use maps.
+      const textured = volume.meshes.filter((mesh: { pbrTextures: boolean }) => mesh.pbrTextures);
+      expect(textured.length, `${id}: decoded textured base meshes remain present`).toBeGreaterThan(10);
+      expect(textured.every((mesh: { uvCount: number; widths: number[] }) => mesh.uvCount > 0 && mesh.widths.every(width => width > 0))).toBe(true);
+      expect(volume.meshes.every((mesh: { uvCount: number }) => mesh.uvCount > 0)).toBe(true);
+    }
   }
   expect(runtime.environment.meshes.length + runtime.clouds.meshes.length).toBeGreaterThan(5);
   expect([...runtime.environment.meshes, ...runtime.clouds.meshes].every((mesh: { pbrTextures: boolean }) => mesh.pbrTextures)).toBe(true);
@@ -123,11 +139,12 @@ test('The real production renderer imports textured Memory, Language and Environ
 for (const id of pr03Ids) {
   test(`Missing new ${id} GLB replaces the premium canvas safely while every game still opens`, async ({ page }) => {
     await page.route(`**/models/${id}.glb`, route => route.fulfill({ status: 404, contentType: 'text/plain', body: 'QA required PR03 model unavailable' }));
-    await page.goto('/');
+    await page.goto('/?view=games&controls=1');
     await expect(page.locator('.ba3d-render-host')).toHaveAttribute('data-state', 'fallback');
     await expect(page.locator('.ba3d-render-host')).toHaveAttribute('data-engine', /legacy-webgl2|canvas/);
     await expect(page.locator('canvas.ba3d-canvas')).toHaveCount(1);
-    for (const [world, stage] of [['math-quest', '.quiz-question'], ['memory-match', '.memory-grid'], ['sentence-builder', '.sentence-bank']]) {
+    for (const [world, stage] of [['math-quest', '.quiz-question'], ['memory-match', '.memory-grid'], ['sentence-builder', '.sentence-bank'], ['word-connect', '.connect-board'], ['sequence-trail', '.trail-bank']]) {
+      await selectWorld(page, world);
       await page.locator(`.ba3d-${world} .ba3d-play`).click(); await expect(page.locator(stage)).toBeVisible();
       await expect(page.locator('.ba37-mascot-fallback')).toBeVisible();
       await page.getByRole('button', { name: /Thoát trò chơi/ }).click();
@@ -143,11 +160,14 @@ test('An actual embedded PNG decode failure in the new Memory model falls back s
     const imageStart = 20 + jsonLength + 8 + (view.byteOffset ?? 0);
     expect([...bytes.subarray(imageStart, imageStart + 8)]).toEqual([137, 80, 78, 71, 13, 10, 26, 10]);
     bytes.fill(0, imageStart, imageStart + 8);
-    await route.fulfill({ response, body: bytes });
+    const headers = { ...response.headers() };
+    delete headers['content-encoding']; delete headers['content-length']; delete headers.etag;
+    await route.fulfill({ response, headers, body: bytes });
   });
-  await page.goto('/');
+  await page.goto('/?view=games&controls=1');
   await expect(page.locator('.ba3d-render-host')).toHaveAttribute('data-state', 'fallback');
   await expect(page.locator('canvas.ba3d-canvas')).toHaveCount(1);
+  await selectWorld(page, 'math-quest');
   await page.locator('.ba3d-math-quest .ba3d-play').click(); await page.locator('.answer-option').first().click();
   await expect(page.locator('.feedback-win')).toBeVisible();
 });
@@ -177,9 +197,11 @@ test('A decoded Math material-name validation failure closes every catalog bitma
     const json = JSON.parse(bytes.toString('utf8', 20, 20 + bytes.readUInt32LE(12)).trim());
     expect(json.materials.some((material: { name: string }) => material.name === 'Living mint grass')).toBe(false);
     expect(json.materials.some((material: { name: string }) => material.name === 'Absent mint grass')).toBe(true);
-    await route.fulfill({ response, body: bytes });
+    const headers = { ...response.headers() };
+    delete headers['content-encoding']; delete headers['content-length']; delete headers.etag;
+    await route.fulfill({ response, headers, body: bytes });
   });
-  await page.goto('/');
+  await page.goto('/?view=games&controls=1');
   await expect(page.locator('.ba3d-render-host')).toHaveAttribute('data-state', 'fallback');
   await expect(page.locator('.ba3d-render-host')).toHaveAttribute('data-engine', /legacy-webgl2|canvas/);
   await expect(page.locator('canvas.ba3d-canvas')).toHaveCount(1);
@@ -187,6 +209,7 @@ test('A decoded Math material-name validation failure closes every catalog bitma
   await expect.poll(async () => (await probe()).decoded).toBe(87);
   await expect.poll(async () => (await probe()).closes.filter(count => count === 1).length).toBe(87);
   expect((await probe()).closes.every(count => count === 1), 'No decoded bitmap is leaked or closed twice during initialization failure').toBe(true);
+  await selectWorld(page, 'memory-match');
   await page.locator('.ba3d-memory-match .ba3d-play').click();
   await expect(page.locator('.memory-card')).toHaveCount(12);
   await testInfo.attach('decoded-catalog-failure-bitmap-cleanup', { body: JSON.stringify(await probe(), null, 2), contentType: 'application/json' });

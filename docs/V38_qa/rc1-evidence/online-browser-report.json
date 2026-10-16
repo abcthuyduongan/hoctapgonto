@@ -1,0 +1,1028 @@
+{
+  "config": {
+    "argv": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\node_modules\\@playwright\\test\\cli.js",
+      "test",
+      "--config=playwright.online.config.ts"
+    ],
+    "configFile": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\playwright.online.config.ts",
+    "rootDir": "D:/Phần mềm 2026/BAO_AN_LEARNING_lam lại/tests/visual",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "D:/Phần mềm 2026/BAO_AN_LEARNING_lam lại/test-results/online-browser-output",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "online-chrome",
+        "name": "online-chrome",
+        "testDir": "D:/Phần mềm 2026/BAO_AN_LEARNING_lam lại/tests/visual",
+        "testIgnore": [],
+        "testMatch": [
+          "/online(?:-[a-z]+)?\\.spec\\.ts$/"
+        ],
+        "timeout": 180000
+      },
+      {
+        "outputDir": "D:/Phần mềm 2026/BAO_AN_LEARNING_lam lại/test-results/online-browser-output",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "online-msedge",
+        "name": "online-msedge",
+        "testDir": "D:/Phần mềm 2026/BAO_AN_LEARNING_lam lại/tests/visual",
+        "testIgnore": [],
+        "testMatch": [
+          "/online(?:-[a-z]+)?\\.spec\\.ts$/"
+        ],
+        "timeout": 180000
+      }
+    ],
+    "filteredProjects": [
+      {
+        "grep": {},
+        "grepInvert": null,
+        "outputDir": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\test-results\\online-browser-output",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "name": "online-chrome",
+        "testDir": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual",
+        "snapshotDir": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual",
+        "testIgnore": [],
+        "testMatch": {},
+        "timeout": 180000,
+        "use": {
+          "headless": true,
+          "actionTimeout": 30000,
+          "navigationTimeout": 30000,
+          "viewport": {
+            "width": 1440,
+            "height": 1000
+          },
+          "serviceWorkers": "block",
+          "trace": "retain-on-failure",
+          "screenshot": "only-on-failure",
+          "channel": "chrome"
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": "online-chrome"
+      },
+      {
+        "grep": {},
+        "grepInvert": null,
+        "outputDir": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\test-results\\online-browser-output",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "name": "online-msedge",
+        "testDir": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual",
+        "snapshotDir": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual",
+        "testIgnore": [],
+        "testMatch": {},
+        "timeout": 180000,
+        "use": {
+          "headless": true,
+          "actionTimeout": 30000,
+          "navigationTimeout": 30000,
+          "viewport": {
+            "width": 1440,
+            "height": 1000
+          },
+          "serviceWorkers": "block",
+          "trace": "retain-on-failure",
+          "screenshot": "only-on-failure",
+          "channel": "msedge"
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": "online-msedge"
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "test-results/online-browser-report.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "default",
+    "updateSourceMethod": "patch",
+    "version": "1.64.0",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "online-management.spec.ts",
+      "file": "online-management.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "M2: a fresh child starts empty; Word and Excel preview every question in eight types and reject unusable media",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [
+                {
+                  "type": "serial",
+                  "location": {
+                    "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-management.spec.ts",
+                    "line": 0,
+                    "column": 0
+                  }
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "online-chrome",
+              "projectName": "online-chrome",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 12149,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T02:16:37.108Z",
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-management.spec.ts",
+                        "line": 0,
+                        "column": 0
+                      }
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "ea7564a898d00dc0f38c-cef7c04c5ab9f1dca227",
+          "file": "online-management.spec.ts",
+          "line": 46,
+          "column": 1
+        },
+        {
+          "title": "M2 M3: an explicit same-source revision preserves stars and history; backup preview is read-only and restore requires reauthentication",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [
+                {
+                  "type": "serial",
+                  "location": {
+                    "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-management.spec.ts",
+                    "line": 0,
+                    "column": 0
+                  }
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "online-chrome",
+              "projectName": "online-chrome",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 9800,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T02:16:49.666Z",
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-management.spec.ts",
+                        "line": 0,
+                        "column": 0
+                      }
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "ea7564a898d00dc0f38c-e680d4e44d3236944eb4",
+          "file": "online-management.spec.ts",
+          "line": 71,
+          "column": 1
+        },
+        {
+          "title": "M2: a fresh child starts empty; Word and Excel preview every question in eight types and reject unusable media",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [
+                {
+                  "type": "serial",
+                  "location": {
+                    "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-management.spec.ts",
+                    "line": 0,
+                    "column": 0
+                  }
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "online-msedge",
+              "projectName": "online-msedge",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 11603,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T02:17:30.882Z",
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-management.spec.ts",
+                        "line": 0,
+                        "column": 0
+                      }
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "ea7564a898d00dc0f38c-3785c8e77bbb47dd9a8d",
+          "file": "online-management.spec.ts",
+          "line": 46,
+          "column": 1
+        },
+        {
+          "title": "M2 M3: an explicit same-source revision preserves stars and history; backup preview is read-only and restore requires reauthentication",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [
+                {
+                  "type": "serial",
+                  "location": {
+                    "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-management.spec.ts",
+                    "line": 0,
+                    "column": 0
+                  }
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "online-msedge",
+              "projectName": "online-msedge",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 9989,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T02:17:43.013Z",
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-management.spec.ts",
+                        "line": 0,
+                        "column": 0
+                      }
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "ea7564a898d00dc0f38c-87f49818b997b79e5fce",
+          "file": "online-management.spec.ts",
+          "line": 71,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "online-routing.spec.ts",
+      "file": "online-routing.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "M1: canonical local entry and auth brand keep a fresh account workspace free of browser profiles",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [
+                {
+                  "type": "serial",
+                  "location": {
+                    "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-routing.spec.ts",
+                    "line": 0,
+                    "column": 0
+                  }
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "online-chrome",
+              "projectName": "online-chrome",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1361,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T02:16:59.538Z",
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-routing.spec.ts",
+                        "line": 0,
+                        "column": 0
+                      }
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e41233f301ee70bb33c2-63325ad57752c989f54f",
+          "file": "online-routing.spec.ts",
+          "line": 17,
+          "column": 1
+        },
+        {
+          "title": "M1: legacy archive reads and exports the exact old origin without recovery, upgrades or seed writes",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [
+                {
+                  "type": "serial",
+                  "location": {
+                    "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-routing.spec.ts",
+                    "line": 0,
+                    "column": 0
+                  }
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "online-chrome",
+              "projectName": "online-chrome",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1786,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T02:17:01.064Z",
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-routing.spec.ts",
+                        "line": 0,
+                        "column": 0
+                      }
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e41233f301ee70bb33c2-8191c68056dc0d5ef388",
+          "file": "online-routing.spec.ts",
+          "line": 22,
+          "column": 1
+        },
+        {
+          "title": "M1: graphics fallback exposes every allowed assigned game and no built-in lesson, retaining retries and server stars",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [
+                {
+                  "type": "serial",
+                  "location": {
+                    "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-routing.spec.ts",
+                    "line": 0,
+                    "column": 0
+                  }
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "online-chrome",
+              "projectName": "online-chrome",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3809,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T02:17:02.859Z",
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-routing.spec.ts",
+                        "line": 0,
+                        "column": 0
+                      }
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e41233f301ee70bb33c2-aff1dff76b4fe52367d6",
+          "file": "online-routing.spec.ts",
+          "line": 29,
+          "column": 1
+        },
+        {
+          "title": "M1: canonical local entry and auth brand keep a fresh account workspace free of browser profiles",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [
+                {
+                  "type": "serial",
+                  "location": {
+                    "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-routing.spec.ts",
+                    "line": 0,
+                    "column": 0
+                  }
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "online-msedge",
+              "projectName": "online-msedge",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1298,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T02:17:53.061Z",
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-routing.spec.ts",
+                        "line": 0,
+                        "column": 0
+                      }
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e41233f301ee70bb33c2-481586ce1af94129894a",
+          "file": "online-routing.spec.ts",
+          "line": 17,
+          "column": 1
+        },
+        {
+          "title": "M1: legacy archive reads and exports the exact old origin without recovery, upgrades or seed writes",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [
+                {
+                  "type": "serial",
+                  "location": {
+                    "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-routing.spec.ts",
+                    "line": 0,
+                    "column": 0
+                  }
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "online-msedge",
+              "projectName": "online-msedge",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3250,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T02:17:54.521Z",
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-routing.spec.ts",
+                        "line": 0,
+                        "column": 0
+                      }
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e41233f301ee70bb33c2-223d29cfb15783aa9cc6",
+          "file": "online-routing.spec.ts",
+          "line": 22,
+          "column": 1
+        },
+        {
+          "title": "M1: graphics fallback exposes every allowed assigned game and no built-in lesson, retaining retries and server stars",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [
+                {
+                  "type": "serial",
+                  "location": {
+                    "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-routing.spec.ts",
+                    "line": 0,
+                    "column": 0
+                  }
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "online-msedge",
+              "projectName": "online-msedge",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4685,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T02:17:57.779Z",
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-routing.spec.ts",
+                        "line": 0,
+                        "column": 0
+                      }
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e41233f301ee70bb33c2-a90aaea45e68b7c4e3ae",
+          "file": "online-routing.spec.ts",
+          "line": 29,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "online.spec.ts",
+      "file": "online.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "online: real Word/Excel publishing, authenticated media, raw game answers, listening gate, cross-device wallet and admin handover",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [
+                {
+                  "type": "serial",
+                  "location": {
+                    "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online.spec.ts",
+                    "line": 0,
+                    "column": 0
+                  }
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "online-chrome",
+              "projectName": "online-chrome",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 14172,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T02:17:06.738Z",
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online.spec.ts",
+                        "line": 0,
+                        "column": 0
+                      }
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c766cdb09ab4d2155712-2208dd48360e5b48d44e",
+          "file": "online.spec.ts",
+          "line": 40,
+          "column": 1
+        },
+        {
+          "title": "online privacy: current worker excludes API and an old controlling worker cannot replay a cached private account",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [
+                {
+                  "type": "serial",
+                  "location": {
+                    "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online.spec.ts",
+                    "line": 0,
+                    "column": 0
+                  }
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "online-chrome",
+              "projectName": "online-chrome",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2434,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T02:17:21.085Z",
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online.spec.ts",
+                        "line": 0,
+                        "column": 0
+                      }
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c766cdb09ab4d2155712-938a6068627660d7a803",
+          "file": "online.spec.ts",
+          "line": 67,
+          "column": 1
+        },
+        {
+          "title": "local server CSP: online=0 keeps the premium five-island scene and embedded GLB textures at 545px and 1440px",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [
+                {
+                  "type": "serial",
+                  "location": {
+                    "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online.spec.ts",
+                    "line": 0,
+                    "column": 0
+                  }
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "online-chrome",
+              "projectName": "online-chrome",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 6330,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T02:17:23.529Z",
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online.spec.ts",
+                        "line": 0,
+                        "column": 0
+                      }
+                    }
+                  ],
+                  "attachments": [
+                    {
+                      "name": "premium-renderer-diagnostics",
+                      "contentType": "application/json",
+                      "body": "ewogICJjc3AiOiAiZGVmYXVsdC1zcmMgJ3NlbGYnOyBzY3JpcHQtc3JjICdzZWxmJyAnd2FzbS11bnNhZmUtZXZhbCc7IHN0eWxlLXNyYyAnc2VsZicgJ3Vuc2FmZS1pbmxpbmUnOyBpbWctc3JjICdzZWxmJyBkYXRhOiBibG9iOjsgbWVkaWEtc3JjICdzZWxmJyBibG9iOjsgd29ya2VyLXNyYyAnc2VsZicgYmxvYjo7IGNvbm5lY3Qtc3JjICdzZWxmJyBibG9iOjsgb2JqZWN0LXNyYyAnbm9uZSc7IGJhc2UtdXJpICdzZWxmJzsgZnJhbWUtYW5jZXN0b3JzICdub25lJyIsCiAgIm1lZGl1bSI6IHsKICAgICJlbmdpbmUiOiAidGhyZWUtd2ViZ2wiLAogICAgImZyYW1lcyI6IDk2LAogICAgImZwc01lZGlhbiI6IDU5LjksCiAgICAiZnBzUDk1RnJhbWVNcyI6IDE3LjIwMDAwMDAwMDAwMDI3MywKICAgICJ0aWVyIjogImxvdyIsCiAgICAic2VsZWN0ZWRXb3JsZCI6IG51bGwsCiAgICAiY2Fyb3VzZWxNb3ZpbmciOiBmYWxzZSwKICAgICJyb3RhdGlvbiI6IDAuNjI4MzE4NTMwNzE3OTU4NiwKICAgICJpc2xhbmRzIjogWwogICAgICB7CiAgICAgICAgImlkIjogIm1hdGgtcXVlc3QiLAogICAgICAgICJ4IjogMS45NTc0OTk5OTk5OTk5OTk4LAogICAgICAgICJ5IjogLTAuMDU2MTQ2NDI5NzkzNTY4NTE0LAogICAgICAgICJ6IjogMS41OTQyNjc2MDkzMjIzMjE4LAogICAgICAgICJzY2FsZSI6IDAuNzMKICAgICAgfSwKICAgICAgewogICAgICAgICJpZCI6ICJtZW1vcnktbWF0Y2giLAogICAgICAgICJ4IjogMy4xNjczMDE1MzI5Nzc5MTkzLAogICAgICAgICJ5IjogLTAuMDM3MzEyOTk3NzY4MzU2MzgsCiAgICAgICAgInoiOiAtMi4xMjkxMTg2NTE5NzMyMDM1LAogICAgICAgICJzY2FsZSI6IDAuNzMKICAgICAgfSwKICAgICAgewogICAgICAgICJpZCI6ICJzZW50ZW5jZS1idWlsZGVyIiwKICAgICAgICAieCI6IDQuMDc4NDM4NjgxNDQyM2UtMTYsCiAgICAgICAgInkiOiAwLjAzMzMyNDUzODU1Mzg3ODk4NSwKICAgICAgICAieiI6IC00LjQzMDI5NzkxNDY5ODIzNywKICAgICAgICAic2NhbGUiOiAwLjczCiAgICAgIH0sCiAgICAgIHsKICAgICAgICAiaWQiOiAid29yZC1jb25uZWN0IiwKICAgICAgICAieCI6IC0zLjE2NzMwMTUzMjk3NzkxOSwKICAgICAgICAieSI6IDAuMDU3Njk1NDEyNDc1NzE3MTUsCiAgICAgICAgInoiOiAtMi4xMjkxMTg2NTE5NzMyMDQ0LAogICAgICAgICJzY2FsZSI6IDAuNzMKICAgICAgfSwKICAgICAgewogICAgICAgICJpZCI6ICJzZXF1ZW5jZS10cmFpbCIsCiAgICAgICAgIngiOiAtMS45NTc1MDAwMDAwMDAwMDA3LAogICAgICAgICJ5IjogMC4wMDE5NjM5MjY3ODc5ODg5MzUzLAogICAgICAgICJ6IjogMS41OTQyNjc2MDkzMjIzMjE4LAogICAgICAgICJzY2FsZSI6IDAuNzMKICAgICAgfQogICAgXSwKICAgICJtYXNjb3RMb2NhdGlvbiI6ICJ3YWl0aW5nIiwKICAgICJtYXNjb3RTdGF0ZSI6ICJ3YWl0aW5nIiwKICAgICJtYXNjb3RQb3NpdGlvbiI6IHsKICAgICAgIngiOiAtNi44LAogICAgICAieSI6IDAuMTIsCiAgICAgICJ6IjogNC4yCiAgICB9LAogICAgImp1bXBQcm9ncmVzcyI6IDEsCiAgICAiZHByIjogMSwKICAgICJkcmF3Q2FsbHMiOiAxNjUsCiAgICAic2hhZG93VXBkYXRlcyI6IDAsCiAgICAiZ3B1R2VvbWV0cmllcyI6IDE5NiwKICAgICJncHVUZXh0dXJlcyI6IDg5LAogICAgImdwdVByb2dyYW1zIjogMTQsCiAgICAic2hhZGVyUHJlcGFyYXRpb25NcyI6IDU0LjI5OTk5OTk5OTgxMzczNSwKICAgICJwYXJhbGxlbFNoYWRlckNvbXBpbGUiOiB0cnVlLAogICAgImdlb21ldHJ5RGV0YWlsIjogInJlZHVjZWQiLAogICAgImxvZFN0YXRlIjogInJlYWR5IiwKICAgICJsb2RNYXN0ZXJUcmlhbmdsZXMiOiAxNTIzMjAsCiAgICAibG9kUmVkdWNlZFRyaWFuZ2xlcyI6IDg0MTE0LAogICAgImxvZE1lc2hlcyI6IDQ3LAogICAgImxvZFByZXBhcmF0aW9uTXMiOiA3NzUuMjAwMDAwMDAwMTg2MywKICAgICJsb2RDcHVQcmVwYXJhdGlvbk1zIjogMjU0LjMwMDAwMDAwMTY3NjM4LAogICAgImxvZE1heE1lc2hQcmVwYXJhdGlvbk1zIjogMTguMDk5OTk5OTk5NjI3NDcsCiAgICAidHJpYW5nbGVzIjogOTUwMDgsCiAgICAidGV4dHVyZUJ5dGVzRXN0aW1hdGUiOiAyODU3MzY5NS45OTk5OTk5NjYsCiAgICAiYXNzZXRFcnJvcnMiOiBbXSwKICAgICJyZWFkeUFzc2V0cyI6IFsKICAgICAgIm1hdGgtd29ybGQiLAogICAgICAiZm94LWd1aWRlIiwKICAgICAgIm1lbW9yeS13b3JsZCIsCiAgICAgICJsYW5ndWFnZS13b3JsZCIsCiAgICAgICJlbnZpcm9ubWVudCIKICAgIF0sCiAgICAiYW5pbWF0aW9uQ2xpcHMiOiBbCiAgICAgICJJZGxlIiwKICAgICAgIkNoZWVyIiwKICAgICAgIlZpY3RvcnkiCiAgICBdLAogICAgInNrZWxldGFsTWVzaGVzIjogMTAsCiAgICAiYm9uZXMiOiAxNCwKICAgICJhbmltYXRpb25UaW1lIjogMS42MzM5LAogICAgImFjdGl2ZUNsaXAiOiAiSWRsZSIsCiAgICAibW90aW9uIjogdHJ1ZSwKICAgICJwYXVzZWQiOiBmYWxzZSwKICAgICJzY2VuZU1vZGUiOiAiaG9tZSIsCiAgICAiZ2FtZVdvcmxkIjogbnVsbCwKICAgICJndWlkZU1vb2QiOiAiaWRsZSIsCiAgICAiZ3VpZGVWaWV3cG9ydCI6IG51bGwsCiAgICAiZ3VpZGVWaXNpYmxlIjogdHJ1ZQogIH0sCiAgImZvY3VzZWQiOiB7CiAgICAiZW5naW5lIjogInRocmVlLXdlYmdsIiwKICAgICJmcmFtZXMiOiAyMTcsCiAgICAiZnBzTWVkaWFuIjogNTkuOSwKICAgICJmcHNQOTVGcmFtZU1zIjogMTcuMjAwMDAwMDAwMDAwMjczLAogICAgInRpZXIiOiAibG93IiwKICAgICJzZWxlY3RlZFdvcmxkIjogIm1lbW9yeS1tYXRjaCIsCiAgICAiY2Fyb3VzZWxNb3ZpbmciOiBmYWxzZSwKICAgICJyb3RhdGlvbiI6IC0xLjI1NjYzNzA2MTQzNTkxNjgsCiAgICAiaXNsYW5kcyI6IFsKICAgICAgewogICAgICAgICJpZCI6ICJtYXRoLXF1ZXN0IiwKICAgICAgICAieCI6IC0zLjE2NzMwMTUzMjk3NzkxODQsCiAgICAgICAgInkiOiAwLAogICAgICAgICJ6IjogLTAuMDcwODgxMzQ4MDI2Nzk0NDcsCiAgICAgICAgInNjYWxlIjogMC43CiAgICAgIH0sCiAgICAgIHsKICAgICAgICAiaWQiOiAibWVtb3J5LW1hdGNoIiwKICAgICAgICAieCI6IDEuNDc4OTQ5MzY5NTAzNjUxZS0xNSwKICAgICAgICAieSI6IDAuMSwKICAgICAgICAieiI6IDIuMjMwMjk3OTE0Njk4MjM2LAogICAgICAgICJzY2FsZSI6IDEuMDQKICAgICAgfSwKICAgICAgewogICAgICAgICJpZCI6ICJzZW50ZW5jZS1idWlsZGVyIiwKICAgICAgICAieCI6IDMuMTY3MzAxNTMyOTc3OTE5MywKICAgICAgICAieSI6IDAsCiAgICAgICAgInoiOiAtMC4wNzA4ODEzNDgwMjY3OTczNSwKICAgICAgICAic2NhbGUiOiAwLjcKICAgICAgfSwKICAgICAgewogICAgICAgICJpZCI6ICJ3b3JkLWNvbm5lY3QiLAogICAgICAgICJ4IjogMS45NTc0OTk5OTk5OTk5OTg3LAogICAgICAgICJ5IjogMCwKICAgICAgICAieiI6IC0zLjc5NDI2NzYwOTMyMjMyMywKICAgICAgICAic2NhbGUiOiAwLjcKICAgICAgfSwKICAgICAgewogICAgICAgICJpZCI6ICJzZXF1ZW5jZS10cmFpbCIsCiAgICAgICAgIngiOiAtMS45NTc1MDAwMDAwMDAwMDA3LAogICAgICAgICJ5IjogMCwKICAgICAgICAieiI6IC0zLjc5NDI2NzYwOTMyMjMyMTUsCiAgICAgICAgInNjYWxlIjogMC43CiAgICAgIH0KICAgIF0sCiAgICAibWFzY290TG9jYXRpb24iOiAibWVtb3J5LW1hdGNoIiwKICAgICJtYXNjb3RTdGF0ZSI6ICJvbi1pc2xhbmQiLAogICAgIm1hc2NvdFBvc2l0aW9uIjogewogICAgICAieCI6IC0wLjk4Nzk5OTk5OTk5OTk5ODUsCiAgICAgICJ5IjogMC4xNDE2LAogICAgICAieiI6IDMuNTMwMjk3OTE0Njk4MjM2MwogICAgfSwKICAgICJqdW1wUHJvZ3Jlc3MiOiAxLAogICAgImRwciI6IDEsCiAgICAiZHJhd0NhbGxzIjogMTYyLAogICAgInNoYWRvd1VwZGF0ZXMiOiAwLAogICAgImdwdUdlb21ldHJpZXMiOiAxOTYsCiAgICAiZ3B1VGV4dHVyZXMiOiA4OSwKICAgICJncHVQcm9ncmFtcyI6IDE0LAogICAgInNoYWRlclByZXBhcmF0aW9uTXMiOiA1NC4yOTk5OTk5OTk4MTM3MzUsCiAgICAicGFyYWxsZWxTaGFkZXJDb21waWxlIjogdHJ1ZSwKICAgICJnZW9tZXRyeURldGFpbCI6ICJyZWR1Y2VkIiwKICAgICJsb2RTdGF0ZSI6ICJyZWFkeSIsCiAgICAibG9kTWFzdGVyVHJpYW5nbGVzIjogMTUyMzIwLAogICAgImxvZFJlZHVjZWRUcmlhbmdsZXMiOiA4NDExNCwKICAgICJsb2RNZXNoZXMiOiA0NywKICAgICJsb2RQcmVwYXJhdGlvbk1zIjogNzc1LjIwMDAwMDAwMDE4NjMsCiAgICAibG9kQ3B1UHJlcGFyYXRpb25NcyI6IDI1NC4zMDAwMDAwMDE2NzYzOCwKICAgICJsb2RNYXhNZXNoUHJlcGFyYXRpb25NcyI6IDE4LjA5OTk5OTk5OTYyNzQ3LAogICAgInRyaWFuZ2xlcyI6IDk0Mzg0LAogICAgInRleHR1cmVCeXRlc0VzdGltYXRlIjogMjg1NzM2OTUuOTk5OTk5OTY2LAogICAgImFzc2V0RXJyb3JzIjogW10sCiAgICAicmVhZHlBc3NldHMiOiBbCiAgICAgICJtYXRoLXdvcmxkIiwKICAgICAgImZveC1ndWlkZSIsCiAgICAgICJtZW1vcnktd29ybGQiLAogICAgICAibGFuZ3VhZ2Utd29ybGQiLAogICAgICAiZW52aXJvbm1lbnQiCiAgICBdLAogICAgImFuaW1hdGlvbkNsaXBzIjogWwogICAgICAiSWRsZSIsCiAgICAgICJDaGVlciIsCiAgICAgICJWaWN0b3J5IgogICAgXSwKICAgICJza2VsZXRhbE1lc2hlcyI6IDEwLAogICAgImJvbmVzIjogMTQsCiAgICAiYW5pbWF0aW9uVGltZSI6IDMuNjUwMzAwMDAwMDAwMDA1NCwKICAgICJhY3RpdmVDbGlwIjogIkNoZWVyIiwKICAgICJtb3Rpb24iOiB0cnVlLAogICAgInBhdXNlZCI6IGZhbHNlLAogICAgInNjZW5lTW9kZSI6ICJob21lIiwKICAgICJnYW1lV29ybGQiOiBudWxsLAogICAgImd1aWRlTW9vZCI6ICJpZGxlIiwKICAgICJndWlkZVZpZXdwb3J0IjogbnVsbCwKICAgICJndWlkZVZpc2libGUiOiB0cnVlCiAgfSwKICAiZGVza3RvcCI6IHsKICAgICJlbmdpbmUiOiAidGhyZWUtd2ViZ2wiLAogICAgImZyYW1lcyI6IDIxNywKICAgICJmcHNNZWRpYW4iOiA1OS45LAogICAgImZwc1A5NUZyYW1lTXMiOiAxNy4yMDAwMDAwMDAwMDAyNzMsCiAgICAidGllciI6ICJsb3ciLAogICAgInNlbGVjdGVkV29ybGQiOiAibWVtb3J5LW1hdGNoIiwKICAgICJjYXJvdXNlbE1vdmluZyI6IGZhbHNlLAogICAgInJvdGF0aW9uIjogLTEuMjU2NjM3MDYxNDM1OTE2OCwKICAgICJpc2xhbmRzIjogWwogICAgICB7CiAgICAgICAgImlkIjogIm1hdGgtcXVlc3QiLAogICAgICAgICJ4IjogLTMuMTY3MzAxNTMyOTc3OTE4NCwKICAgICAgICAieSI6IDAsCiAgICAgICAgInoiOiAtMC4wNzA4ODEzNDgwMjY3OTQ0NywKICAgICAgICAic2NhbGUiOiAwLjcKICAgICAgfSwKICAgICAgewogICAgICAgICJpZCI6ICJtZW1vcnktbWF0Y2giLAogICAgICAgICJ4IjogMS40Nzg5NDkzNjk1MDM2NTFlLTE1LAogICAgICAgICJ5IjogMC4xLAogICAgICAgICJ6IjogMi4yMzAyOTc5MTQ2OTgyMzYsCiAgICAgICAgInNjYWxlIjogMS4wNAogICAgICB9LAogICAgICB7CiAgICAgICAgImlkIjogInNlbnRlbmNlLWJ1aWxkZXIiLAogICAgICAgICJ4IjogMy4xNjczMDE1MzI5Nzc5MTkzLAogICAgICAgICJ5IjogMCwKICAgICAgICAieiI6IC0wLjA3MDg4MTM0ODAyNjc5NzM1LAogICAgICAgICJzY2FsZSI6IDAuNwogICAgICB9LAogICAgICB7CiAgICAgICAgImlkIjogIndvcmQtY29ubmVjdCIsCiAgICAgICAgIngiOiAxLjk1NzQ5OTk5OTk5OTk5ODcsCiAgICAgICAgInkiOiAwLAogICAgICAgICJ6IjogLTMuNzk0MjY3NjA5MzIyMzIzLAogICAgICAgICJzY2FsZSI6IDAuNwogICAgICB9LAogICAgICB7CiAgICAgICAgImlkIjogInNlcXVlbmNlLXRyYWlsIiwKICAgICAgICAieCI6IC0xLjk1NzUwMDAwMDAwMDAwMDcsCiAgICAgICAgInkiOiAwLAogICAgICAgICJ6IjogLTMuNzk0MjY3NjA5MzIyMzIxNSwKICAgICAgICAic2NhbGUiOiAwLjcKICAgICAgfQogICAgXSwKICAgICJtYXNjb3RMb2NhdGlvbiI6ICJtZW1vcnktbWF0Y2giLAogICAgIm1hc2NvdFN0YXRlIjogIm9uLWlzbGFuZCIsCiAgICAibWFzY290UG9zaXRpb24iOiB7CiAgICAgICJ4IjogLTAuOTg3OTk5OTk5OTk5OTk4NSwKICAgICAgInkiOiAwLjE0MTYsCiAgICAgICJ6IjogMy41MzAyOTc5MTQ2OTgyMzYzCiAgICB9LAogICAgImp1bXBQcm9ncmVzcyI6IDEsCiAgICAiZHByIjogMSwKICAgICJkcmF3Q2FsbHMiOiAxNjIsCiAgICAic2hhZG93VXBkYXRlcyI6IDAsCiAgICAiZ3B1R2VvbWV0cmllcyI6IDE5NiwKICAgICJncHVUZXh0dXJlcyI6IDg5LAogICAgImdwdVByb2dyYW1zIjogMTQsCiAgICAic2hhZGVyUHJlcGFyYXRpb25NcyI6IDU0LjI5OTk5OTk5OTgxMzczNSwKICAgICJwYXJhbGxlbFNoYWRlckNvbXBpbGUiOiB0cnVlLAogICAgImdlb21ldHJ5RGV0YWlsIjogInJlZHVjZWQiLAogICAgImxvZFN0YXRlIjogInJlYWR5IiwKICAgICJsb2RNYXN0ZXJUcmlhbmdsZXMiOiAxNTIzMjAsCiAgICAibG9kUmVkdWNlZFRyaWFuZ2xlcyI6IDg0MTE0LAogICAgImxvZE1lc2hlcyI6IDQ3LAogICAgImxvZFByZXBhcmF0aW9uTXMiOiA3NzUuMjAwMDAwMDAwMTg2MywKICAgICJsb2RDcHVQcmVwYXJhdGlvbk1zIjogMjU0LjMwMDAwMDAwMTY3NjM4LAogICAgImxvZE1heE1lc2hQcmVwYXJhdGlvbk1zIjogMTguMDk5OTk5OTk5NjI3NDcsCiAgICAidHJpYW5nbGVzIjogOTQzODQsCiAgICAidGV4dHVyZUJ5dGVzRXN0aW1hdGUiOiAyODU3MzY5NS45OTk5OTk5NjYsCiAgICAiYXNzZXRFcnJvcnMiOiBbXSwKICAgICJyZWFkeUFzc2V0cyI6IFsKICAgICAgIm1hdGgtd29ybGQiLAogICAgICAiZm94LWd1aWRlIiwKICAgICAgIm1lbW9yeS13b3JsZCIsCiAgICAgICJsYW5ndWFnZS13b3JsZCIsCiAgICAgICJlbnZpcm9ubWVudCIKICAgIF0sCiAgICAiYW5pbWF0aW9uQ2xpcHMiOiBbCiAgICAgICJJZGxlIiwKICAgICAgIkNoZWVyIiwKICAgICAgIlZpY3RvcnkiCiAgICBdLAogICAgInNrZWxldGFsTWVzaGVzIjogMTAsCiAgICAiYm9uZXMiOiAxNCwKICAgICJhbmltYXRpb25UaW1lIjogMy42NTAzMDAwMDAwMDAwMDU0LAogICAgImFjdGl2ZUNsaXAiOiAiQ2hlZXIiLAogICAgIm1vdGlvbiI6IHRydWUsCiAgICAicGF1c2VkIjogZmFsc2UsCiAgICAic2NlbmVNb2RlIjogImhvbWUiLAogICAgImdhbWVXb3JsZCI6IG51bGwsCiAgICAiZ3VpZGVNb29kIjogImlkbGUiLAogICAgImd1aWRlVmlld3BvcnQiOiBudWxsLAogICAgImd1aWRlVmlzaWJsZSI6IHRydWUKICB9LAogICJpc3N1ZXMiOiBbXSwKICAicGFnZUVycm9ycyI6IFtdCn0="
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c766cdb09ab4d2155712-977d42666a3a03c6a573",
+          "file": "online.spec.ts",
+          "line": 88,
+          "column": 1
+        },
+        {
+          "title": "online: real Word/Excel publishing, authenticated media, raw game answers, listening gate, cross-device wallet and admin handover",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [
+                {
+                  "type": "serial",
+                  "location": {
+                    "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online.spec.ts",
+                    "line": 0,
+                    "column": 0
+                  }
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "online-msedge",
+              "projectName": "online-msedge",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 14636,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T02:18:02.523Z",
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online.spec.ts",
+                        "line": 0,
+                        "column": 0
+                      }
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c766cdb09ab4d2155712-ed0903cf9387a5b8ad63",
+          "file": "online.spec.ts",
+          "line": 40,
+          "column": 1
+        },
+        {
+          "title": "online privacy: current worker excludes API and an old controlling worker cannot replay a cached private account",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [
+                {
+                  "type": "serial",
+                  "location": {
+                    "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online.spec.ts",
+                    "line": 0,
+                    "column": 0
+                  }
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "online-msedge",
+              "projectName": "online-msedge",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2714,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T02:18:17.318Z",
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online.spec.ts",
+                        "line": 0,
+                        "column": 0
+                      }
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c766cdb09ab4d2155712-c9b03e81a69910670d1d",
+          "file": "online.spec.ts",
+          "line": 67,
+          "column": 1
+        },
+        {
+          "title": "local server CSP: online=0 keeps the premium five-island scene and embedded GLB textures at 545px and 1440px",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [
+                {
+                  "type": "serial",
+                  "location": {
+                    "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online.spec.ts",
+                    "line": 0,
+                    "column": 0
+                  }
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "online-msedge",
+              "projectName": "online-msedge",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 6355,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T02:18:20.039Z",
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online.spec.ts",
+                        "line": 0,
+                        "column": 0
+                      }
+                    }
+                  ],
+                  "attachments": [
+                    {
+                      "name": "premium-renderer-diagnostics",
+                      "contentType": "application/json",
+                      "body": "ewogICJjc3AiOiAiZGVmYXVsdC1zcmMgJ3NlbGYnOyBzY3JpcHQtc3JjICdzZWxmJyAnd2FzbS11bnNhZmUtZXZhbCc7IHN0eWxlLXNyYyAnc2VsZicgJ3Vuc2FmZS1pbmxpbmUnOyBpbWctc3JjICdzZWxmJyBkYXRhOiBibG9iOjsgbWVkaWEtc3JjICdzZWxmJyBibG9iOjsgd29ya2VyLXNyYyAnc2VsZicgYmxvYjo7IGNvbm5lY3Qtc3JjICdzZWxmJyBibG9iOjsgb2JqZWN0LXNyYyAnbm9uZSc7IGJhc2UtdXJpICdzZWxmJzsgZnJhbWUtYW5jZXN0b3JzICdub25lJyIsCiAgIm1lZGl1bSI6IHsKICAgICJlbmdpbmUiOiAidGhyZWUtd2ViZ2wiLAogICAgImZyYW1lcyI6IDk2LAogICAgImZwc01lZGlhbiI6IDU5LjksCiAgICAiZnBzUDk1RnJhbWVNcyI6IDE3LjEwMDAwMDAwMDAwMDM2NCwKICAgICJ0aWVyIjogImxvdyIsCiAgICAic2VsZWN0ZWRXb3JsZCI6IG51bGwsCiAgICAiY2Fyb3VzZWxNb3ZpbmciOiBmYWxzZSwKICAgICJyb3RhdGlvbiI6IDAuNjI4MzE4NTMwNzE3OTU4NiwKICAgICJpc2xhbmRzIjogWwogICAgICB7CiAgICAgICAgImlkIjogIm1hdGgtcXVlc3QiLAogICAgICAgICJ4IjogMS45NTc0OTk5OTk5OTk5OTk4LAogICAgICAgICJ5IjogLTAuMDU2MTk1NzgxMTg2MDk2NDQ0LAogICAgICAgICJ6IjogMS41OTQyNjc2MDkzMjIzMjE4LAogICAgICAgICJzY2FsZSI6IDAuNzMKICAgICAgfSwKICAgICAgewogICAgICAgICJpZCI6ICJtZW1vcnktbWF0Y2giLAogICAgICAgICJ4IjogMy4xNjczMDE1MzI5Nzc5MTkzLAogICAgICAgICJ5IjogLTAuMDM3MjAyOTQ3MDc4NzI5NDMsCiAgICAgICAgInoiOiAtMi4xMjkxMTg2NTE5NzMyMDM1LAogICAgICAgICJzY2FsZSI6IDAuNzMKICAgICAgfSwKICAgICAgewogICAgICAgICJpZCI6ICJzZW50ZW5jZS1idWlsZGVyIiwKICAgICAgICAieCI6IDQuMDc4NDM4NjgxNDQyM2UtMTYsCiAgICAgICAgInkiOiAwLjAzMzQ0MTIwMDY2OTc0MDE4NCwKICAgICAgICAieiI6IC00LjQzMDI5NzkxNDY5ODIzNywKICAgICAgICAic2NhbGUiOiAwLjczCiAgICAgIH0sCiAgICAgIHsKICAgICAgICAiaWQiOiAid29yZC1jb25uZWN0IiwKICAgICAgICAieCI6IC0zLjE2NzMwMTUzMjk3NzkxOSwKICAgICAgICAieSI6IDAuMDU3NjU2NzE2MjgxMjg1MjUsCiAgICAgICAgInoiOiAtMi4xMjkxMTg2NTE5NzMyMDQ0LAogICAgICAgICJzY2FsZSI6IDAuNzMKICAgICAgfSwKICAgICAgewogICAgICAgICJpZCI6ICJzZXF1ZW5jZS10cmFpbCIsCiAgICAgICAgIngiOiAtMS45NTc1MDAwMDAwMDAwMDA3LAogICAgICAgICJ5IjogMC4wMDE4MjM1OTY3NzEwMzM1MDUzLAogICAgICAgICJ6IjogMS41OTQyNjc2MDkzMjIzMjE4LAogICAgICAgICJzY2FsZSI6IDAuNzMKICAgICAgfQogICAgXSwKICAgICJtYXNjb3RMb2NhdGlvbiI6ICJ3YWl0aW5nIiwKICAgICJtYXNjb3RTdGF0ZSI6ICJ3YWl0aW5nIiwKICAgICJtYXNjb3RQb3NpdGlvbiI6IHsKICAgICAgIngiOiAtNi44LAogICAgICAieSI6IDAuMTIsCiAgICAgICJ6IjogNC4yCiAgICB9LAogICAgImp1bXBQcm9ncmVzcyI6IDEsCiAgICAiZHByIjogMSwKICAgICJkcmF3Q2FsbHMiOiAxNjUsCiAgICAic2hhZG93VXBkYXRlcyI6IDAsCiAgICAiZ3B1R2VvbWV0cmllcyI6IDE5NiwKICAgICJncHVUZXh0dXJlcyI6IDg5LAogICAgImdwdVByb2dyYW1zIjogMTQsCiAgICAic2hhZGVyUHJlcGFyYXRpb25NcyI6IDY3LjQwMDAwMDAwMDM3MjUzLAogICAgInBhcmFsbGVsU2hhZGVyQ29tcGlsZSI6IHRydWUsCiAgICAiZ2VvbWV0cnlEZXRhaWwiOiAicmVkdWNlZCIsCiAgICAibG9kU3RhdGUiOiAicmVhZHkiLAogICAgImxvZE1hc3RlclRyaWFuZ2xlcyI6IDE1MjMyMCwKICAgICJsb2RSZWR1Y2VkVHJpYW5nbGVzIjogODQxMTQsCiAgICAibG9kTWVzaGVzIjogNDcsCiAgICAibG9kUHJlcGFyYXRpb25NcyI6IDc3MS42MDAwMDAwMDA1NTg4LAogICAgImxvZENwdVByZXBhcmF0aW9uTXMiOiAyNTguMjAwMDAwMDAwMTg2MjYsCiAgICAibG9kTWF4TWVzaFByZXBhcmF0aW9uTXMiOiAxNy4zMDAwMDAwMDA3NDUwNTgsCiAgICAidHJpYW5nbGVzIjogOTUwMDgsCiAgICAidGV4dHVyZUJ5dGVzRXN0aW1hdGUiOiAyODU3MzY5NS45OTk5OTk5NjYsCiAgICAiYXNzZXRFcnJvcnMiOiBbXSwKICAgICJyZWFkeUFzc2V0cyI6IFsKICAgICAgIm1hdGgtd29ybGQiLAogICAgICAiZm94LWd1aWRlIiwKICAgICAgIm1lbW9yeS13b3JsZCIsCiAgICAgICJsYW5ndWFnZS13b3JsZCIsCiAgICAgICJlbnZpcm9ubWVudCIKICAgIF0sCiAgICAiYW5pbWF0aW9uQ2xpcHMiOiBbCiAgICAgICJJZGxlIiwKICAgICAgIkNoZWVyIiwKICAgICAgIlZpY3RvcnkiCiAgICBdLAogICAgInNrZWxldGFsTWVzaGVzIjogMTAsCiAgICAiYm9uZXMiOiAxNCwKICAgICJhbmltYXRpb25UaW1lIjogMS42MzM1OTk5OTk5OTk5OTg0LAogICAgImFjdGl2ZUNsaXAiOiAiSWRsZSIsCiAgICAibW90aW9uIjogdHJ1ZSwKICAgICJwYXVzZWQiOiBmYWxzZSwKICAgICJzY2VuZU1vZGUiOiAiaG9tZSIsCiAgICAiZ2FtZVdvcmxkIjogbnVsbCwKICAgICJndWlkZU1vb2QiOiAiaWRsZSIsCiAgICAiZ3VpZGVWaWV3cG9ydCI6IG51bGwsCiAgICAiZ3VpZGVWaXNpYmxlIjogdHJ1ZQogIH0sCiAgImZvY3VzZWQiOiB7CiAgICAiZW5naW5lIjogInRocmVlLXdlYmdsIiwKICAgICJmcmFtZXMiOiAyMTUsCiAgICAiZnBzTWVkaWFuIjogNTkuOSwKICAgICJmcHNQOTVGcmFtZU1zIjogMTcsCiAgICAidGllciI6ICJsb3ciLAogICAgInNlbGVjdGVkV29ybGQiOiAibWVtb3J5LW1hdGNoIiwKICAgICJjYXJvdXNlbE1vdmluZyI6IGZhbHNlLAogICAgInJvdGF0aW9uIjogLTEuMjU2NjM3MDYxNDM1OTE3MiwKICAgICJpc2xhbmRzIjogWwogICAgICB7CiAgICAgICAgImlkIjogIm1hdGgtcXVlc3QiLAogICAgICAgICJ4IjogLTMuMTY3MzAxNTMyOTc3OTE5LAogICAgICAgICJ5IjogMCwKICAgICAgICAieiI6IC0wLjA3MDg4MTM0ODAyNjc5NjAyLAogICAgICAgICJzY2FsZSI6IDAuNwogICAgICB9LAogICAgICB7CiAgICAgICAgImlkIjogIm1lbW9yeS1tYXRjaCIsCiAgICAgICAgIngiOiAwLAogICAgICAgICJ5IjogMC4xLAogICAgICAgICJ6IjogMi4yMzAyOTc5MTQ2OTgyMzYsCiAgICAgICAgInNjYWxlIjogMS4wNAogICAgICB9LAogICAgICB7CiAgICAgICAgImlkIjogInNlbnRlbmNlLWJ1aWxkZXIiLAogICAgICAgICJ4IjogMy4xNjczMDE1MzI5Nzc5MTksCiAgICAgICAgInkiOiAwLAogICAgICAgICJ6IjogLTAuMDcwODgxMzQ4MDI2Nzk2MDIsCiAgICAgICAgInNjYWxlIjogMC43CiAgICAgIH0sCiAgICAgIHsKICAgICAgICAiaWQiOiAid29yZC1jb25uZWN0IiwKICAgICAgICAieCI6IDEuOTU3NTAwMDAwMDAwMDAwMiwKICAgICAgICAieSI6IDAsCiAgICAgICAgInoiOiAtMy43OTQyNjc2MDkzMjIzMjIsCiAgICAgICAgInNjYWxlIjogMC43CiAgICAgIH0sCiAgICAgIHsKICAgICAgICAiaWQiOiAic2VxdWVuY2UtdHJhaWwiLAogICAgICAgICJ4IjogLTEuOTU3NDk5OTk5OTk5OTk5NiwKICAgICAgICAieSI6IDAsCiAgICAgICAgInoiOiAtMy43OTQyNjc2MDkzMjIzMjI0LAogICAgICAgICJzY2FsZSI6IDAuNwogICAgICB9CiAgICBdLAogICAgIm1hc2NvdExvY2F0aW9uIjogIm1lbW9yeS1tYXRjaCIsCiAgICAibWFzY290U3RhdGUiOiAib24taXNsYW5kIiwKICAgICJtYXNjb3RQb3NpdGlvbiI6IHsKICAgICAgIngiOiAtMC45ODgsCiAgICAgICJ5IjogMC4xNDE2LAogICAgICAieiI6IDMuNTMwMjk3OTE0Njk4MjM2MwogICAgfSwKICAgICJqdW1wUHJvZ3Jlc3MiOiAxLAogICAgImRwciI6IDEsCiAgICAiZHJhd0NhbGxzIjogMTYyLAogICAgInNoYWRvd1VwZGF0ZXMiOiAwLAogICAgImdwdUdlb21ldHJpZXMiOiAxOTYsCiAgICAiZ3B1VGV4dHVyZXMiOiA4OSwKICAgICJncHVQcm9ncmFtcyI6IDE0LAogICAgInNoYWRlclByZXBhcmF0aW9uTXMiOiA2Ny40MDAwMDAwMDAzNzI1MywKICAgICJwYXJhbGxlbFNoYWRlckNvbXBpbGUiOiB0cnVlLAogICAgImdlb21ldHJ5RGV0YWlsIjogInJlZHVjZWQiLAogICAgImxvZFN0YXRlIjogInJlYWR5IiwKICAgICJsb2RNYXN0ZXJUcmlhbmdsZXMiOiAxNTIzMjAsCiAgICAibG9kUmVkdWNlZFRyaWFuZ2xlcyI6IDg0MTE0LAogICAgImxvZE1lc2hlcyI6IDQ3LAogICAgImxvZFByZXBhcmF0aW9uTXMiOiA3NzEuNjAwMDAwMDAwNTU4OCwKICAgICJsb2RDcHVQcmVwYXJhdGlvbk1zIjogMjU4LjIwMDAwMDAwMDE4NjI2LAogICAgImxvZE1heE1lc2hQcmVwYXJhdGlvbk1zIjogMTcuMzAwMDAwMDAwNzQ1MDU4LAogICAgInRyaWFuZ2xlcyI6IDk0Mzg0LAogICAgInRleHR1cmVCeXRlc0VzdGltYXRlIjogMjg1NzM2OTUuOTk5OTk5OTY2LAogICAgImFzc2V0RXJyb3JzIjogW10sCiAgICAicmVhZHlBc3NldHMiOiBbCiAgICAgICJtYXRoLXdvcmxkIiwKICAgICAgImZveC1ndWlkZSIsCiAgICAgICJtZW1vcnktd29ybGQiLAogICAgICAibGFuZ3VhZ2Utd29ybGQiLAogICAgICAiZW52aXJvbm1lbnQiCiAgICBdLAogICAgImFuaW1hdGlvbkNsaXBzIjogWwogICAgICAiSWRsZSIsCiAgICAgICJDaGVlciIsCiAgICAgICJWaWN0b3J5IgogICAgXSwKICAgICJza2VsZXRhbE1lc2hlcyI6IDEwLAogICAgImJvbmVzIjogMTQsCiAgICAiYW5pbWF0aW9uVGltZSI6IDMuNjE3LAogICAgImFjdGl2ZUNsaXAiOiAiQ2hlZXIiLAogICAgIm1vdGlvbiI6IHRydWUsCiAgICAicGF1c2VkIjogZmFsc2UsCiAgICAic2NlbmVNb2RlIjogImhvbWUiLAogICAgImdhbWVXb3JsZCI6IG51bGwsCiAgICAiZ3VpZGVNb29kIjogImlkbGUiLAogICAgImd1aWRlVmlld3BvcnQiOiBudWxsLAogICAgImd1aWRlVmlzaWJsZSI6IHRydWUKICB9LAogICJkZXNrdG9wIjogewogICAgImVuZ2luZSI6ICJ0aHJlZS13ZWJnbCIsCiAgICAiZnJhbWVzIjogMjE1LAogICAgImZwc01lZGlhbiI6IDU5LjksCiAgICAiZnBzUDk1RnJhbWVNcyI6IDE3LAogICAgInRpZXIiOiAibG93IiwKICAgICJzZWxlY3RlZFdvcmxkIjogIm1lbW9yeS1tYXRjaCIsCiAgICAiY2Fyb3VzZWxNb3ZpbmciOiBmYWxzZSwKICAgICJyb3RhdGlvbiI6IC0xLjI1NjYzNzA2MTQzNTkxNzIsCiAgICAiaXNsYW5kcyI6IFsKICAgICAgewogICAgICAgICJpZCI6ICJtYXRoLXF1ZXN0IiwKICAgICAgICAieCI6IC0zLjE2NzMwMTUzMjk3NzkxOSwKICAgICAgICAieSI6IDAsCiAgICAgICAgInoiOiAtMC4wNzA4ODEzNDgwMjY3OTYwMiwKICAgICAgICAic2NhbGUiOiAwLjcKICAgICAgfSwKICAgICAgewogICAgICAgICJpZCI6ICJtZW1vcnktbWF0Y2giLAogICAgICAgICJ4IjogMCwKICAgICAgICAieSI6IDAuMSwKICAgICAgICAieiI6IDIuMjMwMjk3OTE0Njk4MjM2LAogICAgICAgICJzY2FsZSI6IDEuMDQKICAgICAgfSwKICAgICAgewogICAgICAgICJpZCI6ICJzZW50ZW5jZS1idWlsZGVyIiwKICAgICAgICAieCI6IDMuMTY3MzAxNTMyOTc3OTE5LAogICAgICAgICJ5IjogMCwKICAgICAgICAieiI6IC0wLjA3MDg4MTM0ODAyNjc5NjAyLAogICAgICAgICJzY2FsZSI6IDAuNwogICAgICB9LAogICAgICB7CiAgICAgICAgImlkIjogIndvcmQtY29ubmVjdCIsCiAgICAgICAgIngiOiAxLjk1NzUwMDAwMDAwMDAwMDIsCiAgICAgICAgInkiOiAwLAogICAgICAgICJ6IjogLTMuNzk0MjY3NjA5MzIyMzIyLAogICAgICAgICJzY2FsZSI6IDAuNwogICAgICB9LAogICAgICB7CiAgICAgICAgImlkIjogInNlcXVlbmNlLXRyYWlsIiwKICAgICAgICAieCI6IC0xLjk1NzQ5OTk5OTk5OTk5OTYsCiAgICAgICAgInkiOiAwLAogICAgICAgICJ6IjogLTMuNzk0MjY3NjA5MzIyMzIyNCwKICAgICAgICAic2NhbGUiOiAwLjcKICAgICAgfQogICAgXSwKICAgICJtYXNjb3RMb2NhdGlvbiI6ICJtZW1vcnktbWF0Y2giLAogICAgIm1hc2NvdFN0YXRlIjogIm9uLWlzbGFuZCIsCiAgICAibWFzY290UG9zaXRpb24iOiB7CiAgICAgICJ4IjogLTAuOTg4LAogICAgICAieSI6IDAuMTQxNiwKICAgICAgInoiOiAzLjUzMDI5NzkxNDY5ODIzNjMKICAgIH0sCiAgICAianVtcFByb2dyZXNzIjogMSwKICAgICJkcHIiOiAxLAogICAgImRyYXdDYWxscyI6IDE2MiwKICAgICJzaGFkb3dVcGRhdGVzIjogMCwKICAgICJncHVHZW9tZXRyaWVzIjogMTk2LAogICAgImdwdVRleHR1cmVzIjogODksCiAgICAiZ3B1UHJvZ3JhbXMiOiAxNCwKICAgICJzaGFkZXJQcmVwYXJhdGlvbk1zIjogNjcuNDAwMDAwMDAwMzcyNTMsCiAgICAicGFyYWxsZWxTaGFkZXJDb21waWxlIjogdHJ1ZSwKICAgICJnZW9tZXRyeURldGFpbCI6ICJyZWR1Y2VkIiwKICAgICJsb2RTdGF0ZSI6ICJyZWFkeSIsCiAgICAibG9kTWFzdGVyVHJpYW5nbGVzIjogMTUyMzIwLAogICAgImxvZFJlZHVjZWRUcmlhbmdsZXMiOiA4NDExNCwKICAgICJsb2RNZXNoZXMiOiA0NywKICAgICJsb2RQcmVwYXJhdGlvbk1zIjogNzcxLjYwMDAwMDAwMDU1ODgsCiAgICAibG9kQ3B1UHJlcGFyYXRpb25NcyI6IDI1OC4yMDAwMDAwMDAxODYyNiwKICAgICJsb2RNYXhNZXNoUHJlcGFyYXRpb25NcyI6IDE3LjMwMDAwMDAwMDc0NTA1OCwKICAgICJ0cmlhbmdsZXMiOiA5NDM4NCwKICAgICJ0ZXh0dXJlQnl0ZXNFc3RpbWF0ZSI6IDI4NTczNjk1Ljk5OTk5OTk2NiwKICAgICJhc3NldEVycm9ycyI6IFtdLAogICAgInJlYWR5QXNzZXRzIjogWwogICAgICAibWF0aC13b3JsZCIsCiAgICAgICJmb3gtZ3VpZGUiLAogICAgICAibWVtb3J5LXdvcmxkIiwKICAgICAgImxhbmd1YWdlLXdvcmxkIiwKICAgICAgImVudmlyb25tZW50IgogICAgXSwKICAgICJhbmltYXRpb25DbGlwcyI6IFsKICAgICAgIklkbGUiLAogICAgICAiQ2hlZXIiLAogICAgICAiVmljdG9yeSIKICAgIF0sCiAgICAic2tlbGV0YWxNZXNoZXMiOiAxMCwKICAgICJib25lcyI6IDE0LAogICAgImFuaW1hdGlvblRpbWUiOiAzLjYxNywKICAgICJhY3RpdmVDbGlwIjogIkNoZWVyIiwKICAgICJtb3Rpb24iOiB0cnVlLAogICAgInBhdXNlZCI6IGZhbHNlLAogICAgInNjZW5lTW9kZSI6ICJob21lIiwKICAgICJnYW1lV29ybGQiOiBudWxsLAogICAgImd1aWRlTW9vZCI6ICJpZGxlIiwKICAgICJndWlkZVZpZXdwb3J0IjogbnVsbCwKICAgICJndWlkZVZpc2libGUiOiB0cnVlCiAgfSwKICAiaXNzdWVzIjogW10sCiAgInBhZ2VFcnJvcnMiOiBbXQp9"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c766cdb09ab4d2155712-27447017a9bc0f177dd7",
+          "file": "online.spec.ts",
+          "line": 88,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-16T02:16:36.102Z",
+    "duration": 110735.751,
+    "expected": 16,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

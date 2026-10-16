@@ -1,0 +1,7 @@
+1440 balanced: 118632 triangles; 59.9 FPS; 16.800000000000182 ms P95
+1440 low: 75074 triangles; 59.9 FPS; 16.799999999999272 ms P95
+1440 high: 221328 triangles; 59.9 FPS; 16.799999999999272 ms P95
+390 balanced: 221328 triangles; 59.9 FPS; 16.800000000000182 ms P95
+390 low: 75074 triangles; 59.9 FPS; 16.799999999999272 ms P95
+390 high: 221328 triangles; 59.9 FPS; 16.799999999999272 ms P95
+Saved performance.json with 2 scenarios.

@@ -2,7 +2,10 @@ import { expect, test, type Page } from '@playwright/test';
 import { BUILTIN_PACKS } from '../../src/core/seed';
 import type { PairsPack, QuizPack, SentencePack } from '../../src/core/contracts';
 
-type WorldId = 'math-quest' | 'memory-match' | 'sentence-builder';
+test.use({serviceWorkers:'block'});
+type WorldId = 'math-quest' | 'memory-match' | 'sentence-builder' | 'word-connect' | 'sequence-trail';
+const islands:Record<WorldId,string>={'math-quest':'Đảo Toán Học','memory-match':'Khu Rừng Trí Nhớ','sentence-builder':'Xưởng Ghép Câu','word-connect':'Đảo Nối Từ','sequence-trail':'Bậc Thang Quy Luật'};
+const defaultPacks:Record<WorldId,string>={'math-quest':'math3-adventure','memory-match':'english3-family','sentence-builder':'english3-sentences','word-connect':'english3-family','sequence-trail':'logic3-sequence'};
 type Stats = {
   engine: string; sceneMode: 'home' | 'game'; gameWorld: WorldId | null;
   guideMood: 'idle' | 'happy' | 'encourage' | 'victory'; guideCue?: number;
@@ -10,22 +13,33 @@ type Stats = {
   guideVisible: boolean; drawCalls: number; motion: boolean; paused: boolean;
   animationTime: number; activeClip: string; tier: string; readyAssets: string[];
 };
-const ids: WorldId[] = ['math-quest', 'memory-match', 'sentence-builder'];
+const ids: WorldId[] = ['math-quest', 'memory-match', 'sentence-builder', 'word-connect', 'sequence-trail'];
 const math = BUILTIN_PACKS.find(pack => pack.id === 'math3-adventure') as QuizPack;
 const memory = BUILTIN_PACKS.find(pack => pack.id === 'english3-family') as PairsPack;
 const sentences = BUILTIN_PACKS.find(pack => pack.id === 'english3-sentences') as SentencePack;
+const sequences = BUILTIN_PACKS.find(pack=>pack.id==='logic3-sequence') as SentencePack;
+async function select(page:Page,id:WorldId){
+  await page.getByRole('button',{name:`Chọn ${islands[id]}`,exact:true}).click();
+  await page.locator(`#ba3d-pack-${id}`).selectOption(`${defaultPacks[id]}@1`);
+}
+async function prompt(page:Page,selector:string,text:string){
+  await expect.poll(()=>page.locator(selector).evaluate(element=>{
+    const copy=element.cloneNode(true) as HTMLElement;copy.querySelectorAll('button').forEach(button=>button.remove());return copy.textContent?.trim();
+  })).toBe(text);
+}
 
 async function stats(page: Page): Promise<Stats> {
   const canvas = await page.locator('canvas.ba3d-canvas').getAttribute('data-diagnostics');
   return JSON.parse(canvas ?? await page.locator('.ba3d-render-host').getAttribute('data-diagnostics') ?? '{}');
 }
 async function home(page: Page) {
-  await page.goto('/');
+  await page.goto('/?view=games&controls=1');
   await expect(page.locator('.ba3d-render-host')).toHaveAttribute('data-engine', 'three-webgl');
   await expect(page.locator('.ba3d-render-host')).toHaveAttribute('data-state', 'ready');
   await expect.poll(async () => (await stats(page)).drawCalls).toBeGreaterThan(0);
 }
 async function open(page: Page, id: WorldId) {
+  await select(page,id);
   await page.locator(`.ba3d-${id} .ba3d-play`).click();
   await expect(page.locator('.immersive-dialog.premium-game')).toBeVisible();
   await expect(page.locator('.immersive-dialog')).toHaveAttribute('data-scene-engine', 'three-webgl');
@@ -43,6 +57,8 @@ async function mood(page: Page, expected: Stats['guideMood']) {
 }
 const card = (page: Page, label: string) => page.locator('.memory-card').filter({ has: page.getByText(label, { exact: true }) });
 const word = (page: Page, label: string) => page.locator('.sentence-bank').getByRole('button', { name: label, exact: true });
+const connect=(page:Page,side:'A'|'B',label:string)=>page.getByRole('button',{name:`Thẻ ${side}: ${label}`,exact:true});
+const sequenceWord=(page:Page,label:string)=>page.locator('.trail-bank').getByRole('button',{name:label,exact:true});
 
 test('All games reuse the home canvas, WebGL context and decoded GLBs, including answers, quality and return home', async ({ page }, testInfo) => {
   test.setTimeout(120_000);
@@ -105,6 +121,8 @@ test('All games reuse the home canvas, WebGL context and decoded GLBs, including
     if (id === 'math-quest') await page.locator('.answer-option').nth(math.items[0].correctIndex).click();
     if (id === 'memory-match') { await card(page, memory.items[0].left).click(); await card(page, memory.items[0].right).click(); }
     if (id === 'sentence-builder') { for (const label of sentences.items[0].words) await word(page, label).click(); await page.getByRole('button', { name: /Kiểm tra câu/ }).click(); }
+    if(id==='word-connect'){await connect(page,'A',memory.items[0].left).click();await connect(page,'B',memory.items[0].right).click();}
+    if(id==='sequence-trail'){for(const label of sequences.items[0].words)await sequenceWord(page,label).click();await page.getByRole('button',{name:/Kiểm tra quy luật/}).click();}
     await mood(page, 'happy');
     snapshots.push(await stats(page));
     expect(await contextCount()).toBe(1);
@@ -159,15 +177,33 @@ for (const id of ids) {
         await expect(page.locator('.memory-card.found')).toHaveCount((index + 1) * 2);
         if (index < memory.items.length - 1) await mood(page, 'happy');
       }
-    } else {
+    } else if(id==='sentence-builder') {
       for (const label of [...sentences.items[0].words].reverse()) await word(page, label).click();
       await page.getByRole('button', { name: /Kiểm tra câu/ }).click(); await mood(page, 'encourage');
       await page.locator('.sentence-main-action').click();
       for (const item of sentences.items) {
-        await expect(page.locator('.sentence-prompt')).toHaveText(item.prompt);
+        await prompt(page,'.sentence-prompt',item.prompt);
         for (const label of item.words) await word(page, label).click();
         await page.getByRole('button', { name: /Kiểm tra câu/ }).click(); await mood(page, 'happy');
         await page.locator('.sentence-main-action').click();
+      }
+    } else if(id==='word-connect') {
+      await connect(page,'A',memory.items[0].left).click();await connect(page,'B',memory.items[1].right).click();
+      await mood(page,'encourage');await expect(page.locator('.connect-card:not(:disabled)')).toHaveCount(memory.items.length*2);
+      for(let index=0;index<memory.items.length;index++){
+        await connect(page,'A',memory.items[index].left).click();await connect(page,'B',memory.items[index].right).click();
+        await expect(page.locator('.connect-card.matched')).toHaveCount((index+1)*2);
+        if(index<memory.items.length-1)await mood(page,'happy');
+      }
+    } else {
+      for(const label of [...sequences.items[0].words].reverse())await sequenceWord(page,label).click();
+      await page.getByRole('button',{name:/Kiểm tra quy luật/}).click();await mood(page,'encourage');
+      await page.locator('.trail-main-action').click();
+      for(const item of sequences.items){
+        await prompt(page,'.trail-prompt',item.prompt);
+        for(const label of item.words)await sequenceWord(page,label).click();
+        await page.getByRole('button',{name:/Kiểm tra quy luật/}).click();await mood(page,'happy');
+        await page.locator('.trail-main-action').click();
       }
     }
     await expect(page.locator('.reward-panel')).toBeVisible(); await mood(page, 'victory');
@@ -254,9 +290,10 @@ test('Reduced motion keeps a visible static game guide and feedback without a co
 
 test('Unavailable premium scene shows the same rendered fox fallback and all game controls remain usable', async ({ page }) => {
   await page.route('**/models/math-world.glb', route => route.fulfill({ status: 404, contentType: 'text/plain', body: 'QA unavailable model' }));
-  await page.goto('/');
+  await page.goto('/?view=games&controls=1');
   await expect(page.locator('.ba3d-render-host')).toHaveAttribute('data-state', 'fallback');
   for (const id of ids) {
+    await select(page,id);
     await page.locator(`.ba3d-${id} .ba3d-play`).click();
     await expect(page.locator('.immersive-dialog')).toBeVisible();
     const fallback = page.locator('.ba37-mascot-fallback');

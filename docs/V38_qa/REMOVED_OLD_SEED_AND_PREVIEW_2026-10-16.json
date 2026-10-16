@@ -1,0 +1,92 @@
+[
+  {
+    "path": "public/audio/family-01.v1.wav",
+    "bytes": 85568,
+    "absolute": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\public\\audio\\family-01.v1.wav"
+  },
+  {
+    "path": "public/audio/family-02.v1.wav",
+    "bytes": 90640,
+    "absolute": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\public\\audio\\family-02.v1.wav"
+  },
+  {
+    "path": "public/audio/family-03.v1.wav",
+    "bytes": 91964,
+    "absolute": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\public\\audio\\family-03.v1.wav"
+  },
+  {
+    "path": "public/audio/family-04.v1.wav",
+    "bytes": 88434,
+    "absolute": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\public\\audio\\family-04.v1.wav"
+  },
+  {
+    "path": "public/audio/family-05.v1.wav",
+    "bytes": 98134,
+    "absolute": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\public\\audio\\family-05.v1.wav"
+  },
+  {
+    "path": "public/audio/intro-01.v1.wav",
+    "bytes": 228444,
+    "absolute": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\public\\audio\\intro-01.v1.wav"
+  },
+  {
+    "path": "public/audio/intro-02.v1.wav",
+    "bytes": 221612,
+    "absolute": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\public\\audio\\intro-02.v1.wav"
+  },
+  {
+    "path": "public/audio/intro-03.v1.wav",
+    "bytes": 218522,
+    "absolute": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\public\\audio\\intro-03.v1.wav"
+  },
+  {
+    "path": "public/audio/intro-04.v1.wav",
+    "bytes": 224032,
+    "absolute": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\public\\audio\\intro-04.v1.wav"
+  },
+  {
+    "path": "public/audio/intro-05.v1.wav",
+    "bytes": 221166,
+    "absolute": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\public\\audio\\intro-05.v1.wav"
+  },
+  {
+    "path": "preview/core-check.txt",
+    "bytes": 10906,
+    "absolute": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\preview\\core-check.txt"
+  },
+  {
+    "path": "preview/interactive.css",
+    "bytes": 4052,
+    "absolute": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\preview\\interactive.css"
+  },
+  {
+    "path": "preview/offline_interactive.js",
+    "bytes": 20656,
+    "absolute": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\preview\\offline_interactive.js"
+  },
+  {
+    "path": "preview/qa-console.txt",
+    "bytes": 955,
+    "absolute": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\preview\\qa-console.txt"
+  },
+  {
+    "path": "preview/engine/engine.js",
+    "bytes": 31556,
+    "absolute": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\preview\\engine\\engine.js"
+  },
+  {
+    "path": "tools/template-assets/build-templates.mjs",
+    "bytes": 6199,
+    "absolute": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tools\\template-assets\\build-templates.mjs"
+  },
+  {
+    "path": "tools/template-assets/template-data.json",
+    "bytes": 75611,
+    "absolute": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tools\\template-assets\\template-data.json"
+  },
+  {
+    "path": "tools/template-assets/build-icons.mjs",
+    "bytes": 410,
+    "absolute": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tools\\template-assets\\build-icons.mjs"
+  }
+]

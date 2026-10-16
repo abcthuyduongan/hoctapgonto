@@ -1,0 +1,22 @@
+{
+  "verifiedOn": "2026-10-16",
+  "projectRef": "fhkgqwdpbgnxjqquuxrs",
+  "projectName": "Học tập của Gôn tồ",
+  "schema": "bao_an",
+  "schemaVersion": 1,
+  "tables": 16,
+  "rlsTables": 16,
+  "schemaChecksPassed": 13,
+  "schemaChecksTotal": 13,
+  "emptyDataGroups": 11,
+  "questionPacks": 0,
+  "bucket": "bao-an-media",
+  "bucketPrivate": true,
+  "bucketMaxFileBytes": 2097152,
+  "storageFiles": 0,
+  "schemaExposed": false,
+  "migrationSha256": "661E4F81456F694B23C43A598AB3EBB18072BF14E3DBCC3EF8AB838A43E1202B",
+  "applicationTestsPassed": 201,
+  "netlifyDeployed": false,
+  "runtimeCredentialsConfigured": false
+}

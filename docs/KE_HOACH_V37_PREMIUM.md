@@ -2,7 +2,7 @@
 
 **Tài liệu triển khai kỹ thuật | Baseline: V3.6.2 RC2 | Đích đề xuất: V3.7 Premium World → V3.8 Content & Gameplay**  
 **Ngày lập:** 13/10/2026  
-**Trạng thái:** Kế hoạch gốc; đã triển khai PR-00/01, lát cắt PR-02, khung cảnh bài test ở mục 13 và asset PR-03 ở mục 14 theo quyết định tiếp tục của chủ dự án ngày 14/10/2026. Chưa nghiệm thu V3.7 FINAL.
+**Trạng thái:** Kế hoạch gốc; đã triển khai PR-00/01, lát cắt PR-02, khung cảnh bài test ở mục 13, asset PR-03 ở mục 14 và tối ưu PR-05 ở mục 15 theo quyết định tiếp tục của chủ dự án ngày 14/10/2026. Chưa nghiệm thu V3.7 FINAL; đối chiếu các phần đã đạt/còn mở tại [V37_RELEASE_READINESS.md](V37_RELEASE_READINESS.md).
 **Quy tắc:** Kế thừa mã nguồn V3.6.2; không làm lại ứng dụng; không xóa hoặc chuyển đổi dữ liệu cũ khi chưa có kế hoạch migration và backup.
 
 > **Định nghĩa “hoàn thành”:** Người dùng mở **ứng dụng chạy thật** trên máy tính và điện thoại, thấy mô hình 3D hoàn thiện theo concept đã chốt; ba game vận hành ổn định; kết quả lưu được; build, kiểm thử và nghiệm thu mỹ thuật đều đạt. Screenshot concept, ảnh nền đẹp hoặc bộ test unit xanh **không thay thế** kết quả nghiệm thu này.
@@ -485,3 +485,29 @@ Giai đoạn này hoàn thiện trải nghiệm hình ảnh trong bài test. Th�
 - [ ] Đo Android tầm trung/Chrome và iPhone/Safari theo thiết bị mục tiêu; ghi CPU/GPU/RAM/OS/browser/chế độ pin và kết quả chơi/lưu dữ liệu.
 
 Source và provenance tại [ASSET_LICENSES_V37.md](ASSET_LICENSES_V37.md). Bằng chứng production trước/sau và kết quả kiểm tra tại `V37_art_qa/`. Cổng đủ năm file không thay thế nghiệm thu FINAL.
+
+## 15. PR-05: giảm công việc GPU và byte tải model
+
+Chủ dự án tiếp tục cho phép thực hiện chủ động, không cần chờ duyệt từng thao tác. Đã triển khai các phần kỹ thuật dưới đây; Android/iPhone và mỹ thuật vẫn là nghiệm thu riêng.
+
+- LOD runtime tạo một geometry thấp cho mỗi mesh tĩnh đủ lớn, chỉ khi quality low cần lần đầu, sau khung vẽ đầu và có yield giữa các mesh. Bản thường/cao khôi phục đúng geometry gốc. Không đổi GLB trên đĩa, material/texture hoặc rig cáo; điểm cáo đáp và raycast được kiểm tra.
+- Đảo 79.956 → 43.198 tam giác, giảm 46%; đảo/môi trường 88.932 → 48.774, giảm 45,2%. Đây là số hình học, tách với số GPU triangles có shadow pass. Chuẩn bị có abort/cleanup; lỗi module tối ưu giữ scene gốc và đường chơi.
+- Bóng game tĩnh được cache; thay cảnh/camera/quality mới cập nhật. Home balanced cập nhật bóng khoảng 30 Hz, high giữ bóng động; nhân vật/canvas vẫn theo RAF chung. Low tắt bóng; reduced-motion/pause không chạy renderer RAF liên tục.
+- Shader cho hai trạng thái có/không bóng được chuẩn bị bất đồng bộ trong lúc tải cảnh, để lần đổi chất lượng đầu tái sử dụng chương trình. Cold startup và first-low long tasks được đo riêng với FPS sau warmup.
+- Vite dev/preview nén đúng năm URL GLB bằng Brotli/gzip. Byte giải nén vẫn 7.271.708, transport Brotli 3.428.044 hoặc gzip 3.791.705. Cache tối đa năm file, nén tối đa hai tác vụ, negotiation/ETag/Vary/HEAD/304 và invalidation cùng byte-length có test HTTP. Host tĩnh khác cần cấu hình tương đương.
+
+Log, ảnh, benchmark trước/sau và stress mạng/CPU tại [V37_performance_qa/verification.md](V37_performance_qa/verification.md). Cold-load local sample và throttle desktop không thay benchmark điện thoại hoặc GPU/RAM peak. Không ghi nhãn FINAL chỉ vì các kiểm thử kỹ thuật đạt.
+
+Lộ trình kế tiếp đã được lập riêng: [Kế hoạch V3.8 — giao diện và game mới](KE_HOACH_V38_GIAO_DIEN_VA_GAME_MOI.md). Gồm bảo toàn hồ sơ, khung/HUD/feedback/reward dùng chung, catalog game/scene rồi Nối từ, Quy luật, Trục số và Phân loại. Các module mới chưa được triển khai bởi việc viết kế hoạch này.
+
+## 16. PR-06: khép điều kiện dữ liệu và ghi nhận nghiệm thu
+
+Đối chiếu Gate B phát hiện Creator chỉ xuất học liệu, chưa xuất tiến độ; phần còn thiếu đã được thực hiện trong đợt này, đồng thời hoàn thành mốc bảo toàn hồ sơ V38-00B.
+
+- [x] Góc phụ huynh có tải bản sao học liệu/phiên/lượt thử và xem trước restore. Schema JSON hồ sơ riêng; giới hạn 10 MiB/500 bộ/10.000 phiên/100.000 event; giữ khả năng sao lưu học liệu đã nhập theo v1.
+- [x] Snapshot ba store nhất quán; restore thêm nguyên tử, bản trùng giống bỏ qua, conflict từ chối toàn bộ; lỗi constraint/quota rollback giữ mọi bytes/counts hiện có. Phiên đang chơi trên thiết bị chặn restore; active mới từ backup chuyển abandoned, chưa hứa resume.
+- [x] Hồ sơ mẫu ba game (3 phiên/20 event) export/download/restore qua UI thật vào context QA mới, report bằng trước/sau. Unit backup 17/17, targeted backup 11/11, full Edge production 69/69 trên build sau tích hợp.
+- [x] Luật game, SDK và các hàm core cũ giữ nguyên theo 19 đối chiếu. `storage.ts` chỉ thêm export kết nối cho module backup riêng; DB version 1 và ba store không đổi. Build/typecheck, core/content/guide và renderer/HTTP đều đạt.
+- [ ] Nghiệm thu Android/iPhone thật và duyệt mỹ thuật chính thức. Giữ RC; các điều kiện ngoài môi trường hiện tại được ghi rõ, không thay bằng emulation.
+
+[QA/build cuối và ảnh phần hồ sơ](V37_backup_qa/verification.md), [đối chiếu A/B/C](V37_RELEASE_READINESS.md). Lộ trình giao diện/game V3.8 đã lập, mốc kế tiếp là khung/HUD/feedback Math trước khi nhân rộng Memory/Sentence và mở game mới.

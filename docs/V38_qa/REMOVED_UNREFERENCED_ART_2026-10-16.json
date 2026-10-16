@@ -1,0 +1,74 @@
+[
+  {
+    "Path": "public\\art\\fox-scene-free.png",
+    "Bytes": 468303
+  },
+  {
+    "Path": "public\\art\\fox-scene-free.webp",
+    "Bytes": 52188
+  },
+  {
+    "Path": "public\\art\\original-cover-math.webp",
+    "Bytes": 56998
+  },
+  {
+    "Path": "public\\art\\original-cover-memory.webp",
+    "Bytes": 75378
+  },
+  {
+    "Path": "public\\art\\original-cover-sentence.webp",
+    "Bytes": 63164
+  },
+  {
+    "Path": "public\\art\\original-mascot.webp",
+    "Bytes": 16848
+  },
+  {
+    "Path": "public\\art\\original-math.svg",
+    "Bytes": 21555
+  },
+  {
+    "Path": "public\\art\\original-memory.svg",
+    "Bytes": 11888
+  },
+  {
+    "Path": "public\\art\\original-sentence.svg",
+    "Bytes": 7711
+  },
+  {
+    "Path": "public\\art\\original-world.svg",
+    "Bytes": 74651
+  },
+  {
+    "Path": "public\\art\\premium-fox-optimized.webp",
+    "Bytes": 65712
+  },
+  {
+    "Path": "public\\art\\premium-fox.png",
+    "Bytes": 502553
+  },
+  {
+    "Path": "public\\art\\premium-island-math-soft.webp",
+    "Bytes": 95578
+  },
+  {
+    "Path": "public\\art\\premium-island-math.png",
+    "Bytes": 755864
+  },
+  {
+    "Path": "public\\art\\premium-island-memory-soft.webp",
+    "Bytes": 111108
+  },
+  {
+    "Path": "public\\art\\premium-island-memory.png",
+    "Bytes": 832353
+  },
+  {
+    "Path": "public\\art\\premium-island-sentence-soft.webp",
+    "Bytes": 97072
+  },
+  {
+    "Path": "public\\art\\premium-island-sentence.png",
+    "Bytes": 750878
+  }
+]

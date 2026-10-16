@@ -1,0 +1,116 @@
+
+> bao-an-learning-v3-6-3d@3.7.0-rc.1 test:backup
+> node --experimental-strip-types --test tests/backup-io.test.mjs
+
+TAP version 13
+# Subtest: Backup round-trip preserves packs, versions, sessions, attempts and report for all three games
+ok 1 - Backup round-trip preserves packs, versions, sessions, attempts and report for all three games
+  ---
+  duration_ms: 7.6563
+  type: 'test'
+  ...
+# Subtest: An empty profile has a valid backup; optional app metadata is not fabricated
+ok 2 - An empty profile has a valid backup; optional app metadata is not fabricated
+  ---
+  duration_ms: 2.7481
+  type: 'test'
+  ...
+# Subtest: Backup parser rejects content-only files, bad JSON, unknown schema/version and oversized UTF-8 input
+ok 3 - Backup parser rejects content-only files, bad JSON, unknown schema/version and oversized UTF-8 input
+  ---
+  duration_ms: 9.1245
+  type: 'test'
+  ...
+# Subtest: All three collections enforce count limits before reading their rows
+ok 4 - All three collections enforce count limits before reading their rows
+  ---
+  duration_ms: 4.4837
+  type: 'test'
+  ...
+# Subtest: Backup objects cannot import PIN/settings, accessors, prototypes or SavedPack wrappers
+ok 5 - Backup objects cannot import PIN/settings, accessors, prototypes or SavedPack wrappers
+  ---
+  duration_ms: 0.9012
+  type: 'test'
+  ...
+# Subtest: Published content and known builtin versions are validated without rewriting source or timestamps
+ok 6 - Published content and known builtin versions are validated without rewriting source or timestamps
+  ---
+  duration_ms: 5.3497
+  type: 'test'
+  ...
+# Subtest: Every accepted v1 content boundary keeps its title, long objectives, high version and inert extension data in backup
+ok 7 - Every accepted v1 content boundary keeps its title, long objectives, high version and inert extension data in backup
+  ---
+  duration_ms: 1.9732
+  type: 'test'
+  ...
+# Subtest: Preserved content extensions still reject executable objects, getters and circular data
+ok 8 - Preserved content extensions still reject executable objects, getters and circular data
+  ---
+  duration_ms: 0.5088
+  type: 'test'
+  ...
+# Subtest: Each collection requires unique internal keys, including otherwise identical records
+ok 9 - Each collection requires unique internal keys, including otherwise identical records
+  ---
+  duration_ms: 4.2745
+  type: 'test'
+  ...
+# Subtest: UTC timestamps reject impossible calendar dates and invalid session state chronology
+ok 10 - UTC timestamps reject impossible calendar dates and invalid session state chronology
+  ---
+  duration_ms: 5.8033
+  type: 'test'
+  ...
+# Subtest: Sessions require a matching pack version and supported module/content combination
+ok 11 - Sessions require a matching pack version and supported module/content combination
+  ---
+  duration_ms: 3.6991
+  type: 'test'
+  ...
+# Subtest: Events require real session/item/objective and exact metadata matching
+ok 12 - Events require real session/item/objective and exact metadata matching
+  ---
+  duration_ms: 7.1325
+  type: 'test'
+  ...
+# Subtest: Attempt outcomes enforce SDK boolean, hints and finite elapsed bounds
+ok 13 - Attempt outcomes enforce SDK boolean, hints and finite elapsed bounds
+  ---
+  duration_ms: 5.6744
+  type: 'test'
+  ...
+# Subtest: Restore preview adds complete data, ignores identical current records and never mutates either input
+ok 14 - Restore preview adds complete data, ignores identical current records and never mutates either input
+  ---
+  duration_ms: 2.4611
+  type: 'test'
+  ...
+# Subtest: Canonical comparison ignores object key order while content array order remains meaningful
+ok 15 - Canonical comparison ignores object key order while content array order remains meaningful
+  ---
+  duration_ms: 2.0409
+  type: 'test'
+  ...
+# Subtest: A conflicting key rejects every addition, across all stores, without overwriting current data
+ok 16 - A conflicting key rejects every addition, across all stores, without overwriting current data
+  ---
+  duration_ms: 0.9413
+  type: 'test'
+  ...
+# Subtest: Only newly imported active sessions become abandoned at export time; reimport is idempotent
+ok 17 - Only newly imported active sessions become abandoned at export time; reimport is idempotent
+  ---
+  duration_ms: 2.6306
+  type: 'test'
+  ...
+1..17
+# tests 17
+# suites 0
+# pass 17
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 213.9613

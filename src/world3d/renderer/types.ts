@@ -13,6 +13,21 @@ export interface RenderStats {
   drawCalls?: number;
   triangles?: number;
   textureBytesEstimate?: number;
+  gpuGeometries?: number;
+  gpuTextures?: number;
+  gpuPrograms?: number;
+  shaderPreparationMs?: number;
+  parallelShaderCompile?: boolean;
+  shadowUpdates?: number;
+  geometryDetail?: 'full' | 'reduced';
+  lodState?: 'idle' | 'preparing' | 'ready' | 'unavailable';
+  lodError?: string;
+  lodMasterTriangles?: number;
+  lodReducedTriangles?: number;
+  lodMeshes?: number;
+  lodPreparationMs?: number;
+  lodCpuPreparationMs?: number;
+  lodMaxMeshPreparationMs?: number;
   tier?: RenderTier;
   dpr?: number;
   frames?: number;
@@ -55,6 +70,8 @@ export interface WorldRenderer {
 export interface RendererInitOptions {
   canvas: HTMLCanvasElement;
   onSelect: (id: WorldId) => void;
+  /** A second activation after the guide arrives can enter the selected game. */
+  onEnterWorld?: (id: WorldId) => void;
   motionOn: boolean;
   paused: boolean;
   quality: QualityChoice;

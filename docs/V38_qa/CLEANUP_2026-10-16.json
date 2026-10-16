@@ -1,0 +1,80 @@
+[
+  {
+    "Path": ".npm-cache",
+    "Absolute": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\.npm-cache",
+    "Bytes": 217256788,
+    "Status": "deleted"
+  },
+  {
+    "Path": "test-results\\b0-fixtures",
+    "Absolute": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\test-results\\b0-fixtures",
+    "Bytes": 91516828,
+    "Status": "deleted"
+  },
+  {
+    "Path": "releases\\bao-an-learning-3.8.0-pilot.1",
+    "Absolute": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\releases\\bao-an-learning-3.8.0-pilot.1",
+    "Bytes": 16882480,
+    "Status": "deleted"
+  },
+  {
+    "Path": "releases\\bao-an-learning-3.8.0-pilot.2",
+    "Absolute": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\releases\\bao-an-learning-3.8.0-pilot.2",
+    "Bytes": 16919664,
+    "Status": "deleted"
+  },
+  {
+    "Path": "releases\\bao-an-learning-3.8.0-pilot.3",
+    "Absolute": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\releases\\bao-an-learning-3.8.0-pilot.3",
+    "Bytes": 17182173,
+    "Status": "deleted"
+  },
+  {
+    "Path": "releases\\bao-an-learning-3.8.0-pilot.4",
+    "Absolute": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\releases\\bao-an-learning-3.8.0-pilot.4",
+    "Bytes": 17182198,
+    "Status": "deleted"
+  },
+  {
+    "Path": "releases\\bao-an-learning-3.8.0-pilot.1.zip",
+    "Absolute": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\releases\\bao-an-learning-3.8.0-pilot.1.zip",
+    "Bytes": 10733311,
+    "Status": "deleted"
+  },
+  {
+    "Path": "releases\\bao-an-learning-3.8.0-pilot.2.zip",
+    "Absolute": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\releases\\bao-an-learning-3.8.0-pilot.2.zip",
+    "Bytes": 10748231,
+    "Status": "deleted"
+  },
+  {
+    "Path": "releases\\bao-an-learning-3.8.0-pilot.3.zip",
+    "Absolute": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\releases\\bao-an-learning-3.8.0-pilot.3.zip",
+    "Bytes": 10859466,
+    "Status": "deleted"
+  },
+  {
+    "Path": "backups\\baseline-validation",
+    "Absolute": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\backups\\baseline-validation",
+    "Bytes": 17559727,
+    "Status": "deleted"
+  },
+  {
+    "Path": "visual-output\\home-polish",
+    "Absolute": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\visual-output\\home-polish",
+    "Bytes": 3594217,
+    "Status": "deleted"
+  },
+  {
+    "Path": "visual-output\\online-templates",
+    "Absolute": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\visual-output\\online-templates",
+    "Bytes": 1060369,
+    "Status": "deleted"
+  },
+  {
+    "Path": "playwright-report",
+    "Absolute": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\playwright-report",
+    "Bytes": 1081004,
+    "Status": "deleted"
+  }
+]

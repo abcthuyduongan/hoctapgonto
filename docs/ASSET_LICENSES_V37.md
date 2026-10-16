@@ -17,7 +17,7 @@
 
 Metadata `asset.extras` ghi `provenance=ORIGINAL_PROCEDURAL_V37_PR02` cho cáo/Toán và `ORIGINAL_PROCEDURAL_V37_PR03` cho ba asset mới, `source` trỏ đúng generator, `acceptance=candidate-not-art-approved`, `externalAssets=[]`. Không dùng nhãn provenance này để thay thế việc duyệt chất lượng hình ảnh trong ứng dụng thật.
 
-Ảnh cáo dự phòng có SHA-256 `257ca7360cb2d016b1b73a316b6f3c6f320be9458e88fedca1aa52cf9a2d2feb`; dữ liệu xuất và kiểm tra alpha trong `docs/V37_games_qa/fox-portrait-provenance.json`. Lệnh tái xuất: `node tools/capture_v37_games.mjs --fox-only` với preview đang chạy. Phong cảnh trong bài test được dựng bằng geometry instancing trong `src/world3d/scenes/gameEnvironments.ts`, dùng chung vật liệu PBR/texture từ các đảo đã tải. Không có model thương mại hoặc texture bên ngoài.
+Ảnh cáo dự phòng có SHA-256 `257ca7360cb2d016b1b73a316b6f3c6f320be9458e88fedca1aa52cf9a2d2feb`; dữ liệu xuất và kiểm tra alpha trong `docs/V37_games_qa/fox-portrait-provenance.json`. Phong cảnh trong bài test được dựng bằng geometry instancing trong `src/world3d/scenes/gameEnvironments.ts`, dùng chung vật liệu PBR/texture từ các đảo đã tải. Không có model thương mại hoặc texture bên ngoài.
 
 ## Thông số xuất
 
@@ -60,7 +60,7 @@ language-world.glb 2556c2fa14a60608622dea42e52165da6e3d5821a345d39ce4aaac84a82e3
 environment.glb 66379fb5ec01f7905f52744f973446b9b52f4842501236407b203a658128f45c
 ```
 
-Ba asset PR-03 dùng lại writer GLB gốc qua import không có tác dụng phụ. `npm run assets:premium-catalog` tạo lại riêng ba file này, không ghi lại cáo/Toán. Báo cáo đầy đủ tại `docs/V37_art_qa/{memory,language,environment}-asset-report.json`.
+Ba asset PR-03 dùng lại writer GLB gốc qua import không có tác dụng phụ. `npm run assets:build` tạo lại riêng ba file này, không ghi lại cáo/Toán.
 
 | Thuộc tính PR-03 | Rừng Trí Nhớ | Xưởng Ngôn Từ | Môi trường chung |
 |---|---:|---:|---:|
@@ -74,7 +74,11 @@ Ba file có POSITION/NORMAL/UV và baseColor/normal/roughness PBR, không có UR
 
 ## Giới hạn nghiệm thu
 
+**Cập nhật PR-05:** `src/world3d/scenes/geometryLod.ts` tạo geometry thấp khi lần đầu cần quality low, bằng meshoptimizer có sẵn trong Three.js. Bản gốc trên đĩa, rig cáo, material/texture giữ nguyên; geometry thấp được cache và hủy theo vòng đời renderer. Bộ đảo 79.956 → 43.198 tam giác (giảm 46%), cả đảo/môi trường 88.932 → 48.774 (giảm 45,2%). Bản thường/cao khôi phục đúng geometry gốc; không dựng hai cảnh hoạt động cùng lúc. Đây là LOD runtime, chưa xuất tệp mobile riêng hoặc giảm byte GLB giải nén.
+
+`tools/modelTransport.mjs` phục vụ đúng năm URL model qua gzip/Brotli trong Vite dev/preview, không thay file. Tổng nguyên bản 7.271.708 byte → 3.428.044 byte Brotli quality 5 / 3.791.705 byte gzip level 6; kiểm thử HTTP giải nén trả lại đúng byte. Có Vary/ETag theo representation, cache tối đa năm file, nén bất đồng bộ tối đa hai tác vụ. Khi đưa lên host tĩnh khác cần cấu hình HTTP tương đương; không tự gán tính năng server local cho mọi nơi phát hành. Các kiểm tra model/renderer và HTTP được giữ trong bộ kiểm thử hiện tại.
+
 - Đã có model/texture/rig/clip và nguồn có thể truy vết cho PR-02/03. Chưa ghi nhận artist phê duyệt hoặc chủ dự án duyệt concept cuối cùng.
 - Manifest chỉ khai báo nguồn cho năm tài nguyên thực tế có trong dự án; file gate không thay thế nghiệm thu hình ảnh và thiết bị.
-- Chưa xuất LOD/mobile riêng, chưa đo FPS trên GPU/điện thoại thực. Số tam giác và dung lượng không thay thế phép đo hiệu năng.
+- Chưa xuất tệp LOD/mobile riêng hoặc đo điện thoại thật; có đo GPU Windows, LOD runtime và transport nén trong PR-05. Số tam giác/dung lượng không thay thế nghiệm thu thiết bị mục tiêu.
 - Cần xem texture, skin và clip qua `GLTFLoader`/`AnimationMixer` trong browser, chụp desktop/mobile, duyệt bố cục và màu trước khi xác nhận mỹ thuật. Báo cáo runtime/QA của dự án là bằng chứng tách biệt với provenance này.

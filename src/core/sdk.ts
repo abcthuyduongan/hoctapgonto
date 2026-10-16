@@ -1,5 +1,6 @@
 import type { AttemptInput, ContentPack, GameManifest, LearningEvent, PlaySession } from './contracts.ts';
 import { GAME_SDK_VERSION } from './contracts.ts';
+import { scoreGameResponse } from './game-rewards.ts';
 
 /** The host validates identity and shape; local game correctness is NOT cheat-proof. */
 export function assertModuleContract(manifest: GameManifest, pack: ContentPack): void {
@@ -20,19 +21,25 @@ export function makeLearningEvent(session: PlaySession, pack: ContentPack, input
     throw new Error('Dữ liệu lượt thử không hợp lệ.');
   }
   const {attemptKey, ...outcome} = input;
+  if(input.response&&scoreGameResponse(pack,session.moduleId,input.itemId,input.response,session.presentationVersion).correct!==input.correct)throw new Error('Kết quả game không khớp câu trả lời gốc.');
   return {
     eventId:`${session.sessionId}:${attemptKey}`,
-    sessionId:session.sessionId,packId:pack.id,contentVersion:pack.version,
+    sessionId:session.sessionId,
+    ...(session.profileId ? {profileId: session.profileId} : {}),
+    packId:pack.id,contentVersion:pack.version,
     moduleId:session.moduleId,moduleVersion:session.moduleVersion,
     occurredAt,...outcome
   };
 }
 export function sameAttempt(a: LearningEvent, b: LearningEvent): boolean {
+  const responseKey=(value:unknown):string=>JSON.stringify(value,(_key,row)=>row&&typeof row==='object'&&!Array.isArray(row)?Object.fromEntries(Object.entries(row).sort(([left],[right])=>left.localeCompare(right))):row);
   return a.eventId === b.eventId && a.sessionId === b.sessionId && a.itemId === b.itemId
+    && (a.profileId ?? 'default-learner') === (b.profileId ?? 'default-learner')
     && a.objectiveId === b.objectiveId && a.correct === b.correct
     && a.hintsUsed === b.hintsUsed
     && a.packId === b.packId && a.contentVersion === b.contentVersion
-    && a.moduleId === b.moduleId && a.moduleVersion === b.moduleVersion;
+    && a.moduleId === b.moduleId && a.moduleVersion === b.moduleVersion
+    && responseKey(a.response)===responseKey(b.response);
 }
 /** Token indices prevent problems when the exact same word appears twice. */
 export function isCorrectSentence(words: string[], chosenIndices: number[]): boolean {

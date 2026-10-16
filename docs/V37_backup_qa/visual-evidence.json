@@ -1,0 +1,454 @@
+{
+  "date": "2026-10-14T07:05:30.443Z",
+  "target": "http://127.0.0.1:5180/",
+  "method": "Production Edge, three fresh isolated contexts; mobile is desktop touch emulation. Files selected through the real UI; no IndexedDB reset or production adapter replacement.",
+  "browser": "155.0.4283.45",
+  "bundles": [
+    "index-BV_zeW5o.js",
+    "index-CqsJkXTY.css",
+    "PremiumWorldRenderer-BZFGJ8hg.js",
+    "LearningProfileBackup-COqsxmTH.js",
+    "LearningProfileBackup-Buo2EMHg.css"
+  ],
+  "scenarios": [
+    {
+      "width": 1440,
+      "states": [
+        {
+          "name": "initial",
+          "documentWidth": 1425,
+          "viewport": 1440,
+          "sectionWidth": 1247.78125,
+          "sectionScrollWidth": 1246,
+          "controls": [
+            {
+              "text": "Tải bản sao hồ sơ",
+              "width": 175.859375,
+              "height": 49,
+              "disabled": false
+            },
+            {
+              "text": "Chọn tệp để khôi phục",
+              "width": 217.546875,
+              "height": 49,
+              "disabled": false
+            }
+          ]
+        },
+        {
+          "name": "preview",
+          "documentWidth": 1425,
+          "viewport": 1440,
+          "sectionWidth": 1247.78125,
+          "sectionScrollWidth": 1246,
+          "controls": [
+            {
+              "text": "Tải bản sao hồ sơ",
+              "width": 175.859375,
+              "height": 49,
+              "disabled": false
+            },
+            {
+              "text": "Chọn tệp để khôi phục",
+              "width": 217.546875,
+              "height": 49,
+              "disabled": false
+            },
+            {
+              "text": "Thêm hồ sơ vào thiết bị",
+              "width": 225.171875,
+              "height": 49,
+              "disabled": false
+            },
+            {
+              "text": "Hủy xem trước",
+              "width": 160.140625,
+              "height": 49,
+              "disabled": false
+            }
+          ]
+        },
+        {
+          "name": "restored",
+          "documentWidth": 1425,
+          "viewport": 1440,
+          "sectionWidth": 1247.78125,
+          "sectionScrollWidth": 1246,
+          "controls": [
+            {
+              "text": "Tải bản sao hồ sơ",
+              "width": 175.859375,
+              "height": 49,
+              "disabled": false
+            },
+            {
+              "text": "Chọn tệp để khôi phục",
+              "width": 217.546875,
+              "height": 49,
+              "disabled": false
+            }
+          ]
+        },
+        {
+          "name": "duplicate",
+          "documentWidth": 1425,
+          "viewport": 1440,
+          "sectionWidth": 1247.78125,
+          "sectionScrollWidth": 1246,
+          "controls": [
+            {
+              "text": "Tải bản sao hồ sơ",
+              "width": 175.859375,
+              "height": 49,
+              "disabled": false
+            },
+            {
+              "text": "Chọn tệp để khôi phục",
+              "width": 217.546875,
+              "height": 49,
+              "disabled": false
+            },
+            {
+              "text": "Thêm hồ sơ vào thiết bị",
+              "width": 225.171875,
+              "height": 49,
+              "disabled": true
+            },
+            {
+              "text": "Hủy xem trước",
+              "width": 160.140625,
+              "height": 49,
+              "disabled": false
+            }
+          ]
+        },
+        {
+          "name": "conflict",
+          "documentWidth": 1425,
+          "viewport": 1440,
+          "sectionWidth": 1247.78125,
+          "sectionScrollWidth": 1246,
+          "controls": [
+            {
+              "text": "Tải bản sao hồ sơ",
+              "width": 175.859375,
+              "height": 49,
+              "disabled": false
+            },
+            {
+              "text": "Chọn tệp để khôi phục",
+              "width": 217.546875,
+              "height": 49,
+              "disabled": false
+            },
+            {
+              "text": "Thêm hồ sơ vào thiết bị",
+              "width": 225.171875,
+              "height": 49,
+              "disabled": true
+            },
+            {
+              "text": "Hủy xem trước",
+              "width": 160.140625,
+              "height": 49,
+              "disabled": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "states": [
+        {
+          "name": "initial",
+          "documentWidth": 390,
+          "viewport": 390,
+          "sectionWidth": 332,
+          "sectionScrollWidth": 330,
+          "controls": [
+            {
+              "text": "Tải bản sao hồ sơ",
+              "width": 280,
+              "height": 47,
+              "disabled": false
+            },
+            {
+              "text": "Chọn tệp để khôi phục",
+              "width": 280,
+              "height": 49,
+              "disabled": false
+            }
+          ]
+        },
+        {
+          "name": "preview",
+          "documentWidth": 390,
+          "viewport": 390,
+          "sectionWidth": 332,
+          "sectionScrollWidth": 330,
+          "controls": [
+            {
+              "text": "Tải bản sao hồ sơ",
+              "width": 280,
+              "height": 47,
+              "disabled": false
+            },
+            {
+              "text": "Chọn tệp để khôi phục",
+              "width": 280,
+              "height": 49,
+              "disabled": false
+            },
+            {
+              "text": "Thêm hồ sơ vào thiết bị",
+              "width": 250,
+              "height": 47,
+              "disabled": false
+            },
+            {
+              "text": "Hủy xem trước",
+              "width": 250,
+              "height": 49,
+              "disabled": false
+            }
+          ]
+        },
+        {
+          "name": "restored",
+          "documentWidth": 390,
+          "viewport": 390,
+          "sectionWidth": 332,
+          "sectionScrollWidth": 330,
+          "controls": [
+            {
+              "text": "Tải bản sao hồ sơ",
+              "width": 280,
+              "height": 47,
+              "disabled": false
+            },
+            {
+              "text": "Chọn tệp để khôi phục",
+              "width": 280,
+              "height": 49,
+              "disabled": false
+            }
+          ]
+        },
+        {
+          "name": "duplicate",
+          "documentWidth": 390,
+          "viewport": 390,
+          "sectionWidth": 332,
+          "sectionScrollWidth": 330,
+          "controls": [
+            {
+              "text": "Tải bản sao hồ sơ",
+              "width": 280,
+              "height": 47,
+              "disabled": false
+            },
+            {
+              "text": "Chọn tệp để khôi phục",
+              "width": 280,
+              "height": 49,
+              "disabled": false
+            },
+            {
+              "text": "Thêm hồ sơ vào thiết bị",
+              "width": 250,
+              "height": 47,
+              "disabled": true
+            },
+            {
+              "text": "Hủy xem trước",
+              "width": 250,
+              "height": 49,
+              "disabled": false
+            }
+          ]
+        },
+        {
+          "name": "conflict",
+          "documentWidth": 390,
+          "viewport": 390,
+          "sectionWidth": 332,
+          "sectionScrollWidth": 330,
+          "controls": [
+            {
+              "text": "Tải bản sao hồ sơ",
+              "width": 280,
+              "height": 47,
+              "disabled": false
+            },
+            {
+              "text": "Chọn tệp để khôi phục",
+              "width": 280,
+              "height": 49,
+              "disabled": false
+            },
+            {
+              "text": "Thêm hồ sơ vào thiết bị",
+              "width": 250,
+              "height": 47,
+              "disabled": true
+            },
+            {
+              "text": "Hủy xem trước",
+              "width": 250,
+              "height": 49,
+              "disabled": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "states": [
+        {
+          "name": "initial",
+          "documentWidth": 320,
+          "viewport": 320,
+          "sectionWidth": 262,
+          "sectionScrollWidth": 260,
+          "controls": [
+            {
+              "text": "Tải bản sao hồ sơ",
+              "width": 210,
+              "height": 47,
+              "disabled": false
+            },
+            {
+              "text": "Chọn tệp để khôi phục",
+              "width": 210,
+              "height": 70,
+              "disabled": false
+            }
+          ]
+        },
+        {
+          "name": "preview",
+          "documentWidth": 320,
+          "viewport": 320,
+          "sectionWidth": 262,
+          "sectionScrollWidth": 260,
+          "controls": [
+            {
+              "text": "Tải bản sao hồ sơ",
+              "width": 210,
+              "height": 47,
+              "disabled": false
+            },
+            {
+              "text": "Chọn tệp để khôi phục",
+              "width": 210,
+              "height": 70,
+              "disabled": false
+            },
+            {
+              "text": "Thêm hồ sơ vào thiết bị",
+              "width": 180,
+              "height": 68,
+              "disabled": false
+            },
+            {
+              "text": "Hủy xem trước",
+              "width": 180,
+              "height": 49,
+              "disabled": false
+            }
+          ]
+        },
+        {
+          "name": "restored",
+          "documentWidth": 320,
+          "viewport": 320,
+          "sectionWidth": 262,
+          "sectionScrollWidth": 260,
+          "controls": [
+            {
+              "text": "Tải bản sao hồ sơ",
+              "width": 210,
+              "height": 47,
+              "disabled": false
+            },
+            {
+              "text": "Chọn tệp để khôi phục",
+              "width": 210,
+              "height": 70,
+              "disabled": false
+            }
+          ]
+        },
+        {
+          "name": "duplicate",
+          "documentWidth": 320,
+          "viewport": 320,
+          "sectionWidth": 262,
+          "sectionScrollWidth": 260,
+          "controls": [
+            {
+              "text": "Tải bản sao hồ sơ",
+              "width": 210,
+              "height": 47,
+              "disabled": false
+            },
+            {
+              "text": "Chọn tệp để khôi phục",
+              "width": 210,
+              "height": 70,
+              "disabled": false
+            },
+            {
+              "text": "Thêm hồ sơ vào thiết bị",
+              "width": 180,
+              "height": 68,
+              "disabled": true
+            },
+            {
+              "text": "Hủy xem trước",
+              "width": 180,
+              "height": 49,
+              "disabled": false
+            }
+          ]
+        },
+        {
+          "name": "conflict",
+          "documentWidth": 320,
+          "viewport": 320,
+          "sectionWidth": 262,
+          "sectionScrollWidth": 260,
+          "controls": [
+            {
+              "text": "Tải bản sao hồ sơ",
+              "width": 210,
+              "height": 47,
+              "disabled": false
+            },
+            {
+              "text": "Chọn tệp để khôi phục",
+              "width": 210,
+              "height": 70,
+              "disabled": false
+            },
+            {
+              "text": "Thêm hồ sơ vào thiết bị",
+              "width": 180,
+              "height": 68,
+              "disabled": true
+            },
+            {
+              "text": "Hủy xem trước",
+              "width": 180,
+              "height": 49,
+              "disabled": false
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": []
+}

@@ -1,4 +1,9 @@
 import { expect, test, type Page } from '@playwright/test';
+import { getSceneTheme } from '../../src/world3d/scenes/sceneCatalog';
+import type { WorldId } from '../../src/world3d/engine';
+
+test.use({ serviceWorkers: 'block' });
+const selectWorld = (page: Page, id: string) => page.getByRole('button', { name: `Chọn ${getSceneTheme(id as WorldId).world}`, exact: true }).click();
 
 type Diagnostics = {
   engine: string; readyAssets: string[]; animationClips: string[]; activeClip: string;
@@ -25,7 +30,7 @@ test('Default home uses one premium scene with textured GLBs, rig and running cl
   });
   const foxResponse = page.waitForResponse(response => response.url().endsWith('/models/fox-guide.glb') && response.status() === 200);
   const mathResponse = page.waitForResponse(response => response.url().endsWith('/models/math-world.glb') && response.status() === 200);
-  await page.goto('/');
+  await page.goto('/?view=games&controls=1');
   await ready(page);
   await expect(page.locator('.ba3d-render-host')).toHaveCount(1);
   await expect(page.locator('.ba3d-render-host canvas.ba3d-canvas')).toHaveCount(1);
@@ -64,7 +69,7 @@ test('Default home uses one premium scene with textured GLBs, rig and running cl
   expect(initial.triangles).toBeGreaterThan(0);
   expect(initial.textureBytesEstimate).toBeGreaterThan(0);
   await expect.poll(async () => (await diagnostics(page)).animationTime).toBeGreaterThan(initial.animationTime);
-  await page.getByRole('button', { name: 'Xem đảo Đảo Toán Học', exact: true }).focus();
+  await page.getByRole('button', { name: 'Chọn Đảo Toán Học', exact: true }).focus();
   await page.keyboard.press('Enter');
   await expect.poll(async () => (await diagnostics(page)).activeClip).toBe('Cheer');
   await expect.poll(async () => (await diagnostics(page)).activeClip).toBe('Idle');
@@ -85,14 +90,16 @@ test('All three decoded skeletal clips deform bones in the actual production ren
   page.on('response', response => {
     if (/\/assets\/PremiumWorldRenderer-[^/]+\.js(?:\?|$)/.test(response.url())) productionModule = response.url();
   });
-  await page.goto('/?premium3d=1');
+  await page.goto('/?premium3d=1&controls=1');
   await ready(page);
   expect(productionModule, 'Use the lazily loaded production module observed on the network').not.toBe('');
   // A focused integration harness imports the real built factory, not /src or
   // a test mock. Inspecting its loaded controller avoids adding QA globals or
   // animation debug controls to the product merely to trigger Victory.
   const clips = await page.evaluate(async moduleUrl => {
-    const { createPremiumRenderer } = await import(moduleUrl);
+    const exports = await import(moduleUrl);
+    const { createPremiumRenderer } = exports.createPremiumRenderer ? exports
+      : Object.values(exports).find((value: any) => typeof value?.createPremiumRenderer === 'function') as any;
     const canvas = document.createElement('canvas');
     canvas.style.cssText = 'position:fixed;left:-600px;top:0;width:512px;height:512px;pointer-events:none';
     document.body.append(canvas);
@@ -147,10 +154,11 @@ test('Game controls work before delayed models finish, then the same canvas rend
   const barrier = new Promise<void>(resolve => { releaseModels = resolve; });
   await page.route(/\/models\/(?:math-world|fox-guide)\.glb$/, async route => { await barrier; await route.continue(); });
   try {
-    await page.goto('/?premium3d=1');
+    await page.goto('/?premium3d=1&controls=1');
     await expect(page.locator('.ba3d-render-host')).toHaveAttribute('data-state', 'loading');
     await page.locator('canvas.ba3d-canvas').evaluate(canvas => canvas.setAttribute('data-loading-canvas', 'yes'));
     expect(await drawCalls(), 'Do not draw incomplete models during initialization').toBe(0);
+    await selectWorld(page, 'math-quest');
     await page.locator('.ba3d-math-quest .ba3d-play').click();
     await expect(page.locator('.quiz-question')).toBeVisible();
     expect(await drawCalls(), 'Opening a game while GLBs are pending must not start a world RAF').toBe(0);
@@ -174,11 +182,12 @@ test('Game controls work before delayed models finish, then the same canvas rend
 
 test('Missing required GLB falls back to a new legacy canvas while DOM gameplay stays available', async ({ page }) => {
   await page.route('**/models/math-world.glb', route => route.fulfill({ status: 404, contentType: 'text/plain', body: 'QA missing model' }));
-  await page.goto('/?premium3d=1');
+  await page.goto('/?premium3d=1&controls=1');
   await expect(page.locator('.ba3d-render-host')).toHaveAttribute('data-state', 'fallback');
   await expect(page.locator('.ba3d-render-host')).toHaveAttribute('data-engine', /legacy-webgl2|canvas/);
   await expect(page.locator('.ba3d-render-status')).toContainText('dự phòng');
   await expect(page.locator('canvas.ba3d-canvas')).toHaveCount(1);
+  await selectWorld(page, 'math-quest');
   await page.locator('.ba3d-math-quest .ba3d-play').click();
   await page.locator('.answer-option').first().click();
   await expect(page.locator('.result-next')).toBeVisible();
@@ -193,17 +202,18 @@ test('A real texture decode failure falls back instead of showing untextured pre
     }) as typeof window.createImageBitmap;
     (window as unknown as { __v37RejectedTextures: () => number }).__v37RejectedTextures = () => rejectedTextures;
   });
-  await page.goto('/?premium3d=1');
+  await page.goto('/?premium3d=1&controls=1');
   await expect(page.locator('.ba3d-render-host')).toHaveAttribute('data-state', 'fallback');
   await expect(page.locator('.ba3d-render-host')).toHaveAttribute('data-engine', /legacy-webgl2|canvas/);
   expect(await page.evaluate(() => (window as unknown as { __v37RejectedTextures: () => number }).__v37RejectedTextures())).toBeGreaterThan(0);
   await expect(page.locator('canvas.ba3d-canvas')).toHaveCount(1);
+  await selectWorld(page, 'math-quest');
   await page.locator('.ba3d-math-quest .ba3d-play').click();
   await page.locator('.answer-option').first().click();
   await expect(page.locator('.answer-feedback')).toContainText('Chính xác');
 });
 
-test('Without any WebGL context, Canvas fallback still opens all three games through DOM controls', async ({ page }) => {
+test('Without any WebGL context, Canvas fallback still opens all five games through DOM controls', async ({ page }) => {
   await page.addInitScript(() => {
     const original = HTMLCanvasElement.prototype.getContext;
     HTMLCanvasElement.prototype.getContext = function (kind: string, ...args: unknown[]) {
@@ -211,18 +221,20 @@ test('Without any WebGL context, Canvas fallback still opens all three games thr
       return original.apply(this, [kind, ...args] as Parameters<typeof original>);
     } as typeof original;
   });
-  await page.goto('/?premium3d=1');
+  await page.goto('/?premium3d=1&controls=1');
   await ready(page, 'canvas');
-  for (const [moduleId, stage] of [['math-quest', '.quiz-question'], ['memory-match', '.memory-grid'], ['sentence-builder', '.sentence-bank']]) {
+  for (const [moduleId, stage] of [['math-quest', '.quiz-question'], ['memory-match', '.memory-grid'], ['sentence-builder', '.sentence-bank'], ['word-connect', '.connect-board'], ['sequence-trail', '.trail-bank']]) {
+    await selectWorld(page, moduleId);
     await page.locator(`.ba3d-${moduleId} .ba3d-play`).click();
     await expect(page.locator(stage)).toBeVisible();
     await page.getByRole('button', { name: /Thoát trò chơi/ }).click();
-    await expect(page.locator('.ba3d-play')).toHaveCount(3);
+    await expect(page.locator('.ba3d-island-choice')).toHaveCount(5);
+    await expect(page.locator('.ba3d-play')).toHaveCount(1);
   }
 });
 
 test('Actual WEBGL_lose_context replaces the premium canvas and keeps gameplay usable', async ({ page }) => {
-  await page.goto('/?premium3d=1');
+  await page.goto('/?premium3d=1&controls=1');
   await ready(page);
   const lost = await page.locator('canvas.ba3d-canvas').evaluate(canvas => {
     canvas.setAttribute('data-before-loss', 'yes');
@@ -236,6 +248,7 @@ test('Actual WEBGL_lose_context replaces the premium canvas and keeps gameplay u
   await expect(page.locator('.ba3d-render-host')).toHaveAttribute('data-engine', /legacy-webgl2|canvas/);
   await expect(page.locator('canvas[data-before-loss]')).toHaveCount(0);
   await expect(page.locator('canvas.ba3d-canvas')).toHaveCount(1);
+  await selectWorld(page, 'memory-match');
   await page.locator('.ba3d-memory-match .ba3d-play').click();
   await expect(page.locator('.memory-card')).toHaveCount(12);
 });
@@ -274,10 +287,11 @@ test('Twenty home/parent transitions release canvas listeners and every renderer
   });
   const snapshot = () => page.evaluate(() => (window as unknown as { __v37Lifecycle: () => { pendingRaf: number; canvasListeners: number; globalListeners: number } }).__v37Lifecycle());
   const samples = [];
-  await page.goto('/?premium3d=1');
+  await page.goto('/?premium3d=1&controls=1');
   await ready(page);
   await page.getByRole('button', { name: /Góc phụ huynh/ }).click();
   await expect(page.locator('.ba3d-render-host')).toHaveCount(0);
+  await expect(page.getByRole('form',{name:'Cấu hình đổi sao'}).getByRole('button',{name:'Lưu tỷ lệ đổi sao',exact:true})).toBeEnabled();
   await expect.poll(async () => (await snapshot()).pendingRaf).toBe(0);
   const baseline = await snapshot();
   expect(baseline.canvasListeners).toBe(0);
@@ -287,6 +301,7 @@ test('Twenty home/parent transitions release canvas listeners and every renderer
     await expect(page.locator('canvas.ba3d-canvas')).toHaveCount(1);
     await page.getByRole('button', { name: /Góc phụ huynh/ }).click();
     await expect(page.locator('canvas.ba3d-canvas')).toHaveCount(0);
+    await expect(page.getByRole('form',{name:'Cấu hình đổi sao'}).getByRole('button',{name:'Lưu tỷ lệ đổi sao',exact:true})).toBeEnabled();
     await expect.poll(async () => (await snapshot()).pendingRaf).toBe(0);
     const sample = await snapshot(); samples.push(sample);
     expect(sample.canvasListeners, `Detached canvas listeners after transition ${iteration + 1}`).toBe(0);

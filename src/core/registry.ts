@@ -5,7 +5,9 @@ import type { GameManifest, ModuleId } from './contracts.ts';
 export const GAME_REGISTRY: GameManifest[] = [
   {id:'math-quest',label:'Math Quest',description:'Vượt các trạm toán học và thu thập ngôi sao.',runtime:'react',contentKind:'quiz',version:'0.2.7',sdkVersion:GAME_SDK_VERSION,icon:'✦',color:'violet'},
   {id:'memory-match',label:'Memory Match',description:'Lật thẻ, ghi nhớ và tìm đúng các cặp kiến thức.',runtime:'react',contentKind:'pairs',version:'0.2.7',sdkVersion:GAME_SDK_VERSION,icon:'◈',color:'mint'},
-  {id:'sentence-builder',label:'Sentence Builder',description:'Ghép từ thành câu đúng thứ tự với gợi ý khi cần.',runtime:'react',contentKind:'sentences',version:'0.2.7',sdkVersion:GAME_SDK_VERSION,icon:'✎',color:'sky'}
+  {id:'sentence-builder',label:'Sentence Builder',description:'Ghép từ thành câu đúng thứ tự với gợi ý khi cần.',runtime:'react',contentKind:'sentences',version:'0.2.7',sdkVersion:GAME_SDK_VERSION,icon:'✎',color:'sky'},
+  {id:'word-connect',label:'Nối Từ Khám Phá',description:'Kết nối trực tiếp hai cột từ vựng và tri thức tương ứng.',runtime:'react',contentKind:'pairs',version:'0.2.7',sdkVersion:GAME_SDK_VERSION,icon:'🔗',color:'teal'},
+  {id:'sequence-trail',label:'Bậc Thang Quy Luật',description:'Khám phá và xếp các thẻ theo đúng trật tự quy luật logic.',runtime:'react',contentKind:'sentences',version:'0.2.7',sdkVersion:GAME_SDK_VERSION,icon:'📶',color:'amber'}
 ];
 export const getGame = (id: ModuleId): GameManifest => {
   const manifest = GAME_REGISTRY.find(g => g.id === id);

@@ -1,0 +1,13 @@
+[WebServer] (node:24240) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 4 tests using 1 worker
+
+(node:3380) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok 1 [chrome-production] › tests\visual\real3d31.spec.ts:3:1 › Bảo An V3.1: scene canvas, three games, controls and no overflow (763ms)
+  ok 2 [chrome-production] › tests\visual\real3d31.spec.ts:13:1 › Bảo An V3.1: navigate Math Quest and return (970ms)
+  ok 3 [chrome-production] › tests\visual\real3d31.spec.ts:21:1 › Bảo An V3.1: Memory Match remains clickable after selecting two cards (2.5s)
+  ok 4 [chrome-production] › tests\visual\real3d31.spec.ts:32:1 › Bảo An V3.1: mobile stays within viewport (508ms)
+
+  4 passed (7.0s)

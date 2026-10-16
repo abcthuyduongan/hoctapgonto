@@ -1,0 +1,4 @@
+stress 390 balanced: 221328 triangles; 59.9 FPS; 16.799999999999272 ms P95
+stress 390 low: 75074 triangles; 59.9 FPS; 16.80000000000291 ms P95
+stress 390 high: 221328 triangles; 59.9 FPS; 16.700000000004366 ms P95
+Saved stress-performance.json with 1 scenarios.

@@ -1,0 +1,29 @@
+{
+  "version": "3.8.0-rc.2",
+  "buildId": "26b666a45d9787c2",
+  "zip": "releases/bao-an-learning-3.8.0-rc.2.zip",
+  "zipBytes": 5900993,
+  "zipSha256": "740315ad2385c931e410cb6a3fa4a2097f6c949abb8d4ffe31c9310fd80c126f",
+  "manifestFiles": 60,
+  "storageSchemas": {
+    "localSqlite": 1,
+    "cloudPostgres": 1
+  },
+  "actualZipHashesVerified": true,
+  "extractedUnicodeFolderBooted": true,
+  "emptyDatabase": {
+    "workspaces": 0,
+    "users": 0,
+    "classes": 0,
+    "students": 0,
+    "weeks": 0,
+    "packs": 0,
+    "plays": 0,
+    "attempts": 0,
+    "awards": 0
+  },
+  "onlyWordExcelTemplates": true,
+  "privateFilesBlocked": true,
+  "releaseReady": false,
+  "humanPilotStatus": "UNVERIFIED"
+}

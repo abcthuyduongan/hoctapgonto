@@ -11,3 +11,6 @@ test-results/
 .npm-cache/
 backups/
 *.tsbuildinfo
+releases/
+.online/
+.netlify/

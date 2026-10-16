@@ -22,7 +22,7 @@ function setupFakeHooks(){
   return {hooks,effects,begin(){cursor=0;}, strictReplay(){for(const eff of effects){eff.cleanup=eff.setup();eff.cleanup?.();eff.cleanup=eff.setup();}},cleanup(){for(const eff of effects)eff.cleanup?.();}};
 }
 async function loadMemory(hooks){
-  const globals=`const {useState,useMemo,useCallback,useEffect,useRef}=globalThis.__memoryHooks;\nconst React=globalThis.__fakeReact;\nconst GameMascot=()=>null;const FeedbackEffects=()=>null;const GameCompletion=()=>null;\nconst shuffle=(arr)=>arr;const playFeedbackTone=()=>{};\n`;
+  const globals=`const {useState,useMemo,useCallback,useEffect,useRef}=globalThis.__memoryHooks;\nconst React=globalThis.__fakeReact;\nconst GameMascot=()=>null;const FeedbackEffects=()=>null;const GameCompletion=()=>null;const QuestionMedia=()=>null;\nconst shuffle=(arr)=>arr;const playFeedbackTone=()=>{};\n`;
   const noImports=source.replace(/^import .*?;\s*$/gm,'');
   let compiled=ts.transpileModule(noImports,{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext,jsx:ts.JsxEmit.React}}).outputText;
   globalThis.__memoryHooks=hooks.hooks;

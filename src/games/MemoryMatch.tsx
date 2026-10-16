@@ -1,3 +1,5 @@
+import {saveFailureMessage} from './save-failure-message';
+import QuestionMedia from '../components/QuestionMedia';
 import GameMascot from './GameMascot';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { GameHostProps, PairsPack } from '../core/contracts';
@@ -58,11 +60,11 @@ export default function MemoryMatch({pack, onAttempt, onComplete, onExit}: GameH
     const move=++moveRef.current;
     setMoves(move);
     try {
-      await onAttempt({attemptKey:`move-${move}`,itemId:card.pairId,objectiveId:card.objectiveId,correct,hintsUsed:0,elapsedMs:Math.max(0,Math.round(performance.now()-started.current))});
-    } catch {
+      await onAttempt({attemptKey:`move-${move}`,itemId:card.pairId,objectiveId:card.objectiveId,correct,hintsUsed:0,elapsedMs:Math.max(0,Math.round(performance.now()-started.current)),response:{kind:'pair',first:{itemId:previous.pairId,side:previous.side},second:{itemId:card.pairId,side:card.side}}});
+    } catch(failure) {
       if (!closed.current) {
         setLastOutcome(null);
-        setError('Không lưu được lượt chơi. Kiểm tra dung lượng lưu trữ rồi thử lại.');
+        setError(saveFailureMessage(failure));
         firstRef.current=null;setFirst(null);setSecond(null);setLocked(false);moveRef.current--;setMoves(moveRef.current);
       }
       setSaving(false);
@@ -115,11 +117,12 @@ export default function MemoryMatch({pack, onAttempt, onComplete, onExit}: GameH
       <div className="forest-board">
         <div className="memory-topline"><span>✦ BẢNG THẺ THẦN KỲ</span><strong>{moves} lượt thử</strong></div>
         <div className="memory-board-subline" aria-live="polite">{saving ? 'Đang ghi kết quả…' : locked ? 'Đang xem cặp thẻ…' : first ? 'Chọn thêm một thẻ để kiểm tra cặp nhé!' : 'Lật hai thẻ để tìm cặp tương ứng'}</div>
+        <div className="pair-question-audio" aria-label="Âm thanh thẻ đang mở">{content.items.filter(item=>first===item.id+'-L'||second===item.id+'-L'||matched.includes(item.id)).map(item=><QuestionMedia key={item.id} media={item.media} audioOnly showTranscript={matched.includes(item.id)}/>)}</div>
         <div className="memory-grid" aria-label="Bảng thẻ ghi nhớ">
           {deck.map(card => {
             const revealed = card.id === first || card.id === second || matched.includes(card.pairId);
             return <button key={card.id} className={`memory-card ${revealed?'revealed':''} ${matched.includes(card.pairId)?'found':''}`} disabled={locked || matched.includes(card.pairId) || !!error} onClick={() => void choose(card)} aria-label={revealed ? card.label : 'Thẻ úp, chọn để lật'} aria-pressed={revealed}>
-              <span className="memory-inner"><span className="memory-face memory-back" aria-hidden="true">✦</span><span className="memory-face memory-front">{card.label}</span></span>
+              <span className="memory-inner"><span className="memory-face memory-back" aria-hidden="true">✦</span><span className="memory-face memory-front">{revealed&&card.side==='left'&&<QuestionMedia media={content.items.find(item=>item.id===card.pairId)?.media} imageOnly/>}<span>{card.label}</span></span></span>
             </button>;
           })}
         </div>

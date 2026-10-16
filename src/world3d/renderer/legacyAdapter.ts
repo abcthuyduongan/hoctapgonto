@@ -5,7 +5,7 @@ export function createLegacyRenderer(opts: RendererInitOptions): WorldRenderer {
   opts.signal.throwIfAborted();
   const world = new LearningWorld3D(opts.canvas, {
     quality: opts.quality === 'low' || window.innerWidth <= 640 ? 'low' : 'full',
-    reducedMotion: !opts.motionOn, onSelect: opts.onSelect,
+    reducedMotion: !opts.motionOn, onSelect: opts.onSelect, onEnterWorld: opts.onEnterWorld,
   });
   if (!world.available) { world.dispose(); throw new Error('Legacy renderer unavailable'); }
   let tier: RenderTier = opts.quality === 'auto' ? 'balanced' : opts.quality;

@@ -6,5 +6,7 @@ import type { GameHostProps, ModuleId } from '../core/contracts';
 export const GAME_COMPONENTS: Record<ModuleId, ReturnType<typeof lazy<ComponentType<GameHostProps>>>> = {
   'math-quest': lazy(() => import('./MathQuest')),
   'memory-match': lazy(() => import('./MemoryMatch')),
-  'sentence-builder': lazy(() => import('./SentenceBuilder'))
+  'sentence-builder': lazy(() => import('./SentenceBuilder')),
+  'word-connect': lazy(() => import('./WordConnect')),
+  'sequence-trail': lazy(() => import('./SequenceTrail'))
 };

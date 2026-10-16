@@ -1,6 +1,6 @@
 # BẢO AN LEARNING V3.7 RC1 — báo cáo PR-00 / PR-01 / lát cắt PR-02
 
-Ngày thực hiện: **14/10/2026**, múi giờ Việt Nam. Báo cáo bên dưới lưu lịch sử PR-02. **Cập nhật mới nhất:** đã sản xuất và tích hợp asset PR-03 theo quyết định tiếp tục trực tiếp của chủ dự án; đủ năm GLB/PBR. [Nguồn và thông số](ASSET_LICENSES_V37.md), bằng chứng production trong `V37_art_qa/`. Chờ duyệt mỹ thuật và điện thoại thật, chưa FINAL.
+Ngày thực hiện: **14/10/2026**, múi giờ Việt Nam. Báo cáo bên dưới lưu lịch sử PR-02. **Cập nhật mới nhất:** đủ năm GLB/PBR, UI/cảnh game dùng chung; PR-05 có LOD runtime, cache bóng, chuẩn bị shader và transport nén. Đã thêm sao lưu/khôi phục hồ sơ ở Góc phụ huynh, chỉ thêm dữ liệu qua giao dịch nguyên tử. [Nguồn và thông số](ASSET_LICENSES_V37.md), [QA PR-03](V37_art_qa/verification.md), [QA PR-05](V37_performance_qa/verification.md), [QA hồ sơ/build mới](V37_backup_qa/verification.md), [đối chiếu phát hành](V37_RELEASE_READINESS.md). Chờ nghiệm thu mỹ thuật/điện thoại thật, chưa FINAL. Phát biểu hash nguyên core ở phần lịch sử dưới đây chỉ áp dụng PR02; đợt backup thêm export cuối storage nhưng giữ toàn bộ thân hàm cũ.
 
 **Cập nhật sau phản hồi chất lượng:** đã chỉnh lại chiều sâu cảnh, tỷ lệ cáo/đảo Toán và giao diện. Báo cáo này lưu bằng chứng của bản PR02 đầu tiên; ảnh và số liệu mới nằm ở [V37_depth_qa/visual-review.md](V37_depth_qa/visual-review.md) và thư mục `V37_depth_qa/`. Không dùng số liệu/ảnh cũ dưới đây để đại diện cho cảnh đã sửa.
 

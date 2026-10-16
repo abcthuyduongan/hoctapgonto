@@ -1,0 +1,27 @@
+{
+  "name": "Bảo An Learning",
+  "short_name": "Bảo An",
+  "description": "Ôn luyện qua năm trò chơi, thêm câu hỏi và tích sao đổi thưởng cùng gia đình.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#faf7f2",
+  "theme_color": "#1cb099",
+  "lang": "vi",
+  "categories": ["education", "games", "kids"],
+  "icons": [
+    {
+      "src": "/icons/bao-an-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/bao-an-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

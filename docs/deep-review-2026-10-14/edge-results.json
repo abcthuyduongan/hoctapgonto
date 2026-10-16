@@ -1,0 +1,245 @@
+{
+  "migration": {
+    "version": 3,
+    "stores": [
+      "events",
+      "packs",
+      "profiles",
+      "reviews",
+      "sessions"
+    ],
+    "session": {
+      "sessionId": "legacy-before-upgrade",
+      "packId": "math3-adventure",
+      "contentVersion": 1,
+      "moduleId": "math-quest",
+      "moduleVersion": "0.2.7",
+      "startedAt": "2026-10-12T10:00:00.000Z",
+      "endedAt": "2026-10-12T10:01:00.000Z",
+      "status": "completed"
+    }
+  },
+  "copiedPack": {
+    "key": "math4-adventure@2",
+    "pack": {
+      "id": "math4-adventure",
+      "version": 2,
+      "title": "Audit: Only title changed",
+      "subject": "math",
+      "grade": 4,
+      "source": "local",
+      "publishedAt": "2026-10-14T12:51:13.898Z",
+      "kind": "quiz",
+      "items": [
+        {
+          "kind": "multiple-choice",
+          "id": "question-1",
+          "objectiveId": "MATH4.FRACTIONS",
+          "prompt": "Rút gọn phân số 6/8 ta được phân số tối giản nào?",
+          "options": [
+            "3/4",
+            "2/3",
+            "1/2",
+            "4/5"
+          ],
+          "correctIndex": 0,
+          "explanation": "Chia cả tử số và mẫu số cho 2: 6:2 / 8:2 = 3/4."
+        },
+        {
+          "kind": "multiple-choice",
+          "id": "question-2",
+          "objectiveId": "MATH4.FRACTIONS",
+          "prompt": "2/5 + 1/5 = ?",
+          "options": [
+            "3/10",
+            "3/5",
+            "2/10",
+            "1/5"
+          ],
+          "correctIndex": 1,
+          "explanation": "Cộng hai phân số cùng mẫu: giữ nguyên mẫu 5, tử 2 + 1 = 3 -> 3/5."
+        },
+        {
+          "kind": "multiple-choice",
+          "id": "question-3",
+          "objectiveId": "MATH4.FRACTIONS",
+          "prompt": "Trung bình cộng của hai số 40 và 60 là bao nhiêu?",
+          "options": [
+            "45",
+            "55",
+            "50",
+            "65"
+          ],
+          "correctIndex": 2,
+          "explanation": "(40 + 60) : 2 = 100 : 2 = 50."
+        },
+        {
+          "kind": "multiple-choice",
+          "id": "question-4",
+          "objectiveId": "MATH4.FRACTIONS",
+          "prompt": "3/4 × 2/5 = ?",
+          "options": [
+            "5/9",
+            "6/9",
+            "5/20",
+            "3/10"
+          ],
+          "correctIndex": 3,
+          "explanation": "(3 × 2) / (4 × 5) = 6/20 = 3/10."
+        },
+        {
+          "kind": "multiple-choice",
+          "id": "question-5",
+          "objectiveId": "MATH4.FRACTIONS",
+          "prompt": "Hình vuông có cạnh 6 cm thì diện tích là bao nhiêu?",
+          "options": [
+            "36 cm²",
+            "24 cm²",
+            "12 cm²",
+            "30 cm²"
+          ],
+          "correctIndex": 0,
+          "explanation": "Diện tích hình vuông = cạnh × cạnh = 6 × 6 = 36 cm²."
+        },
+        {
+          "kind": "multiple-choice",
+          "id": "question-6",
+          "objectiveId": "MATH4.FRACTIONS",
+          "prompt": "Số gồm 5 trăm nghìn, 3 chục nghìn và 2 đơn vị viết là:",
+          "options": [
+            "503 002",
+            "530 002",
+            "532 000",
+            "530 020"
+          ],
+          "correctIndex": 1,
+          "explanation": "5 trăm nghìn (5), 3 chục nghìn (3), 0 nghìn (0), 0 trăm (0), 0 chục (0), 2 đơn vị (2) -> 530 002."
+        }
+      ]
+    }
+  },
+  "originalObjectives": [
+    "MATH4.FRACTIONS",
+    "MATH4.FRACTIONS",
+    "MATH4.AVERAGE",
+    "MATH4.FRACTIONS",
+    "MATH4.GEOMETRY",
+    "MATH4.NUMBER"
+  ],
+  "navigation": [
+    {
+      "width": 390,
+      "scrollWidth": 390,
+      "buttons": [
+        {
+          "text": "🏠 Thế giới game",
+          "rect": {
+            "x": 339.921875,
+            "y": 27.25,
+            "width": 28,
+            "height": 52.5,
+            "top": 27.25,
+            "right": 367.921875,
+            "bottom": 79.75,
+            "left": 339.921875
+          },
+          "hitIsButtonOrChild": false,
+          "fullyInViewport": true,
+          "textWidth": 32,
+          "clientWidth": 28
+        },
+        {
+          "text": "📊 Góc phụ huynh",
+          "rect": {
+            "x": 348.609375,
+            "y": 27.25,
+            "width": 28,
+            "height": 52.5,
+            "top": 27.25,
+            "right": 376.609375,
+            "bottom": 79.75,
+            "left": 348.609375
+          },
+          "hitIsButtonOrChild": false,
+          "fullyInViewport": true,
+          "textWidth": 33,
+          "clientWidth": 28
+        },
+        {
+          "text": "📚 Xưởng học liệu",
+          "rect": {
+            "x": 357.296875,
+            "y": 27.25,
+            "width": 28,
+            "height": 52.5,
+            "top": 27.25,
+            "right": 385.296875,
+            "bottom": 79.75,
+            "left": 357.296875
+          },
+          "hitIsButtonOrChild": true,
+          "fullyInViewport": true,
+          "textWidth": 35,
+          "clientWidth": 28
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "scrollWidth": 320,
+      "buttons": [
+        {
+          "text": "🏠 Thế giới game",
+          "rect": {
+            "x": 179,
+            "y": 56,
+            "width": 34,
+            "height": 52.5,
+            "top": 56,
+            "right": 213,
+            "bottom": 108.5,
+            "left": 179
+          },
+          "hitIsButtonOrChild": true,
+          "fullyInViewport": true,
+          "textWidth": 35,
+          "clientWidth": 34
+        },
+        {
+          "text": "📊 Góc phụ huynh",
+          "rect": {
+            "x": 218,
+            "y": 56,
+            "width": 34,
+            "height": 52.5,
+            "top": 56,
+            "right": 252,
+            "bottom": 108.5,
+            "left": 218
+          },
+          "hitIsButtonOrChild": true,
+          "fullyInViewport": true,
+          "textWidth": 36,
+          "clientWidth": 34
+        },
+        {
+          "text": "📚 Xưởng học liệu",
+          "rect": {
+            "x": 257,
+            "y": 56,
+            "width": 34,
+            "height": 52.5,
+            "top": 56,
+            "right": 291,
+            "bottom": 108.5,
+            "left": 257
+          },
+          "hitIsButtonOrChild": true,
+          "fullyInViewport": true,
+          "textWidth": 38,
+          "clientWidth": 34
+        }
+      ]
+    }
+  ]
+}

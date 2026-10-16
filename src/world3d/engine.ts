@@ -3,7 +3,7 @@
  * No network requests, no external textures, no extra rendering dependencies.
  */
 import { importGLB, ModelImportError } from './assets/glb.ts';
-export type WorldId = 'math-quest' | 'memory-match' | 'sentence-builder';
+export type WorldId = 'math-quest' | 'memory-match' | 'sentence-builder' | 'word-connect' | 'sequence-trail';
 export type WorldQuality = 'full' | 'low';
 type Vec3 = [number, number, number];
 const PI = Math.PI;
@@ -224,24 +224,24 @@ function fox(m:Mesh,x:number,y:number,z:number,s=.8){
 }
 function cloud(m:Mesh,x:number,y:number,z:number,s:number){for(let k=0;k<4;k++)m.sphere([x+(k-1.5)*s*.43,y+Math.sin(k*2)*s*.13,z],[s*.52,s*.26+(k%2)*s*.12,s*.34],k%2?'#effaff':'#d9f4ff',6,10,2);}
 function stars(m:Mesh){for(let i=0;i<27;i++){const x=Math.sin(i*2.23)*11.2,y=2.6+(i%7)*.54,z=-7-(i%5)*1.3;sparkle(m,x,y,z,.06+(i%4)*.038,i%3?'#fff3b6':'#a8f6ff');}}
-export interface WorldSceneOptions { reducedMotion?:boolean; quality?:WorldQuality; onSelect?:(id:WorldId)=>void; onReady?:(success:boolean)=>void; }
+export interface WorldSceneOptions { reducedMotion?:boolean; quality?:WorldQuality; onSelect?:(id:WorldId)=>void; onEnterWorld?:(id:WorldId)=>void; onReady?:(success:boolean)=>void; }
 export class LearningWorld3D {
  private renderPreset:'balanced'|'sharp'='balanced';private softwareDirty=true;private lastRendered=0;private avgFrameMs=0;private frameSamples=0;
  private canvas:HTMLCanvasElement;private gl:WebGL2RenderingContext|null=null;private ctx:CanvasRenderingContext2D|null=null;private softwareData:Float32Array|null=null;
  private program:WebGLProgram|null=null;private vao:WebGLVertexArrayObject|null=null;private buffer:WebGLBuffer|null=null;
- private drawCount=0;private raf=0;private active=true;private disposed=false;private quality:WorldQuality='full';private modelAbort:AbortController|null=null;private modelSequence=0;private importedModel=false;private cheerUntil=0;private motion=true;private target:Vec3=[0,.4,0];private eye:Vec3=[0,5.9,17];private focus:WorldId|null=null;private pointer=0;private h=1;private w=1;private onSelect?: (id:WorldId)=>void;private ready=false;
+ private drawCount=0;private raf=0;private active=true;private disposed=false;private quality:WorldQuality='full';private modelAbort:AbortController|null=null;private modelSequence=0;private importedModel=false;private cheerUntil=0;private motion=true;private target:Vec3=[0,.4,0];private eye:Vec3=[0,5.9,17];private focus:WorldId|null=null;private pointer=0;private h=1;private w=1;private onSelect?: (id:WorldId)=>void;private onEnterWorld?: (id:WorldId)=>void;private ready=false;
  private onMove=(e:PointerEvent)=>{if(!this.motion||this.ctx)return;const r=this.canvas.getBoundingClientRect();this.pointer=clamp((e.clientX-r.left)/Math.max(1,r.width)*2-1,-1,1)};
- private onClick=(e:MouseEvent)=>{const r=this.canvas.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;
+ private onClick=(e:MouseEvent)=>{if(!this.active||this.disposed||e.button!==0)return;this.canvas.focus({preventScroll:true});const r=this.canvas.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;
   const ids:WorldId[]=['math-quest','memory-match','sentence-builder'];
   const coords=[-4.8,0,4.8].map(px=>project3D([px,.55,0],[...this.eye] as Vec3,[...this.target] as Vec3,this.w,this.h));
   const idx=coords.reduce((best,p,i)=>Math.hypot(p.x-x,p.y-y)<Math.hypot(coords[best].x-x,coords[best].y-y)?i:best,0);
-  if(y>this.h*.23&&y<this.h*.82&&Math.abs(coords[idx].x-x)<this.w*.2){this.focusOn(ids[idx]);this.onSelect?.(ids[idx]);}
+  if(y>this.h*.23&&y<this.h*.82&&Math.abs(coords[idx].x-x)<this.w*.2){if(this.focus===ids[idx]&&this.onEnterWorld)this.onEnterWorld(ids[idx]);else{this.focusOn(ids[idx]);this.onSelect?.(ids[idx]);}}
  };
  private onResize=()=>{const dpr=Math.min(devicePixelRatio||1,this.renderPreset==='sharp'?2:1.25);const w=Math.max(1,this.canvas.clientWidth),h=Math.max(1,this.canvas.clientHeight);
   this.canvas.width=Math.floor(w*dpr);this.canvas.height=Math.floor(h*dpr);this.w=w;this.h=h;this.ctx?.setTransform(dpr,0,0,dpr,0,0);this.gl?.viewport(0,0,this.canvas.width,this.canvas.height);if(this.ctx)this.invalidateSoftware();
  };
  private onLoss=(event:Event)=>{event.preventDefault();this.ready=false;cancelAnimationFrame(this.raf);};
- constructor(canvas:HTMLCanvasElement,options:WorldSceneOptions={}){this.canvas=canvas;this.motion=!options.reducedMotion;this.onSelect=options.onSelect;try{this.start(options.quality??'full');options.onReady?.(true)}catch(e){console.warn('Bảo An 3D: renderer could not start',e);this.dispose();options.onReady?.(false)}}
+ constructor(canvas:HTMLCanvasElement,options:WorldSceneOptions={}){this.canvas=canvas;this.motion=!options.reducedMotion;this.onSelect=options.onSelect;this.onEnterWorld=options.onEnterWorld;try{this.start(options.quality??'full');options.onReady?.(true)}catch(e){console.warn('Bảo An 3D: renderer could not start',e);this.dispose();options.onReady?.(false)}}
  get available(){return this.ready}
  /** Render-resolution control; does not discard models, scores or the current scene. */
  setRenderQuality(preset:'balanced'|'sharp') {this.renderPreset=preset;this.onResize();}
@@ -419,7 +419,7 @@ export class LearningWorld3D {
   const gl=this.gl,w=this.canvas.clientWidth,h=this.canvas.clientHeight;if(!w||!h){this.raf=requestAnimationFrame(this.draw);return;}
   const t=this.motion?now:0,smaller=w<760;
   const centered=smaller?22.3:17.7;
-  const focusX=this.focus?({'math-quest':-1.0,'memory-match':0,'sentence-builder':1.0}[this.focus]):0;
+  const focusX=this.focus?({'math-quest':-1.0,'memory-match':0,'sentence-builder':1.0,'word-connect':1.5,'sequence-trail':-1.5} as Record<WorldId, number>)[this.focus] ?? 0:0;
   const desiredEye:Vec3=[this.pointer*.48+focusX,smaller?8.25:6.8,centered],desiredTarget:Vec3=[focusX*.55,smaller?-.05:.18,-.3];
   this.eye=add(mul(this.eye,.96),mul(desiredEye,.04));this.target=add(mul(this.target,.96),mul(desiredTarget,.04));
   gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.useProgram(this.program);gl.bindVertexArray(this.vao);
@@ -443,7 +443,7 @@ export class LearningWorld3D {
    const ctx=this.ctx!,a=this.softwareData!;const w=this.w,h=this.h;
    if(!w||!h)return;
    const smaller=w<760;
-   const focusX=this.focus?({'math-quest':-1.0,'memory-match':0,'sentence-builder':1.0}[this.focus]):0;
+   const focusX=this.focus?({'math-quest':-1.0,'memory-match':0,'sentence-builder':1.0,'word-connect':1.5,'sequence-trail':-1.5} as Record<WorldId, number>)[this.focus] ?? 0:0;
    const desiredEye:Vec3=[this.pointer*.48+focusX,smaller?8.25:6.8,smaller?22.3:17.7];
    this.eye=add(mul(this.eye,.88),mul(desiredEye,.12));this.target=add(mul(this.target,.88),mul([focusX*.55,smaller?-.05:.18,-.3],.12));
    const v=lookAt(this.eye,this.target),pr=perspective(PI/(smaller?3.5:4.3),w/h,.1,85);

@@ -1,0 +1,27 @@
+[
+  {
+    "Path": "test-results\\v37",
+    "Bytes": 229709560,
+    "Status": "deleted"
+  },
+  {
+    "Path": "test-results\\rc1-regression-recheck",
+    "Bytes": 45,
+    "Status": "deleted"
+  },
+  {
+    "Path": "test-results\\online-management-ljZmO4",
+    "Bytes": 17706047,
+    "Status": "deleted"
+  },
+  {
+    "Path": "test-results\\online-routing-browser-output",
+    "Bytes": 217886,
+    "Status": "deleted"
+  },
+  {
+    "Path": "playwright-report",
+    "Bytes": 77142323,
+    "Status": "deleted"
+  }
+]

@@ -1,0 +1,182 @@
+[
+  {
+    "Path": "src/content/grade3-pilot-v2.json",
+    "Bytes": 191135
+  },
+  {
+    "Path": "src/content/grade3-pilot-v3.json",
+    "Bytes": 238093
+  },
+  {
+    "Path": "src/content/reviewed-additions.json",
+    "Bytes": 59
+  },
+  {
+    "Path": "src/core/app-version.ts",
+    "Bytes": 111
+  },
+  {
+    "Path": "src/core/audio-assets.ts",
+    "Bytes": 2108
+  },
+  {
+    "Path": "src/core/backup-io.ts",
+    "Bytes": 47305
+  },
+  {
+    "Path": "src/core/backup-storage.ts",
+    "Bytes": 13951
+  },
+  {
+    "Path": "src/core/contest-catalog.ts",
+    "Bytes": 4197
+  },
+  {
+    "Path": "src/core/journey-seed.ts",
+    "Bytes": 2407
+  },
+  {
+    "Path": "src/core/learning-runtime.ts",
+    "Bytes": 11792
+  },
+  {
+    "Path": "src/core/lesson-host.ts",
+    "Bytes": 3283
+  },
+  {
+    "Path": "src/core/lesson-seed.ts",
+    "Bytes": 2233
+  },
+  {
+    "Path": "src/core/lesson-starter.ts",
+    "Bytes": 8864
+  },
+  {
+    "Path": "src/core/offline.ts",
+    "Bytes": 3773
+  },
+  {
+    "Path": "src/core/question-import-client.ts",
+    "Bytes": 2456
+  },
+  {
+    "Path": "src/core/question-import.ts",
+    "Bytes": 32955
+  },
+  {
+    "Path": "src/core/question-import.worker.ts",
+    "Bytes": 632
+  },
+  {
+    "Path": "src/core/question-storage.ts",
+    "Bytes": 2691
+  },
+  {
+    "Path": "src/core/question-template-download.ts",
+    "Bytes": 5849
+  },
+  {
+    "Path": "src/core/reports.ts",
+    "Bytes": 942
+  },
+  {
+    "Path": "src/core/seed.ts",
+    "Bytes": 12383
+  },
+  {
+    "Path": "src/core/session-manager.ts",
+    "Bytes": 2514
+  },
+  {
+    "Path": "src/core/spacedRepetition.ts",
+    "Bytes": 6740
+  },
+  {
+    "Path": "src/core/storage.ts",
+    "Bytes": 58417
+  },
+  {
+    "Path": "src/styles/design-match290.css",
+    "Bytes": 25515
+  },
+  {
+    "Path": "src/styles/game-hub.css",
+    "Bytes": 19150
+  },
+  {
+    "Path": "src/styles/game-world.css",
+    "Bytes": 24441
+  },
+  {
+    "Path": "src/styles/learning.css",
+    "Bytes": 6076
+  },
+  {
+    "Path": "src/styles/legacy-archive.css",
+    "Bytes": 3292
+  },
+  {
+    "Path": "src/styles/main.css",
+    "Bytes": 21603
+  },
+  {
+    "Path": "src/styles/memory281.css",
+    "Bytes": 8123
+  },
+  {
+    "Path": "src/styles/panorama271.css",
+    "Bytes": 10670
+  },
+  {
+    "Path": "src/styles/polish26.css",
+    "Bytes": 16671
+  },
+  {
+    "Path": "src/styles/portal272.css",
+    "Bytes": 26117
+  },
+  {
+    "Path": "src/styles/premium-games37.css",
+    "Bytes": 35971
+  },
+  {
+    "Path": "src/styles/premium-world37.css",
+    "Bytes": 28257
+  },
+  {
+    "Path": "src/styles/premium280.css",
+    "Bytes": 8153
+  },
+  {
+    "Path": "src/styles/professional-design-system.css",
+    "Bytes": 21337
+  },
+  {
+    "Path": "src/styles/profile-backup37.css",
+    "Bytes": 1295
+  },
+  {
+    "Path": "src/styles/real3d31.css",
+    "Bytes": 12892
+  },
+  {
+    "Path": "src/styles/stability27.css",
+    "Bytes": 6568
+  },
+  {
+    "Path": "src/styles/unified-frame.css",
+    "Bytes": 26269
+  },
+  {
+    "Path": "src/styles/workspace-unified.css",
+    "Bytes": 19536
+  },
+  {
+    "Path": "src/styles/world276.css",
+    "Bytes": 13884
+  },
+  {
+    "Path": "src/styles/world277.css",
+    "Bytes": 8272
+  }
+]

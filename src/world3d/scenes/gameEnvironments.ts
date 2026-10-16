@@ -25,6 +25,16 @@ export const GAME_WORLD_MATERIAL_NAMES: Readonly<Record<WorldId, GameWorldMateri
     bark: 'Walnut door planks shelves and quill desk', leaf: 'Sculpted jade canopy and garden leaves', leafLight: 'Sunlit sage leaf tips',
     accent: 'Individually glazed teal roof panels', paper: 'Warm ivory sculpted book paper', wood: 'Walnut door planks shelves and quill desk', bookCover: 'Dusty lavender book covers and blossoms',
   },
+  'word-connect': {
+    lawn: 'Soft meadow grass and rim moss', cliff: 'Warm weathered sandstone cliff', path: 'Ivory bevelled plinth paths and carved frames',
+    bark: 'Walnut door planks shelves and quill desk', leaf: 'Sculpted jade canopy and garden leaves', leafLight: 'Sunlit sage leaf tips',
+    accent: 'Individually glazed teal roof panels', paper: 'Warm ivory sculpted book paper', wood: 'Walnut door planks shelves and quill desk', bookCover: 'Dusty lavender book covers and blossoms',
+  },
+  'sequence-trail': {
+    lawn: 'Living mint grass', cliff: 'Warm stratified island rock', path: 'Pale paving and trim',
+    bark: 'Walnut arched door', leaf: 'Deep jade leaves', leafLight: 'Fresh lime grass tips',
+    accent: 'Turquoise glazed roof band', paper: 'Pale paving and trim', wood: 'Walnut arched door', bookCover: 'Glazed blue castle roofs',
+  },
 };
 function batch(geometry: BufferGeometry, material: Material, placements: Placement[], shadows = true) {
   const mesh = new InstancedMesh(geometry, material, placements.length), transform = new Object3D();
@@ -46,7 +56,13 @@ function tileUvs(geometry: BufferGeometry, repeatU: number, repeatV: number) {
   for (let index = 0; index < uv.count; index++) uv.setXY(index, uv.getX(index) * repeatU, uv.getY(index) * repeatV);
   uv.needsUpdate = true; return geometry;
 }
-const grassColors: Record<WorldId, number> = { 'math-quest': 0x70b67d, 'memory-match': 0x79b88c, 'sentence-builder': 0x81bb84 };
+const grassColors: Record<WorldId, number> = {
+  'math-quest': 0x70b67d,
+  'memory-match': 0x79b88c,
+  'sentence-builder': 0x81bb84,
+  'word-connect': 0xe6a15c,
+  'sequence-trail': 0x5ea3e6,
+};
 
 /** Lightweight interiors borrow decoded island PBR maps/materials without changing their owner. */
 export function buildGameEnvironments() {

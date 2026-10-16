@@ -1,9 +1,12 @@
+import {saveFailureMessage} from './save-failure-message';
+import QuestionMedia from '../components/QuestionMedia';
 import GameMascot from './GameMascot';
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { GameHostProps, SentencePack } from '../core/contracts';
 import { shuffle } from '../core/utils';
 import { isCorrectSentence } from '../core/sdk';
 import { playFeedbackTone } from '../core/experience';
+import { speakText, stopSpeaking } from '../core/speech';
 import GameCompletion from './GameCompletion';
 import FeedbackEffects from './FeedbackEffects';
 
@@ -22,6 +25,10 @@ export default function SentenceBuilder({pack,onAttempt,onComplete,onExit}: Game
   const started = useRef(performance.now());
   const submitting = useRef(false);
   const item = content.items[index];
+
+  useEffect(() => {
+    return () => { stopSpeaking(); };
+  }, [index]);
   const shuffled = useMemo(() => {
     const shuffledIds = shuffle(item.words.map((_,i)=>i));
     if (shuffledIds.length > 1 && shuffledIds.every((n,i)=>n===i)) shuffledIds.reverse();
@@ -35,13 +42,13 @@ export default function SentenceBuilder({pack,onAttempt,onComplete,onExit}: Game
     const correct = isCorrectSentence(item.words,placed);
     try {
       await onAttempt({attemptKey:`${item.id}:try:${retries+1}`,itemId:item.id,objectiveId:item.objectiveId,
-        correct,hintsUsed:hint?1:0,elapsedMs:Math.max(0,Math.round(performance.now()-started.current))});
+        correct,hintsUsed:hint?1:0,elapsedMs:Math.max(0,Math.round(performance.now()-started.current)),response:{kind:'order',indices:[...placed]}});
       setRetries(r=>r+1);
       setFeedback(correct?'correct':'retry');
       playFeedbackTone(correct?'success':'retry');
       if (correct && retries === 0 && !hint) setFirstTry(v=>v+1);
-    } catch {
-      setError('Chưa thể lưu đáp án. Kiểm tra bộ nhớ trình duyệt rồi thử lại.');
+    } catch(failure) {
+      setError(saveFailureMessage(failure));
     } finally {submitting.current=false;setBusy(false);}
   }
 
@@ -70,8 +77,11 @@ export default function SentenceBuilder({pack,onAttempt,onComplete,onExit}: Game
       <div className="sentence-scroll">
         <div className="quest-progress"><span>CÂU {index+1}/{content.items.length}</span><span>✎ GHÉP CÂU VUI</span></div>
         <div className="progress-track"><div style={{width:`${(index+(feedback==='correct'?1:0))/content.items.length*100}%`}}/></div>
-        <h2 className="sentence-prompt" key={item.id}>{item.prompt}</h2>
-        <p className="sentence-instruction">🧩 Xếp các từ theo thứ tự để tạo câu đúng</p>
+        <h2 className="sentence-prompt" key={item.id}>
+          {item.prompt}
+          <button type="button" className="speech-trigger-btn" onClick={() => speakText(item.prompt, { lang: pack.subject === 'english' ? 'en-US' : 'vi-VN' })} aria-label="Nghe đọc yêu cầu" title="Nghe đọc yêu cầu">🔊</button>
+        </h2>
+        <QuestionMedia key={`media-${item.id}`} media={item.media} showTranscript={feedback!==null}/><p className="sentence-instruction">🧩 Xếp các từ theo thứ tự để tạo câu đúng</p>
         <div className="sentence-drop" aria-label="Câu đang sắp xếp" onDragOver={e=>e.preventDefault()} onDrop={e=>{
           e.preventDefault();const rawIndex=e.dataTransfer.getData('text/plain');const indexToAdd=Number(rawIndex);
           if (/^(0|[1-9]\d*)$/.test(rawIndex)&&Number.isInteger(indexToAdd)&&indexToAdd>=0&&indexToAdd<item.words.length) insertWord(indexToAdd);
@@ -86,7 +96,7 @@ export default function SentenceBuilder({pack,onAttempt,onComplete,onExit}: Game
         <div className="sentence-result-reserve" aria-live="polite" aria-atomic="true">
           <FeedbackEffects result={feedback==='correct'?'success':feedback==='retry'?'retry':null} eventKey={`${item.id}-${retries}`}/>
           {error ? <div className="notice error" role="alert">{error} <button onClick={()=>setError('')}>Đóng</button> <button onClick={onExit}>Thoát</button></div>
-          : feedback === 'correct' ? <div className="answer-feedback feedback-win"><strong>🌟 Chính xác! Xuất sắc!</strong><p>{item.words.join(' ')}</p></div>
+          : feedback === 'correct' ? <div className="answer-feedback feedback-win"><strong>🌟 Chính xác! Xuất sắc!</strong><p>{item.words.join(' ')} <button type="button" className="speech-trigger-btn" onClick={() => speakText(item.words.join(' '), { lang: pack.subject === 'english' ? 'en-US' : 'vi-VN' })} aria-label="Nghe đọc câu hoàn chỉnh" title="Nghe đọc câu">🔊</button></p></div>
           : feedback === 'retry' ? <div className="answer-feedback feedback-retry"><strong>💡 Chưa khớp đáp án mẫu.</strong><p>Con thử cách sắp xếp khác nhé.</p></div>
           : hint ? <p className="sentence-hint">💡 {item.hint}</p>
           : <p className="sentence-hint sentence-empty-hint">✨ Con hãy chọn các từ để tạo câu hoàn chỉnh.</p>}

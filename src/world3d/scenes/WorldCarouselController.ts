@@ -39,6 +39,11 @@ export class WorldCarouselController {
     ])) as Record<WorldId, IslandPose>;
   }
   private neutral() {
+    if (this.ids.length > 3) {
+      const overviewRotation = Math.PI / this.ids.length;
+      return orbitSlots(this.ids, overviewRotation, this.layout.radiusX, this.layout.radiusZ,
+        this.layout.centerZ, this.layout.neutralScale);
+    }
     return neutralSlots(this.ids, this.layout.spacing, 0, -1, this.layout.neutralScale);
   }
   private orbit(rotation: number) {
@@ -71,12 +76,13 @@ export class WorldCarouselController {
   }
   settle() {
     this.moving = false;
+    const overviewAngle = this.ids.length > 3 ? Math.PI / this.ids.length : OVERVIEW_ANGLE;
     if (this.selected) {
       this.rotation = targetRotationForIndex(this.ids.indexOf(this.selected), this.ids.length, this.rotation);
       const poses = this.orbit(this.rotation);
       poses[this.selected].scale = this.layout.frontScale; poses[this.selected].y = .1;
       this.apply(poses);
-    } else { this.rotation = OVERVIEW_ANGLE; this.apply(this.neutral()); }
+    } else { this.rotation = overviewAngle; this.apply(this.neutral()); }
     this.waitingPlatform.position.set(this.layout.waiting.x, 0, this.layout.waiting.z);
     this.waitingPlatform.visible = !this.selected;
     this.finishJump();
@@ -91,9 +97,10 @@ export class WorldCarouselController {
     }])) as Record<WorldId, IslandPose>;
     this.fromRotation = this.rotation;
     this.selected = id;
+    const overviewAngle = this.ids.length > 3 ? Math.PI / this.ids.length : OVERVIEW_ANGLE;
     this.targetRotation = id
       ? targetRotationForIndex(this.ids.indexOf(id), this.ids.length, this.rotation)
-      : targetRotationForIndex(0, this.ids.length, this.rotation - OVERVIEW_ANGLE) + OVERVIEW_ANGLE;
+      : targetRotationForIndex(0, this.ids.length, this.rotation - overviewAngle) + overviewAngle;
     this.elapsed = 0; this.jumpProgress = 0;
     this.jumpStart.copy(this.guide.position);
     this.moving = true; this.mascotState = 'jumping';

@@ -1,0 +1,664 @@
+{
+  "Date": "2026-10-14",
+  "Scope": "Current working tree; report-only audit",
+  "HEAD": "b3702c2b89053afe12a7fbc11b66e9a779839bfe",
+  "Node": "v22.22.2",
+  "SourceHashes": [
+    {
+      "Path": "index.html",
+      "SHA256": "2a3223cc19981b33380003ee188fae90063a09b8741b3686229bdbd5ff6fc491"
+    },
+    {
+      "Path": "package-lock.json",
+      "SHA256": "96d404563571b87a521f3809d818521d85f52ef2073b7a3b54d3eb5e9c9ced62"
+    },
+    {
+      "Path": "package.json",
+      "SHA256": "ae140daa6da8e627813eb0fa3ffa316e37df829e5a93fafce9aec5d7475a2a63"
+    },
+    {
+      "Path": "playwright.v37.config.ts",
+      "SHA256": "f93f1010649454bbaf40777936d5e1a6b3555c854514473b00a70168e4dea943"
+    },
+    {
+      "Path": "public\\manifest.webmanifest",
+      "SHA256": "dac40713cd15c5bddd3f0c9369c0e4df148b1ebc5cb688534ef0e7ac8612857e"
+    },
+    {
+      "Path": "public\\models\\environment.glb",
+      "SHA256": "66379fb5ec01f7905f52744f973446b9b52f4842501236407b203a658128f45c"
+    },
+    {
+      "Path": "public\\models\\fox-guide-mobile.glb",
+      "SHA256": "6895d4463ce5b2d4aa3a1f5e3e389e6443acc80ee383b00fe59b0be7dab6a996"
+    },
+    {
+      "Path": "public\\models\\fox-guide-prototype.glb",
+      "SHA256": "91d6c618954caa2034b95f9e42c9b013805b992506002564481e9c8e2bd30c8f"
+    },
+    {
+      "Path": "public\\models\\fox-guide.glb",
+      "SHA256": "398382e919be69af9502cb103e3d1359147157e76ac852a30ad07cd60a23e9fc"
+    },
+    {
+      "Path": "public\\models\\language-world.glb",
+      "SHA256": "2556c2fa14a60608622dea42e52165da6e3d5821a345d39ce4aaac84a82e317a"
+    },
+    {
+      "Path": "public\\models\\math-world.glb",
+      "SHA256": "dd7cacdfb62d86b0dc287b264d6cc71df5822a2b6943c48d73c5c84b3091d6cb"
+    },
+    {
+      "Path": "public\\models\\memory-world.glb",
+      "SHA256": "8e13532de90cbfb5353e2aae22cf56da1a8bad859db2363de6dd5c2be8805a56"
+    },
+    {
+      "Path": "public\\sw.js",
+      "SHA256": "2ee71380e4e6e408e2db0fb07a985ae900b8209aec5307c0b908eca721d96a43"
+    },
+    {
+      "Path": "src\\App.tsx",
+      "SHA256": "b9dab972d4f6c030284cc0dd4155d571f960757b0dac3c48e38272f297117265"
+    },
+    {
+      "Path": "src\\core\\backup-io.ts",
+      "SHA256": "7d89dced385f69f88591ce5518fdb92227ad70f8ca7f07df6ef51992343b00db"
+    },
+    {
+      "Path": "src\\core\\backup-storage.ts",
+      "SHA256": "317ce30d21fe0fd49ccff440ee7f8b18434bee2cdad841bd03c8148259f2b1b5"
+    },
+    {
+      "Path": "src\\core\\content-io.ts",
+      "SHA256": "7ccfaa18abf1991877d52bad31d0b81135e29c2edf3a7331afa1ef2b4b95432e"
+    },
+    {
+      "Path": "src\\core\\contracts.ts",
+      "SHA256": "d170727805110dfc25f5edb05cfbd02b5ba16b2d76926fe3604e5c99d4fb4a82"
+    },
+    {
+      "Path": "src\\core\\excel-import.ts",
+      "SHA256": "cc9744cff528bf1014510732d790d491935fd87ea8b78d50f75ed95dcc8ba8c1"
+    },
+    {
+      "Path": "src\\core\\experience.ts",
+      "SHA256": "223af90ac6ab034f25e8185835cbd462e4d7ca8ca230fe59310c0be0fcccbe72"
+    },
+    {
+      "Path": "src\\core\\registry.ts",
+      "SHA256": "9c5043ce72e67cb9bc33bac30963649932df549774d45a1cdd003e06a75cf2ef"
+    },
+    {
+      "Path": "src\\core\\reports.ts",
+      "SHA256": "ecd3257753c6b3675d1c50e6876735d3afa86ef16428ca47fe70eca07f3b1f2a"
+    },
+    {
+      "Path": "src\\core\\sdk.ts",
+      "SHA256": "61e272aca03a13516de71da55c142ad0c0b96e9e1a2b027aab0a25ce837dc000"
+    },
+    {
+      "Path": "src\\core\\seed.ts",
+      "SHA256": "d5e75d7da9e8b3073800533d8c55607ab5d97b24f0f7778f28315f058fc44214"
+    },
+    {
+      "Path": "src\\core\\sound.ts",
+      "SHA256": "e1d3d3f801f570de8cbe0c3d330402b996275416f13e7fe8103a372e5b556c6d"
+    },
+    {
+      "Path": "src\\core\\spacedRepetition.ts",
+      "SHA256": "771953f52c8913add8ff00972e335bc22b5b08df071bfe46b60df822647ed4b2"
+    },
+    {
+      "Path": "src\\core\\speech.ts",
+      "SHA256": "15cd518a4903710eb9f4012e77240b5da2a8c60b92544b314e5efb6bf50accb4"
+    },
+    {
+      "Path": "src\\core\\storage.ts",
+      "SHA256": "f36bb9394ebd55049b417d5e6163939fa41cb3f5eab2239476b7edf3eb8fd71c"
+    },
+    {
+      "Path": "src\\core\\utils.ts",
+      "SHA256": "828c0fd0aaac26c7cb538ae834e7c132f7016332a714804df96e4063bb48d880"
+    },
+    {
+      "Path": "src\\core\\validation.ts",
+      "SHA256": "303df08d7ada1cc1dbd6922b828297dc1b960de0162093b773485eaae305b09f"
+    },
+    {
+      "Path": "src\\games\\FeedbackEffects.tsx",
+      "SHA256": "5bb34b1958c1eb1f13d6529dc87d5616ba3ef89d060b307b9517de9024a4aec0"
+    },
+    {
+      "Path": "src\\games\\GameCompletion.tsx",
+      "SHA256": "fe6291e0ef5ff0bfba311bef12eb97c4c59d44eac296c5bf2ab3f96ec0033883"
+    },
+    {
+      "Path": "src\\games\\GameMascot.tsx",
+      "SHA256": "6a5b36ef10400226cc242e26cce858d685f76bf479718570bce635f067ea3017"
+    },
+    {
+      "Path": "src\\games\\loaders.ts",
+      "SHA256": "91a160821e47106cf750dd632867e205ab50292b96b80c7aa2e4211eeff5926f"
+    },
+    {
+      "Path": "src\\games\\MathQuest.tsx",
+      "SHA256": "1e1c01d50b768d1a82cb2966132891d335c449954ba747e1d4cffe5e66d5f3bf"
+    },
+    {
+      "Path": "src\\games\\MemoryMatch.tsx",
+      "SHA256": "9b3b75c9c77829386b4e32d12b0e1930b2dcd344954e873e71c928f57d429567"
+    },
+    {
+      "Path": "src\\games\\SentenceBuilder.tsx",
+      "SHA256": "9244fbcebc416d0759204934ff4137c1029e5e910c303d5cbce06de112100986"
+    },
+    {
+      "Path": "src\\games\\SequenceTrail.tsx",
+      "SHA256": "a5bf27cd2b5a860aeb982dac08b7393e91436b036fc8d587f2bae8bec30b1c4d"
+    },
+    {
+      "Path": "src\\games\\WordConnect.tsx",
+      "SHA256": "a21642611449ee0e7cc6cc61b56426b7465312e93f9b734026901a3dadadb303"
+    },
+    {
+      "Path": "src\\main.tsx",
+      "SHA256": "50d5d13e7d0581a20fa356e57a2f079bd8cb66d45e326ed677f3f20b1e55bbef"
+    },
+    {
+      "Path": "src\\miniapps\\TimesTable.tsx",
+      "SHA256": "8f38168fe370b3df2bb3ae8cac92a681f264ac90e7f734e3ba521ae906ca6b09"
+    },
+    {
+      "Path": "src\\screens\\CreatorScreen.tsx",
+      "SHA256": "c2be52e281bb85a30d024e9cb40a559679c6a9024317482c5947b8985974d247"
+    },
+    {
+      "Path": "src\\screens\\LearningProfileBackup.tsx",
+      "SHA256": "93ec079087478d7c4212a1b815f7065e5287f6986118666e56e4d7ae34732cb4"
+    },
+    {
+      "Path": "src\\screens\\ParentScreen.tsx",
+      "SHA256": "ce62afaa5d4dc830d4f65e61cdd55a3360da0a8fd63a4d1c78476cfd65733cdd"
+    },
+    {
+      "Path": "src\\screens\\ProfileModal.tsx",
+      "SHA256": "2ca28f75bc1319324e16a0059eb924b9f7f71b9b140c7747211a698cac18b74b"
+    },
+    {
+      "Path": "src\\screens\\StudentScreen.tsx",
+      "SHA256": "c75d391f3c9d9fd8e1832db2b1e988201d212a7869a63edd722730be053e7dd4"
+    },
+    {
+      "Path": "src\\styles\\design-match290.css",
+      "SHA256": "192e88d0db55741524273450f2e743e882d97ef264d5325ed06ddd12f4917e1c"
+    },
+    {
+      "Path": "src\\styles\\game-world.css",
+      "SHA256": "9be9a7075573f43048aafab3ffe7933371e0991c1324766d58540f17c1095098"
+    },
+    {
+      "Path": "src\\styles\\main.css",
+      "SHA256": "d337235f2c1f8f24ab5c22d900ec16e7f5f44ff1cd7b782f4da313332806d371"
+    },
+    {
+      "Path": "src\\styles\\memory281.css",
+      "SHA256": "e2a2d920ee1156dc86137241a5e8a2604f22736549de8b8d769b4db7adf163d6"
+    },
+    {
+      "Path": "src\\styles\\panorama271.css",
+      "SHA256": "c0422d2d1d70f337047061a3197a67ad8ee3d69af0d251a53988ca69cc957749"
+    },
+    {
+      "Path": "src\\styles\\polish26.css",
+      "SHA256": "23d64c5938bae12815d26cfbd39faa6b0aac744bf0c0174256a2041408ae44ed"
+    },
+    {
+      "Path": "src\\styles\\portal272.css",
+      "SHA256": "89662dbd248f9e64c2d726dd44b7b07854dacf1d9f8af3773ab441412f3612ad"
+    },
+    {
+      "Path": "src\\styles\\premium-games37.css",
+      "SHA256": "526263b42b32d04cef9f96d4f9bf3c25600c152891039402e7276118a8464d8f"
+    },
+    {
+      "Path": "src\\styles\\premium-world37.css",
+      "SHA256": "b85f9be9b2c3e9819ef7e1adca910584ac246bdca692618fcdac1c5972560eac"
+    },
+    {
+      "Path": "src\\styles\\premium280.css",
+      "SHA256": "c956dfbb301cbd8e1700c729b059cec18a834893da940d15625bc86a917cb955"
+    },
+    {
+      "Path": "src\\styles\\professional-design-system.css",
+      "SHA256": "fc1fc6729dc52bfe2c1bd21b960aab67047cadb605c0e4c12e40787fb81cfa42"
+    },
+    {
+      "Path": "src\\styles\\profile-backup37.css",
+      "SHA256": "74b76cecb74f92392a2be456a6732439a2f4bed1736e92b7c91420b0c16c4daa"
+    },
+    {
+      "Path": "src\\styles\\real3d31.css",
+      "SHA256": "4a14bef536c83ce961eba495893f086d08cb171797697a141889de191692257b"
+    },
+    {
+      "Path": "src\\styles\\stability27.css",
+      "SHA256": "21dd90eb2996889d6201dadfa4303fadd1ac1bb59ae02f48fd57cea75bda8089"
+    },
+    {
+      "Path": "src\\styles\\unified-frame.css",
+      "SHA256": "5e65e63617204b838f60b5360f4a81c6af7dd38057e29579efca7854bb98658f"
+    },
+    {
+      "Path": "src\\styles\\workspace-unified.css",
+      "SHA256": "2e119a238696d0dde3013c60704de98de880f4a805146206251cf723ad646c11"
+    },
+    {
+      "Path": "src\\styles\\world276.css",
+      "SHA256": "7de19c30c49059d50697657a50e9bb064e7bf9762dceefc5dba712b8ee738138"
+    },
+    {
+      "Path": "src\\styles\\world277.css",
+      "SHA256": "c1e817918c5dd51f4c7b945c5bff0d4b3d3d4a004790aaa2dfd8d101ac37d38d"
+    },
+    {
+      "Path": "src\\vite-env.d.ts",
+      "SHA256": "65996936fbb042915f7b74a200fcdde7e410f32a669b1ab9597cfaa4b0faddb5"
+    },
+    {
+      "Path": "src\\world3d\\assets\\glb.ts",
+      "SHA256": "dff59bd0f411bd1b088e3d19acd832feff3f9095b13a8f91df8aa1948c67d60f"
+    },
+    {
+      "Path": "src\\world3d\\assets\\premium-manifest.json",
+      "SHA256": "96e002b6943c7e540e4a60dc605e3cbbc12d785fdc39b904776324c6c192b8d3"
+    },
+    {
+      "Path": "src\\world3d\\engine.ts",
+      "SHA256": "d97368108ba11ede92518623451d8a3818bc176a44fce3a5aab2b469f434e187"
+    },
+    {
+      "Path": "src\\world3d\\GameSceneContext.tsx",
+      "SHA256": "4f99282b4e94c32517bd56e1db7bec5be54f62ad23f8132c79ea69c60b75d93a"
+    },
+    {
+      "Path": "src\\world3d\\renderer\\assetLoader.ts",
+      "SHA256": "6a9afd70ad74686cd6a12d9eff4b3e1e66f20381db34e6a9dfe2275bb7774207"
+    },
+    {
+      "Path": "src\\world3d\\renderer\\disposeScene.ts",
+      "SHA256": "293650875d63362a7de6dd06b31f68c9268f2ed459f1bc51276233a4b093ab11"
+    },
+    {
+      "Path": "src\\world3d\\renderer\\legacyAdapter.ts",
+      "SHA256": "d1e69ce4c28d971c15a6e24514dd2791daaa0f18f735a31bf3dba73a99de58ad"
+    },
+    {
+      "Path": "src\\world3d\\renderer\\loadCatalog.ts",
+      "SHA256": "fadb874e576c4439927e7027ef5c02b6a22bd23c841ef7680822260daa301066"
+    },
+    {
+      "Path": "src\\world3d\\renderer\\performanceMetrics.ts",
+      "SHA256": "f9281287556522a50d87d62d695209e5144cad63cf3a88b33818816697b0ea6e"
+    },
+    {
+      "Path": "src\\world3d\\renderer\\PremiumWorldRenderer.ts",
+      "SHA256": "fd8021951cbfb2e3cf0e4098423d8a77fa03d685730268faadd4f5c566838b82"
+    },
+    {
+      "Path": "src\\world3d\\renderer\\qualityManager.ts",
+      "SHA256": "8ac1ddb7d57f481a1b853955e218a35e67c5dfff45fad8d1e48f72917017640d"
+    },
+    {
+      "Path": "src\\world3d\\renderer\\rendererFactory.ts",
+      "SHA256": "70f6dc61910d43cfbfbbab5e8b4182e0aa5f24b2eb7195a2f7fd00beb803ce68"
+    },
+    {
+      "Path": "src\\world3d\\renderer\\shadowUpdates.ts",
+      "SHA256": "c4642dda6996a1c0cea3188bb51c1a39b1ed83629bb2c04a1fab56852cf50323"
+    },
+    {
+      "Path": "src\\world3d\\renderer\\types.ts",
+      "SHA256": "b6e33746d9aede2792213cde521c5aa522b8d32d4e8a13cea34ced9dc14745ca"
+    },
+    {
+      "Path": "src\\world3d\\scenes\\buildWorld.ts",
+      "SHA256": "c3fa25acf4e2ff3c661e5e469de709e04325ccacd821c65ee29e21a80bd613dd"
+    },
+    {
+      "Path": "src\\world3d\\scenes\\gameEnvironments.ts",
+      "SHA256": "139b03078e0d5856e761d7b7a871bdd051f05b2b439322d08e768860257a78bb"
+    },
+    {
+      "Path": "src\\world3d\\scenes\\geometryLod.ts",
+      "SHA256": "495602e4fd48f822c69db551ff0abb01c10dc7de5cdce9f8411b299c99b32a59"
+    },
+    {
+      "Path": "src\\world3d\\scenes\\guideViewport.ts",
+      "SHA256": "e3fad97ccc8b984a1ccb923cb587df40b83b7863d57a7132fce055b89f61b423"
+    },
+    {
+      "Path": "src\\world3d\\scenes\\islandCarousel.ts",
+      "SHA256": "720ec4e283931bf8e52959acf4785232271c65dda14505d3e24b2cb0b8072a50"
+    },
+    {
+      "Path": "src\\world3d\\scenes\\mascotController.ts",
+      "SHA256": "7de06ff73ca09f919ab9efb902b50b8744eedd54e2d9df9b771928070e7de07d"
+    },
+    {
+      "Path": "src\\world3d\\scenes\\sceneCatalog.ts",
+      "SHA256": "689b2b0933ecff3486f57c8436f634246a7d3c0df1a2e78d9645b0fb7665ff5a"
+    },
+    {
+      "Path": "src\\world3d\\scenes\\WorldCarouselController.ts",
+      "SHA256": "bbe604f0485b7e29fb5028f7fab0cc13cebf5fc03767e1c906b894138a3ce0d9"
+    },
+    {
+      "Path": "src\\world3d\\scenes\\worldLayout.ts",
+      "SHA256": "7c973d1910e2cc02d6f9da36c34330e3a8d06bd1533a861a2dddbd726f5b497c"
+    },
+    {
+      "Path": "src\\world3d\\WorldCanvas.tsx",
+      "SHA256": "888b8bd006e42a559e2fa64048b09baab0ae3194f61de5b17623e6c8dbff1e58"
+    },
+    {
+      "Path": "tests\\archive\\frame300.legacy.mjs",
+      "SHA256": "ed32c5a118ce7d90050f64eb4abbe72dc02d8fa484457df9a0f54e121c1a00d2"
+    },
+    {
+      "Path": "tests\\archive\\panorama271.legacy.mjs",
+      "SHA256": "2d9f74faf203c51f30a3ec5551cedeac04f89b26c623f3ee84b01a0ee1a5034b"
+    },
+    {
+      "Path": "tests\\archive\\polish26.legacy.mjs",
+      "SHA256": "bc88c7f2f7c66147e1fd992915dcc0af5a76104f23ae44c93a04fc541b7d1da0"
+    },
+    {
+      "Path": "tests\\archive\\portal272.legacy.mjs",
+      "SHA256": "1784921f95b459069fad522a6d3a942d31ed41e5bbced9b642056ef2230db3d8"
+    },
+    {
+      "Path": "tests\\archive\\premium274.legacy.mjs",
+      "SHA256": "1b621525dbcf92b724c44f7b7e923ae803a89b6586e08b6cce3e92ba3e7da2bc"
+    },
+    {
+      "Path": "tests\\archive\\premium280-visual.legacy.mjs",
+      "SHA256": "7b8cf93158851ae94d4ed07acfdca83090e81d17e845b65892acb13e5f896c9d"
+    },
+    {
+      "Path": "tests\\archive\\visual-assets.legacy.mjs",
+      "SHA256": "58cda82fb6e23cf780f726f2a04a0e548431eb5e46ba36c683bef8415c2fafe1"
+    },
+    {
+      "Path": "tests\\archive\\visual275.legacy.mjs",
+      "SHA256": "5762fbd55d9f31f987563a3611530daee4fbae1cd973cf898e1549982ee8a873"
+    },
+    {
+      "Path": "tests\\archive\\visual277.legacy.mjs",
+      "SHA256": "b34ca9b51a39444223954c2755a40568e7231a39c7c13324201a0421a4b93138"
+    },
+    {
+      "Path": "tests\\archive\\world276.legacy.mjs",
+      "SHA256": "92f614b04886879779bbd894273ae38c334e7c35f898916cb22ad49cf54bc4d4"
+    },
+    {
+      "Path": "tests\\asset-catalog.test.mjs",
+      "SHA256": "87d1c6ea19958baaa36d3ff5788b58b42eb8a2fdc3b8e525c69384065f3274ef"
+    },
+    {
+      "Path": "tests\\backup-io.test.mjs",
+      "SHA256": "3aa45f0b1d16c8fba07453971704c096f0e3234dabf1804ebdaf8b65f9c3d4e3"
+    },
+    {
+      "Path": "tests\\check-tsx.mjs",
+      "SHA256": "564b8751b4eff0f62d1b03a0a42015dac54d6780e494828044c9443d77f95b54"
+    },
+    {
+      "Path": "tests\\content-import-v362.test.mjs",
+      "SHA256": "a6c4aa2a1ea3399f28464f897a002cd49fafeaf1ae89a4e5ad5f3c2b1ecb6d31"
+    },
+    {
+      "Path": "tests\\excel-import.test.mjs",
+      "SHA256": "73200827825f3f250b4006608dbae23b9e0e5a2991d40b4bf8e43cdcaf1454d2"
+    },
+    {
+      "Path": "tests\\game-environments.test.mjs",
+      "SHA256": "964897d62a685eda719a1d00dcb2d2d8fce4989db1f910c5e368a91a3321bdcf"
+    },
+    {
+      "Path": "tests\\geometry-lod.test.mjs",
+      "SHA256": "120a3d59e9a8b76e77cb35a7e8700fd7af8229faf986ff446df4fc77f166ea41"
+    },
+    {
+      "Path": "tests\\glb-animation.test.mjs",
+      "SHA256": "183bbaf374c140a427fb5f3183ed8180f5d57fc788d009833bf605c9cd647d89"
+    },
+    {
+      "Path": "tests\\glb-guide-integration.test.mjs",
+      "SHA256": "391e2fc9057b84f646408a238f9ebb1a7058d5de2fa4ed01175527a7dd85af37"
+    },
+    {
+      "Path": "tests\\glb-guide-runtime.test.mjs",
+      "SHA256": "b8d335cdf208da496fbcfcf15a6a61f3157bdb4139a912a777cbe92238b2e435"
+    },
+    {
+      "Path": "tests\\glb-import.test.mjs",
+      "SHA256": "47dd231dd180edb2ab74ae8e9addf05db16040ec296b8a0bf15434c05a734d66"
+    },
+    {
+      "Path": "tests\\guide-viewport.test.mjs",
+      "SHA256": "dfe2f28653d14f1f2fb30c3a5da51b28315d4f907075dc82e894e2796d2cb147"
+    },
+    {
+      "Path": "tests\\island-carousel.test.mjs",
+      "SHA256": "0a48a86b1c5e3ab4c85bf08674d67df98e1bf6b0a8e6f102c0e7c7f3255265b2"
+    },
+    {
+      "Path": "tests\\memory281.test.mjs",
+      "SHA256": "78fba583ac9bdcd33ea75ffdbb1a265d3c419ab782892c8c266b59aaae69a814"
+    },
+    {
+      "Path": "tests\\model-asset-runtime.test.mjs",
+      "SHA256": "551bff135342d1ea5dcecead28170a1b8e10ec22fdfa7cb6b17a9240ed673337"
+    },
+    {
+      "Path": "tests\\model-transport.test.mjs",
+      "SHA256": "968d72c6ad5b5eb9d76d17bb092e1809f5c2ae549d3d054f75da9d18899f6aac"
+    },
+    {
+      "Path": "tests\\premium280.test.mjs",
+      "SHA256": "cda723dce05fa64938492b50d4cee1d4d680384e0e4648b6d00507862d92877b"
+    },
+    {
+      "Path": "tests\\profile.test.mjs",
+      "SHA256": "27bd1e235b19d61d843e0a77cf8496e7fb4bdfcbfd9556b80fb3fa6c2a053735"
+    },
+    {
+      "Path": "tests\\quality-manager.test.mjs",
+      "SHA256": "d6651f8ca90e82fa5127188096a223e1aeb4de2b09f3d2a44ee060fc14393722"
+    },
+    {
+      "Path": "tests\\real3d31.test.mjs",
+      "SHA256": "61861253ba081985b54750757dd8d521de0cf56674aafb54640e7c7b6516ce79"
+    },
+    {
+      "Path": "tests\\real3d32.test.mjs",
+      "SHA256": "f4c0c6d0b2b554be407fb2d5fa29bcec796efae64c8edb22799b339a326bd818"
+    },
+    {
+      "Path": "tests\\release-3d-assets.mjs",
+      "SHA256": "e82a1ac74987075d0e92c153dd38673443ce57334246dc5a9bb7ec96452cfb1a"
+    },
+    {
+      "Path": "tests\\renderer-contract.test.mjs",
+      "SHA256": "37b8e10ed8bb2ce3b357210b9fb08e22781766b9d5088a7bfad1afded6edce51"
+    },
+    {
+      "Path": "tests\\reports.test.mjs",
+      "SHA256": "c5a0d5cdb17de74aa750f7bfb41a16d00ffd595f86447354cbe5a7a50ad3f570"
+    },
+    {
+      "Path": "tests\\sdk.test.mjs",
+      "SHA256": "26ee6d0132b7a0319ddcfc7c9e6d4d545f364802ca7bab3389973e857a300c27"
+    },
+    {
+      "Path": "tests\\seed.test.mjs",
+      "SHA256": "32080b81fbe1752dceedaf4c674c7be321a47b96fef68408c48b03a193ff2ad4"
+    },
+    {
+      "Path": "tests\\sequence-trail.test.mjs",
+      "SHA256": "7e01dfaf0d6d15124ef49efdcb75cb3ec78162c35aeb3b0c568f298efe3136dd"
+    },
+    {
+      "Path": "tests\\shadow-updates.test.mjs",
+      "SHA256": "0bb1a9a54d617a59d1c7923b12214ea7730b5e5c353ba2ef44a3318e237f48fc"
+    },
+    {
+      "Path": "tests\\spaced-repetition.test.mjs",
+      "SHA256": "58e99298913109011d58d8089081d0f65000ac463bd5cc3519b3283f16c11ede"
+    },
+    {
+      "Path": "tests\\speech.test.mjs",
+      "SHA256": "6616c7a75ca49578527394ff5634e7f780035b1f166ab5163c242045365c9fc6"
+    },
+    {
+      "Path": "tests\\stability27.test.mjs",
+      "SHA256": "8bdfc72d24c90919c4439daa4df368d9cc869c12186395658bdbdc6fc11ed5a7"
+    },
+    {
+      "Path": "tests\\validation.test.mjs",
+      "SHA256": "a0190a3b57cf097dd7572359849740b6e4c29b4423a0c39a30af664dd2f2d8c1"
+    },
+    {
+      "Path": "tests\\visual\\art-world.spec.ts",
+      "SHA256": "4c7e39e4326af7016972b3aaa3b3978f752188ce753dc0157002f5eddfd36c50"
+    },
+    {
+      "Path": "tests\\visual\\backup-profile.spec.ts",
+      "SHA256": "e55e8a045801d3dca993aef93669f6acc9dced7dc9acf36b13457a4dfd5a3cc6"
+    },
+    {
+      "Path": "tests\\visual\\design-match290.spec.ts",
+      "SHA256": "d506e2abb7e9606ea5da8e00ba1fd8ee1999923e0b966e57aae4cdbeea2dc91a"
+    },
+    {
+      "Path": "tests\\visual\\game-scene.spec.ts",
+      "SHA256": "8e4f7e9ebe1cb8fda361e2613e8fc4dde6ab86c04f1624f8bc60a72311ea25bf"
+    },
+    {
+      "Path": "tests\\visual\\gameplay-regression.spec.ts",
+      "SHA256": "ff8bbb3b524174edbb30bc69dcb494b7624ce5cc6ce7420d681825bb1dcd042d"
+    },
+    {
+      "Path": "tests\\visual\\island-carousel.spec.ts",
+      "SHA256": "86363427af4c649f5fc1c147b14c24fffee2886b57cf7085daa53e54a80f9e69"
+    },
+    {
+      "Path": "tests\\visual\\mobile-ui-lock.spec.ts",
+      "SHA256": "121d1aa6442a602b08a7ecbce8081c4c90349a04bd9274a9a9170ca971149593"
+    },
+    {
+      "Path": "tests\\visual\\performance-world.spec.ts",
+      "SHA256": "1cae3f68060d6b2aa21ef628ffb8f5f49d1fc7e1461578d2528ea2e597021468"
+    },
+    {
+      "Path": "tests\\visual\\premium-world.spec.ts",
+      "SHA256": "08465cfb9c2e688388c1655625b0eb0bf104a06006c8d47737b8959e3d6df8c2"
+    },
+    {
+      "Path": "tests\\visual\\premium280.spec.ts",
+      "SHA256": "d1db7079786dd32c506ef58ee2811d433b9b06f1b66331183e6ee8404cde014a"
+    },
+    {
+      "Path": "tests\\visual\\real3d31.spec.ts",
+      "SHA256": "9ec175b082711a0c57d524ed310d5d0bbc09baf6816f738871cbc2f079bdc8ab"
+    },
+    {
+      "Path": "tests\\visual\\stability-alpha27.spec.ts",
+      "SHA256": "afc8e44034bbc3f2700158cea3748958f71a6027941ff3c7e62310f5f0063142"
+    },
+    {
+      "Path": "tests\\visual\\visual-alpha26.spec.ts",
+      "SHA256": "23fdda8e66a0fc7b97322baf33b3ea751e89ed9fb7bff5e31510d9ea837fabac"
+    },
+    {
+      "Path": "tests\\visual\\visual277.spec.ts",
+      "SHA256": "fe06ec1452d8af0d620752bd9d6caab6153a69b8454134fd456b523bcb589d96"
+    },
+    {
+      "Path": "tests\\word-connect.test.mjs",
+      "SHA256": "79aea689ad59cd44a9e9344ab3741a1798bc3fc3bb843f53f5661b041567a742"
+    },
+    {
+      "Path": "tests\\world-carousel-controller.test.mjs",
+      "SHA256": "afb0d10d429d118e0cf6c8c8420d9125fa50f304c9020182fd17a7464b77a519"
+    },
+    {
+      "Path": "tools\\audit_v37_game_logic.mjs",
+      "SHA256": "f5d1b9d79f889b454bc712fdf7de98c0ef814c0c870e2ee66201eb41b752c8b3"
+    },
+    {
+      "Path": "tools\\capture_v37_art.mjs",
+      "SHA256": "be7360c1fe41c361e744bb8dc7ab177bdb6af09b173bf2d1095b5370d0f8655c"
+    },
+    {
+      "Path": "tools\\capture_v37_backup.mjs",
+      "SHA256": "863ff799ea1fbdd50253140dc01e60d65cce474fb019196344479cb665f7b0e3"
+    },
+    {
+      "Path": "tools\\capture_v37_carousel.mjs",
+      "SHA256": "21a7b95c74b89459e1911c542e8b00b82c90f763392a7a1cfb61433e6dc51a4c"
+    },
+    {
+      "Path": "tools\\capture_v37_depth.mjs",
+      "SHA256": "515b8d9001d1958d4649d6c3a04b0c5967774b8d31243aa7774841ef0e7eff44"
+    },
+    {
+      "Path": "tools\\capture_v37_games.mjs",
+      "SHA256": "9dd84fc531b015be9e0d3fa500f5959da7c16c3d4374211fb0dc8596653018b1"
+    },
+    {
+      "Path": "tools\\capture_v37.mjs",
+      "SHA256": "1fd107e457da711531d0b66db4c2129f8b77079fbc0a7828cae49a264da3a1ca"
+    },
+    {
+      "Path": "tools\\check_offline_v37.mjs",
+      "SHA256": "88942e6e3840383b4aed8e04a53f9f606ce964dc823df114b9027e072859bfcf"
+    },
+    {
+      "Path": "tools\\generate_v37_environment_asset.mjs",
+      "SHA256": "d48090391086fdce1be9a1c20009e7d5e7ec03f82712536ea631ef5bfadff83a"
+    },
+    {
+      "Path": "tools\\generate_v37_language_asset.mjs",
+      "SHA256": "c1dc8339ed53b4b9c68f237888dbd5885da50a6adcc16379e08fd1b1210321b6"
+    },
+    {
+      "Path": "tools\\generate_v37_memory_asset.mjs",
+      "SHA256": "063899b19fac6e0d0650e1f74b15d2f3c74462d943cf9e73cba67761fe1a786b"
+    },
+    {
+      "Path": "tools\\generate_v37_slice_assets.mjs",
+      "SHA256": "a4529b30e2072f54ce2699a662c9312b282325027fd457e4d1eec1db90514c3e"
+    },
+    {
+      "Path": "tools\\modelTransport.d.ts",
+      "SHA256": "99d31dc4547a2464bbaf22f444d50fec168a0ec48fcdf347575db715c8c30287"
+    },
+    {
+      "Path": "tools\\modelTransport.mjs",
+      "SHA256": "3607e652d74a3d0f021668250fc9d087db9c452298b59dd390751285bf03eea9"
+    },
+    {
+      "Path": "tools\\profile_v37_performance.mjs",
+      "SHA256": "4392429c0a2555e2bc3ed01e63bc4340376a80db7d5b1055898d258e4c3102c1"
+    },
+    {
+      "Path": "tsconfig.json",
+      "SHA256": "9a47bda9689aadb061373fd8a6b346145ce7019763ad86e58223496fa55c6298"
+    },
+    {
+      "Path": "vite.config.ts",
+      "SHA256": "742a25c212dfc7dea8a4f6b0ea5a13d0ff7e0f54c3e60b6a86497648eabda0d8"
+    }
+  ]
+}

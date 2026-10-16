@@ -1,0 +1,92 @@
+
+> bao-an-learning-v3-6-3d@3.7.0-rc.1 test:guide-animation
+> node --experimental-strip-types --test tests/glb-animation.test.mjs tests/glb-import.test.mjs tests/glb-guide-integration.test.mjs tests/glb-guide-runtime.test.mjs
+
+TAP version 13
+# Subtest: GLB upload marks only character vertices as the guide animation group
+ok 1 - GLB upload marks only character vertices as the guide animation group
+  ---
+  duration_ms: 173.9792
+  type: 'test'
+  ...
+# Subtest: World selection animates only while enabled and respects reduced-motion
+ok 2 - World selection animates only while enabled and respects reduced-motion
+  ---
+  duration_ms: 33.4848
+  type: 'test'
+  ...
+# Subtest: Re-selecting the same world does not restart celebration repeatedly
+ok 3 - Re-selecting the same world does not restart celebration repeatedly
+  ---
+  duration_ms: 23.3749
+  type: 'test'
+  ...
+# Subtest: Real GLB file is self-contained, reasonably sized and parses to expected layout
+ok 4 - Real GLB file is self-contained, reasonably sized and parses to expected layout
+  ---
+  duration_ms: 2.1744
+  type: 'test'
+  ...
+# Subtest: 3D fox actually has three dimensions, geometry not a screenshot
+ok 5 - 3D fox actually has three dimensions, geometry not a screenshot
+  ---
+  duration_ms: 5.4411
+  type: 'test'
+  ...
+# Subtest: GLB contains colored materials distinct from the original procedural fox
+ok 6 - GLB contains colored materials distinct from the original procedural fox
+  ---
+  duration_ms: 27.8661
+  type: 'test'
+  ...
+# Subtest: Runtime swaps only after successful import, updates WebGL buffer and preserves fallback
+ok 7 - Runtime swaps only after successful import, updates WebGL buffer and preserves fallback
+  ---
+  duration_ms: 4.0927
+  type: 'test'
+  ...
+# Subtest: WebGL runtime really uploads prototype fox GLB after base scene and updates model state
+ok 8 - WebGL runtime really uploads prototype fox GLB after base scene and updates model state
+  ---
+  duration_ms: 142.3377
+  type: 'test'
+  ...
+# Subtest: Missing model leaves procedural character available without throwing
+ok 9 - Missing model leaves procedural character available without throwing
+  ---
+  duration_ms: 25.377
+  type: 'test'
+  ...
+# Subtest: If renderer is disposed while a model is downloading, no stale buffer is uploaded
+ok 10 - If renderer is disposed while a model is downloading, no stale buffer is uploaded
+  ---
+  duration_ms: 52.444
+  type: 'test'
+  ...
+# Subtest: GLB: nhập một tam giác có dịch chuyển node
+ok 11 - GLB: nhập một tam giác có dịch chuyển node
+  ---
+  duration_ms: 3.8006
+  type: 'test'
+  ...
+# Subtest: GLB: từ chối file hỏng, extension chưa hỗ trợ và node lặp
+ok 12 - GLB: từ chối file hỏng, extension chưa hỗ trợ và node lặp
+  ---
+  duration_ms: 1.4018
+  type: 'test'
+  ...
+# Subtest: GLB: đọc màu từ material và từ chối primitive sai mode
+ok 13 - GLB: đọc màu từ material và từ chối primitive sai mode
+  ---
+  duration_ms: 0.8958
+  type: 'test'
+  ...
+1..13
+# tests 13
+# suites 0
+# pass 13
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 457.1551

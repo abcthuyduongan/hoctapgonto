@@ -1,0 +1,845 @@
+{
+  "backupWithProfile": "Phiên học 1: có trường không được hỗ trợ.",
+  "backupNewModule": "Phiên học 1: game chưa được hỗ trợ.",
+  "reviewCollision": {
+    "first": {
+      "cardId": "learner:shared-item",
+      "profileId": "learner",
+      "itemId": "shared-item",
+      "packId": "pack-a",
+      "repetitions": 1,
+      "intervalDays": 1,
+      "easeFactor": 2.6,
+      "lastQuality": 5,
+      "lastReviewedAt": "2026-10-14T12:00:00.000Z",
+      "nextReviewDate": "2026-10-15"
+    },
+    "second": {
+      "cardId": "learner:shared-item",
+      "profileId": "learner",
+      "itemId": "shared-item",
+      "packId": "pack-b",
+      "repetitions": 2,
+      "intervalDays": 6,
+      "easeFactor": 2.7,
+      "lastQuality": 5,
+      "lastReviewedAt": "2026-10-14T12:00:00.000Z",
+      "nextReviewDate": "2026-10-20"
+    },
+    "sameCardId": true
+  },
+  "invalidExcelAnswer": {
+    "kind": "quiz",
+    "count": 2,
+    "quizzes": [
+      {
+        "key": "013cc887-c67c-44e9-8bea-c30575a3044a",
+        "prompt": "2 + 2 = ?",
+        "options": [
+          "3",
+          "4",
+          "5",
+          "6"
+        ],
+        "correctIndex": 0,
+        "explanation": "2 + 2 = 4"
+      },
+      {
+        "key": "3735b724-d2f9-45f0-8cf0-16998db4f3c1",
+        "prompt": "3 + 3 = ?",
+        "options": [
+          "5",
+          "6",
+          "7",
+          "8"
+        ],
+        "correctIndex": 0,
+        "explanation": "3 + 3 = 6"
+      }
+    ],
+    "warnings": []
+  },
+  "swStaleNavigation": {
+    "networkHTML": "NEW HTML",
+    "offlineHTML": "OLD HTML"
+  },
+  "initialHome": {
+    "playButtons": 0,
+    "canvasTabIndex": null
+  },
+  "realAttempt": {
+    "events": [
+      {
+        "eventId": "c73b558a-62d8-401b-b7f8-78d11705301c:math-1",
+        "sessionId": "c73b558a-62d8-401b-b7f8-78d11705301c",
+        "profileId": "default-learner",
+        "packId": "math3-adventure",
+        "contentVersion": 1,
+        "moduleId": "math-quest",
+        "moduleVersion": "0.2.7",
+        "occurredAt": "2026-10-14T12:47:47.887Z",
+        "itemId": "math-1",
+        "objectiveId": "MATH3.NUMBER",
+        "correct": true,
+        "hintsUsed": 0,
+        "elapsedMs": 63
+      }
+    ],
+    "packs": [],
+    "profiles": [
+      {
+        "profileId": "default-learner",
+        "name": "Bé Học Giỏi",
+        "avatar": "fox",
+        "grade": 3,
+        "colorTheme": "teal",
+        "createdAt": "2026-10-14T12:47:45.762Z",
+        "updatedAt": "2026-10-14T12:47:45.762Z"
+      }
+    ],
+    "reviews": [
+      {
+        "cardId": "default-learner:math-1",
+        "profileId": "default-learner",
+        "itemId": "math-1",
+        "packId": "math3-adventure",
+        "repetitions": 1,
+        "intervalDays": 1,
+        "easeFactor": 2.6,
+        "lastQuality": 5,
+        "lastReviewedAt": "2026-10-14T12:47:47.900Z",
+        "nextReviewDate": "2026-10-15"
+      }
+    ],
+    "sessions": [
+      {
+        "sessionId": "c73b558a-62d8-401b-b7f8-78d11705301c",
+        "profileId": "default-learner",
+        "packId": "math3-adventure",
+        "contentVersion": 1,
+        "moduleId": "math-quest",
+        "moduleVersion": "0.2.7",
+        "startedAt": "2026-10-14T12:47:47.472Z",
+        "status": "active"
+      }
+    ]
+  },
+  "exitHitTest": {
+    "buttonRect": {
+      "x": 1254.734375,
+      "y": 12.5,
+      "width": 143.265625,
+      "height": 44,
+      "top": 12.5,
+      "right": 1398,
+      "bottom": 56.5,
+      "left": 1254.734375
+    },
+    "hitTag": "BUTTON",
+    "hitClass": "control-pill",
+    "hitText": "✨Hiệu ứng",
+    "headerZ": "100",
+    "overlayZ": "95"
+  },
+  "exitPointerClick": "blocked by site header; used keyboard Enter to continue the audit",
+  "backupUIError": "Phiên học 1: có trường không được hỗ trợ.",
+  "otherTabAbandonsLive": [
+    {
+      "sessionId": "bdc5b4d2-54cb-43b0-bdf6-d27f9f9ea320",
+      "profileId": "default-learner",
+      "packId": "math3-adventure",
+      "contentVersion": 1,
+      "moduleId": "math-quest",
+      "moduleVersion": "0.2.7",
+      "startedAt": "2026-10-14T12:47:50.836Z",
+      "status": "abandoned",
+      "endedAt": "2026-10-14T12:47:50.996Z"
+    },
+    {
+      "sessionId": "c73b558a-62d8-401b-b7f8-78d11705301c",
+      "profileId": "default-learner",
+      "packId": "math3-adventure",
+      "contentVersion": 1,
+      "moduleId": "math-quest",
+      "moduleVersion": "0.2.7",
+      "startedAt": "2026-10-14T12:47:47.472Z",
+      "status": "abandoned",
+      "endedAt": "2026-10-14T12:47:49.349Z"
+    }
+  ],
+  "otherTabAttemptError": "Không lưu được câu trả lời. Thử giải phóng bộ nhớ hoặc mở lại ứng dụng. Đóng",
+  "unavailableRenderer": {
+    "state": "unavailable",
+    "playButtons": 0,
+    "message": "Cảnh 3D không khả dụng. Chọn trò chơi bằng các nút Bắt đầu."
+  },
+  "gameWalkthroughs": [
+    {
+      "moduleId": "math-quest",
+      "session": {
+        "sessionId": "06b8f182-ccd4-4c71-8f5b-1e8696fca4db",
+        "profileId": "default-learner",
+        "packId": "math3-adventure",
+        "contentVersion": 1,
+        "moduleId": "math-quest",
+        "moduleVersion": "0.2.7",
+        "startedAt": "2026-10-14T12:47:53.271Z",
+        "status": "completed",
+        "endedAt": "2026-10-14T12:47:54.265Z"
+      },
+      "events": [
+        {
+          "eventId": "06b8f182-ccd4-4c71-8f5b-1e8696fca4db:math-1",
+          "sessionId": "06b8f182-ccd4-4c71-8f5b-1e8696fca4db",
+          "profileId": "default-learner",
+          "packId": "math3-adventure",
+          "contentVersion": 1,
+          "moduleId": "math-quest",
+          "moduleVersion": "0.2.7",
+          "occurredAt": "2026-10-14T12:47:53.470Z",
+          "itemId": "math-1",
+          "objectiveId": "MATH3.NUMBER",
+          "correct": true,
+          "hintsUsed": 0,
+          "elapsedMs": 69
+        },
+        {
+          "eventId": "06b8f182-ccd4-4c71-8f5b-1e8696fca4db:math-2",
+          "sessionId": "06b8f182-ccd4-4c71-8f5b-1e8696fca4db",
+          "profileId": "default-learner",
+          "packId": "math3-adventure",
+          "contentVersion": 1,
+          "moduleId": "math-quest",
+          "moduleVersion": "0.2.7",
+          "occurredAt": "2026-10-14T12:47:53.570Z",
+          "itemId": "math-2",
+          "objectiveId": "MATH3.NUMBER",
+          "correct": true,
+          "hintsUsed": 0,
+          "elapsedMs": 31
+        },
+        {
+          "eventId": "06b8f182-ccd4-4c71-8f5b-1e8696fca4db:math-3",
+          "sessionId": "06b8f182-ccd4-4c71-8f5b-1e8696fca4db",
+          "profileId": "default-learner",
+          "packId": "math3-adventure",
+          "contentVersion": 1,
+          "moduleId": "math-quest",
+          "moduleVersion": "0.2.7",
+          "occurredAt": "2026-10-14T12:47:53.669Z",
+          "itemId": "math-3",
+          "objectiveId": "MATH3.NUMBER",
+          "correct": true,
+          "hintsUsed": 0,
+          "elapsedMs": 31
+        },
+        {
+          "eventId": "06b8f182-ccd4-4c71-8f5b-1e8696fca4db:math-4",
+          "sessionId": "06b8f182-ccd4-4c71-8f5b-1e8696fca4db",
+          "profileId": "default-learner",
+          "packId": "math3-adventure",
+          "contentVersion": 1,
+          "moduleId": "math-quest",
+          "moduleVersion": "0.2.7",
+          "occurredAt": "2026-10-14T12:47:53.785Z",
+          "itemId": "math-4",
+          "objectiveId": "MATH3.NUMBER",
+          "correct": true,
+          "hintsUsed": 0,
+          "elapsedMs": 46
+        },
+        {
+          "eventId": "06b8f182-ccd4-4c71-8f5b-1e8696fca4db:math-5",
+          "sessionId": "06b8f182-ccd4-4c71-8f5b-1e8696fca4db",
+          "profileId": "default-learner",
+          "packId": "math3-adventure",
+          "contentVersion": 1,
+          "moduleId": "math-quest",
+          "moduleVersion": "0.2.7",
+          "occurredAt": "2026-10-14T12:47:53.886Z",
+          "itemId": "math-5",
+          "objectiveId": "MATH3.NUMBER",
+          "correct": true,
+          "hintsUsed": 0,
+          "elapsedMs": 31
+        },
+        {
+          "eventId": "06b8f182-ccd4-4c71-8f5b-1e8696fca4db:math-6",
+          "sessionId": "06b8f182-ccd4-4c71-8f5b-1e8696fca4db",
+          "profileId": "default-learner",
+          "packId": "math3-adventure",
+          "contentVersion": 1,
+          "moduleId": "math-quest",
+          "moduleVersion": "0.2.7",
+          "occurredAt": "2026-10-14T12:47:53.986Z",
+          "itemId": "math-6",
+          "objectiveId": "MATH3.NUMBER",
+          "correct": true,
+          "hintsUsed": 0,
+          "elapsedMs": 33
+        },
+        {
+          "eventId": "06b8f182-ccd4-4c71-8f5b-1e8696fca4db:math-7",
+          "sessionId": "06b8f182-ccd4-4c71-8f5b-1e8696fca4db",
+          "profileId": "default-learner",
+          "packId": "math3-adventure",
+          "contentVersion": 1,
+          "moduleId": "math-quest",
+          "moduleVersion": "0.2.7",
+          "occurredAt": "2026-10-14T12:47:54.085Z",
+          "itemId": "math-7",
+          "objectiveId": "MATH3.NUMBER",
+          "correct": true,
+          "hintsUsed": 0,
+          "elapsedMs": 32
+        },
+        {
+          "eventId": "06b8f182-ccd4-4c71-8f5b-1e8696fca4db:math-8",
+          "sessionId": "06b8f182-ccd4-4c71-8f5b-1e8696fca4db",
+          "profileId": "default-learner",
+          "packId": "math3-adventure",
+          "contentVersion": 1,
+          "moduleId": "math-quest",
+          "moduleVersion": "0.2.7",
+          "occurredAt": "2026-10-14T12:47:54.186Z",
+          "itemId": "math-8",
+          "objectiveId": "MATH3.NUMBER",
+          "correct": true,
+          "hintsUsed": 0,
+          "elapsedMs": 32
+        }
+      ],
+      "activeCanvases": 1
+    },
+    {
+      "moduleId": "memory-match",
+      "session": {
+        "sessionId": "6009b6e9-1322-4eea-8a62-5ec1f7e0bd1f",
+        "profileId": "default-learner",
+        "packId": "english3-family",
+        "contentVersion": 1,
+        "moduleId": "memory-match",
+        "moduleVersion": "0.2.7",
+        "startedAt": "2026-10-14T12:47:55.504Z",
+        "status": "completed",
+        "endedAt": "2026-10-14T12:47:56.019Z"
+      },
+      "events": [
+        {
+          "eventId": "6009b6e9-1322-4eea-8a62-5ec1f7e0bd1f:move-1",
+          "sessionId": "6009b6e9-1322-4eea-8a62-5ec1f7e0bd1f",
+          "profileId": "default-learner",
+          "packId": "english3-family",
+          "contentVersion": 1,
+          "moduleId": "memory-match",
+          "moduleVersion": "0.2.7",
+          "occurredAt": "2026-10-14T12:47:55.620Z",
+          "itemId": "en-1",
+          "objectiveId": "ENG3.FAMILY",
+          "correct": true,
+          "hintsUsed": 0,
+          "elapsedMs": 93
+        },
+        {
+          "eventId": "6009b6e9-1322-4eea-8a62-5ec1f7e0bd1f:move-2",
+          "sessionId": "6009b6e9-1322-4eea-8a62-5ec1f7e0bd1f",
+          "profileId": "default-learner",
+          "packId": "english3-family",
+          "contentVersion": 1,
+          "moduleId": "memory-match",
+          "moduleVersion": "0.2.7",
+          "occurredAt": "2026-10-14T12:47:55.687Z",
+          "itemId": "en-2",
+          "objectiveId": "ENG3.FAMILY",
+          "correct": true,
+          "hintsUsed": 0,
+          "elapsedMs": 160
+        },
+        {
+          "eventId": "6009b6e9-1322-4eea-8a62-5ec1f7e0bd1f:move-3",
+          "sessionId": "6009b6e9-1322-4eea-8a62-5ec1f7e0bd1f",
+          "profileId": "default-learner",
+          "packId": "english3-family",
+          "contentVersion": 1,
+          "moduleId": "memory-match",
+          "moduleVersion": "0.2.7",
+          "occurredAt": "2026-10-14T12:47:55.786Z",
+          "itemId": "en-3",
+          "objectiveId": "ENG3.FAMILY",
+          "correct": true,
+          "hintsUsed": 0,
+          "elapsedMs": 260
+        },
+        {
+          "eventId": "6009b6e9-1322-4eea-8a62-5ec1f7e0bd1f:move-4",
+          "sessionId": "6009b6e9-1322-4eea-8a62-5ec1f7e0bd1f",
+          "profileId": "default-learner",
+          "packId": "english3-family",
+          "contentVersion": 1,
+          "moduleId": "memory-match",
+          "moduleVersion": "0.2.7",
+          "occurredAt": "2026-10-14T12:47:55.853Z",
+          "itemId": "en-4",
+          "objectiveId": "ENG3.FAMILY",
+          "correct": true,
+          "hintsUsed": 0,
+          "elapsedMs": 326
+        },
+        {
+          "eventId": "6009b6e9-1322-4eea-8a62-5ec1f7e0bd1f:move-5",
+          "sessionId": "6009b6e9-1322-4eea-8a62-5ec1f7e0bd1f",
+          "profileId": "default-learner",
+          "packId": "english3-family",
+          "contentVersion": 1,
+          "moduleId": "memory-match",
+          "moduleVersion": "0.2.7",
+          "occurredAt": "2026-10-14T12:47:55.922Z",
+          "itemId": "en-5",
+          "objectiveId": "ENG3.FAMILY",
+          "correct": true,
+          "hintsUsed": 0,
+          "elapsedMs": 395
+        },
+        {
+          "eventId": "6009b6e9-1322-4eea-8a62-5ec1f7e0bd1f:move-6",
+          "sessionId": "6009b6e9-1322-4eea-8a62-5ec1f7e0bd1f",
+          "profileId": "default-learner",
+          "packId": "english3-family",
+          "contentVersion": 1,
+          "moduleId": "memory-match",
+          "moduleVersion": "0.2.7",
+          "occurredAt": "2026-10-14T12:47:56.003Z",
+          "itemId": "en-6",
+          "objectiveId": "ENG3.FAMILY",
+          "correct": true,
+          "hintsUsed": 0,
+          "elapsedMs": 476
+        }
+      ],
+      "activeCanvases": 1
+    },
+    {
+      "moduleId": "sentence-builder",
+      "session": {
+        "sessionId": "c3b07634-ba3d-4380-9363-d2d60a9eac64",
+        "profileId": "default-learner",
+        "packId": "english3-sentences",
+        "contentVersion": 1,
+        "moduleId": "sentence-builder",
+        "moduleVersion": "0.2.7",
+        "startedAt": "2026-10-14T12:47:58.036Z",
+        "status": "completed",
+        "endedAt": "2026-10-14T12:47:59.566Z"
+      },
+      "events": [
+        {
+          "eventId": "c3b07634-ba3d-4380-9363-d2d60a9eac64:sen-1:try:1",
+          "sessionId": "c3b07634-ba3d-4380-9363-d2d60a9eac64",
+          "profileId": "default-learner",
+          "packId": "english3-sentences",
+          "contentVersion": 1,
+          "moduleId": "sentence-builder",
+          "moduleVersion": "0.2.7",
+          "occurredAt": "2026-10-14T12:47:58.288Z",
+          "itemId": "sen-1",
+          "objectiveId": "ENG3.SENTENCES",
+          "correct": true,
+          "hintsUsed": 0,
+          "elapsedMs": 227
+        },
+        {
+          "eventId": "c3b07634-ba3d-4380-9363-d2d60a9eac64:sen-2:try:1",
+          "sessionId": "c3b07634-ba3d-4380-9363-d2d60a9eac64",
+          "profileId": "default-learner",
+          "packId": "english3-sentences",
+          "contentVersion": 1,
+          "moduleId": "sentence-builder",
+          "moduleVersion": "0.2.7",
+          "occurredAt": "2026-10-14T12:47:58.520Z",
+          "itemId": "sen-2",
+          "objectiveId": "ENG3.SENTENCES",
+          "correct": true,
+          "hintsUsed": 0,
+          "elapsedMs": 167
+        },
+        {
+          "eventId": "c3b07634-ba3d-4380-9363-d2d60a9eac64:sen-3:try:1",
+          "sessionId": "c3b07634-ba3d-4380-9363-d2d60a9eac64",
+          "profileId": "default-learner",
+          "packId": "english3-sentences",
+          "contentVersion": 1,
+          "moduleId": "sentence-builder",
+          "moduleVersion": "0.2.7",
+          "occurredAt": "2026-10-14T12:47:58.752Z",
+          "itemId": "sen-3",
+          "objectiveId": "ENG3.SENTENCES",
+          "correct": true,
+          "hintsUsed": 0,
+          "elapsedMs": 167
+        },
+        {
+          "eventId": "c3b07634-ba3d-4380-9363-d2d60a9eac64:sen-4:try:1",
+          "sessionId": "c3b07634-ba3d-4380-9363-d2d60a9eac64",
+          "profileId": "default-learner",
+          "packId": "english3-sentences",
+          "contentVersion": 1,
+          "moduleId": "sentence-builder",
+          "moduleVersion": "0.2.7",
+          "occurredAt": "2026-10-14T12:47:58.986Z",
+          "itemId": "sen-4",
+          "objectiveId": "ENG3.SENTENCES",
+          "correct": true,
+          "hintsUsed": 0,
+          "elapsedMs": 167
+        },
+        {
+          "eventId": "c3b07634-ba3d-4380-9363-d2d60a9eac64:sen-5:try:1",
+          "sessionId": "c3b07634-ba3d-4380-9363-d2d60a9eac64",
+          "profileId": "default-learner",
+          "packId": "english3-sentences",
+          "contentVersion": 1,
+          "moduleId": "sentence-builder",
+          "moduleVersion": "0.2.7",
+          "occurredAt": "2026-10-14T12:47:59.220Z",
+          "itemId": "sen-5",
+          "objectiveId": "ENG3.SENTENCES",
+          "correct": true,
+          "hintsUsed": 0,
+          "elapsedMs": 168
+        },
+        {
+          "eventId": "c3b07634-ba3d-4380-9363-d2d60a9eac64:sen-6:try:1",
+          "sessionId": "c3b07634-ba3d-4380-9363-d2d60a9eac64",
+          "profileId": "default-learner",
+          "packId": "english3-sentences",
+          "contentVersion": 1,
+          "moduleId": "sentence-builder",
+          "moduleVersion": "0.2.7",
+          "occurredAt": "2026-10-14T12:47:59.487Z",
+          "itemId": "sen-6",
+          "objectiveId": "ENG3.SENTENCES",
+          "correct": true,
+          "hintsUsed": 0,
+          "elapsedMs": 184
+        }
+      ],
+      "activeCanvases": 1
+    },
+    {
+      "moduleId": "word-connect",
+      "session": {
+        "sessionId": "a1fd751a-7a42-4a72-a283-ad419425899d",
+        "profileId": "default-learner",
+        "packId": "english3-family",
+        "contentVersion": 1,
+        "moduleId": "word-connect",
+        "moduleVersion": "0.2.7",
+        "startedAt": "2026-10-14T12:48:01.569Z",
+        "status": "completed",
+        "endedAt": "2026-10-14T12:48:03.785Z"
+      },
+      "events": [
+        {
+          "eventId": "a1fd751a-7a42-4a72-a283-ad419425899d:connect-1",
+          "sessionId": "a1fd751a-7a42-4a72-a283-ad419425899d",
+          "profileId": "default-learner",
+          "packId": "english3-family",
+          "contentVersion": 1,
+          "moduleId": "word-connect",
+          "moduleVersion": "0.2.7",
+          "occurredAt": "2026-10-14T12:48:01.687Z",
+          "itemId": "en-1",
+          "objectiveId": "ENG3.FAMILY",
+          "correct": false,
+          "hintsUsed": 0,
+          "elapsedMs": 94
+        },
+        {
+          "eventId": "a1fd751a-7a42-4a72-a283-ad419425899d:connect-2",
+          "sessionId": "a1fd751a-7a42-4a72-a283-ad419425899d",
+          "profileId": "default-learner",
+          "packId": "english3-family",
+          "contentVersion": 1,
+          "moduleId": "word-connect",
+          "moduleVersion": "0.2.7",
+          "occurredAt": "2026-10-14T12:48:03.203Z",
+          "itemId": "en-1",
+          "objectiveId": "ENG3.FAMILY",
+          "correct": true,
+          "hintsUsed": 0,
+          "elapsedMs": 1609
+        },
+        {
+          "eventId": "a1fd751a-7a42-4a72-a283-ad419425899d:connect-3",
+          "sessionId": "a1fd751a-7a42-4a72-a283-ad419425899d",
+          "profileId": "default-learner",
+          "packId": "english3-family",
+          "contentVersion": 1,
+          "moduleId": "word-connect",
+          "moduleVersion": "0.2.7",
+          "occurredAt": "2026-10-14T12:48:03.503Z",
+          "itemId": "en-2",
+          "objectiveId": "ENG3.FAMILY",
+          "correct": true,
+          "hintsUsed": 0,
+          "elapsedMs": 1909
+        },
+        {
+          "eventId": "a1fd751a-7a42-4a72-a283-ad419425899d:connect-4",
+          "sessionId": "a1fd751a-7a42-4a72-a283-ad419425899d",
+          "profileId": "default-learner",
+          "packId": "english3-family",
+          "contentVersion": 1,
+          "moduleId": "word-connect",
+          "moduleVersion": "0.2.7",
+          "occurredAt": "2026-10-14T12:48:03.570Z",
+          "itemId": "en-3",
+          "objectiveId": "ENG3.FAMILY",
+          "correct": true,
+          "hintsUsed": 0,
+          "elapsedMs": 1976
+        },
+        {
+          "eventId": "a1fd751a-7a42-4a72-a283-ad419425899d:connect-5",
+          "sessionId": "a1fd751a-7a42-4a72-a283-ad419425899d",
+          "profileId": "default-learner",
+          "packId": "english3-family",
+          "contentVersion": 1,
+          "moduleId": "word-connect",
+          "moduleVersion": "0.2.7",
+          "occurredAt": "2026-10-14T12:48:03.636Z",
+          "itemId": "en-4",
+          "objectiveId": "ENG3.FAMILY",
+          "correct": true,
+          "hintsUsed": 0,
+          "elapsedMs": 2042
+        },
+        {
+          "eventId": "a1fd751a-7a42-4a72-a283-ad419425899d:connect-6",
+          "sessionId": "a1fd751a-7a42-4a72-a283-ad419425899d",
+          "profileId": "default-learner",
+          "packId": "english3-family",
+          "contentVersion": 1,
+          "moduleId": "word-connect",
+          "moduleVersion": "0.2.7",
+          "occurredAt": "2026-10-14T12:48:03.703Z",
+          "itemId": "en-5",
+          "objectiveId": "ENG3.FAMILY",
+          "correct": true,
+          "hintsUsed": 0,
+          "elapsedMs": 2109
+        },
+        {
+          "eventId": "a1fd751a-7a42-4a72-a283-ad419425899d:connect-7",
+          "sessionId": "a1fd751a-7a42-4a72-a283-ad419425899d",
+          "profileId": "default-learner",
+          "packId": "english3-family",
+          "contentVersion": 1,
+          "moduleId": "word-connect",
+          "moduleVersion": "0.2.7",
+          "occurredAt": "2026-10-14T12:48:03.769Z",
+          "itemId": "en-6",
+          "objectiveId": "ENG3.FAMILY",
+          "correct": true,
+          "hintsUsed": 0,
+          "elapsedMs": 2176
+        }
+      ],
+      "activeCanvases": 1
+    },
+    {
+      "moduleId": "sequence-trail",
+      "session": {
+        "sessionId": "9902ff97-3ae9-4a20-a4db-40492dc8354e",
+        "profileId": "default-learner",
+        "packId": "logic3-sequence",
+        "contentVersion": 1,
+        "moduleId": "sequence-trail",
+        "moduleVersion": "0.2.7",
+        "startedAt": "2026-10-14T12:48:05.402Z",
+        "status": "completed",
+        "endedAt": "2026-10-14T12:48:07.366Z"
+      },
+      "events": [
+        {
+          "eventId": "9902ff97-3ae9-4a20-a4db-40492dc8354e:seq-1:try:1",
+          "sessionId": "9902ff97-3ae9-4a20-a4db-40492dc8354e",
+          "profileId": "default-learner",
+          "packId": "logic3-sequence",
+          "contentVersion": 1,
+          "moduleId": "sequence-trail",
+          "moduleVersion": "0.2.7",
+          "occurredAt": "2026-10-14T12:48:05.686Z",
+          "itemId": "seq-1",
+          "objectiveId": "MATH3.SEQUENCE",
+          "correct": false,
+          "hintsUsed": 0,
+          "elapsedMs": 261
+        },
+        {
+          "eventId": "9902ff97-3ae9-4a20-a4db-40492dc8354e:seq-1:try:2",
+          "sessionId": "9902ff97-3ae9-4a20-a4db-40492dc8354e",
+          "profileId": "default-learner",
+          "packId": "logic3-sequence",
+          "contentVersion": 1,
+          "moduleId": "sequence-trail",
+          "moduleVersion": "0.2.7",
+          "occurredAt": "2026-10-14T12:48:05.953Z",
+          "itemId": "seq-1",
+          "objectiveId": "MATH3.SEQUENCE",
+          "correct": true,
+          "hintsUsed": 0,
+          "elapsedMs": 528
+        },
+        {
+          "eventId": "9902ff97-3ae9-4a20-a4db-40492dc8354e:seq-2:try:1",
+          "sessionId": "9902ff97-3ae9-4a20-a4db-40492dc8354e",
+          "profileId": "default-learner",
+          "packId": "logic3-sequence",
+          "contentVersion": 1,
+          "moduleId": "sequence-trail",
+          "moduleVersion": "0.2.7",
+          "occurredAt": "2026-10-14T12:48:06.219Z",
+          "itemId": "seq-2",
+          "objectiveId": "MATH3.SEQUENCE",
+          "correct": true,
+          "hintsUsed": 0,
+          "elapsedMs": 200
+        },
+        {
+          "eventId": "9902ff97-3ae9-4a20-a4db-40492dc8354e:seq-3:try:1",
+          "sessionId": "9902ff97-3ae9-4a20-a4db-40492dc8354e",
+          "profileId": "default-learner",
+          "packId": "logic3-sequence",
+          "contentVersion": 1,
+          "moduleId": "sequence-trail",
+          "moduleVersion": "0.2.7",
+          "occurredAt": "2026-10-14T12:48:06.486Z",
+          "itemId": "seq-3",
+          "objectiveId": "MATH3.SEQUENCE",
+          "correct": true,
+          "hintsUsed": 0,
+          "elapsedMs": 201
+        },
+        {
+          "eventId": "9902ff97-3ae9-4a20-a4db-40492dc8354e:seq-4:try:1",
+          "sessionId": "9902ff97-3ae9-4a20-a4db-40492dc8354e",
+          "profileId": "default-learner",
+          "packId": "logic3-sequence",
+          "contentVersion": 1,
+          "moduleId": "sequence-trail",
+          "moduleVersion": "0.2.7",
+          "occurredAt": "2026-10-14T12:48:06.752Z",
+          "itemId": "seq-4",
+          "objectiveId": "MATH3.SEQUENCE",
+          "correct": true,
+          "hintsUsed": 0,
+          "elapsedMs": 200
+        },
+        {
+          "eventId": "9902ff97-3ae9-4a20-a4db-40492dc8354e:seq-5:try:1",
+          "sessionId": "9902ff97-3ae9-4a20-a4db-40492dc8354e",
+          "profileId": "default-learner",
+          "packId": "logic3-sequence",
+          "contentVersion": 1,
+          "moduleId": "sequence-trail",
+          "moduleVersion": "0.2.7",
+          "occurredAt": "2026-10-14T12:48:07.018Z",
+          "itemId": "seq-5",
+          "objectiveId": "MATH3.SEQUENCE",
+          "correct": true,
+          "hintsUsed": 0,
+          "elapsedMs": 199
+        },
+        {
+          "eventId": "9902ff97-3ae9-4a20-a4db-40492dc8354e:seq-6:try:1",
+          "sessionId": "9902ff97-3ae9-4a20-a4db-40492dc8354e",
+          "profileId": "default-learner",
+          "packId": "logic3-sequence",
+          "contentVersion": 1,
+          "moduleId": "sequence-trail",
+          "moduleVersion": "0.2.7",
+          "occurredAt": "2026-10-14T12:48:07.286Z",
+          "itemId": "seq-6",
+          "objectiveId": "MATH3.SEQUENCE",
+          "correct": true,
+          "hintsUsed": 0,
+          "elapsedMs": 200
+        }
+      ],
+      "activeCanvases": 1
+    }
+  ],
+  "walkthroughAfterReload": {
+    "completed": 5,
+    "events": 34,
+    "reviews": 26
+  },
+  "mobileLayouts": [
+    {
+      "width": 390,
+      "height": 844,
+      "home": {
+        "client": 390,
+        "scroll": 390
+      },
+      "game": {
+        "client": 390,
+        "scroll": 390,
+        "panel": {
+          "x": 10,
+          "y": 377,
+          "width": 370,
+          "height": 510,
+          "top": 377,
+          "right": 380,
+          "bottom": 887,
+          "left": 10
+        }
+      }
+    },
+    {
+      "width": 320,
+      "height": 640,
+      "home": {
+        "client": 320,
+        "scroll": 320
+      },
+      "game": {
+        "client": 320,
+        "scroll": 320,
+        "panel": {
+          "x": 10,
+          "y": 355,
+          "width": 300,
+          "height": 554,
+          "top": 355,
+          "right": 310,
+          "bottom": 909,
+          "left": 10
+        }
+      }
+    }
+  ],
+  "unvisitedOfflineGame": {
+    "cacheKeys": [
+      "http://127.0.0.1:5198/",
+      "http://127.0.0.1:5198/index.html",
+      "http://127.0.0.1:5198/manifest.webmanifest",
+      "http://127.0.0.1:5198/art/original-mascot.webp",
+      "http://127.0.0.1:5198/assets/index-BoWF6We0.js",
+      "http://127.0.0.1:5198/assets/index-BuSdu1iY.css",
+      "http://127.0.0.1:5198/assets/PremiumWorldRenderer-BAf1MySM.js",
+      "http://127.0.0.1:5198/assets/three-vendor-Bo2cogaG.js",
+      "http://127.0.0.1:5198/models/fox-guide.glb",
+      "http://127.0.0.1:5198/models/math-world.glb",
+      "http://127.0.0.1:5198/models/language-world.glb",
+      "http://127.0.0.1:5198/models/memory-world.glb",
+      "http://127.0.0.1:5198/models/environment.glb"
+    ],
+    "errors": [
+      "Failed to fetch dynamically imported module: http://127.0.0.1:5198/assets/WordConnect-BIWHOWjb.js"
+    ],
+    "rootText": ""
+  }
+}

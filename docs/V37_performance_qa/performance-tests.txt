@@ -1,0 +1,11 @@
+[WebServer] (node:17892) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 2 tests using 1 worker
+
+(node:7676) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok 1 [edge-production] › tests\visual\performance-world.spec.ts:11:1 › Quality changes and every game retain one live canvas/context, one RAF, five fetches and complete bitmap disposal (7.7s)
+  ok 2 [edge-production] › tests\visual\performance-world.spec.ts:78:1 › Low detail reduces actual island geometry by at least 25 percent and high restores original geometry, materials and shadows (3.5s)
+
+  2 passed (13.8s)

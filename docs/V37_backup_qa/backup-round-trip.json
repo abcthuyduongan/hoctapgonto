@@ -1,0 +1,52 @@
+{
+  "exportedRecords": {
+    "packs": 5,
+    "sessions": 3,
+    "events": 20
+  },
+  "snapshotTransactions": [
+    {
+      "mode": "readonly",
+      "stores": [
+        "packs",
+        "sessions",
+        "events"
+      ]
+    }
+  ],
+  "report": {
+    "attempts": 20,
+    "correct": 20,
+    "accuracy": 100,
+    "completed": 3,
+    "objectives": [
+      {
+        "id": "MATH3.NUMBER",
+        "correct": 8,
+        "total": 8,
+        "hints": 0,
+        "accuracy": 100
+      },
+      {
+        "id": "ENG3.SENTENCES",
+        "correct": 6,
+        "total": 6,
+        "hints": 0,
+        "accuracy": 100
+      },
+      {
+        "id": "ENG3.FAMILY",
+        "correct": 6,
+        "total": 6,
+        "hints": 0,
+        "accuracy": 100
+      }
+    ]
+  },
+  "restoredStores": [
+    "events",
+    "packs",
+    "sessions"
+  ],
+  "restoredVersion": 1
+}

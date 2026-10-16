@@ -9,9 +9,9 @@ const pack = BUILTIN_PACKS.find(p=>p.kind==='sentences');
 const session = {sessionId:'test-session',packId:pack.id,contentVersion:pack.version,moduleId:'sentence-builder',moduleVersion:'0.1.0',status:'active',startedAt:'2026-10-12T00:00:00Z'};
 const attempt = {attemptKey:'sentence-1:try:1',itemId:pack.items[0].id,objectiveId:pack.items[0].objectiveId,correct:true,hintsUsed:0,elapsedMs:1200};
 
-test('Registry: 3 game đều đúng SDK và đủ runtime / content-kind',()=>{
-  assert.equal(GAME_REGISTRY.length,3);
-  assert.equal(new Set(GAME_REGISTRY.map(g=>g.id)).size,3);
+test('Registry: 5 game đều đúng SDK và đủ runtime / content-kind',()=>{
+  assert.equal(GAME_REGISTRY.length,5);
+  assert.equal(new Set(GAME_REGISTRY.map(g=>g.id)).size,5);
   for (const manifest of GAME_REGISTRY) {
     assert.equal(manifest.sdkVersion,1);
     const p = BUILTIN_PACKS.find(x=>x.kind===manifest.contentKind);
@@ -26,6 +26,8 @@ test('SDK: phản hồi có eventId tất định cho cùng một lượt',()=>{
   assert.equal(a.eventId,'test-session:sentence-1:try:1');
   assert.ok(sameAttempt(a,b)); // retry may have a different elapsedMs
   assert.ok(!sameAttempt(a,{...b,correct:false}));
+  assert.ok(!sameAttempt(a,{...b,profileId:'another-learner'}));
+  assert.ok(sameAttempt(a,{...b,profileId:'default-learner'}));
 });
 test('SDK: không cho item không thuộc bộ được ghi sự kiện',()=>{
   assert.throws(()=>makeLearningEvent(session,pack,{...attempt,itemId:'fake'},'2026-10-12T00:00:00Z'),/không thuộc/);

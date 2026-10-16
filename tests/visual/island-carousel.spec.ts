@@ -1,6 +1,10 @@
 import { expect, test, type Page } from '@playwright/test';
+import { carouselLayout } from '../../src/world3d/scenes/worldLayout';
+import { getSceneTheme } from '../../src/world3d/scenes/sceneCatalog';
 
-type WorldId = 'math-quest' | 'memory-match' | 'sentence-builder';
+test.use({ serviceWorkers: 'block' });
+
+type WorldId = 'math-quest' | 'memory-match' | 'sentence-builder' | 'word-connect' | 'sequence-trail';
 type Position = { x: number; y: number; z: number };
 type Diagnostics = {
   selectedWorld: WorldId | null;
@@ -16,16 +20,16 @@ type Diagnostics = {
   motion: boolean;
   tier: string;
 };
-const worlds: WorldId[] = ['math-quest', 'memory-match', 'sentence-builder'];
+const worlds: WorldId[] = ['math-quest', 'memory-match', 'sentence-builder', 'word-connect', 'sequence-trail'];
 const stats = async (page: Page): Promise<Diagnostics> => JSON.parse(await page.locator('.ba3d-render-host').getAttribute('data-diagnostics') || '{}');
-const select = (page: Page, id: WorldId) => page.locator(`.ba3d-${id} .ba3d-world-name`);
+const select = (page: Page, id: WorldId) => page.getByRole('button', { name: `Chọn ${getSceneTheme(id).world}`, exact: true });
 
 async function openWorld(page: Page) {
-  await page.goto('/?premium3d=1');
+  await page.goto('/?premium3d=1&controls=1');
   await expect(page.locator('.ba3d-render-host')).toHaveAttribute('data-engine', 'three-webgl');
   await expect(page.locator('.ba3d-render-host')).toHaveAttribute('data-state', 'ready');
   await expect.poll(async () => (await stats(page)).drawCalls).toBeGreaterThan(0);
-  await expect.poll(async () => (await stats(page)).islands?.length).toBe(3);
+  await expect.poll(async () => (await stats(page)).islands?.length).toBe(5);
 }
 
 function expectNeutral(value: Diagnostics) {
@@ -38,11 +42,24 @@ function expectNeutral(value: Diagnostics) {
   expect(new Set(ordered.map(island => island.id))).toEqual(new Set(worlds));
   for (const island of ordered) {
     expect(island.scale).toBeCloseTo(ordered[0].scale, 5);
-    expect(island.y).toBeCloseTo(ordered[0].y, 5);
-    expect(island.z).toBeCloseTo(ordered[0].z, 5);
+    if (value.motion) {
+      expect(Math.abs(island.y), `${island.id}: decorative floating stays within 6 cm of the overview plane`).toBeLessThanOrEqual(.060001);
+    } else {
+      expect(island.y).toBeCloseTo(ordered[0].y, 5);
+    }
   }
-  expect(ordered[1].x - ordered[0].x).toBeGreaterThan(0);
-  expect(ordered[1].x - ordered[0].x).toBeCloseTo(ordered[2].x - ordered[1].x, 5);
+  // Five islands enter on an equally spaced ellipse, at equal size and height.
+  // The former three-island row's equal-z/equal-x-gap contract no longer applies.
+  const layout = carouselLayout(ordered[0].scale < 1, worlds.length);
+  const angles = ordered.map(island => {
+    const x = island.x / layout.radiusX, z = (island.z - layout.centerZ) / layout.radiusZ;
+    expect(Math.hypot(x, z), `${island.id}: stays on the overview ring`).toBeCloseTo(1, 5);
+    return (Math.atan2(x, z) + Math.PI * 2) % (Math.PI * 2);
+  }).sort((a, b) => a - b);
+  for (let index = 0; index < angles.length; index++) {
+    const next = angles[(index + 1) % angles.length] + (index === angles.length - 1 ? Math.PI * 2 : 0);
+    expect(next - angles[index], 'Overview islands have equal angular spacing').toBeCloseTo(Math.PI * 2 / worlds.length, 5);
+  }
 }
 
 function expectChosen(value: Diagnostics, id: WorldId) {
@@ -71,7 +88,7 @@ for (const viewport of [{ width: 1440, height: 900 }, { width: 768, height: 1024
       await page.setViewportSize(viewport);
       await openWorld(page);
       expectNeutral(await stats(page));
-      await expect(page.locator('.ba3d-world-name[aria-pressed="true"]')).toHaveCount(0);
+      await expect(page.locator('.ba3d-island-choice[aria-pressed="true"]')).toHaveCount(0);
       await testInfo.attach(`initial-carousel-${viewport.width}x${viewport.height}`, { body: await page.screenshot(), contentType: 'image/png' });
     });
   }
@@ -88,7 +105,9 @@ for (const viewport of [{ width: 1440, height: 900 }, { width: 768, height: 1024
     await page.getByRole('button', { name: /Góc phụ huynh/ }).click();
     await expect(page.locator('.ba3d-render-host')).toHaveCount(0);
     const evidence = await page.evaluate(async ({ moduleUrl, size }) => {
-      const { createPremiumRenderer } = await import(moduleUrl);
+      const exports = await import(moduleUrl);
+      const { createPremiumRenderer } = exports.createPremiumRenderer ? exports
+        : Object.values(exports).find((value: any) => typeof value?.createPremiumRenderer === 'function') as any;
       const canvas = document.createElement('canvas');
       canvas.style.cssText = `position:fixed;left:-2000px;top:0;width:${size.width}px;height:${size.height}px;pointer-events:none`;
       document.body.append(canvas);
@@ -181,7 +200,9 @@ test('The actual built renderer rotates through intermediate positions and moves
   await page.getByRole('button', { name: /Góc phụ huynh/ }).click();
   await expect(page.locator('.ba3d-render-host')).toHaveCount(0);
   const movement = await page.evaluate(async moduleUrl => {
-    const { createPremiumRenderer } = await import(moduleUrl);
+    const exports = await import(moduleUrl);
+    const { createPremiumRenderer } = exports.createPremiumRenderer ? exports
+      : Object.values(exports).find((value: any) => typeof value?.createPremiumRenderer === 'function') as any;
     const canvas = document.createElement('canvas');
     canvas.style.cssText = 'position:fixed;left:-600px;top:0;width:512px;height:512px;pointer-events:none';
     document.body.append(canvas);
@@ -226,7 +247,7 @@ test('Rapid choices settle on the latest island without new model fetches or a s
   expect(modelRequests).toEqual(initialRequests);
 });
 
-test('Overview explicitly returns the guide to its left waiting corner and restores the equal island row', async ({ page }) => {
+test('Overview explicitly returns the guide to its left waiting corner and restores the equal island ring', async ({ page }) => {
   await openWorld(page);
   const initial = await stats(page);
   expectNeutral(initial);
@@ -243,7 +264,7 @@ test('Overview explicitly returns the guide to its left waiting corner and resto
   expectNeutral(reset);
   await expect(page.getByRole('group', { name: 'Tổng quan các đảo', exact: true })).toBeFocused();
   for (const coordinate of ['x', 'y', 'z'] as const) expect(reset.mascotPosition[coordinate]).toBeCloseTo(initial.mascotPosition[coordinate], 5);
-  await expect(page.locator('.ba3d-world-name[aria-pressed="true"]')).toHaveCount(0);
+  await expect(page.locator('.ba3d-island-choice[aria-pressed="true"]')).toHaveCount(0);
 });
 
 test('Quality and responsive resize preserve the chosen island and the guide arrival', async ({ page }) => {

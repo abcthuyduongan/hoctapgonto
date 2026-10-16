@@ -1,0 +1,202 @@
+[
+  {
+    "Path": "public\\question-templates\\BA_Lop3_TiengAnh_GhepCau_minh-hoa.csv",
+    "Bytes": 1120
+  },
+  {
+    "Path": "public\\question-templates\\BA_Lop3_TiengAnh_GhepCau_minh-hoa.json",
+    "Bytes": 2545
+  },
+  {
+    "Path": "public\\question-templates\\BA_Lop3_TiengAnh_GhepCau_minh-hoa.xlsx",
+    "Bytes": 9557
+  },
+  {
+    "Path": "public\\question-templates\\BA_Lop3_TiengAnh_GhepCau_trong.csv",
+    "Bytes": 587
+  },
+  {
+    "Path": "public\\question-templates\\BA_Lop3_TiengAnh_GhepCau_trong.json",
+    "Bytes": 1374
+  },
+  {
+    "Path": "public\\question-templates\\BA_Lop3_TiengAnh_GhepCau_trong.xlsx",
+    "Bytes": 9258
+  },
+  {
+    "Path": "public\\question-templates\\BA_Lop3_TiengAnh_NgheChon_minh-hoa.csv",
+    "Bytes": 1259
+  },
+  {
+    "Path": "public\\question-templates\\BA_Lop3_TiengAnh_NgheChon_minh-hoa.json",
+    "Bytes": 2699
+  },
+  {
+    "Path": "public\\question-templates\\BA_Lop3_TiengAnh_NgheChon_minh-hoa.xlsx",
+    "Bytes": 9628
+  },
+  {
+    "Path": "public\\question-templates\\BA_Lop3_TiengAnh_NgheChon_trong.csv",
+    "Bytes": 602
+  },
+  {
+    "Path": "public\\question-templates\\BA_Lop3_TiengAnh_NgheChon_trong.json",
+    "Bytes": 1404
+  },
+  {
+    "Path": "public\\question-templates\\BA_Lop3_TiengAnh_NgheChon_trong.xlsx",
+    "Bytes": 9300
+  },
+  {
+    "Path": "public\\question-templates\\BA_Lop3_TiengAnh_NgheDien_minh-hoa.csv",
+    "Bytes": 1230
+  },
+  {
+    "Path": "public\\question-templates\\BA_Lop3_TiengAnh_NgheDien_minh-hoa.json",
+    "Bytes": 2665
+  },
+  {
+    "Path": "public\\question-templates\\BA_Lop3_TiengAnh_NgheDien_minh-hoa.xlsx",
+    "Bytes": 9583
+  },
+  {
+    "Path": "public\\question-templates\\BA_Lop3_TiengAnh_NgheDien_trong.csv",
+    "Bytes": 597
+  },
+  {
+    "Path": "public\\question-templates\\BA_Lop3_TiengAnh_NgheDien_trong.json",
+    "Bytes": 1394
+  },
+  {
+    "Path": "public\\question-templates\\BA_Lop3_TiengAnh_NgheDien_trong.xlsx",
+    "Bytes": 9274
+  },
+  {
+    "Path": "public\\question-templates\\BA_Lop3_TiengViet_DienTu_minh-hoa.csv",
+    "Bytes": 1143
+  },
+  {
+    "Path": "public\\question-templates\\BA_Lop3_TiengViet_DienTu_minh-hoa.json",
+    "Bytes": 2578
+  },
+  {
+    "Path": "public\\question-templates\\BA_Lop3_TiengViet_DienTu_minh-hoa.xlsx",
+    "Bytes": 9548
+  },
+  {
+    "Path": "public\\question-templates\\BA_Lop3_TiengViet_DienTu_trong.csv",
+    "Bytes": 597
+  },
+  {
+    "Path": "public\\question-templates\\BA_Lop3_TiengViet_DienTu_trong.json",
+    "Bytes": 1394
+  },
+  {
+    "Path": "public\\question-templates\\BA_Lop3_TiengViet_DienTu_trong.xlsx",
+    "Bytes": 9273
+  },
+  {
+    "Path": "public\\question-templates\\BA_Lop3_TiengViet_DocHieu_minh-hoa.csv",
+    "Bytes": 1435
+  },
+  {
+    "Path": "public\\question-templates\\BA_Lop3_TiengViet_DocHieu_minh-hoa.json",
+    "Bytes": 2879
+  },
+  {
+    "Path": "public\\question-templates\\BA_Lop3_TiengViet_DocHieu_minh-hoa.xlsx",
+    "Bytes": 9702
+  },
+  {
+    "Path": "public\\question-templates\\BA_Lop3_TiengViet_DocHieu_trong.csv",
+    "Bytes": 606
+  },
+  {
+    "Path": "public\\question-templates\\BA_Lop3_TiengViet_DocHieu_trong.json",
+    "Bytes": 1412
+  },
+  {
+    "Path": "public\\question-templates\\BA_Lop3_TiengViet_DocHieu_trong.xlsx",
+    "Bytes": 9305
+  },
+  {
+    "Path": "public\\question-templates\\BA_Lop3_TiengViet_NoiTu_minh-hoa.csv",
+    "Bytes": 1043
+  },
+  {
+    "Path": "public\\question-templates\\BA_Lop3_TiengViet_NoiTu_minh-hoa.json",
+    "Bytes": 2466
+  },
+  {
+    "Path": "public\\question-templates\\BA_Lop3_TiengViet_NoiTu_minh-hoa.xlsx",
+    "Bytes": 9501
+  },
+  {
+    "Path": "public\\question-templates\\BA_Lop3_TiengViet_NoiTu_trong.csv",
+    "Bytes": 585
+  },
+  {
+    "Path": "public\\question-templates\\BA_Lop3_TiengViet_NoiTu_trong.json",
+    "Bytes": 1370
+  },
+  {
+    "Path": "public\\question-templates\\BA_Lop3_TiengViet_NoiTu_trong.xlsx",
+    "Bytes": 9271
+  },
+  {
+    "Path": "public\\question-templates\\BA_Lop3_Toan_NhapSo_minh-hoa.csv",
+    "Bytes": 1102
+  },
+  {
+    "Path": "public\\question-templates\\BA_Lop3_Toan_NhapSo_minh-hoa.json",
+    "Bytes": 2529
+  },
+  {
+    "Path": "public\\question-templates\\BA_Lop3_Toan_NhapSo_minh-hoa.xlsx",
+    "Bytes": 9527
+  },
+  {
+    "Path": "public\\question-templates\\BA_Lop3_Toan_NhapSo_trong.csv",
+    "Bytes": 589
+  },
+  {
+    "Path": "public\\question-templates\\BA_Lop3_Toan_NhapSo_trong.json",
+    "Bytes": 1378
+  },
+  {
+    "Path": "public\\question-templates\\BA_Lop3_Toan_NhapSo_trong.xlsx",
+    "Bytes": 9255
+  },
+  {
+    "Path": "public\\question-templates\\BA_Lop3_Toan_TracNghiem_minh-hoa.csv",
+    "Bytes": 1037
+  },
+  {
+    "Path": "public\\question-templates\\BA_Lop3_Toan_TracNghiem_minh-hoa.json",
+    "Bytes": 2448
+  },
+  {
+    "Path": "public\\question-templates\\BA_Lop3_Toan_TracNghiem_minh-hoa.xlsx",
+    "Bytes": 9538
+  },
+  {
+    "Path": "public\\question-templates\\BA_Lop3_Toan_TracNghiem_trong.csv",
+    "Bytes": 573
+  },
+  {
+    "Path": "public\\question-templates\\BA_Lop3_Toan_TracNghiem_trong.json",
+    "Bytes": 1346
+  },
+  {
+    "Path": "public\\question-templates\\BA_Lop3_Toan_TracNghiem_trong.xlsx",
+    "Bytes": 9282
+  },
+  {
+    "Path": "public\\question-templates\\BA_Thu_Loi_Dap_An.csv",
+    "Bytes": 1456
+  },
+  {
+    "Path": "public\\question-templates\\catalog.json",
+    "Bytes": 4632
+  }
+]
