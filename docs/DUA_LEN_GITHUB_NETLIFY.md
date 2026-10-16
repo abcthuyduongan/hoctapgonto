@@ -109,6 +109,8 @@ Chỉ tiếp tục khi hai lệnh thành công. Setup tạo schema riêng `bao_a
 
 Vào **Project configuration → Environment variables**. Thêm từng biến sau cho **Production**. Chọn scope **Functions** nếu gói cho chọn; nếu không, giữ **All scopes**. Không chọn riêng scope tên **Runtime**. Không thêm tiền tố `VITE_` vào các khóa này. [Netlify: biến Functions](https://docs.netlify.com/build/functions/environment-variables/).
 
+Scope và lựa chọn **Contains secret values** là hai mục riêng. Đánh dấu secret cho `SUPABASE_DB_URL` (chứa mật khẩu), `SUPABASE_SECRET_KEY` hoặc `SUPABASE_SERVICE_ROLE_KEY`, và `BAO_AN_SETUP_TOKEN`. Địa chỉ `SUPABASE_URL`, origin website và tên bucket là cấu hình không cần đánh dấu secret. Nếu đã đánh dấu URL là secret, vẫn có thể giữ biến đó; lưu giá trị thật trực tiếp trong Netlify, ngoài tài liệu/mã nguồn. Netlify không cho gỡ secret flag sau khi tạo. [Netlify: quản lý secret](https://docs.netlify.com/build/environment-variables/secrets-controller/).
+
 | Tên biến | Nội dung điền |
 |---|---|
 | `BAO_AN_PUBLIC_ORIGIN` | URL HTTPS cuối cùng của Netlify/domain, không có dấu `/` cuối |

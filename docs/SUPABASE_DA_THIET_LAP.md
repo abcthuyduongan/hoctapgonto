@@ -15,7 +15,7 @@ Ngày 16/10/2026. Dự án **Học tập của Gôn tồ**, mã `fhkgqwdpbgnxjqq
 - [Dự án Supabase](https://supabase.com/dashboard/project/fhkgqwdpbgnxjqquuxrs)
 - [Table Editor — schema bao_an](https://supabase.com/dashboard/project/fhkgqwdpbgnxjqquuxrs/editor?schema=bao_an): mở menu Table Editor để xem danh sách 16 bảng. Schema `public` vẫn rỗng vì ứng dụng dùng schema riêng.
 - [Kho tư liệu](https://supabase.com/dashboard/project/fhkgqwdpbgnxjqquuxrs/storage/files/buckets/bao-an-media)
-- Project URL dùng cho biến `SUPABASE_URL`: `https://fhkgqwdpbgnxjqquuxrs.supabase.co`.
+- Giá trị `SUPABASE_URL`: sao chép Project URL từ Dashboard của đúng dự án và điền trực tiếp vào biến môi trường Netlify hoặc `.env.cloud.local`; không lưu giá trị cấu hình thật trong tài liệu của repo.
 
 Ảnh đối chiếu nằm trong `V38_qa/supabase-live`: `setup-summary.jpg`, `tables-bao-an.jpg`, `schema-checks.jpg`, `empty-data.jpg`, `private-bucket.jpg`, `unexposed-schema.jpg`. Truy vấn cuối xác nhận 16/16 bảng bật RLS, 0 gói câu hỏi, bucket riêng tư với giới hạn chính xác 2.097.152 byte và 0 tệp. Số liệu và hash SQL lưu trong `verification.json`. Không có mật khẩu hoặc khóa riêng trong báo cáo.
 

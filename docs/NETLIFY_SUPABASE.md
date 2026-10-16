@@ -83,6 +83,7 @@ Không đưa `SUPABASE_MIGRATION_DB_URL`/`SUPABASE_MIGRATION_DB_CA` lên Netlify
 | Tạo lớp/lưu bài báo sai origin | `BAO_AN_PUBLIC_ORIGIN` trùng chính xác tên miền đang mở, bao gồm `https://`; sau đổi origin cần redeploy và đăng nhập lại |
 | Ảnh/âm thanh không tải lên | Bucket đúng tên, private, khóa server còn hiệu lực; tệp đúng loại và không quá 2 MB |
 | Không thấy bảng trong `public` | Chọn schema `bao_an` trong Supabase; không chuyển bảng sang `public` hay exposed schemas |
+| Build báo Secrets scanning tìm thấy giá trị biến trong tài liệu/mã | Xóa giá trị thật khỏi đúng tệp được báo, commit/push rồi deploy lại. Giữ biến trong Netlify; giữ cơ chế quét bật. Scope Functions khác tùy chọn Contains secret values. URI có mật khẩu, khóa server và mã khởi tạo cần secret flag; URL dự án không cần flag này |
 | Đăng nhập bằng Supabase Auth không được | Tạo quản lý đầu tiên trong ứng dụng, sau đó quản lý tạo tài khoản học sinh trong ứng dụng |
 
 ## Sao lưu và cập nhật
