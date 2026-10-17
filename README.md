@@ -1,4 +1,4 @@
-# Bảo An Learning · 3.8.0-rc.2
+# Bảo An Learning · 3.8.0-rc.6
 
 Ứng viên phát hành cục bộ cho Windows Edge/Chrome. Giáo viên quản lý nhiều lớp, tự soạn câu hỏi nhiều môn theo tuần; ứng dụng nhận dạng câu và đưa vào trò phù hợp. Chờ nghiệm thu thực tế trước khi công bố production.
 
@@ -14,7 +14,7 @@ npm run online
 
 Mở [Bảo An tại cổng 4180](http://127.0.0.1:4180/?online=1). Giữ máy chủ chạy trong lúc sử dụng. Lần đầu lấy mã từ tệp riêng .online/bootstrap-token.txt và tự đặt tài khoản quản lý. Trong ZIP đã giải nén, mở **MO_BAO_AN.cmd** hoặc **MO_QUAN_LY.cmd**; không cần npm install.
 
-**Bản cài mới có dữ liệu câu hỏi rỗng.** Giáo viên tạo lớp/học sinh, tải mẫu trắng Word .docx hoặc Excel .xlsx, soạn rồi xem trước và giao tuần. Học sinh chưa được giao bài sẽ chờ giáo viên; không tự nạp chương trình hoặc câu mẫu. Cập nhật ứng dụng giữ nguyên học liệu đã nhập.
+**Bản cài mới có dữ liệu câu hỏi rỗng.** Giáo viên tạo lớp/học sinh, chọn tuần, chọn một file câu hỏi cùng ảnh/âm thanh rồi kiểm tra. Câu lỗi được báo vị trí và bị loại; có thể giao các câu hợp lệ trong những nhóm đủ 2–30 câu. Có mẫu trắng Word/Excel và [bộ mẫu đầy đủ](public/question-templates/bo-mau-day-du.zip) gồm Excel 16 câu/tám dạng, hai hình, hai âm thanh và hướng dẫn; giải nén trước khi chọn tệp. Học sinh chưa được giao bài sẽ chờ giáo viên; mẫu không tự nạp vào lớp. Cập nhật ứng dụng giữ nguyên học liệu đã nhập.
 
 Có tám dạng: trắc nghiệm, nối cặp, xếp câu, nhập số, điền từ, đọc chọn đáp án, nghe chọn đáp án, nghe điền từ. Hỗ trợ hình và âm thanh riêng tư. Tên môn/chủ đề do người soạn đặt; đây là dạng luyện tập, không phải mẫu nộp đề chính thức của các kỳ thi.
 
@@ -37,12 +37,14 @@ npm run package:pilot
 
 verify:local chạy TypeScript, kiểm thử renderer/học liệu/dữ liệu/khôi phục/cloud cục bộ/ZIP, kiểm tra tài nguyên, build và các ca trình duyệt máy chủ thật. Cần Chrome và Edge cho Playwright; BAO_AN_BROWSER_CHANNEL có thể chọn riêng chrome hoặc msedge. Nhóm hiện hành mặc định chạy cả hai trình duyệt. CI được cấu hình cho Node 22.22.2 và 24 trên Windows; kết quả chạy cục bộ được ghi riêng trong báo cáo bàn giao.
 
-Gói bất biến ở releases/bao-an-learning-3.8.0-rc.2.zip; manifest ghi build ID, hash từng tệp và schema riêng: SQLite 1, PostgreSQL 1. releaseReady:false và humanPilotStatus:UNVERIFIED được giữ tới khi người dùng nghiệm thu. Không ghi đè cùng phiên bản bằng nội dung khác.
+Gói bất biến ở releases/bao-an-learning-3.8.0-rc.6.zip; manifest ghi build ID, hash từng tệp và schema riêng: SQLite 1, PostgreSQL 1. releaseReady:false và humanPilotStatus:UNVERIFIED được giữ tới khi người dùng nghiệm thu. Không ghi đè cùng phiên bản bằng nội dung khác.
 
 ## Tài liệu
 
 - [Kế hoạch và điều kiện phát hành](docs/KE_HOACH_HOAN_THIEN_PRODUCTION_2026-10-16.md)
-- [Kết quả kiểm tra và gói RC2](docs/V38_qa/RC2_2026-10-16.md)
+- [Rà soát, kết quả sửa và gói RC6](docs/BAO_CAO_RA_SOAT_2026-10-16.md)
+- [Phiếu nghiệm thu RC6](docs/NGHIEM_THU_CUC_BO_RC6.md)
+- [Cập nhật bản sửa nhập liệu lên Netlify qua GitHub](docs/CAP_NHAT_NETLIFY_RC6.md)
 - [Dùng quản lý cục bộ](docs/QUAN_LY_CUC_BO.md)
 - [Soạn Word/Excel](docs/ONLINE_QUESTION_IMPORT.md)
 - [Hướng dẫn đi kèm ZIP và phiếu nghiệm thu](tools/release-files/HUONG_DAN_SU_DUNG.html)

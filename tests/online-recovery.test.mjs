@@ -58,6 +58,25 @@ class Client{
 }
 async function login(client,username){return client.ok('/login',{method:'POST',body:{username,password}});}
 
+test('reward note validation preserves history and a restorable HTTP backup',async t=>{
+  const f=await fixture(t),origin=await f.start(),manager=new Client(origin);await login(manager,'manager');
+  const route=`/redemptions/${f.request.requestId}/transition`;
+  for(const note of ['x'.repeat(301),{text:'invalid'},null,'line\nbreak','control\u0000']){
+    const before=f.database().prepare('SELECT json FROM redemptions').get().json;
+    const response=await manager.call(route,{method:'POST',body:{status:'fulfilled',note}});
+    assert.equal(response.status,409);
+    assert.equal(f.database().prepare('SELECT json FROM redemptions').get().json,before);
+  }
+  const note='Đ'.repeat(300),body={status:'fulfilled',note};
+  const completed=await manager.ok(route,{method:'POST',body});assert.equal(completed.history.at(-1).note,note);
+  assert.deepEqual(await manager.ok(route,{method:'POST',body}),completed);
+  const bytes=await manager.ok('/backup',{method:'POST',binary:true}),file=join(f.directory,'validated-notes.sqlite');await writeFile(file,bytes);
+  const preview=inspectOnlineBackup(file);assert.equal(preview.counts.redemptions,1);
+  const target=join(f.directory,'restored-notes','bao-an.sqlite');
+  await restoreOnlineDatabase({databasePath:target,backupPath:file,expectedSha256:preview.sha256});
+  const restored=new OnlineStore(target);try{assert.equal(JSON.parse(restored.db.prepare('SELECT json FROM redemptions').get().json).history.at(-1).note,note);}finally{restored.close();}
+});
+
 test('recovery CLI previews without writing, restores into a clean directory and boots through real HTTP after restart',async t=>{
   const f=await fixture(t),snapshot=join(f.directory,'snapshot.sqlite'),preview=await snapshotOnlineDatabase(f.store().db,snapshot);f.closeStore();
   assert.equal(preview.activePlays,1);assert.equal(preview.sessionsToRevoke,1);assert.equal(preview.counts.media,2);

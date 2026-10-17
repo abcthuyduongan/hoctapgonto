@@ -27,12 +27,74 @@ async function fixture(t){
   const f=await createPostgresFixture(t,{bootstrap:false}),objects=new Map(),removed=[];
   const storage={async upload(path,bytes,mime){assert.ok(!objects.has(path));objects.set(path,{bytes:Buffer.from(bytes),mime});},async download(path){assert.ok(objects.has(path));return Buffer.from(objects.get(path).bytes);},async remove(path){removed.push(path);objects.delete(path);}};
   const api=createCloudApi({store:f.store,storage,publicOrigin:origin,setupToken});
-  return{...f,api,objects,removed,client:()=>new Client(api)};
+  return{...f,api,objects,removed,storage,client:()=>new Client(api)};
 }
 async function bootstrap(f){const manager=f.client();await manager.ok('/setup',{method:'POST',body:{token:setupToken,name:'Lớp học trên máy chủ',username:'manager',password:managerPassword}});return manager;}
 async function classroom(manager,name='Lớp tự nhiên'){return manager.ok('/classes',{method:'POST',body:{name,grade:3}});}
 async function student(manager,classId,username){return manager.ok('/students',{method:'POST',body:{classId,name:username,username,password:studentPassword}});}
 async function login(client,username,password=studentPassword){return client.ok('/login',{method:'POST',body:{username,password}});}
+
+test('cloud batches sixteen audio uploads in one transaction, deduplicates retries and validates the entire batch',async t=>{
+  const f=await fixture(t),manager=await bootstrap(f),files=Array.from({length:16},(_,i)=>({name:`audio-${i}.wav`,mime:'audio/wav',base64:waveFixture().toString('base64')}));
+  let commits=0;const transaction=f.store.transaction.bind(f.store);f.store.transaction=async action=>{commits++;return transaction(action);};
+  const assets=await manager.ok('/media/batch',{method:'POST',body:{files}});assert.equal(assets.length,16);assert.equal(commits,1);assert.equal(f.objects.size,16);
+  assert.equal((await manager.ok('/media')).length,16);assert.equal((await f.store.rows("SELECT id FROM bao_an.audit WHERE action='media.upload'")).length,16);
+  assert.deepEqual(await manager.ok('/media/batch',{method:'POST',body:{files}}),assets);assert.equal(commits,1);assert.equal(f.objects.size,16);
+  const concurrentFiles=files.slice(0,2).map(file=>({...file,name:'new-'+file.name}));
+  const [a,b]=await Promise.all([manager.ok('/media/batch',{method:'POST',body:{files:concurrentFiles}}),manager.ok('/media/batch',{method:'POST',body:{files:concurrentFiles}})]);
+  assert.deepEqual(a,b);assert.equal(f.objects.size,18);assert.equal((await manager.ok('/media')).length,18);
+  for(const invalid of [[],Array(25).fill(files[0]),[{...files[0],mime:'image/png'}],[{...files[0],name:'valid.wav'},{...files[1],base64:'invalid'}]])await manager.denied('/media/batch',{method:'POST',body:{files:invalid}},400);
+  const large=Buffer.alloc(1100000);waveFixture().copy(large);await manager.denied('/media/batch',{method:'POST',body:{files:[0,1].map(i=>({name:`large-${i}.wav`,mime:'audio/wav',base64:large.toString('base64')}))}},400);
+  assert.equal(f.objects.size,18);
+  const cls=await classroom(manager);await student(manager,cls.id,'batch-child');const child=f.client();await login(child,'batch-child');await child.denied('/media/batch',{method:'POST',body:{files}},403);
+  await manager.denied('/media/batch',{method:'POST',body:{files},csrf:'wrong'},403);
+});
+
+test('cloud batch failures roll back metadata and clean uploaded objects; logout during upload cannot commit',async t=>{
+  const f=await fixture(t),manager=await bootstrap(f),files=Array.from({length:4},(_,i)=>({name:`fail-${i}.wav`,mime:'audio/wav',base64:waveFixture().toString('base64')}));
+  const first=f.store.addMediaBatch.bind(f.store),exec=f.store.exec.bind(f.store);
+  f.store.exec=async(sql,...args)=>{if(sql.includes('INSERT INTO bao_an.audit')&&sql.includes('jsonb_to_recordset'))throw new Error('Simulated audit failure after media insert');return exec(sql,...args);};
+  await manager.denied('/media/batch',{method:'POST',body:{files}},500);assert.equal(f.objects.size,0);assert.equal((await manager.ok('/media')).length,0);
+  f.store.exec=exec;const upload=f.storage.upload;let calls=0;f.storage.upload=async(...args)=>{if(++calls===2)throw new Error('Simulated storage failure');return upload(...args);};
+  await manager.denied('/media/batch',{method:'POST',body:{files}},500);assert.equal(f.objects.size,0);assert.equal((await manager.ok('/media')).length,0);f.storage.upload=upload;
+  f.store.addMediaBatch=async(...args)=>{await manager.ok('/logout',{method:'POST'});return first(...args);};
+  await manager.denied('/media/batch',{method:'POST',body:{files}},401);assert.equal(f.objects.size,0);assert.equal((await f.store.rows('SELECT id FROM bao_an.media')).length,0);
+});
+
+async function pendingBody(f,client,route){
+  let controller,authenticated;
+  const entered=new Promise(resolve=>{authenticated=resolve;}),find=f.store.findSession.bind(f.store);
+  f.store.findSession=async(...args)=>{const result=await find(...args);authenticated();return result;};
+  const stream=new ReadableStream({start(value){controller=value;}});
+  const response=f.api(new Request(origin+'/api/online'+route,{method:'POST',duplex:'half',body:stream,
+    headers:{Origin:origin,'Content-Type':'application/json',Cookie:client.cookie,'X-CSRF-Token':client.csrf}}));
+  await entered;f.store.findSession=find;
+  return async body=>{controller.enqueue(new TextEncoder().encode(JSON.stringify(body)));controller.close();return response;};
+}
+
+test('cloud pending mutations cannot outlive logout or session expiry',async t=>{
+  const f=await fixture(t),manager=await bootstrap(f);
+  for(const reason of ['logout','expiry']){
+    if(reason==='expiry')await login(manager,'manager',managerPassword);
+    const finish=await pendingBody(f,manager,'/classes');
+    if(reason==='logout')await manager.ok('/logout',{method:'POST'});
+    else await f.store.exec('UPDATE bao_an.auth_sessions SET expires_at=0');
+    const response=await finish({name:'Must not be committed',grade:3});
+    assert.equal(response.status,401,reason);
+    assert.equal((await f.store.rows('SELECT id FROM bao_an.classes')).length,0);
+  }
+});
+
+test('cloud pending student play cannot outlive a password reset',async t=>{
+  const f=await fixture(t),manager=await bootstrap(f),cls=await classroom(manager),created=await student(manager,cls.id,'pending-child'),source=pack();
+  await manager.ok('/weeks',{method:'POST',body:{requestId:'pending-week',title:'Pending week',classId:cls.id,sets:[{subjectLabel:'Nature',pack:source}]}});
+  const learner=f.client();await login(learner,'pending-child');
+  const finish=await pendingBody(f,learner,'/play');
+  await manager.ok(`/students/${created.student.id}/reset-password`,{method:'POST'});
+  const response=await finish({requestId:'pending-play',moduleId:'math-quest',packId:source.id,contentVersion:1});
+  assert.equal(response.status,401);
+  assert.equal((await f.store.rows('SELECT id FROM bao_an.plays')).length,0);
+});
 function pack(){return{id:'cloud-nature-questions',version:1,title:'Tự nhiên',subject:'thinking',grade:3,source:'local',publishedAt:'2026-10-15T00:00:00.000Z',kind:'pairs',items:[['Cây cần gì?','Ánh sáng'],['Nước đông thành gì?','Nước đá'],['Vật gì có cánh?','Máy bay'],['Hành tinh chúng ta sống?','Trái Đất']].map(([left,right],index)=>({id:`cloud-item-${index}`,objectiveId:'NATURE3.CLOUD',kind:'pair',left,right}))};}
 
 test('cloud Request/Response API preserves real scrypt authentication, CSRF, gameplay and atomic reward accounting',async t=>{
@@ -63,7 +125,12 @@ test('cloud Request/Response API preserves real scrypt authentication, CSRF, gam
   assert.deepEqual(wishes.map(row=>row.status).sort(),[201,400]);const wish=wishes.find(row=>row.ok).data;
   assert.deepEqual((await learner.ok('/student')).balance,{earned:3,available:1,pending:2,redeemed:0});
   await learner.denied(`/redemptions/${wish.requestId}/transition`,{method:'POST',body:{status:'approved'}},403);
-  await manager.ok(`/redemptions/${wish.requestId}/transition`,{method:'POST',body:{status:'approved'}});
+  for(const note of ['x'.repeat(301),{text:'invalid'},null,'line\nbreak','control\u0000']){
+    await manager.denied(`/redemptions/${wish.requestId}/transition`,{method:'POST',body:{status:'approved',note}},409);
+    assert.equal((await learner.ok('/student')).requests[0].history.length,1);
+  }
+  const approved=await manager.ok(`/redemptions/${wish.requestId}/transition`,{method:'POST',body:{status:'approved',note:'Đ'.repeat(300)}});
+  assert.equal(approved.history.at(-1).note,'Đ'.repeat(300));
   await manager.ok(`/redemptions/${wish.requestId}/transition`,{method:'POST',body:{status:'fulfilled'}});
   assert.deepEqual((await learner.ok('/student')).balance,{earned:3,available:1,pending:0,redeemed:2});
   const reset=await manager.ok(`/students/${created.student.id}/reset-password`,{method:'POST'});

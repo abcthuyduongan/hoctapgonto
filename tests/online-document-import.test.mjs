@@ -2,9 +2,10 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import {zipSync,unzipSync} from 'fflate';
-import {ONLINE_DOCUMENT_HEADERS,ONLINE_DOCUMENT_KINDS,parseOnlineDocument,onlineDocumentGameChoices} from '../src/core/online-document-import.ts';
+import {ONLINE_DOCUMENT_HEADERS,ONLINE_DOCUMENT_KINDS,parseOnlineDocument,inspectOnlineDocument,onlineDocumentGameChoices} from '../src/core/online-document-import.ts';
 import {parseQuestionWorkbookBytes} from '../src/core/excel-import.ts';
 import {validatePack} from '../src/core/validation.ts';
+import {onlinePresentation,onlineScoreResponse} from '../src/core/online-exercises.ts';
 import {onlineDocumentSourceId} from '../src/core/online-document-import.ts';
 
 const context={idPrefix:'author-week',grade:5,title:'Tuần do tác giả soạn'};
@@ -48,6 +49,37 @@ function populatedDocx(questionRows=rows(),mutate){
   if(mutate)mutate(files);return zipSync(files);
 }
 const importFile=(bytes,name='week.xlsx',assets=media)=>parseOnlineDocument(bytes,name,context,assets);
+
+test('Large workspace media catalogs do not block text or referenced media imports',async()=>{
+  for(const count of [300,301,1000]){
+    const catalog=Array.from({length:count},(_,i)=>({...media[0],id:`unrelated-${i}`,name:`unrelated-${i}.png`}));
+    for(const [name,create] of [['week.docx',populatedDocx],['week.xlsx',populatedXlsx]]){
+      const textRows=rows().filter(row=>row.kind==='pairs');
+      assert.equal((await importFile(create(textRows),name,catalog)).sets.length,1);
+      const audioRows=rows().filter(row=>row.kind==='listening-choice');
+      const result=await importFile(create(audioRows),name,[...catalog,...media]);
+      assert.equal(result.sets[0].pack.items[0].audioId,'audio-asset');
+      const imageRows=rows().filter(row=>row.kind==='quiz');
+      assert.equal((await importFile(create(imageRows),name,[...catalog,...media])).sets[0].pack.items[0].media.imageId,'image-asset');
+      await assert.rejects(importFile(create(imageRows),name,[...catalog,...media,{...media[0],id:'duplicate-image'}]),/đúng một tệp/);
+      await assert.rejects(importFile(create(imageRows),name,[...catalog,{...media[0],sha256:'bad'}]),/catalog không hợp lệ/);
+    }
+  }
+});
+
+test('Imported pairs preserve every correct answer when presented as quizzes for all supported sizes',async()=>{
+  for(let count=4;count<=30;count++){
+    const input=Array.from({length:count},(_,i)=>({kind:'pairs',subjectLabel:'Nối cặp',title:'Bộ kiểm tra',left:`Trái ${i}`,right:`Phải ${i}`}));
+    const source=(await importFile(populatedXlsx(input))).sets[0].pack;
+    const view=onlinePresentation('math-quest',source);assert.deepEqual(validatePack(view),[]);
+    for(let i=0;i<count;i++){
+      const item=view.items[i];assert.equal(item.id,source.items[i].id);
+      assert.equal(item.options[item.correctIndex],source.items[i].right);assert.equal(new Set(item.options).size,4);
+      for(let choiceIndex=0;choiceIndex<4;choiceIndex++)assert.equal(
+        onlineScoreResponse(source,'math-quest',item.id,{kind:'choice',choiceIndex}).correct,choiceIndex===item.correctIndex);
+    }
+  }
+});
 
 test('The actual exported blank Word and Excel templates contain all eight kinds and import no sample questions',async()=>{
   assert.ok(emptyDocx.byteLength>1000);assert.ok(emptyXlsx.byteLength>1000);
@@ -156,4 +188,82 @@ test('Question errors identify the exact physical Excel row or Word table and mi
   await assert.rejects(importFile(populatedDocx(sentence),'week.docx'),/Word, bảng 4: hint/);
   const malformed=populatedDocx(rows().filter(row=>row.kind==='quiz'),files=>{files['word/document.xml']=encode(decode(files['word/document.xml']).replace('<w:t>field</w:t>','<w:t>Đổi nhầm cột</w:t>'));});
   await assert.rejects(importFile(malformed,'week.docx'),/Word, bảng 2: tiêu đề/);
+});
+
+const threeQuestions=kind=>{const first=rows().filter(row=>row.kind===kind);return [...first,{...first[0],itemId:`author.${kind}.3`,
+  ...(kind==='pairs'?{left:'Trước 3',right:'Sau 3'}:kind==='sentences'?{prompt:'Yêu cầu số 3',answer:'bảy tám chín'}:{prompt:`Yêu cầu ${kind} số 3`})}];};
+const inspect=(bytes,name='week.xlsx',assets=media,options)=>inspectOnlineDocument(bytes,name,context,assets,options);
+
+test('Partial preview excludes each malformed question and leaves only validated playable packs for all eight kinds',async()=>{
+  const changes={quiz:row=>row.answer='Z',pairs:row=>delete row.right,sentences:row=>row.answer='hai từ',
+    'numeric-answer':row=>row.answer='NaN','fill-blank':row=>row.caseSensitive='yes','reading-choice':row=>delete row.passage,
+    'listening-choice':row=>delete row.audioFile,'listening-gap':row=>delete row.audioTranscript};
+  for(const kind of ONLINE_DOCUMENT_KINDS){const input=threeQuestions(kind);changes[kind](input[1]);
+    for(const [name,create,location] of [['week.xlsx',populatedXlsx,'Excel, sheet Câu hỏi, dòng 4'],['week.docx',populatedDocx,'Word, bảng 4']]){
+      const bytes=create(input),result=await inspect(bytes,name);assert.equal(result.totalQuestions,3,kind);assert.equal(result.acceptedQuestions,2,kind);
+      assert.equal(result.sets.length,1);assert.deepEqual(validatePack(result.sets[0].pack),[]);assert.equal(result.issues.length,1);
+      assert.equal(result.issues[0].location,location);assert.equal(result.issues[0].itemId,input[1].itemId);
+      assert.deepEqual(result.sets[0].pack.items.map(item=>item.id),[input[0].itemId,input[2].itemId]);await assert.rejects(importFile(bytes,name));
+    }
+  }
+});
+
+test('Partial preview keeps the first valid duplicate and identifies the later physical row',async()=>{
+  for(const kind of ONLINE_DOCUMENT_KINDS){
+    for(const duplicateId of [false,true]){const input=threeQuestions(kind);input[2]=duplicateId?{...input[2],itemId:input[0].itemId}:{...input[0],itemId:input[2].itemId};
+      const result=await inspect(populatedXlsx(input));assert.equal(result.acceptedQuestions,2,`${kind}: ${duplicateId}`);
+      assert.deepEqual(validatePack(result.sets[0].pack),[]);assert.equal(result.issues.length,1);assert.equal(result.issues[0].location,'Excel, sheet Câu hỏi, dòng 5');assert.match(result.issues[0].message,/trùng/);
+    }
+  }
+  const pairs=threeQuestions('pairs');pairs[2].left=pairs[0].right;const result=await inspect(populatedXlsx(pairs));assert.equal(result.acceptedQuestions,2);assert.match(result.issues[0].message,/mặt thẻ bị trùng/);
+});
+
+test('Partial preview reports missing media, invalid grouping fields and literal null placeholders without changing supplied answers',async()=>{
+  const input=[...threeQuestions('quiz'),...threeQuestions('fill-blank')];
+  input[1].imageFile='chưa tải.png';input[4].A='null';
+  const malformed=[{...input[0],itemId:'bad-kind',kind:'unknown'},{...input[0],itemId:'bad-subject',subjectLabel:' '},{...input[0],itemId:'bad-title',title:'x'.repeat(91)}];
+  const result=await inspect(populatedXlsx([...input,...malformed]));assert.equal(result.totalQuestions,9);assert.equal(result.acceptedQuestions,4);assert.equal(result.issues.length,5);
+  assert.match(result.issues[0].message,/chưa tải.png/);assert.match(result.issues[1].message,/trường A/);
+  assert.match(result.issues[2].message,/kind/);assert.match(result.issues[3].message,/subjectLabel/);assert.match(result.issues[4].message,/title/);
+  assert.equal(result.sets[0].pack.items[0].correctIndex,2);assert.deepEqual(result.sets[1].pack.items[0].acceptedAnswers,['từ một','từ hai']);
+});
+
+test('Partial preview diagnoses every all-invalid question and excludes otherwise valid singletons with an explicit playable-size reason',async()=>{
+  for(const kind of ONLINE_DOCUMENT_KINDS){const input=threeQuestions(kind).slice(0,2);for(const row of input){if(kind==='pairs')delete row.right;else delete row.prompt;}
+    const result=await inspect(populatedXlsx(input));assert.equal(result.acceptedQuestions,0);assert.equal(result.sets.length,0);assert.equal(result.issues.length,2);
+    assert.ok(result.issues.every(issue=>!/chỉ còn 1 câu/.test(issue.message)),kind);
+  }
+  const input=threeQuestions('quiz').slice(0,2);input[1].answer='Z';const result=await inspect(populatedXlsx(input));assert.equal(result.acceptedQuestions,0);assert.equal(result.issues.length,2);
+  assert.match(result.issues[0].message,/chỉ còn 1 câu.*ít nhất 2/);assert.match(result.issues[1].message,/answer/);
+  const singleton=await inspect(populatedXlsx(threeQuestions('pairs').slice(0,1)));assert.match(singleton.issues[0].message,/ít nhất 2/);
+});
+
+test('Partial preview rejects oversized groups explicitly without truncating and still allows other valid groups',async()=>{
+  const oversized=Array.from({length:31},(_,i)=>({kind:'pairs',subjectLabel:'Nối cặp',left:`Trái ${i}`,right:`Phải ${i}`}));
+  const result=await inspect(populatedXlsx([...oversized,...threeQuestions('quiz')]));assert.equal(result.totalQuestions,34);assert.equal(result.acceptedQuestions,3);assert.equal(result.issues.length,31);
+  assert.ok(result.issues.every(issue=>/có 31 câu.*chia bộ/.test(issue.message)));assert.equal(result.sets[0].pack.kind,'quiz');
+});
+
+test('Partial preview reports conflicting later titles but a malformed first row cannot determine the retained title',async()=>{
+  const input=threeQuestions('quiz');input[2].title='Tên khác';let result=await inspect(populatedXlsx(input));assert.equal(result.acceptedQuestions,2);assert.match(result.issues[0].message,/cùng title/);
+  input[0].answer='Z';input[0].title='Tên câu lỗi';input[1].title=input[2].title='Bộ câu đã đảm bảo';
+  result=await inspect(populatedXlsx(input));assert.equal(result.acceptedQuestions,2);assert.equal(result.sets[0].pack.title,'Bộ câu đã đảm bảo');assert.equal(result.issues.length,1);assert.match(result.issues[0].message,/answer/);
+});
+
+test('Partial preview scheduling title does not remap source pack identities and file-level failures remain fatal',async()=>{
+  const bytes=populatedXlsx(threeQuestions('quiz')),strict=await importFile(bytes),result=await inspect(bytes,'week.xlsx',media,{weekTitle:'Tuần 08'});
+  assert.equal(result.title,'Tuần 08');assert.deepEqual(result.sets,strict.sets);assert.deepEqual(result.issues,[]);
+  const multi=threeQuestions('quiz');multi[0].week='Tuần 01';multi[1].week='Tuần 02';await assert.rejects(inspect(populatedXlsx(multi),'week.xlsx',media,{weekTitle:'Tuần 08'}),/một tuần/);
+  await assert.rejects(inspect(new Uint8Array(30)),undefined);await assert.rejects(inspect(bytes,'week.xlsx',media,{weekTitle:' '}),/Tên tuần/);
+  await assert.rejects(inspect(populatedXlsx(rows(),(files,file)=>{files[file]=encode(decode(files[file]).replace('<t xml:space="preserve">subjectLabel</t>','<t xml:space="preserve">unknown</t>'));})),/Tiêu đề/);
+});
+
+test('Partial preview excludes malformed Word question tables and Excel overflow cells with source locations',async()=>{
+  const input=threeQuestions('quiz'),duplicate='<w:tr><w:tc><w:p><w:r><w:t>kind</w:t></w:r></w:p></w:tc><w:tc><w:p><w:r><w:t>quiz</w:t></w:r></w:p></w:tc></w:tr>';
+  const duplicateField=populatedDocx(input,files=>{files['word/document.xml']=encode(decode(files['word/document.xml']).replace(recordTable(input[1]),recordTable(input[1]).replace('</w:tbl>',duplicate+'</w:tbl>')));});
+  let result=await inspect(duplicateField,'week.docx');assert.equal(result.acceptedQuestions,2);assert.equal(result.issues[0].location,'Word, bảng 4');assert.match(result.issues[0].message,/Trường kind/);
+  const badHeader=populatedDocx(input,files=>{files['word/document.xml']=encode(decode(files['word/document.xml']).replace(recordTable(input[1]),recordTable(input[1]).replace('<w:t>field</w:t>','<w:t>nhầm cột</w:t>')));});
+  result=await inspect(badHeader,'week.docx');assert.equal(result.acceptedQuestions,2);assert.equal(result.issues[0].location,'Word, bảng 4');assert.match(result.issues[0].message,/tiêu đề/);
+  const overflow=populatedXlsx(input,(files,file)=>{files[file]=encode(decode(files[file]).replace(/(<row r="4">.*?)(<\/row>)/s,'$1<c r="AF4" t="inlineStr"><is><t>thừa ô</t></is></c>$2'));});
+  result=await inspect(overflow);assert.equal(result.acceptedQuestions,2);assert.equal(result.issues[0].location,'Excel, sheet Câu hỏi, dòng 4');assert.match(result.issues[0].message,/ngoài mẫu/);
 });

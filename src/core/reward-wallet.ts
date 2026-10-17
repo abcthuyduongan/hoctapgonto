@@ -61,6 +61,7 @@ export function makeRewardRequest(wallet:RewardWallet,earned:number,input:{reque
   return request;
 }
 export function changeRewardRequest(request:RewardRequest,status:Exclude<RewardRequestStatus,'pending'>,now:string,note?:string):RewardRequest{
+  if(note!==undefined&&(typeof note!=='string'||/[\u0000-\u001f\u007f]/u.test(note)||note.trim().length>300))throw new Error('Ghi chú cần là văn bản tối đa 300 ký tự, không chứa ký tự điều khiển.');
   const current=rewardStatus(request);if(current===status)return request;
   if(current==='pending'?!['approved','cancelled','rejected'].includes(status):current==='approved'?status!=='fulfilled':true)throw new Error('Yêu cầu đã đổi trạng thái. Hãy tải lại lịch sử.');
   if(!validTime(now)||now<request.history.at(-1)!.at)throw new Error('Thời gian thiết bị đang lùi. Hãy kiểm tra đồng hồ rồi thử lại.');

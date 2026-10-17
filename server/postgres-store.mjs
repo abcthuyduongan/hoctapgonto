@@ -42,6 +42,9 @@ export class PostgresStore{
   async activeActor(auth,client){
     const user=await this.one('SELECT * FROM bao_an.users WHERE workspace_id=$1 AND id=$2 FOR UPDATE',[auth.workspaceId,auth.id],client);
     if(!user?.active||user.role!==auth.role||(user.student_id??undefined)!==(auth.studentId??undefined))fail(401,'Tài khoản hoặc quyền truy cập đã thay đổi. Hãy đăng nhập lại.');
+    // HTTP actors carry their session; trusted in-process callers may omit it.
+    // mutate holds the same workspace lock as logout/reset until commit.
+    if(auth.tokenHash!==undefined&&!await this.one('SELECT token_hash FROM bao_an.auth_sessions WHERE token_hash=$1 AND user_id=$2 AND csrf_token=$3 AND expires_at>$4',[auth.tokenHash,auth.id,auth.csrfToken,Date.now()],client))fail(401,'Phiên đăng nhập đã hết hạn hoặc đã được thu hồi. Hãy đăng nhập lại.');
     if(user.role==='student'){const student=await this.one('SELECT active FROM bao_an.students WHERE workspace_id=$1 AND id=$2',[auth.workspaceId,user.student_id],client);if(!student?.active)fail(401,'Tài khoản học sinh đã được khóa.');}
   }
   async mutate(auth,action){return this.transaction(async client=>{await this.workspace(auth.workspaceId,client,true);await this.activeActor(auth,client);return action(client);});}
@@ -71,7 +74,11 @@ export class PostgresStore{
       await this.exec('INSERT INTO bao_an.auth_sessions(token_hash,user_id,csrf_token,expires_at) VALUES($1,$2,$3,$4)',[tokenHash,userId,csrfToken,expiresAt],client);return user;
     });
   }
-  async revokeSession(tokenHash){await this.exec('DELETE FROM bao_an.auth_sessions WHERE token_hash=$1',[tokenHash]);}
+  async revokeSession(tokenHash){
+    const session=await this.one('SELECT u.workspace_id FROM bao_an.auth_sessions s JOIN bao_an.users u ON u.id=s.user_id WHERE s.token_hash=$1',[tokenHash]);
+    if(!session)return;
+    await this.transaction(async client=>{await this.workspace(session.workspace_id,client,true);await this.exec('DELETE FROM bao_an.auth_sessions WHERE token_hash=$1',[tokenHash],client);});
+  }
   async consumeLoginLimit({addressHash,userHash,now:time=Date.now()}){
     const entries=[{key:addressHash,max:100},{key:userHash,max:12}].sort((a,b)=>a.key.localeCompare(b.key));
     for(const entry of entries)text(entry.key,'Mã giới hạn đăng nhập',100);
@@ -91,7 +98,7 @@ export class PostgresStore{
   publicClass(row){return{id:row.id,name:row.name,grade:row.grade,createdAt:row.created_at};}
   publicMedia(row){return{id:row.id,name:row.name,mime:row.mime,kind:row.kind,size:row.size,sha256:row.sha256};}
   async listMedia(auth){role(auth,'admin');return(await this.rows('SELECT * FROM bao_an.media WHERE workspace_id=$1 ORDER BY created_at,id',[auth.workspaceId])).map(row=>this.publicMedia(row));}
-  async addMedia(auth,{id:mediaId,name,mime,bytes,objectPath}){
+  prepareMedia(auth,{id:mediaId,name,mime,bytes,objectPath}){
     role(auth,'admin');name=text(name,'Tên tệp',180);if(/[\\/]/.test(name))fail(400,'Tên tệp không được chứa đường dẫn.');
     if(!Buffer.isBuffer(bytes)&&!(bytes instanceof Uint8Array))fail(400,'Dữ liệu tệp không hợp lệ.');bytes=Buffer.from(bytes);if(bytes.length<12||bytes.length>2*1024*1024)fail(400,'Mỗi tệp cần từ 12 byte đến 2 MB.');
     text(mediaId,'Mã tệp',100);if(!/^[A-Za-z0-9-]+$/.test(mediaId))fail(400,'Mã tệp không hợp lệ.');
@@ -107,11 +114,38 @@ export class PostgresStore{
     else fail(400,'Chỉ nhận ảnh PNG/JPEG/WebP và âm thanh MP3/WAV/OGG đúng định dạng thực.');
     if(mime&&mime!==detected&&!(detected==='audio/mpeg'&&mime==='audio/mp3')&&!(detected==='audio/wav'&&['audio/x-wav','audio/wave'].includes(mime)))fail(400,'Loại tệp khai báo không khớp nội dung.');
     const sha256=createHash('sha256').update(bytes).digest('hex');
+    return{mediaId,name,bytes,objectPath,sha256,detected,kind};
+  }
+  async addMedia(auth,input){
+    const{mediaId,name,bytes,objectPath,sha256,detected,kind}=this.prepareMedia(auth,input);
     return this.mutate(auth,async client=>{
       const prior=await this.one('SELECT * FROM bao_an.media WHERE workspace_id=$1 AND name=$2 AND sha256=$3',[auth.workspaceId,name,sha256],client);if(prior)return this.publicMedia(prior);
       const used=await this.one('SELECT coalesce(sum(size),0) AS used FROM bao_an.media WHERE workspace_id=$1',[auth.workspaceId],client);if(Number(used.used)+bytes.length>256*1024*1024)fail(400,'Kho hình/âm thanh đã đạt giới hạn 256 MB của bản này.');
       const row=await this.one('INSERT INTO bao_an.media(id,workspace_id,name,mime,kind,size,sha256,object_path,created_at) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING *',[mediaId,auth.workspaceId,name,detected,kind,bytes.length,sha256,objectPath,now()],client);
       await this.audit(auth,'media.upload',mediaId,client);return this.publicMedia(row);
+    });
+  }
+  async addMediaBatch(auth,inputs){
+    role(auth,'admin');if(!Array.isArray(inputs)||inputs.length<1||inputs.length>24)fail(400,'Mỗi đợt tải cần 1–24 tệp.');
+    const prepared=inputs.map(input=>this.prepareMedia(auth,input));
+    if(prepared.reduce((n,row)=>n+row.bytes.length,0)>2*1024*1024)fail(400,'Mỗi đợt tải tối đa 2 MB.');
+    return this.mutate(auth,async client=>{
+      const prior=await this.rows('SELECT * FROM bao_an.media WHERE workspace_id=$1 AND name=ANY($2::text[]) AND sha256=ANY($3::text[])',[auth.workspaceId,prepared.map(row=>row.name),prepared.map(row=>row.sha256)],client);
+      const rows=[...prior],fresh=[];
+      for(const row of prepared)if(!rows.some(old=>old.name===row.name&&old.sha256===row.sha256)){
+        const value={id:row.mediaId,workspace_id:auth.workspaceId,name:row.name,mime:row.detected,kind:row.kind,size:row.bytes.length,sha256:row.sha256,object_path:row.objectPath,created_at:now()};rows.push(value);fresh.push(value);
+      }
+      if(fresh.length){
+        const used=await this.one('SELECT coalesce(sum(size),0) AS used FROM bao_an.media WHERE workspace_id=$1',[auth.workspaceId],client);
+        if(Number(used.used)+fresh.reduce((n,row)=>n+row.size,0)>256*1024*1024)fail(400,'Kho hình/âm thanh đã đạt giới hạn 256 MB của bản này.');
+        await this.exec(`INSERT INTO bao_an.media(id,workspace_id,name,mime,kind,size,sha256,object_path,created_at)
+          SELECT id,workspace_id,name,mime,kind,size,sha256,object_path,created_at FROM jsonb_to_recordset($1::jsonb)
+          AS x(id text,workspace_id text,name text,mime text,kind text,size integer,sha256 text,object_path text,created_at text)`,[json(fresh)],client);
+        const audits=fresh.map(row=>({id:id(),workspace_id:auth.workspaceId,user_id:auth.id,action:'media.upload',target_id:row.id,at:now()}));
+        await this.exec(`INSERT INTO bao_an.audit(id,workspace_id,user_id,action,target_id,at) SELECT id,workspace_id,user_id,action,target_id,at
+          FROM jsonb_to_recordset($1::jsonb) AS x(id text,workspace_id text,user_id text,action text,target_id text,at text)`,[json(audits)],client);
+      }
+      return prepared.map(row=>this.publicMedia(rows.find(old=>old.name===row.name&&old.sha256===row.sha256)));
     });
   }
   referencedMedia(pack){return new Set([...(pack.media??[]).map(asset=>asset.mediaId),...pack.items.flatMap(item=>[item.media?.imageId,item.media?.audioId,...('audioId'in item?[item.audioId]:[])])].filter(Boolean));}
@@ -162,11 +196,13 @@ export class PostgresStore{
   async publishWeek(auth,input){role(auth,'admin');shape(input,['requestId','title','classId','sets','replaceWeekId']);const requestId=text(input.requestId,'Mã lần nạp',100),title=text(input.title,'Tên tuần',100),classId=text(input.classId,'Lớp học',100),replaceWeekId=input.replaceWeekId===undefined?undefined:text(input.replaceWeekId,'Tuần cần cập nhật',100);
     if(!Array.isArray(input.sets)||input.sets.length<1||input.sets.length>30)fail(400,'Mỗi tuần cần từ 1–30 bộ câu hỏi.');const hash=digest(input);
     return this.mutate(auth,async client=>{
-      const cls=await this.class(auth,classId,client),seen=new Set(),sets=[];
+      const cls=await this.class(auth,classId,client),catalog=(await this.rows('SELECT * FROM bao_an.packs WHERE workspace_id=$1 ORDER BY version',[auth.workspaceId],client)).map(row=>({...row,pack:parse(row.json)})),seen=new Set(),sets=[];
       for(const[ index,set]of input.sets.entries()){
         shape(set,['subjectLabel','pack']);const label=set.subjectLabel===undefined||set.subjectLabel===''?'':text(set.subjectLabel,'Tên môn/chủ đề',120);
         if(!set.pack||typeof set.pack!=='object'||!['quiz','pairs','sentences','learning'].includes(set.pack.kind))fail(400,`Bộ ${index+1}: dạng câu chưa có trò chơi phù hợp.`);
-        let pack;try{pack=parseContentImport(json({schema:'baoan-learning-content',formatVersion:set.pack.kind==='learning'?2:1,packs:[{...set.pack,grade:cls.grade,subject:'thinking'}]}))[0];}catch(error){fail(400,`Bộ ${index+1}: ${error.message}`);}await this.validateMedia(auth,pack,client);
+        // Grade belongs to the published source; the receiving class keeps its own grade.
+        const source=catalog.find(row=>row.pack_id===set.pack.id&&row.version===set.pack.version)??catalog.find(row=>row.pack_id===set.pack.id);
+        let pack;try{pack=parseContentImport(json({schema:'baoan-learning-content',formatVersion:set.pack.kind==='learning'?2:1,packs:[{...set.pack,grade:source?.pack.grade??cls.grade,subject:'thinking'}]}))[0];}catch(error){fail(400,`Bộ ${index+1}: ${error.message}`);}await this.validateMedia(auth,pack,client);
         if(seen.has(pack.id))fail(400,'Một tuần không được lặp lại mã bộ câu hỏi gốc.');seen.add(pack.id);
         sets.push({subjectLabel:label,pack});
       }
@@ -179,7 +215,6 @@ export class PostgresStore{
         if(priorWeek&&(prior.payload_hash===hash||onlineWeekIdentity(priorWeek,mediaHashes)===incomingIdentity))return priorWeek;
         fail(409,'Mã lần nạp đã được dùng cho nội dung khác.');}
       const replay=replaceWeekId?undefined:weeks.find(week=>onlineWeekIdentity(week,mediaHashes)===incomingIdentity);if(replay)return replay;
-      const catalog=(await this.rows('SELECT * FROM bao_an.packs WHERE workspace_id=$1',[auth.workspaceId],client)).map(row=>({...row,pack:parse(row.json)}));
       let revision;
       if(replaceWeekId){const original=weeks.find(week=>week.id===replaceWeekId)??fail(404,'Không tìm thấy tuần cần cập nhật trong lớp này.');
         try{revision=onlineRevisionOrder(original,{title,sets},mediaHashes);}catch(error){fail(409,error.message);}if(revision.unchanged)return original;

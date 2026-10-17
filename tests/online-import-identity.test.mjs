@@ -65,6 +65,33 @@ async function sqliteFixture(t){
   store.db.prepare("INSERT INTO users(id,workspace_id,username,password_hash,role,created_at) VALUES(?,?,?,?,'admin',?)").run(userId,workspaceId,'manager','salt:manager',at);
   t.after(()=>store.close());return{store,admin:{id:userId,workspaceId,username:'manager',role:'admin'}};
 }
+for(const [name,fixture] of [['SQLite',sqliteFixture],['PostgreSQL',createPostgresFixture]])test(`${name}: a shared source retains its published grade across class assignment, revision and transfer`,async t=>{
+  const {store,admin}=await fixture(t),classes=[];
+  for(const grade of [3,3,4])classes.push(await store.createClass(admin,{name:`Lớp ${classes.length}`,grade}));
+  const input={title:'Tuần ôn tập dùng chung',sets:[{subjectLabel:'Ôn tập',pack:quiz()}]},weeks=[];
+  for(const [index,cls]of classes.entries())weeks.push(await store.publishWeek(admin,{...structuredClone(input),classId:cls.id,requestId:`shared-${index}`}));
+  for(const week of weeks)assert.deepEqual(week.sets[0].pack,weeks[0].sets[0].pack);
+  const student=await store.createStudent(admin,{name:'An',classId:classes[0].id,username:'shared.learner'},'salt:student','shared.learner');
+  const user=name==='SQLite'?store.db.prepare("SELECT * FROM users WHERE username='shared.learner'").get():await store.findUserByUsername('shared.learner');
+  const learner={id:user.id,workspaceId:admin.workspaceId,username:user.username,role:'student',studentId:student.id};
+  async function finish(requestId,version){const play=await store.startPlay(learner,{requestId,moduleId:'math-quest',packId:quiz().id,contentVersion:version});
+    for(const item of play.presentation.items)await store.attempt(learner,play.session.sessionId,{attemptKey:`answer-${item.id}`,itemId:item.id,response:{kind:'choice',choiceIndex:item.correctIndex},hintsUsed:0,elapsedMs:100});
+    return store.finishPlay(learner,play.session.sessionId);}
+  assert.equal((await finish('before-transfer',1)).gained,3);
+  await store.updateStudent(admin,student.id,{classId:classes[2].id});
+  assert.equal((await store.studentState(learner)).profile.grade,4);
+  assert.equal((await finish('after-transfer',1)).gained,0);
+  const revised=quiz(undefined,2);revised.grade=4;revised.items[0].explanation='Giải thích đã cập nhật';
+  const revision={requestId:'shared-revision-4',replaceWeekId:weeks[2].id,classId:classes[2].id,title:input.title,sets:[{subjectLabel:'Ôn tập',pack:revised}]};
+  const updated=await store.publishWeek(admin,revision);assert.equal(updated.sets[0].pack.grade,3);
+  await store.publishWeek(admin,{...revision,requestId:'shared-revision-3',replaceWeekId:weeks[0].id,classId:classes[0].id});
+  assert.equal((await finish('after-revision',2)).gained,0);
+  const invalid=structuredClone(revision);invalid.requestId='changed-without-version';invalid.sets[0].pack.items[0].correctIndex=0;
+  await assert.rejects(Promise.resolve().then(()=>store.publishWeek(admin,invalid)),e=>e.status===409);
+  const copy=structuredClone(input);copy.sets[0].pack.id='copied-for-another-grade';
+  await assert.rejects(Promise.resolve().then(()=>store.publishWeek(admin,{...copy,title:'Tuần sao chép',requestId:'grade-copy',classId:classes[2].id})),e=>e.status===409);
+  const state=await store.studentState(learner);assert.equal(state.balance.earned,3);assert.equal((await store.dashboard(admin)).weeks.length,3);
+});
 for(const [name,fixture] of [['SQLite',sqliteFixture],['PostgreSQL',createPostgresFixture]])test(`${name}: reimport is source-stable, immutable, atomic and cannot mint stars through copied IDs`,async t=>{
   const {store,admin}=await fixture(t),classroom=await store.createClass(admin,{name:'Lớp nhập học liệu',grade:3});
   const student=await store.createStudent(admin,{name:'An',classId:classroom.id,username:'learner'},'salt:student','learner');

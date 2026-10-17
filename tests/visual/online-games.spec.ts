@@ -4,6 +4,33 @@ import {once} from 'node:events';
 import {test,expect} from '@playwright/test';
 import {createOnlineServer} from '../../server/online-server.mjs';
 
+test('completed packs can be replayed from history for only the missing star, without unlocking future weeks',async({page})=>{
+ const root=path.resolve('test-results');await mkdir(root,{recursive:true});const directory=await mkdtemp(path.join(root,'online-replay-'));let server;
+ try{
+  server=createOnlineServer({databasePath:path.join(directory,'data.sqlite'),staticRoot:path.resolve('dist'),setupToken:'replay-bootstrap-token-2026',secureCookies:false});server.listen(0,'127.0.0.1');await once(server,'listening');const origin='http://127.0.0.1:'+server.address().port;
+  async function api(route:string,body?:unknown){const me=body&&!['/setup','/login'].includes(route)?await(await page.request.get(origin+'/api/online/me')).json():null;const r=body?await page.request.post(origin+'/api/online'+route,{data:body,headers:{Origin:origin,...(me?{'X-CSRF-Token':me.csrfToken}:{})}}):await page.request.get(origin+'/api/online'+route);expect(r.ok(),await r.text()).toBe(true);return r.json();}
+  await api('/setup',{token:'replay-bootstrap-token-2026',name:'Replay workspace',username:'replay.admin',password:'Replay-password-2026!'});
+  const cls=await api('/classes',{name:'Replay class',grade:3});await api('/students',{classId:cls.id,name:'Replay student',username:'replay.student',password:'Replay-password-2026!'});
+  const packs=['first','next','locked'].map(name=>({id:'replay-'+name,title:'Bộ '+name,version:1,grade:3,subject:'thinking',source:'local',publishedAt:new Date().toISOString(),kind:'quiz',items:Array.from({length:5},(_,i)=>({id:name+'-'+i,kind:'multiple-choice',objectiveId:'REPLAY.TEST',prompt:name+' câu '+i,options:['Đúng '+i,'Sai A','Sai B','Sai C'],correctIndex:0,explanation:'Đáp án do tác giả xác định.'}))}));
+  await api('/weeks',{requestId:'replay-week',classId:cls.id,title:'Tuần đang học',sets:packs.slice(0,2).map(pack=>({subjectLabel:pack.title,pack}))});
+  await api('/weeks',{requestId:'locked-week',classId:cls.id,title:'Tuần khóa',sets:[{subjectLabel:'Khóa',pack:packs[2]}]});
+  await page.context().clearCookies();await api('/login',{username:'replay.student',password:'Replay-password-2026!'});
+  async function finishApi(pack:typeof packs[number],wrong=false){const play=await api('/play',{requestId:crypto.randomUUID(),packId:pack.id,contentVersion:1,moduleId:'math-quest'});for(const [i,item] of pack.items.entries())await api(`/play/${play.session.sessionId}/attempt`,{attemptKey:item.id,itemId:item.id,response:{kind:'choice',choiceIndex:wrong&&i===0?1:0},hintsUsed:0,elapsedMs:100});return api(`/play/${play.session.sessionId}/complete`,{});}
+  expect((await finishApi(packs[0],true)).tier).toBe(2);
+  await page.goto(origin+'/?online=1&controls=1');
+  const replay=page.getByRole('button',{name:'Chơi lại Bộ first · Đảo Câu Hỏi',exact:true});await expect(replay).toBeVisible();
+  await expect(page.locator('.online-week-path > li.is-locked button')).toHaveCount(0);
+  const me=await api('/me'),denied=await page.request.post(origin+'/api/online/play',{headers:{Origin:origin,'X-CSRF-Token':me.csrfToken},data:{requestId:'locked-attempt',moduleId:'math-quest',packId:packs[2].id,contentVersion:1}});expect(denied.status()).toBe(403);
+  for(const gained of [1,0]){
+   await replay.click();await expect(page.getByRole('dialog',{name:'Đang chơi Bộ first',exact:true})).toBeVisible();await expect(page.locator('.game-dialog-head .eyebrow')).toHaveText('Bộ first');
+   for(let i=0;i<5;i++){await page.locator('.quiz-question').filter({hasText:'first câu '+i}).waitFor();await page.locator('.answer-option').nth(0).click();await page.getByRole('button',{name:i===4?'Nhận phần thưởng ⭐':'Đến trạm kế tiếp ➜',exact:true}).click();}
+   await expect(page.locator('.game-star-receipt')).toContainText(gained?'+1 sao mới':'Đã giữ mức sao cao nhất');
+   await page.getByRole('button',{name:/Trở về thế giới game/}).click();expect((await api('/student')).balance.earned).toBe(3);
+  }
+  await finishApi(packs[1]);await finishApi(packs[2]);expect((await api('/student')).current).toBeNull();await page.reload();await expect(replay).toBeVisible();await replay.click();await expect(page.getByRole('dialog',{name:'Đang chơi Bộ first',exact:true})).toBeVisible();await page.getByRole('button',{name:'← Thoát trò chơi',exact:true}).click();
+ }finally{if(server){server.closeAllConnections();await new Promise<void>(done=>server.close(()=>done()));server.onlineClose();}expect(path.dirname(path.resolve(directory))).toBe(root);expect(path.basename(directory)).toMatch(/^online-replay-/);await rm(directory,{recursive:true,force:true});}
+});
+
 test('assigned memory, sentence and sequence games complete through server-scored account history',async({page},testInfo)=>{
  const root=path.resolve('test-results');await mkdir(root,{recursive:true});const directory=await mkdtemp(path.join(root,'online-games-'));let server;
  try{

@@ -18,9 +18,17 @@ export const ONLINE_DOCUMENT_HEADERS=['subjectLabel','kind','title','topic','wee
 type Fields=Partial<Record<typeof ONLINE_DOCUMENT_HEADERS[number],string>>;
 type SourceLocation={row?:number;table?:number};
 const sourceLocations=new WeakMap<Fields,SourceLocation>();
-function atSource<T>(row:Fields,action:()=>T):T {try{return action();}catch(error){const location=sourceLocations.get(row),message=error instanceof Error?error.message:String(error);
-  if(message.startsWith('Excel, sheet')||message.startsWith('Word, bảng'))throw error;
-  throw new Error(`${location?.table?`Word, bảng ${location.table}`:`Excel, sheet Câu hỏi, dòng ${location?.row??'?'}`}: ${message}`);
+const sourceProblems=new WeakMap<Fields,string>();
+export type OnlineDocumentIssue={location:string;message:string;itemId?:string;prompt?:string};
+export type OnlineDocumentInspection=OnlineWeek&{issues:OnlineDocumentIssue[];totalQuestions:number;acceptedQuestions:number};
+function sourceLocation(row:Fields):string {const location=sourceLocations.get(row);return location?.table?`Word, bảng ${location.table}`:`Excel, sheet Câu hỏi, dòng ${location?.row??'?'}`;}
+class SourceRowError extends Error {
+  row:Fields;detail:string;
+  constructor(row:Fields,message:string){super(`${sourceLocation(row)}: ${message}`);this.row=row;this.detail=message;}
+}
+function atSource<T>(row:Fields,action:()=>T):T {try{return action();}catch(error){
+  if(error instanceof SourceRowError)throw error;
+  throw new SourceRowError(row,error instanceof Error?error.message:String(error));
 }}
 const UNDATED='1970-01-01T00:00:00.000Z';
 const DEFAULT_SOURCE='Nội dung do người soạn cung cấp';
@@ -40,15 +48,16 @@ function rowMetadata(row:Fields):QuestionMetadata {
     ...(row.topic?{topicId:required(row.topic,'topic',120)}:{}),...(row.competition?{formId:required(row.competition,'competition',120)}:{}),
     ...(row.level?{level:required(row.level,'level',120)}:{})};
 }
-function sourceRows(matrix:string[][],rowNumbers:number[]):Fields[] {
+function sourceRows(matrix:string[][],rowNumbers:number[],inspect=false):Fields[] {
   if(matrix.length<2||matrix[0][0]!=='baoan-online-week'||matrix[0][1]!=='1')fail('Excel, sheet Câu hỏi, dòng 1, trường schema/formatVersion: thiếu mã mẫu baoan-online-week phiên bản 1.');
   const headers=matrix[1];
   if(!headers.length||headers.some(header=>!ONLINE_DOCUMENT_HEADERS.includes(header as typeof ONLINE_DOCUMENT_HEADERS[number]))||new Set(headers).size!==headers.length)fail('Excel, sheet Câu hỏi, dòng 2: Tiêu đề cột bị trùng hoặc không thuộc mẫu.');
   if(!['subjectLabel','kind'].every(header=>headers.includes(header)))fail('Excel, sheet Câu hỏi, dòng 2: cần cột subjectLabel và kind.');
   return matrix.slice(2).map((cells,index)=>{
     const number=rowNumbers[index+2]??index+3;
-    if(cells.length>headers.length&&cells.slice(headers.length).some(Boolean))fail(`Excel, sheet Câu hỏi, dòng ${number}: có ô nằm ngoài mẫu.`);
-    const row:Fields={};headers.forEach((header,i)=>{if(cells[i]?.trim())row[header as keyof Fields]=cells[i].trim();});sourceLocations.set(row,{row:number});return row;
+    const row:Fields={};headers.forEach((header,i)=>{if(cells[i]?.trim())row[header as keyof Fields]=cells[i].trim();});sourceLocations.set(row,{row:number});
+    if(cells.length>headers.length&&cells.slice(headers.length).some(Boolean)){if(!inspect)atSource(row,()=>fail('có ô nằm ngoài mẫu.'));sourceProblems.set(row,'Có ô nằm ngoài mẫu.');}
+    return row;
   });
 }
 function decodeXml(value:string):string {
@@ -98,7 +107,7 @@ function wordXml(bytes:Uint8Array):string {
   assertXmlTree(result);
   return result.replace(/(<\/?)[A-Za-z_][\w.-]*:/g,'$1');
 }
-function wordRows(bytes:Uint8Array):{rows:Fields[];title?:string} {
+function wordRows(bytes:Uint8Array,inspect=false):{rows:Fields[];title?:string} {
   const xml=wordXml(bytes);if(!/<document\b/.test(xml)||!/<\/document>/.test(xml))fail('Nội dung DOCX không hợp lệ.');
   const tables=[...xml.matchAll(/<tbl\b[^>]*>(.*?)<\/tbl>/gs)];
   if(tables.length>932)fail('DOCX có quá nhiều bảng.');
@@ -111,14 +120,20 @@ function wordRows(bytes:Uint8Array):{rows:Fields[];title?:string} {
       if(marker)fail('Word có nhiều bảng thông tin tuần.');
       if(cells.find(row=>row[0]==='formatVersion')?.[1]!=='1')fail('Mẫu Word cần formatVersion 1.');marker=true;title=cells.find(row=>row[0]==='title')?.[1];continue;
     }
+    const row:Fields={},names=new Set<string>();sourceLocations.set(row,{table:tableIndex+1});
     if(cells[0]?.[0]!=='field'||cells[0]?.[1]!=='value'){
-      if(cells.some(row=>['kind','subjectLabel','prompt','left','acceptedAnswers'].includes(row[0])))fail(`Word, bảng ${tableIndex+1}: tiêu đề bảng câu hỏi phải là field và value; không bỏ qua bảng đã điền.`);
+      if(cells.some(row=>['kind','subjectLabel','prompt','left','acceptedAnswers'].includes(row[0]))){
+        const message='tiêu đề bảng câu hỏi phải là field và value; không bỏ qua bảng đã điền.';
+        if(!inspect)atSource(row,()=>fail(message));
+        for(const [name,value] of cells)if(ONLINE_DOCUMENT_HEADERS.includes(name as keyof Fields)&&value)row[name as keyof Fields]=value;
+        sourceProblems.set(row,message);rows.push(row);
+      }
       continue;
     }
-    const row:Fields={},names=new Set<string>();sourceLocations.set(row,{table:tableIndex+1});
     for(const cellsRow of cells.slice(1)){
-      const [name,value]=cellsRow;atSource(row,()=>{if(cellsRow.length!==2||!ONLINE_DOCUMENT_HEADERS.includes(name as typeof ONLINE_DOCUMENT_HEADERS[number])||names.has(name))fail(`Trường ${name??'?'} không hợp lệ hoặc trùng tên.`);
-      names.add(name);if(value)row[name as keyof Fields]=required(value,name,name==='passage'||name==='audioTranscript'?8000:4000);});
+      const [name,value]=cellsRow;try{atSource(row,()=>{if(cellsRow.length!==2||!ONLINE_DOCUMENT_HEADERS.includes(name as typeof ONLINE_DOCUMENT_HEADERS[number])||names.has(name))fail(`Trường ${name??'?'} không hợp lệ hoặc trùng tên.`);
+      names.add(name);if(value)row[name as keyof Fields]=required(value,name,name==='passage'||name==='audioTranscript'?8000:4000);});}
+      catch(error){if(!inspect||!(error instanceof SourceRowError))throw error;if(!sourceProblems.has(row))sourceProblems.set(row,error.detail);}
     }rows.push(row);
   }
   if(!marker)fail('Word thiếu bảng schema baoan-online-week phiên bản 1.');
@@ -148,8 +163,15 @@ function choice(row:Fields):{options:[string,string,string,string];correctIndex:
   if(new Set(options.map(option=>normalizedWord(option,false))).size!==4)fail('Các trường A, B, C, D phải chứa bốn phương án khác nhau.');
   const answer=required(row.answer,'answer',1).toUpperCase();if(!/^[A-D]$/.test(answer))fail('answer phải là A, B, C hoặc D.');return {options,correctIndex:(answer.charCodeAt(0)-65) as 0|1|2|3};
 }
-function groupPack(rows:Fields[],packKind:OnlineDocumentKind,id:string,version:number,title:string,grade:number,catalog:OnlineMediaAsset[]):ContentPack {
-  if(rows.length<2||rows.length>30)fail(`${rows[0].subjectLabel}: mỗi môn và dạng câu cần 2–30 câu hỏi.`);
+function packValidationFailure(rows:Fields[],message:string):never {
+  // Only validators' explicit item numbers identify a question. A pack-level
+  // failure must never be attributed to an arbitrary first question.
+  const number=Number(/^(?:Câu|Cặp|Mục) (\d+):/i.exec(message)?.[1]);
+  if(Number.isInteger(number)&&rows[number-1])return atSource(rows[number-1],()=>fail(message));
+  return fail(message);
+}
+function groupPack(rows:Fields[],packKind:OnlineDocumentKind,id:string,version:number,title:string,grade:number,catalog:OnlineMediaAsset[],diagnoseSingleton=false):ContentPack {
+  if(rows.length<(diagnoseSingleton?1:2)||rows.length>30)fail(`${rows[0].subjectLabel}: mỗi môn và dạng câu cần 2–30 câu hỏi.`);
   const shared=['subjectLabel','kind','title','topic','week','competition','level','imageFile','imageAlt','audioFile','audioTranscript','source','rights','itemId','objectiveId'];
   const specifics=packKind==='pairs'?['left','right']:packKind==='sentences'?['prompt','words','answer']
     :packKind==='numeric-answer'?['prompt','answer','unit']:['fill-blank','listening-gap'].includes(packKind)?['prompt','answer','acceptedAnswers','caseSensitive']
@@ -168,9 +190,19 @@ function groupPack(rows:Fields[],packKind:OnlineDocumentKind,id:string,version:n
       ...(packKind==='quiz'?{prompt:required(row.prompt,'prompt'),...choice(row),explanation:required(row.explanation??`Đáp án: ${row.answer}`,'explanation',500)}
         :packKind==='pairs'?{left:required(row.left,'left',120),right:required(row.right,'right',120)}:{prompt:required(row.prompt,'prompt'),...(row.words?{words:split(row.words,'words')}:{answer:required(row.answer,'answer',689)}),...(row.hint?{hint:required(row.hint,'hint',160)}:{})}),
       })));
+    // A singleton can never be published. Build its actual item only to expose
+    // its field errors before reporting that the group also lacks a partner.
+    if(diagnoseSingleton&&rows.length===1){const row=rows[0],base={id:row.itemId??'',objectiveId:row.objectiveId??'CUSTOM.QUESTION',metadata:rowMetadata(row)};
+      const item:ContentPack['items'][number]=packKind==='quiz'?{...base,kind:'multiple-choice',prompt:required(row.prompt,'prompt'),...choice(row),explanation:row.explanation??`Đáp án: ${row.answer}`}
+        :packKind==='pairs'?{...base,kind:'pair',left:required(row.left,'left',120),right:required(row.right,'right',120)}
+        :{...base,kind:'sentence',prompt:required(row.prompt,'prompt'),words:row.words?split(row.words,'words'):required(row.answer,'answer',689).split(/\s+/),hint:row.hint??'Sắp xếp các thẻ theo đúng thứ tự đáp án.'};
+      if(extras[0].question)item.media=extras[0].question;if(!item.id)item.id=onlineGeneratedItemId(item);
+      const pack={id,version,title,grade,subject:'thinking',source:'local',publishedAt:UNDATED,kind:packKind,items:[item]} as ContentPack;
+      const errors=validatePack(pack).filter(message=>message!=='Mỗi bộ phải có từ 2 đến 30 câu/cặp.');if(errors.length)return packValidationFailure(rows,errors[0]);return pack;
+    }
     let pack:ContentPack;try{pack=parseOnlineQuestions(JSON.stringify({kind:packKind,items:nativeRows}),'question.json',{id,version,title,grade});}
-    catch(error){const number=Number(/(?:Câu|Cặp|Mục) (\d+)/i.exec(error instanceof Error?error.message:'')?.[1]??1);return atSource(rows[number-1]??rows[0],()=>{throw error;});}
-    pack.items.forEach((item,index)=>{if(extras[index].question)item.media=extras[index].question;if(!rows[index].itemId)item.id=onlineGeneratedItemId(item);});const errors=validatePack(pack);if(errors.length)return atSource(rows[0],()=>fail(errors[0]));return pack;
+    catch(error){return packValidationFailure(rows,error instanceof Error?error.message:String(error));}
+    pack.items.forEach((item,index)=>{if(extras[index].question)item.media=extras[index].question;if(!rows[index].itemId)item.id=onlineGeneratedItemId(item);});const errors=validatePack(pack);if(errors.length)return packValidationFailure(rows,errors[0]);return pack;
   }
   const media:LearningMedia[]=[],passages:LearningPack['passages']=[];
   const items:RichLearningItem[]=rows.map((row,index)=>atSource(row,()=>{
@@ -200,7 +232,7 @@ function groupPack(rows:Fields[],packKind:OnlineDocumentKind,id:string,version:n
   }));
   items.forEach(item=>{if(!item.id)item.id=onlineGeneratedItemId(item);});
   const pack:LearningPack={id,version,title,grade,subject:'thinking',source:'local',publishedAt:UNDATED,kind:'learning',contentFormatVersion:2,items,passages,media};
-  const errors=validatePack(pack);if(errors.length){const number=Number(/(?:Câu|Mục) (\d+)/i.exec(errors[0])?.[1]??1);return atSource(rows[number-1]??rows[0],()=>fail(errors[0]));}return pack;
+  const errors=validatePack(pack).filter(message=>!diagnoseSingleton||message!=='Mỗi bộ phải có từ 2 đến 30 câu/cặp.');if(errors.length)return packValidationFailure(rows,errors[0]);return pack;
 }
 
 export function onlineDocumentGameChoices(pack:ContentPack) {
@@ -208,23 +240,30 @@ export function onlineDocumentGameChoices(pack:ContentPack) {
   return GAME_REGISTRY.filter(game=>{const presentation=onlinePresentation(game.id,pack);return presentation&&validatePack(presentation).length===0;}).map(({id,label})=>({id,label}));
 }
 
-/** Only text tables and supplied media catalog references are interpreted. */
-export async function parseOnlineDocument(bytes:Uint8Array,fileName:string,context:OnlineWeekContext,media:OnlineMediaAsset[]):Promise<OnlineWeek> {
+function documentSource(bytes:Uint8Array,fileName:string,context:OnlineWeekContext,media:OnlineMediaAsset[],inspect=false) {
   if(!(bytes instanceof Uint8Array)||bytes.byteLength<22||bytes.byteLength>1024*1024)fail('Word hoặc Excel cần dung lượng dưới 1 MB; tải ảnh và âm thanh riêng.');
-  if(!Array.isArray(media)||media.length>300||media.some(asset=>!asset||typeof asset.name!=='string'||typeof asset.id!=='string'||typeof asset.sha256!=='string'||typeof asset.mime!=='string'||!['image','audio'].includes(asset.kind)))fail('Catalog đa phương tiện không hợp lệ.');
+  // The catalog spans the workspace, not just this document. Its storage quota is
+  // enforced by the host; references below still require a unique, valid asset.
+  if(!Array.isArray(media)||media.some(asset=>!asset||typeof asset.name!=='string'||typeof asset.id!=='string'||typeof asset.sha256!=='string'||typeof asset.mime!=='string'||!['image','audio'].includes(asset.kind)))fail('Catalog đa phương tiện không hợp lệ.');
   const extension=fileName.toLowerCase().split('.').pop();let rows:Fields[];let sourceTitle:string|undefined;
   if(extension==='xlsx'){
-    const workbook=parseQuestionWorkbookBytes(bytes);rows=sourceRows(workbook.sheets['Câu hỏi'],workbook.rowNumbers['Câu hỏi']);
+    const workbook=parseQuestionWorkbookBytes(bytes);rows=sourceRows(workbook.sheets['Câu hỏi'],workbook.rowNumbers['Câu hỏi'],inspect);
     const info=workbook.sheets['Thông tin bộ'];if(info[0]?.[0]!=='schema'||info[0]?.[1]!=='baoan-online-week'||info.find(row=>row[0]==='formatVersion')?.[1]!=='1')fail('Thông tin bộ thiếu schema hoặc phiên bản mẫu.');
     sourceTitle=info.find(row=>row[0]==='title')?.[1];
-  }else if(extension==='docx'){const parsed=wordRows(bytes);rows=parsed.rows;sourceTitle=parsed.title;}else fail('Chỉ nhận mẫu Word .docx hoặc Excel .xlsx.');
+  }else if(extension==='docx'){const parsed=wordRows(bytes,inspect);rows=parsed.rows;sourceTitle=parsed.title;}else fail('Chỉ nhận mẫu Word .docx hoặc Excel .xlsx.');
   if(!/^[a-z0-9-]{3,77}$/.test(context.idPrefix)||!Number.isInteger(context.grade)||context.grade<1||context.grade>12)fail('Thông tin lớp hoặc mã tuần không hợp lệ.');
-  const filled=rows.filter(row=>Object.keys(row).some(key=>!['kind','title','subjectLabel','week','topic','competition','level','source','rights'].includes(key)));
+  const filled=rows.filter(row=>sourceProblems.has(row)||Object.keys(row).some(key=>!['kind','title','subjectLabel','week','topic','competition','level','source','rights'].includes(key)));
   if(!filled.length)fail('Mẫu chưa có câu hỏi. Điền nội dung và đáp án, tối thiểu 2 câu cho mỗi môn và dạng câu.');
   const weeks=new Set(filled.map(row=>row.week).filter(Boolean));if(weeks.size>1)fail('Một tệp chỉ chứa một tuần.');
   const title=required([...weeks][0]??(sourceTitle||context.title),'Tên tuần',90);
   const sourceCode=onlineSourceCode(title,context.sourceId),version=context.version??1;
   if(!Number.isSafeInteger(version)||version<1)fail('version: phiên bản phải là số nguyên dương.');
+  return {filled,title,sourceCode,version};
+}
+
+/** Only text tables and supplied media catalog references are interpreted. */
+export async function parseOnlineDocument(bytes:Uint8Array,fileName:string,context:OnlineWeekContext,media:OnlineMediaAsset[]):Promise<OnlineWeek> {
+  const {filled,title,sourceCode,version}=documentSource(bytes,fileName,context,media);
   const groups=new Map<string,{label:string;kind:OnlineDocumentKind;title:string;rows:Fields[]}>();
   for(const row of filled)atSource(row,()=>{
     const label=required(row.subjectLabel??context.subjectLabel,'subjectLabel',120);
@@ -236,4 +275,54 @@ export async function parseOnlineDocument(bytes:Uint8Array,fileName:string,conte
   if(groups.size>30)fail('Mỗi tuần tối đa 30 bộ môn và dạng câu.');
   return {title,sets:[...groups.values()].map(group=>({subjectLabel:group.label,pack:groupPack(group.rows,group.kind,
     context.packIds?.[JSON.stringify([group.label,group.kind])]??onlineGeneratedPackId(sourceCode,group.label,group.kind),version,group.title,context.grade,media)}))};
+}
+
+/** Preview valid, playable groups and keep every excluded source question visible. */
+export async function inspectOnlineDocument(bytes:Uint8Array,fileName:string,context:OnlineWeekContext,media:OnlineMediaAsset[],options:{weekTitle?:string}={}):Promise<OnlineDocumentInspection> {
+  const {filled,title:documentTitle,sourceCode,version}=documentSource(bytes,fileName,context,media,true);
+  const title=options.weekTitle===undefined?documentTitle:required(options.weekTitle,'Tên tuần',90);
+  const issues:OnlineDocumentIssue[]=[],excluded=new Set<Fields>();
+  const exclude=(row:Fields,message:string)=>{if(excluded.has(row))return;excluded.add(row);issues.push({location:sourceLocation(row),message,
+    ...(row.itemId?{itemId:row.itemId}:{}),...(row.prompt||row.left?{prompt:row.prompt??row.left}:{})});};
+  const groups=new Map<string,{label:string;kind:OnlineDocumentKind;rows:Fields[]}>();
+  for(const row of filled){
+    const problem=sourceProblems.get(row);if(problem){exclude(row,problem);continue;}
+    try{atSource(row,()=>{
+      const label=required(row.subjectLabel??context.subjectLabel,'subjectLabel',120);
+      if(!ONLINE_DOCUMENT_KINDS.includes(row.kind as OnlineDocumentKind))fail('kind: chọn một trong 8 dạng được liệt kê trong mẫu.');
+      required(row.title??documentTitle,'title',90);
+      const kind=row.kind as OnlineDocumentKind,key=JSON.stringify([label,kind]);let group=groups.get(key);
+      if(!group){group={label,kind,rows:[]};groups.set(key,group);}group.rows.push(row);
+    });}catch(error){if(!(error instanceof SourceRowError))throw error;exclude(row,error.detail);}
+  }
+  if(groups.size>30)fail('Mỗi tuần tối đa 30 bộ môn và dạng câu.');
+  const sets:OnlineWeek['sets']=[];
+  for(const [key,group] of groups){
+    let candidates=[...group.rows];
+    if(candidates.length>30){for(const row of candidates)exclude(row,`${group.label}: mỗi môn và dạng câu cần 2–30 câu hỏi; bộ này có ${candidates.length} câu, hãy chia bộ trước khi nhập.`);continue;}
+    const id=context.packIds?.[key]??onlineGeneratedPackId(sourceCode,group.label,group.kind);
+    while(candidates.length>=2){
+      const packTitle=candidates[0].title??documentTitle;
+      try{
+        const pack=groupPack(candidates,group.kind,id,version,packTitle,context.grade,media);
+        // Validate the questions first: a malformed first row must not make its
+        // title authoritative and cause otherwise valid later rows to be lost.
+        const conflicts=candidates.filter(row=>(row.title??documentTitle)!==packTitle);
+        if(conflicts.length){for(const row of conflicts)exclude(row,'Các câu cùng môn và dạng cần cùng title.');candidates=candidates.filter(row=>!excluded.has(row));continue;}
+        sets.push({subjectLabel:group.label,pack});candidates=[];break;
+      }catch(error){
+        if(error instanceof SourceRowError&&candidates.includes(error.row)){exclude(error.row,error.detail);candidates=candidates.filter(row=>row!==error.row);}
+        else {const message=error instanceof Error?error.message:String(error);for(const row of candidates)exclude(row,`Bộ ${group.label}: ${message}`);candidates=[];}
+      }
+    }
+    for(const row of candidates){
+      try{groupPack([row],group.kind,id,version,row.title??documentTitle,context.grade,media,true);
+        exclude(row,`${group.label}: chỉ còn 1 câu đủ điều kiện; mỗi môn và dạng cần ít nhất 2 câu để giao bài.`);}
+      catch(error){exclude(row,error instanceof SourceRowError?error.detail:`Bộ ${group.label}: ${error instanceof Error?error.message:String(error)}`);}
+    }
+  }
+  // Source order makes a long report easy to compare with the original file.
+  const positions=new Map(filled.map((row,index)=>[sourceLocation(row),index]));issues.sort((a,b)=>positions.get(a.location)!-positions.get(b.location)!);
+  const acceptedQuestions=sets.reduce((count,set)=>count+set.pack.items.length,0);
+  return {title,sets,issues,totalQuestions:filled.length,acceptedQuestions};
 }

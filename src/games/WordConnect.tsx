@@ -1,5 +1,5 @@
 import {saveFailureMessage} from './save-failure-message';
-import QuestionMedia from '../components/QuestionMedia';
+import QuestionMedia,{QuestionImageRecovery} from '../components/QuestionMedia';
 import GameMascot from './GameMascot';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { GameHostProps, PairsPack } from '../core/contracts';
@@ -238,7 +238,7 @@ export default function WordConnect({ pack, onAttempt, onComplete, onExit }: Gam
             <strong>{moves} lượt nối</strong>
           </div>
           <div className="pair-question-audio" aria-label="Âm thanh câu hỏi đang chọn">{selectedLeft&&<QuestionMedia key={selectedLeft} media={content.items.find(item=>item.id===selectedLeft)?.media} audioOnly/>}</div>
-          <div className="connect-columns" aria-label="Bảng hai cột nối từ">
+          <QuestionImageRecovery><div className="connect-columns" aria-label="Bảng hai cột nối từ">
             <div className="connect-col connect-col-left" aria-label="Cột từ vựng bên trái">
               <div className="connect-col-header">CỘT A</div>
               {leftDeck.map(item => {
@@ -284,7 +284,7 @@ export default function WordConnect({ pack, onAttempt, onComplete, onExit }: Gam
                 );
               })}
             </div>
-          </div>
+          </div></QuestionImageRecovery>
         </div>
       </div>
 

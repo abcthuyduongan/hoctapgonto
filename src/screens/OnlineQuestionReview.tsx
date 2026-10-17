@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {memo,useState} from 'react';
 import type {ContentPack} from '../core/contracts';
 import {normalizedWord} from '../core/rich-content';
 import {onlineScoreResponse} from '../core/online-exercises';
@@ -7,7 +7,7 @@ import QuestionMedia from '../components/QuestionMedia';
 const labels:Record<string,string>={quiz:'Trắc nghiệm','multiple-choice':'Trắc nghiệm',pair:'Nối cặp',sentence:'Xếp thứ tự câu','numeric-answer':'Nhập số','fill-blank':'Điền từ','reading-choice':'Đọc & chọn đáp án','listening-choice':'Nghe & chọn đáp án','listening-gap':'Nghe & điền từ'};
 export function onlinePackKindLabel(pack:ContentPack){return [...new Set(pack.items.map(item=>labels[item.kind]??item.kind))].join(', ');}
 function ReviewItem({pack,index}:{pack:ContentPack;index:number}){
-  const item=pack.items[index],[value,setValue]=useState(''),[choice,setChoice]=useState<number|null>(null),[result,setResult]=useState('');
+  const item=pack.items[index],[value,setValue]=useState(''),[choice,setChoice]=useState<number|null>(null),[result,setResult]=useState(''),[open,setOpen]=useState(false);
   const passage=pack.kind==='learning'&&'passageId' in item?pack.passages.find(row=>row.passageId===item.passageId):undefined;
   const catalog=pack.kind==='learning'&&'audioId'in item?pack.media.find(row=>row.mediaId===item.audioId):undefined;
   const media={...item.media,...(catalog?{audioId:catalog.mediaId,audioTranscript:catalog.transcript}:{})};
@@ -16,7 +16,7 @@ function ReviewItem({pack,index}:{pack:ContentPack;index:number}){
     const correct=item.kind==='pair'?normalizedWord(value,false)===normalizedWord(item.right,false):item.kind==='sentence'?normalizedWord(value,false)===normalizedWord(item.words.join(' '),false):onlineScoreResponse(pack,'math-quest',item.id,options?{kind:'choice',choiceIndex:choice}:{kind:'text',value}).correct;
     setResult(correct?'Khớp đáp án của bộ. Lượt thử không ghi sao.':'Chưa khớp đáp án. Lượt thử không ghi sao.');
   }catch(error){setResult(error instanceof Error?error.message:'Chưa kiểm tra được câu thử.');}}
-  return <details className="online-review-item"><summary>Câu {index+1} · {labels[item.kind]} · {item.kind==='pair'?item.left:item.prompt}</summary>
+  return <details className="online-review-item" onToggle={event=>setOpen(event.currentTarget.open)}><summary>Câu {index+1} · {labels[item.kind]} · {item.kind==='pair'?item.left:item.prompt}</summary>{open&&<>
     {passage&&<article className="online-reading"><h4>{passage.title}</h4><p>{passage.body}</p></article>}
     <QuestionMedia media={media} showTranscript/>
     {options&&<ol type="A">{options.map((option,i)=><li key={i}>{option}{'correctIndex'in item&&item.correctIndex===i?' ✓ Đáp án đúng':''}</li>)}</ol>}
@@ -29,9 +29,14 @@ function ReviewItem({pack,index}:{pack:ContentPack;index:number}){
     <div className="online-question-try" role="group" aria-label={`Thử câu ${index+1}`}><p><strong>Thử làm câu này</strong></p>
       {options?<div className="online-actions">{options.map((option,i)=><button type="button" aria-pressed={choice===i} key={i} onClick={()=>{setChoice(i);setResult('');}}>{String.fromCharCode(65+i)}. {option}</button>)}</div>:<label>Câu trả lời thử<input value={value} maxLength={500} onChange={event=>{setValue(event.target.value);setResult('');}}/></label>}
       <button type="button" disabled={options?choice===null:!value.trim()} onClick={check}>Kiểm tra câu thử</button>{result&&<p role="status">{result}</p>}
-    </div>
+    </div></>}
   </details>;
 }
-export default function OnlineQuestionReview({pack}:{pack:ContentPack}){
+const OnlineQuestionReview=memo(function OnlineQuestionReview({pack}:{pack:ContentPack}){
   return <div className="online-question-review" aria-label={`Duyệt mọi câu trong ${pack.title}`}><p>{pack.items.length} câu · mở từng câu để xem đáp án, tư liệu và thử làm.</p>{pack.items.map((item,index)=><ReviewItem key={item.id} pack={pack} index={index}/>)}</div>;
-}
+});
+export const OnlineQuestionDisclosure=memo(function OnlineQuestionDisclosure({pack,label}:{pack:ContentPack;label:string}){
+  const[open,setOpen]=useState(false);
+  return <details onToggle={event=>setOpen(event.currentTarget.open)}><summary>{label}</summary>{open&&<OnlineQuestionReview pack={pack}/>}</details>;
+});
+export default OnlineQuestionReview;

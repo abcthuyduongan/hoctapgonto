@@ -1,5 +1,5 @@
 import {saveFailureMessage} from './save-failure-message';
-import QuestionMedia from '../components/QuestionMedia';
+import QuestionMedia,{QuestionImageRecovery} from '../components/QuestionMedia';
 import GameMascot from './GameMascot';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { GameHostProps, PairsPack } from '../core/contracts';
@@ -118,14 +118,14 @@ export default function MemoryMatch({pack, onAttempt, onComplete, onExit}: GameH
         <div className="memory-topline"><span>✦ BẢNG THẺ THẦN KỲ</span><strong>{moves} lượt thử</strong></div>
         <div className="memory-board-subline" aria-live="polite">{saving ? 'Đang ghi kết quả…' : locked ? 'Đang xem cặp thẻ…' : first ? 'Chọn thêm một thẻ để kiểm tra cặp nhé!' : 'Lật hai thẻ để tìm cặp tương ứng'}</div>
         <div className="pair-question-audio" aria-label="Âm thanh thẻ đang mở">{content.items.filter(item=>first===item.id+'-L'||second===item.id+'-L'||matched.includes(item.id)).map(item=><QuestionMedia key={item.id} media={item.media} audioOnly showTranscript={matched.includes(item.id)}/>)}</div>
-        <div className="memory-grid" aria-label="Bảng thẻ ghi nhớ">
+        <QuestionImageRecovery><div className="memory-grid" aria-label="Bảng thẻ ghi nhớ">
           {deck.map(card => {
             const revealed = card.id === first || card.id === second || matched.includes(card.pairId);
             return <button key={card.id} className={`memory-card ${revealed?'revealed':''} ${matched.includes(card.pairId)?'found':''}`} disabled={locked || matched.includes(card.pairId) || !!error} onClick={() => void choose(card)} aria-label={revealed ? card.label : 'Thẻ úp, chọn để lật'} aria-pressed={revealed}>
               <span className="memory-inner"><span className="memory-face memory-back" aria-hidden="true">✦</span><span className="memory-face memory-front">{revealed&&card.side==='left'&&<QuestionMedia media={content.items.find(item=>item.id===card.pairId)?.media} imageOnly/>}<span>{card.label}</span></span></span>
             </button>;
           })}
-        </div>
+        </div></QuestionImageRecovery>
       </div>
     </div>
     {status === 'done' && <GameCompletion title="Giải mã khu rừng!" summary={`Con đã ghép ${content.items.length} cặp sau ${moves} lượt thử. Tuyệt vời!`} onExit={onExit}/>}

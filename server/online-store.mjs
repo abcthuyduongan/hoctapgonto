@@ -112,10 +112,12 @@ export class OnlineStore{
     if(!Array.isArray(input.sets)||input.sets.length<1||input.sets.length>30)fail(400,'Mỗi tuần cần từ 1–30 bộ câu hỏi.');
     const hash=digest(input);
     return this.tx(()=>{
-      const cls=this.class(auth,classId),seen=new Set(),sets=input.sets.map((set,index)=>{
+      const cls=this.class(auth,classId),catalog=this.db.prepare('SELECT * FROM packs WHERE workspace_id=? ORDER BY version').all(auth.workspaceId).map(row=>({...row,pack:parse(row.json)})),seen=new Set(),sets=input.sets.map((set,index)=>{
         shape(set,['subjectLabel','pack']);const label=set.subjectLabel===undefined||set.subjectLabel===''?'':text(set.subjectLabel,'Tên môn/chủ đề',120);
         if(!set.pack||typeof set.pack!=='object'||!['quiz','pairs','sentences','learning'].includes(set.pack.kind))fail(400,`Bộ ${index+1}: dạng câu chưa có trò chơi phù hợp.`);
-        let parsed;try{parsed=parseContentImport(json({schema:'baoan-learning-content',formatVersion:set.pack.kind==='learning'?2:1,packs:[{...set.pack,grade:cls.grade,subject:'thinking'}]}))[0];}catch(error){fail(400,`Bộ ${index+1}: ${error.message}`);}this.validateMedia(auth,parsed);
+        // Grade belongs to the published source; the receiving class keeps its own grade.
+        const source=catalog.find(row=>row.pack_id===set.pack.id&&row.version===set.pack.version)??catalog.find(row=>row.pack_id===set.pack.id);
+        let parsed;try{parsed=parseContentImport(json({schema:'baoan-learning-content',formatVersion:set.pack.kind==='learning'?2:1,packs:[{...set.pack,grade:source?.pack.grade??cls.grade,subject:'thinking'}]}))[0];}catch(error){fail(400,`Bộ ${index+1}: ${error.message}`);}this.validateMedia(auth,parsed);
         if(seen.has(parsed.id))fail(400,'Một tuần không được lặp lại mã bộ câu hỏi gốc.');seen.add(parsed.id);return{subjectLabel:label,pack:parsed};
       });
       const mediaHashes=Object.fromEntries(this.db.prepare('SELECT id,sha256 FROM media WHERE workspace_id=?').all(auth.workspaceId).map(row=>[row.id,row.sha256]));
@@ -127,7 +129,6 @@ export class OnlineStore{
         if(priorWeek&&(prior.payload_hash===hash||onlineWeekIdentity(priorWeek,mediaHashes)===incomingIdentity))return priorWeek;
         fail(409,'Mã lần nạp đã được dùng cho nội dung khác.');}
       const replay=replaceWeekId?undefined:weeks.find(week=>onlineWeekIdentity(week,mediaHashes)===incomingIdentity);if(replay)return replay;
-      const catalog=this.db.prepare('SELECT * FROM packs WHERE workspace_id=?').all(auth.workspaceId).map(row=>({...row,pack:parse(row.json)}));
       let revision;
       if(replaceWeekId){const original=weeks.find(week=>week.id===replaceWeekId)??fail(404,'Không tìm thấy tuần cần cập nhật trong lớp này.');
         try{revision=onlineRevisionOrder(original,{title,sets},mediaHashes);}catch(error){fail(409,error.message);}if(revision.unchanged)return original;

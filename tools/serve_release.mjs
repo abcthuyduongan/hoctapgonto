@@ -11,7 +11,7 @@ export const MIME_TYPES=Object.freeze({
   '.css':'text/css; charset=utf-8','.json':'application/json; charset=utf-8','.webmanifest':'application/manifest+json; charset=utf-8',
   '.svg':'image/svg+xml','.png':'image/png','.jpg':'image/jpeg','.jpeg':'image/jpeg','.webp':'image/webp','.ico':'image/x-icon',
   '.wav':'audio/wav','.mp3':'audio/mpeg','.ogg':'audio/ogg','.wasm':'application/wasm','.glb':'model/gltf-binary',
-  '.gltf':'model/gltf+json','.bin':'application/octet-stream','.woff2':'font/woff2','.woff':'font/woff',
+  '.gltf':'model/gltf+json','.bin':'application/octet-stream','.zip':'application/zip','.woff2':'font/woff2','.woff':'font/woff',
   '.docx':'application/vnd.openxmlformats-officedocument.wordprocessingml.document','.xlsx':'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet','.csv':'text/csv; charset=utf-8','.txt':'text/plain; charset=utf-8',
 });
 const within=(root,path)=>{const rel=relative(root,path);return rel===''||(!isAbsolute(rel)&&rel!=='..'&&!rel.startsWith(`..${sep}`));};

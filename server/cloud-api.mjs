@@ -74,6 +74,29 @@ export function createCloudApi({store,storage,publicOrigin,setupToken}){
       if(method==='GET'&&route==='/recovery'){role(auth,'admin');return cloudJson(200,{supported:false,reason:'Bản cloud dùng công cụ sao lưu và phục hồi PostgreSQL cùng Storage trong Supabase. Không khôi phục tệp SQLite trực tiếp vào môi trường này.'});}
       if(method==='GET'&&route==='/student'){role(auth,'student');return cloudJson(200,await store.studentState(auth));}
       if(method==='GET'&&route==='/media'){role(auth,'admin');return cloudJson(200,await store.listMedia(auth));}
+      if(method==='POST'&&route==='/media/batch'){
+        role(auth,'admin');const input=shape(await body(request,3*1024*1024),['files']);
+        if(!Array.isArray(input.files)||input.files.length<1||input.files.length>24)fail(400,'Mỗi đợt tải cần 1–24 tệp.');
+        const files=input.files.map(validateCloudMedia);
+        if(files.reduce((n,file)=>n+file.bytes.length,0)>MAX_MEDIA)fail(400,'Mỗi đợt tải tối đa 2 MB.');
+        const existing=await store.listMedia(auth),uploaded=[],pending=[];
+        for(const file of files)if(!existing.some(row=>row.name===file.name&&row.sha256===file.sha256)&&!pending.some(row=>row.name===file.name&&row.sha256===file.sha256)){
+          const id=randomUUID();pending.push({...file,id,objectPath:`${auth.workspaceId}/${id}`});
+        }
+        if(!pending.length)return cloudJson(201,files.map(file=>existing.find(row=>row.name===file.name&&row.sha256===file.sha256)));
+        let assets;
+        try{
+          // Bound Storage concurrency; the database commits the entire batch once.
+          for(let offset=0;offset<pending.length;offset+=3){
+            const results=await Promise.allSettled(pending.slice(offset,offset+3).map(async file=>{await storage.upload(file.objectPath,file.bytes,file.mime);uploaded.push(file);return file;}));
+            const failed=results.find(row=>row.status==='rejected');if(failed)throw failed.reason;
+          }
+          assets=await store.addMediaBatch(auth,pending);
+        }catch(error){await Promise.allSettled(uploaded.map(file=>storage.remove(file.objectPath)));throw error;}
+        // Cleanup after commit must never remove objects referenced by committed rows.
+        const used=new Set(assets.map(row=>row.id));await Promise.allSettled(uploaded.filter(file=>!used.has(file.id)).map(file=>storage.remove(file.objectPath)));
+        return cloudJson(201,files.map(file=>assets.find(row=>row.name===file.name&&row.sha256===file.sha256)??existing.find(row=>row.name===file.name&&row.sha256===file.sha256)));
+      }
       if(method==='POST'&&route==='/media'){
         role(auth,'admin');const input=validateCloudMedia(await body(request,3*1024*1024)),existing=(await store.listMedia(auth)).find(row=>row.name===input.name&&row.sha256===input.sha256);if(existing)return cloudJson(201,existing);
         const id=randomUUID(),objectPath=`${auth.workspaceId}/${id}`;await storage.upload(objectPath,input.bytes,input.mime);

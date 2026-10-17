@@ -40,6 +40,7 @@ export const onlineApi={
   restorePreview:(base64:string)=>request<OnlineRestorePreview>('/restore/preview','POST',{base64}),
   restoreCommit:async(body:{restoreToken:string;sha256:string;confirm:true})=>{const result=await request<{restored:true;reauthenticate:true;counts:Record<string,number>;preBackupCreated:boolean}>('/restore/commit','POST',body);csrfToken='';return result;},
   uploadMedia:(body:{name:string;mime:string;base64:string})=>request<OnlineMediaAsset>('/media','POST',body),
+  uploadMediaBatch:(files:{name:string;mime:string;base64:string}[])=>request<OnlineMediaAsset[]>('/media/batch','POST',{files}),
   createClass:(body:{name:string;grade:number})=>request<OnlineClass>('/classes','POST',body),
   createStudent:(body:{name:string;classId:string;username:string;password?:string})=>request<{student:OnlineStudent;credentials:{username:string;password:string}}>('/students','POST',body),
   updateStudent:(id:string,body:{active?:boolean;classId?:string;name?:string})=>request<OnlineStudent>(`/students/${segment(id)}`,'PATCH',body),

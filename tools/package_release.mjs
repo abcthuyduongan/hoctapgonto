@@ -6,7 +6,7 @@ import {unzipSync,zipSync} from 'fflate';
 import {build} from 'esbuild';
 import {setTimeout as delay} from 'node:timers/promises';
 
-export const RELEASE_VERSION='3.8.0-rc.2';
+export const RELEASE_VERSION='3.8.0-rc.6';
 export const RELEASE_STORAGE_SCHEMAS=Object.freeze({localSqlite:1,cloudPostgres:1});
 const PROJECT_ROOT=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const MAX_FILES=3000,MAX_FILE_BYTES=64*1024*1024,MAX_TOTAL_BYTES=256*1024*1024;
@@ -53,7 +53,7 @@ async function buildPayload(distDir){
   payload.set('restore-online.mjs',Buffer.from(restoreBundle.outputFiles[0].contents));
   payload.set('backup-online.mjs',await readFile(join(PROJECT_ROOT,'server/backup-online.mjs')));
   payload.set('QUAN_LY_CUC_BO.md',await readFile(join(PROJECT_ROOT,'docs/QUAN_LY_CUC_BO.md')));
-  payload.set('NGHIEM_THU_CUC_BO_RC2.md',await readFile(join(PROJECT_ROOT,'docs/NGHIEM_THU_CUC_BO_RC2.md')));
+  payload.set('NGHIEM_THU_CUC_BO_RC6.md',await readFile(join(PROJECT_ROOT,'docs/NGHIEM_THU_CUC_BO_RC6.md')));
   const assetCount=files.length;
   const entries=[...payload].sort(([a],[b])=>a.localeCompare(b)).map(([path,bytes])=>({path,bytes:bytes.byteLength,sha256:hash(bytes)}));
   return {payload,buildId,assetCount,entries,payloadHash:hash(Buffer.from(JSON.stringify(entries)))};
