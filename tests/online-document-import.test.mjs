@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import {zipSync,unzipSync} from 'fflate';
-import {ONLINE_DOCUMENT_HEADERS,ONLINE_DOCUMENT_KINDS,parseOnlineDocument,inspectOnlineDocument,onlineDocumentGameChoices} from '../src/core/online-document-import.ts';
+import {ONLINE_DOCUMENT_HEADERS,ONLINE_DOCUMENT_KINDS,parseOnlineDocument,inspectOnlineDocument,onlineDocumentGameChoices,onlineDocumentMediaNames} from '../src/core/online-document-import.ts';
 import {parseQuestionWorkbookBytes} from '../src/core/excel-import.ts';
 import {validatePack} from '../src/core/validation.ts';
 import {onlinePresentation,onlineScoreResponse} from '../src/core/online-exercises.ts';
@@ -49,6 +49,12 @@ function populatedDocx(questionRows=rows(),mutate){
   if(mutate)mutate(files);return zipSync(files);
 }
 const importFile=(bytes,name='week.xlsx',assets=media)=>parseOnlineDocument(bytes,name,context,assets);
+
+test('Word and Excel retain per-question difficulty, isolate invalid difficulty and list referenced media without loading a catalogue',async()=>{
+  const source=rows().filter(row=>row.kind==='quiz').flatMap((row,index)=>[{...row,itemId:row.itemId+'.a',difficulty:index?'hard':'easy'},{...row,itemId:row.itemId+'.b',prompt:row.prompt+' khác',difficulty:'medium'}]);
+  for(const [name,bytes]of [['week.xlsx',populatedXlsx(source)],['week.docx',populatedDocx(source)]]){const result=await importFile(bytes,name);assert.deepEqual(result.sets[0].pack.items.map(item=>item.metadata.difficulty),['easy','medium','hard','medium']);assert.deepEqual(onlineDocumentMediaNames(bytes,name),['hình ảnh.png']);}
+  const invalid=source.map((row,index)=>index?row:{...row,difficulty:'super-hard'}),report=await inspectOnlineDocument(populatedXlsx(invalid),'week.xlsx',context,media);assert.equal(report.acceptedQuestions,3);assert.equal(report.issues.length,1);assert.match(report.issues[0].message,/difficulty/);assert.match(report.issues[0].location,/dòng 3/);
+});
 
 test('Large workspace media catalogs do not block text or referenced media imports',async()=>{
   for(const count of [300,301,1000]){
@@ -222,9 +228,9 @@ test('Partial preview reports missing media, invalid grouping fields and literal
   const input=[...threeQuestions('quiz'),...threeQuestions('fill-blank')];
   input[1].imageFile='chưa tải.png';input[4].A='null';
   const malformed=[{...input[0],itemId:'bad-kind',kind:'unknown'},{...input[0],itemId:'bad-subject',subjectLabel:' '},{...input[0],itemId:'bad-title',title:'x'.repeat(91)}];
-  const result=await inspect(populatedXlsx([...input,...malformed]));assert.equal(result.totalQuestions,9);assert.equal(result.acceptedQuestions,4);assert.equal(result.issues.length,5);
-  assert.match(result.issues[0].message,/chưa tải.png/);assert.match(result.issues[1].message,/trường A/);
-  assert.match(result.issues[2].message,/kind/);assert.match(result.issues[3].message,/subjectLabel/);assert.match(result.issues[4].message,/title/);
+  const result=await inspect(populatedXlsx([...input,...malformed]));assert.equal(result.totalQuestions,9);assert.equal(result.acceptedQuestions,5);assert.equal(result.issues.length,4);
+  assert.match(result.issues[0].message,/chưa tải.png/);
+  assert.match(result.issues[1].message,/kind/);assert.match(result.issues[2].message,/subjectLabel/);assert.match(result.issues[3].message,/title/);
   assert.equal(result.sets[0].pack.items[0].correctIndex,2);assert.deepEqual(result.sets[1].pack.items[0].acceptedAnswers,['từ một','từ hai']);
 });
 
@@ -264,6 +270,22 @@ test('Partial preview excludes malformed Word question tables and Excel overflow
   let result=await inspect(duplicateField,'week.docx');assert.equal(result.acceptedQuestions,2);assert.equal(result.issues[0].location,'Word, bảng 4');assert.match(result.issues[0].message,/Trường kind/);
   const badHeader=populatedDocx(input,files=>{files['word/document.xml']=encode(decode(files['word/document.xml']).replace(recordTable(input[1]),recordTable(input[1]).replace('<w:t>field</w:t>','<w:t>nhầm cột</w:t>')));});
   result=await inspect(badHeader,'week.docx');assert.equal(result.acceptedQuestions,2);assert.equal(result.issues[0].location,'Word, bảng 4');assert.match(result.issues[0].message,/tiêu đề/);
-  const overflow=populatedXlsx(input,(files,file)=>{files[file]=encode(decode(files[file]).replace(/(<row r="4">.*?)(<\/row>)/s,'$1<c r="AF4" t="inlineStr"><is><t>thừa ô</t></is></c>$2'));});
+  const overflow=populatedXlsx(input,(files,file)=>{files[file]=encode(decode(files[file]).replace(/(<row r="4">.*?)(<\/row>)/s,'$1<c r="AH4" t="inlineStr"><is><t>thừa ô</t></is></c>$2'));});
   result=await inspect(overflow);assert.equal(result.acceptedQuestions,2);assert.equal(result.issues[0].location,'Excel, sheet Câu hỏi, dòng 4');assert.match(result.issues[0].message,/ngoài mẫu/);
+});
+
+
+test('Excel null values mean missing data; only bad source rows and Excel error cells are excluded',async()=>{
+  const good=rows().filter(row=>row.kind==='quiz').map(row=>({...row,imageFile:' NuLl ',imageAlt:'null',hint:'null',difficulty:'NULL'}));
+  const bad=[{...good[0],itemId:'bad-null-prompt',prompt:' null '},{...good[0],itemId:'bad-empty-A',A:''},{...good[0],itemId:'bad-excel-cell',prompt:'#NULL!'}];
+  const bytes=populatedXlsx([...good,...bad],(files,key)=>{files[key]=encode(decode(files[key]).replace(/<c r="H7"[^>]*>.*?<\/c>/,'<c r="H7" t="e"><v>#NULL!</v></c>'));});
+  const result=await inspectOnlineDocument(bytes,'null.xlsx',context,[]);
+  assert.equal(result.totalQuestions,5);assert.equal(result.acceptedQuestions,2);assert.equal(result.issues.length,3);
+  assert.match(result.issues[0].location,/dòng 5/);assert.match(result.issues[0].message,/prompt.*thiếu dữ liệu/);assert.match(result.issues[0].message,/null/);
+  assert.match(result.issues[1].message,/A: thiếu dữ liệu/);assert.match(result.issues[2].message,/Ô H7: lỗi Excel #NULL!/);
+  assert.equal(result.sets[0].pack.items[0].metadata.difficulty,'medium');assert.equal(result.sets[0].pack.items[0].media,undefined);
+  await assert.rejects(()=>parseOnlineDocument(bytes,'null.xlsx',context,[]),/prompt.*thiếu dữ liệu|lỗi Excel #NULL!/);
+  const numeric=rows().filter(row=>row.kind==='numeric-answer');assert.equal((await inspectOnlineDocument(populatedXlsx(numeric),'zero.xlsx',context,[])).acceptedQuestions,2);
+  const booleanBytes=populatedXlsx(rows().filter(row=>row.kind==='fill-blank'),(files,key)=>{files[key]=encode(decode(files[key]).replace(/<c r="U3"[^>]*>.*?<\/c>/,'<c r="U3" t="b"><v>0</v></c>'));});const booleans=await inspectOnlineDocument(booleanBytes,'false.xlsx',context,[]);assert.equal(booleans.acceptedQuestions,2);assert.equal(booleans.sets[0].pack.items[0].caseSensitive,false);
+  const unicode=await inspectOnlineDocument(populatedXlsx(rows().filter(row=>row.kind==='quiz').map(row=>({...row,imageFile:row.imageFile.toLocaleUpperCase('vi').normalize('NFD')}))),'unicode.xlsx',context,media);assert.equal(unicode.acceptedQuestions,2);assert.equal(unicode.sets[0].pack.items[0].media.imageId,'image-asset');
 });

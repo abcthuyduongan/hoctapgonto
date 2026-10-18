@@ -5,9 +5,11 @@ import {request} from 'node:http';
 import {lstat,mkdir,readFile,readdir,rmdir,unlink,writeFile} from 'node:fs/promises';
 import {dirname,join,relative,resolve,sep} from 'node:path';
 import {fileURLToPath} from 'node:url';
+import {runInNewContext} from 'node:vm';
 import {unzipSync,zipSync} from 'fflate';
 import {createReleaseServer,DEFAULT_PORT,parseServerArguments,releaseRequestPath} from '../tools/serve_release.mjs';
 import {packageRelease,RELEASE_VERSION,RELEASE_STORAGE_SCHEMAS} from '../tools/package_release.mjs';
+import {writeOfflineWorker} from '../tools/offlineBuild.mjs';
 
 const workspace=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const digest=bytes=>createHash('sha256').update(bytes).digest('hex');
@@ -50,6 +52,53 @@ function http(port,path,headers={},method='GET'){
     });call.on('error',reject);call.end();
   });
 }
+
+async function workerFixture(t){
+  const {dist}=await fixture(t),build=await writeOfflineWorker(dist),source=await readFile(join(dist,'sw.js'),'utf8');
+  const origin='https://bao-an.example',storage=new Map(),listeners=new Map(),deleted=[],network=[];
+  const key=value=>new URL(typeof value==='string'?value:value.url,origin).href;
+  const caches={
+    async keys(){return [...storage.keys()];},
+    async delete(name){deleted.push(name);return storage.delete(name);},
+    async open(name){
+      if(!storage.has(name))storage.set(name,new Map());
+      const entries=storage.get(name);
+      return {async match(request){return entries.get(key(request))?.clone();},async put(request,response){entries.set(key(request),response.clone());}};
+    },
+  };
+  let claims=0;
+  class WorkerRequest extends Request {constructor(input,options){super(typeof input==='string'?new URL(input,origin):input,options);}}
+  runInNewContext(source,{caches,URL,Request:WorkerRequest,fetch:async request=>{network.push(key(request));return new Response('network: '+key(request));},self:{location:{origin},clients:{async claim(){claims++;},async matchAll(){return [];}},addEventListener(type,callback){listeners.set(type,callback);}}});
+  return {build,caches,storage,deleted,network,get claims(){return claims;},async seed(name,path,text){await (await caches.open(name)).put(path,new Response(text));},async activate(){let work;listeners.get('activate')({waitUntil(value){work=value;}});await work;},async fetch(path,{method='GET',mode='cors'}={}){let response;const work=[];listeners.get('fetch')({request:{method,mode,url:new URL(path,origin).href},respondWith(value){response=value;},waitUntil(value){work.push(value);}});const result=await response;await Promise.all(work);return result;}};
+}
+
+test('Offline worker bounds build storage to current plus two previous deployments and preserves unrelated caches and API isolation',async t=>{
+  const worker=await workerFixture(t),prefix='bao-an-learning-build-';
+  const prior=Array.from({length:5},(_,index)=>prefix+(index+1).toString(16).padStart(16,'0'));
+  for(const [index,name] of prior.entries())await worker.seed(name,`/assets/old-${index}.js`,`build ${index}`);
+  const unrelated=['classroom-local-data',prefix+'external-cache',prefix+'1234567890abcdef-copy'];
+  for(const name of unrelated)await worker.seed(name,'/private-record','untouched');
+  await worker.seed(worker.build.cacheName,'/index.html','current build');
+  // Lookup is bounded even before activation cleans a long history from older workers.
+  assert.match(await (await worker.fetch('/assets/old-0.js')).text(),/^network:/);
+  await worker.activate();
+  assert.deepEqual(worker.deleted,prior.slice(0,3));
+  assert.deepEqual((await worker.caches.keys()).filter(name=>/^bao-an-learning-build-[a-f0-9]{16}$/.test(name)),[...prior.slice(-2),worker.build.cacheName]);
+  assert.equal(worker.claims,1);
+  for(const name of unrelated)assert.equal(await (await (await worker.caches.open(name)).match('/private-record')).text(),'untouched');
+  const before=worker.network.length;
+  assert.equal(await (await worker.fetch('/assets/old-4.js')).text(),'build 4');
+  assert.equal(await (await worker.fetch('/assets/old-3.js')).text(),'build 3');
+  assert.equal(worker.network.length,before);
+  assert.match(await (await worker.fetch('/assets/old-1.js')).text(),/^network:/);
+  const cachedBefore=worker.storage.get(worker.build.cacheName).size,networkBefore=worker.network.length;
+  assert.equal(await worker.fetch('/api/student?token=private'),undefined);
+  assert.equal(await worker.fetch('/assets/not-cached.js',{method:'POST'}),undefined);
+  assert.equal(worker.storage.get(worker.build.cacheName).size,cachedBefore);
+  assert.equal(worker.network.length,networkBefore);
+  await worker.activate();
+  assert.deepEqual(worker.deleted,prior.slice(0,3));
+});
 
 test('Release server defaults preserve the local origin; CLI accepts only bounded explicit options',()=>{
   assert.equal(DEFAULT_PORT,4173);assert.deepEqual(parseServerArguments([]),{host:'127.0.0.1',port:4173,help:false,open:false});

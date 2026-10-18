@@ -1,6 +1,9 @@
 import {randomBytes,randomUUID,createHash,scrypt as scryptCallback,scryptSync,timingSafeEqual} from 'node:crypto';
 import {promisify} from 'node:util';
-import {OnlineError,fail,shape,text} from './online-errors.mjs';
+import {OnlineError,fail,shape,text,integer} from './online-errors.mjs';
+import {adminSummary,adminWeek,adminMedia,adminWeekCheck} from './admin-data.mjs';
+import {audioDurationMs} from './audio-duration.mjs';
+import {createFailureReporter,ONLINE_RUNTIME_VERSION} from './api-diagnostics.mjs';
 
 const scrypt=promisify(scryptCallback),options={N:32768,r:8,p:1,maxmem:64*1024*1024};
 const COOKIE='baoan_online_session',MAX_MEDIA=2*1024*1024;
@@ -8,7 +11,7 @@ const hash=value=>createHash('sha256').update(value).digest('hex');
 const secret=()=>randomBytes(32).toString('base64url');
 const same=(a,b)=>timingSafeEqual(createHash('sha256').update(String(a??'')).digest(),createHash('sha256').update(String(b??'')).digest());
 const dummySalt=randomBytes(16).toString('hex'),dummyHash=`${dummySalt}:${scryptSync(secret(),dummySalt,64,options).toString('hex')}`;
-export const privateHeaders={'Cache-Control':'no-store, private','Netlify-CDN-Cache-Control':'no-store','Pragma':'no-cache','Vary':'Cookie','X-Content-Type-Options':'nosniff','Referrer-Policy':'same-origin','X-Frame-Options':'DENY'};
+export const privateHeaders={'X-Bao-An-Question-Protocol':'1','Cache-Control':'no-store, private','Netlify-CDN-Cache-Control':'no-store','Pragma':'no-cache','Vary':'Cookie','X-Content-Type-Options':'nosniff','Referrer-Policy':'same-origin','X-Frame-Options':'DENY'};
 export const cloudJson=(status,value,extra={})=>new Response(JSON.stringify(value),{status,headers:{...privateHeaders,'Content-Type':'application/json; charset=utf-8',...extra}});
 function username(value){const name=text(value,'Tên đăng nhập',60).toLowerCase();if(!/^[a-z0-9][a-z0-9._-]{2,59}$/.test(name))fail(400,'Tên đăng nhập cần 3–60 chữ không dấu, số, dấu chấm, gạch dưới hoặc gạch ngang.');return name;}
 async function passwordHash(value){if(typeof value!=='string'||value.length<10||value.length>128)fail(400,'Mật khẩu cần từ 10–128 ký tự.');const salt=randomBytes(16).toString('hex');return`${salt}:${(await scrypt(value,salt,64,options)).toString('hex')}`;}
@@ -48,7 +51,9 @@ export function createCloudApi({store,storage,publicOrigin,setupToken}){
   function cookie(token,clear=false){return`${COOKIE}=${token}; HttpOnly; SameSite=Lax; Path=/; Max-Age=${clear?0:43200}${canonical.protocol==='https:'?'; Secure':''}`;}
   async function login(user,status=200){const token=secret(),csrfToken=secret(),current=await store.createSession({tokenHash:hash(token),userId:user.id,csrfToken,expiresAt:Date.now()+43200000,passwordHash:user.password_hash});return cloudJson(status,await identity(userAuth(current,csrfToken)),{'Set-Cookie':cookie(token)});}
   async function limit(context,name){await store.consumeLoginLimit({addressHash:hash(`ip:${context.ip??'unknown'}`),userHash:hash(`user:${name}`),now:Date.now()});}
+  const reportFailure=createFailureReporter();
   return async(request,context={})=>{
+    const started=performance.now();
     try{
       const url=new URL(request.url),method=request.method,route=url.pathname.slice('/api/online'.length),mutable=!['GET','HEAD','OPTIONS'].includes(method);
       if(url.origin!==origin)fail(421,'Địa chỉ máy chủ không đúng cấu hình.');
@@ -56,7 +61,7 @@ export function createCloudApi({store,storage,publicOrigin,setupToken}){
       if(!url.pathname.startsWith('/api/online/'))fail(404,'Không có API này.');
       if(method==='OPTIONS')fail(405,'API chỉ dùng cùng origin.');
       if(mutable&&(request.headers.get('origin')!==origin||request.headers.get('sec-fetch-site')==='cross-site'))fail(403,'Yêu cầu phải xuất phát từ chính website này.');
-      if(method==='GET'&&route==='/status')return cloudJson(200,{available:true,configured:await store.configured(),mediaMaxBytes:MAX_MEDIA});
+      if(method==='GET'&&route==='/status')return cloudJson(200,{available:true,configured:await store.configured(),mediaMaxBytes:MAX_MEDIA,runtimeVersion:ONLINE_RUNTIME_VERSION,questionProtocolVersion:1});
       if(method==='POST'&&route==='/setup'){
         const input=shape(await body(request),['token','name','username','password']);if(await store.configured())fail(409,'Máy chủ đã được khởi tạo. Hãy đăng nhập.');await limit(context,'bootstrap');
         if(!setupToken||setupToken.length<24||!same(input.token,setupToken))fail(403,'Mã khởi tạo không đúng. Lấy mã riêng từ quản trị máy chủ.');
@@ -70,15 +75,35 @@ export function createCloudApi({store,storage,publicOrigin,setupToken}){
       const auth=await actor(request);if(mutable&&!same(request.headers.get('x-csrf-token'),auth.csrfToken))fail(403,'Phiên xác thực của biểu mẫu đã thay đổi. Hãy tải lại.');
       if(method==='GET'&&route==='/me')return cloudJson(200,await identity(auth));
       if(method==='POST'&&route==='/logout'){shape(await body(request),[]);await store.revokeSession(auth.tokenHash);return cloudJson(200,{ok:true},{'Set-Cookie':cookie('',true)});}
+      if(method==='POST'&&route==='/account/password'){
+        role(auth,'student');const input=shape(await body(request),['currentPassword','newPassword']);
+        await store.consumeLoginLimit({addressHash:hash(`password-ip:${context.ip??'unknown'}`),userHash:hash(`password-user:${auth.id}`),now:Date.now(),purpose:'password'});
+        for(const value of [input.currentPassword,input.newPassword])if(typeof value!=='string'||value.length<10||value.length>128)fail(400,'Mật khẩu cần từ 10–128 ký tự.');
+        if(same(input.currentPassword,input.newPassword))fail(400,'Mật khẩu mới cần khác mật khẩu hiện tại.');
+        const user=await store.findUserById(auth.id);if(!await verifyPassword(input.currentPassword,user?.password_hash))fail(400,'Mật khẩu hiện tại chưa đúng.');
+        const result=await store.changeOwnPassword(auth,user.password_hash,await passwordHash(input.newPassword));return cloudJson(200,result,{'Set-Cookie':cookie('',true)});
+      }
+      if(method==='GET'&&route==='/admin/summary')return cloudJson(200,await adminSummary(store,auth,Object.fromEntries(url.searchParams)));
+      const adminWeekMatch=route.match(/^\/admin\/weeks\/([^/]+)$/);
+      if(method==='GET'&&adminWeekMatch)return cloudJson(200,await adminWeek(store,auth,decodeURIComponent(adminWeekMatch[1])));
+      if(method==='GET'&&route==='/admin/media')return cloudJson(200,await adminMedia(store,auth,Object.fromEntries(url.searchParams)));
+      if(method==='POST'&&route==='/admin/media/lookup')return cloudJson(200,await adminMedia(store,auth,await body(request)));
+      if(method==='POST'&&route==='/admin/week-check')return cloudJson(200,await adminWeekCheck(store,auth,await body(request)));
       if(method==='GET'&&route==='/dashboard'){role(auth,'admin');return cloudJson(200,await store.dashboard(auth));}
       if(method==='GET'&&route==='/recovery'){role(auth,'admin');return cloudJson(200,{supported:false,reason:'Bản cloud dùng công cụ sao lưu và phục hồi PostgreSQL cùng Storage trong Supabase. Không khôi phục tệp SQLite trực tiếp vào môi trường này.'});}
-      if(method==='GET'&&route==='/student'){role(auth,'student');return cloudJson(200,await store.studentState(auth));}
+      if(method==='GET'&&route==='/student'){role(auth,'student');if(request.headers.get('x-bao-an-question-protocol')!=='1')fail(409,'Ứng dụng đã được cập nhật. Hãy tải lại trang; sao đã lưu vẫn được giữ.');return cloudJson(200,await store.studentSummary(auth));}
+      if(method==='GET'&&route==='/student/summary'){role(auth,'student');return cloudJson(200,await store.studentSummary(auth,url.searchParams.get('cursor')??'0'));}
+      if(method==='POST'&&route==='/student/journey'){role(auth,'student');return cloudJson(200,await store.ensureJourney(auth,await body(request)));}
+      if(method==='POST'&&route==='/student/advance-week'){role(auth,'student');return cloudJson(200,await store.advanceWeek(auth,await body(request)));}
+      const gamesMatch=route.match(/^\/student\/pack\/([^/]+)\/(\d+)\/games$/);
+      if(method==='GET'&&gamesMatch){role(auth,'student');return cloudJson(200,await store.packGames(auth,text(decodeURIComponent(gamesMatch[1]),'Mã bộ',80),integer(Number(gamesMatch[2]),'Phiên bản')));}
       if(method==='GET'&&route==='/media'){role(auth,'admin');return cloudJson(200,await store.listMedia(auth));}
       if(method==='POST'&&route==='/media/batch'){
         role(auth,'admin');const input=shape(await body(request,3*1024*1024),['files']);
         if(!Array.isArray(input.files)||input.files.length<1||input.files.length>24)fail(400,'Mỗi đợt tải cần 1–24 tệp.');
         const files=input.files.map(validateCloudMedia);
         if(files.reduce((n,file)=>n+file.bytes.length,0)>MAX_MEDIA)fail(400,'Mỗi đợt tải tối đa 2 MB.');
+        for(const file of files)if(file.mime.startsWith('audio/'))await audioDurationMs(file.bytes,file.mime);
         const existing=await store.listMedia(auth),uploaded=[],pending=[];
         for(const file of files)if(!existing.some(row=>row.name===file.name&&row.sha256===file.sha256)&&!pending.some(row=>row.name===file.name&&row.sha256===file.sha256)){
           const id=randomUUID();pending.push({...file,id,objectPath:`${auth.workspaceId}/${id}`});
@@ -98,7 +123,7 @@ export function createCloudApi({store,storage,publicOrigin,setupToken}){
         return cloudJson(201,files.map(file=>assets.find(row=>row.name===file.name&&row.sha256===file.sha256)??existing.find(row=>row.name===file.name&&row.sha256===file.sha256)));
       }
       if(method==='POST'&&route==='/media'){
-        role(auth,'admin');const input=validateCloudMedia(await body(request,3*1024*1024)),existing=(await store.listMedia(auth)).find(row=>row.name===input.name&&row.sha256===input.sha256);if(existing)return cloudJson(201,existing);
+        role(auth,'admin');const input=validateCloudMedia(await body(request,3*1024*1024));if(input.mime.startsWith('audio/'))await audioDurationMs(input.bytes,input.mime);const existing=(await store.listMedia(auth)).find(row=>row.name===input.name&&row.sha256===input.sha256);if(existing)return cloudJson(201,existing);
         const id=randomUUID(),objectPath=`${auth.workspaceId}/${id}`;await storage.upload(objectPath,input.bytes,input.mime);
         try{const asset=await store.addMedia(auth,{id,name:input.name,mime:input.mime,bytes:input.bytes,objectPath});if(asset.id!==id)await storage.remove(objectPath);return cloudJson(201,asset);}catch(error){await storage.remove(objectPath).catch(()=>{});throw error;}
       }
@@ -111,7 +136,7 @@ export function createCloudApi({store,storage,publicOrigin,setupToken}){
         }
         const headers={...privateHeaders,'Content-Type':asset.mime,'Accept-Ranges':'bytes','Content-Length':String(end-start+1),'Content-Disposition':`inline; filename*=UTF-8''${encodeURIComponent(asset.name)}`,...(status===206?{'Content-Range':`bytes ${start}-${end}/${asset.size}`}:{})};
         if(method==='HEAD')return new Response(null,{status,headers});const bytes=await storage.download(asset.object_path);
-        if(bytes.length!==asset.size||hash(bytes)!==asset.sha256)fail(502,'Tệp tư liệu không khớp dữ liệu đã duyệt.');return new Response(bytes.subarray(start,end+1),{status,headers});
+        if(bytes.length!==asset.size||hash(bytes)!==asset.sha256)fail(502,'Tệp tư liệu không khớp dữ liệu đã duyệt.');if(auth.role==='student'&&asset.kind==='audio'&&url.searchParams.has('playId')&&start===0&&end===asset.size-1)await store.recordAudioDelivery(auth,url.searchParams.get('playId'),url.searchParams.get('itemId'),media[1],await audioDurationMs(bytes,asset.mime));return new Response(bytes.subarray(start,end+1),{status,headers});
       }
       if(method==='POST'&&route==='/classes'){role(auth,'admin');return cloudJson(201,await store.createClass(auth,await body(request)));}
       if(method==='POST'&&route==='/students'){role(auth,'admin');const input=await body(request),name=username(input.username),password=input.password||randomBytes(12).toString('base64url'),student=await store.createStudent(auth,input,await passwordHash(password),name);return cloudJson(201,{student,credentials:{username:name,password}});}
@@ -119,13 +144,13 @@ export function createCloudApi({store,storage,publicOrigin,setupToken}){
       if(student){role(auth,'admin');const id=decodeURIComponent(student[1]);if(method==='PATCH'&&!student[2])return cloudJson(200,await store.updateStudent(auth,id,await body(request)));if(method==='POST'&&student[2]){const input=shape(await body(request),['password']),password=input.password||randomBytes(12).toString('base64url'),row=await store.resetStudentPassword(auth,id,await passwordHash(password));return cloudJson(200,{username:row.username,password});}}
       if(method==='POST'&&route==='/weeks'){role(auth,'admin');return cloudJson(201,await store.publishWeek(auth,await body(request)));}
       if(method==='POST'&&route==='/wallet'){role(auth,'admin');return cloudJson(200,await store.configureWallet(auth,await body(request)));}
-      if(method==='POST'&&route==='/play'){role(auth,'student');return cloudJson(201,await store.startPlay(auth,await body(request)));}
-      const play=route.match(/^\/play\/([^/]+)\/(attempt|complete|abandon)$/);
-      if(method==='POST'&&play){role(auth,'student');const input=await body(request),id=decodeURIComponent(play[1]);if(play[2]==='attempt')return cloudJson(200,await store.attempt(auth,id,input));shape(input,[]);return cloudJson(200,await store.finishPlay(auth,id,play[2]==='abandon'));}
+      if(method==='POST'&&['/play','/play/compact'].includes(route)){role(auth,'student');if(request.headers.get('x-bao-an-question-protocol')!=='1')fail(409,'Ứng dụng đã được cập nhật. Hãy tải lại trang trước khi mở trò chơi; sao đã lưu vẫn được giữ.');return cloudJson(201,await store.startPlay(auth,await body(request),route==='/play/compact',true));}
+      const play=route.match(/^\/play\/([^/]+)\/(attempt|question-open|question-hint|complete|complete-compact|abandon)$/);
+      if(method==='POST'&&play){role(auth,'student');const input=await body(request),id=decodeURIComponent(play[1]);if(play[2]==='attempt')return cloudJson(200,await store.attempt(auth,id,input,true));if(play[2]==='question-hint')return cloudJson(200,await store.questionHint(auth,id,input));if(play[2]==='question-open')return cloudJson(200,await store.openQuestion(auth,id,input,true));shape(input,[]);return cloudJson(200,await store.finishPlay(auth,id,play[2]==='abandon',true,true));}
       if(method==='POST'&&route==='/redemptions'){role(auth,'student');return cloudJson(201,await store.requestReward(auth,await body(request)));}
       const redemption=route.match(/^\/redemptions\/([^/]+)\/(transition|cancel)$/);
       if(method==='POST'&&redemption){role(auth,redemption[2]==='cancel'?'student':'admin');return cloudJson(200,await store.transitionReward(auth,decodeURIComponent(redemption[1]),await body(request),redemption[2]==='cancel'));}
       fail(404,'Không có thao tác API này.');
-    }catch(error){return cloudJson(error instanceof OnlineError?error.status:error instanceof URIError?400:500,{error:error instanceof OnlineError?error.message:error instanceof URIError?'Đường dẫn không hợp lệ.':'Máy chủ chưa xử lý được yêu cầu. Vui lòng thử lại.'});}
+    }catch(error){const status=error instanceof OnlineError?error.status:error instanceof URIError?400:500,supportId=reportFailure(new URL(request.url).pathname,request.method,status,performance.now()-started);return cloudJson(status,{error:error instanceof OnlineError?error.message:error instanceof URIError?'Đường dẫn không hợp lệ.':'Máy chủ chưa xử lý được yêu cầu. Vui lòng thử lại.',...(supportId?{supportId}:{})});}
   };
 }

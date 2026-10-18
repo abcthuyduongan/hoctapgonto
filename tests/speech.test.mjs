@@ -25,6 +25,7 @@ test('Speech: mock Web Speech API interactions', () => {
 
   const mockWindow = {
     speechSynthesis: {
+      getVoices:()=>[{name:'Vietnamese',lang:'vi-VN',localService:true}],
       speak: (utt) => {
         speakCalls++;
         lastUtterance = utt;

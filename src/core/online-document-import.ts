@@ -1,5 +1,5 @@
 import {Unzip,UnzipInflate,unzipSync} from 'fflate';
-import type {ContentPack,LearningPack,QuestionMedia,QuestionMetadata,RichLearningItem} from './contracts.ts';
+import type {ContentPack,LearningPack,ModuleId,QuestionMedia,QuestionMetadata,RichLearningItem} from './contracts.ts';
 import type {LearningMedia} from './learning-contracts.ts';
 import type {OnlineMediaAsset} from './online-contracts.ts';
 import type {OnlineWeek,OnlineWeekContext} from './online-content.ts';
@@ -10,15 +10,21 @@ import {validatePack} from './validation.ts';
 import {onlinePresentation} from './online-exercises.ts';
 import {GAME_REGISTRY} from './registry.ts';
 import {onlineGeneratedItemId,onlineGeneratedPackId,onlineIdentityHash,onlineSourceCode} from './online-import-identity.ts';
+import {gameRestrictionError} from './game-policy.ts';
 export {onlineDocumentSourceId} from './online-import-identity.ts';
 
 export const ONLINE_DOCUMENT_KINDS=['quiz','pairs','sentences','numeric-answer','fill-blank','reading-choice','listening-choice','listening-gap'] as const;
 export type OnlineDocumentKind=typeof ONLINE_DOCUMENT_KINDS[number];
-export const ONLINE_DOCUMENT_HEADERS=['subjectLabel','kind','title','topic','week','competition','level','prompt','A','B','C','D','answer','left','right','words','hint','explanation','unit','acceptedAnswers','caseSensitive','passageTitle','passage','imageFile','imageAlt','audioFile','audioTranscript','source','rights','itemId','objectiveId'] as const;
+export const ONLINE_DOCUMENT_HEADERS=['subjectLabel','kind','title','topic','week','competition','level','prompt','A','B','C','D','answer','left','right','words','hint','explanation','unit','acceptedAnswers','caseSensitive','passageTitle','passage','imageFile','imageAlt','audioFile','audioTranscript','source','rights','itemId','objectiveId','allowedGameIds','difficulty'] as const;
 type Fields=Partial<Record<typeof ONLINE_DOCUMENT_HEADERS[number],string>>;
 type SourceLocation={row?:number;table?:number};
 const sourceLocations=new WeakMap<Fields,SourceLocation>();
 const sourceProblems=new WeakMap<Fields,string>();
+const sourceNulls=new WeakMap<Fields,string[]>();
+function normalizeMissing(row:Fields):void {
+  const names=Object.keys(row).filter(key=>/^null$/i.test(row[key as keyof Fields]?.trim()??''));
+  if(names.length){sourceNulls.set(row,names);for(const name of names)delete row[name as keyof Fields];}
+}
 export type OnlineDocumentIssue={location:string;message:string;itemId?:string;prompt?:string};
 export type OnlineDocumentInspection=OnlineWeek&{issues:OnlineDocumentIssue[];totalQuestions:number;acceptedQuestions:number};
 function sourceLocation(row:Fields):string {const location=sourceLocations.get(row);return location?.table?`Word, bảng ${location.table}`:`Excel, sheet Câu hỏi, dòng ${location?.row??'?'}`;}
@@ -28,7 +34,8 @@ class SourceRowError extends Error {
 }
 function atSource<T>(row:Fields,action:()=>T):T {try{return action();}catch(error){
   if(error instanceof SourceRowError)throw error;
-  throw new SourceRowError(row,error instanceof Error?error.message:String(error));
+  const message=error instanceof Error?error.message:String(error),nulls=sourceNulls.get(row);
+  throw new SourceRowError(row,message+(nulls?.length?` Các ô null (thiếu dữ liệu): ${nulls.join(', ')}.`:''));
 }}
 const UNDATED='1970-01-01T00:00:00.000Z';
 const DEFAULT_SOURCE='Nội dung do người soạn cung cấp';
@@ -36,19 +43,23 @@ const DEFAULT_RIGHTS='Người soạn chịu trách nhiệm';
 const nativeKinds=new Set(['quiz','pairs','sentences']);
 function fail(message:string):never {throw new Error(message);}
 function required(value:string|undefined,field:string,max=320):string {
-  if(typeof value!=='string'||!value.trim()||value.length>max||/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/.test(value))fail(`${field}: cần nội dung không trống, tối đa ${max} ký tự.`);
+  if(typeof value!=='string'||!value.trim()||/^null$/i.test(value.trim()))fail(`${field}: thiếu dữ liệu (ô trống hoặc null); cần điền nội dung.`);
+  if(value.length>max||/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/.test(value))fail(`${field}: nội dung không hợp lệ hoặc vượt ${max} ký tự.`);
   return value.trim();
 }
 function split(value:string|undefined,field:string):string[] {
   return required(value,field,1600).split('|').map(part=>required(part,field,120));
 }
 function rowMetadata(row:Fields):QuestionMetadata {
-  return {knowledgeId:required(row.objectiveId??'CUSTOM.QUESTION','objectiveId',120),difficulty:'medium',contentRole:'unassigned',
+  const allowedGameIds=row.allowedGameIds?.split('|').map(id=>id.trim()) as ModuleId[]|undefined;
+  const restriction=gameRestrictionError(allowedGameIds);if(restriction)fail(restriction);
+  const difficulty=row.difficulty??'medium';if(!['easy','medium','hard'].includes(difficulty))fail('difficulty chỉ nhận easy, medium hoặc hard.');
+  return {knowledgeId:required(row.objectiveId??'CUSTOM.QUESTION','objectiveId',120),difficulty:difficulty as QuestionMetadata['difficulty'],contentRole:'unassigned',
     source:required(row.source??DEFAULT_SOURCE,'source',1000),rights:required(row.rights??DEFAULT_RIGHTS,'rights',1000),reviewStatus:'draft',
     ...(row.topic?{topicId:required(row.topic,'topic',120)}:{}),...(row.competition?{formId:required(row.competition,'competition',120)}:{}),
-    ...(row.level?{level:required(row.level,'level',120)}:{})};
+    ...(row.level?{level:required(row.level,'level',120)}:{}),...(allowedGameIds?{allowedGameIds}:{})};
 }
-function sourceRows(matrix:string[][],rowNumbers:number[],inspect=false):Fields[] {
+function sourceRows(matrix:string[][],rowNumbers:number[],inspect=false,cellErrors:Record<number,string[]>={}):Fields[] {
   if(matrix.length<2||matrix[0][0]!=='baoan-online-week'||matrix[0][1]!=='1')fail('Excel, sheet Câu hỏi, dòng 1, trường schema/formatVersion: thiếu mã mẫu baoan-online-week phiên bản 1.');
   const headers=matrix[1];
   if(!headers.length||headers.some(header=>!ONLINE_DOCUMENT_HEADERS.includes(header as typeof ONLINE_DOCUMENT_HEADERS[number]))||new Set(headers).size!==headers.length)fail('Excel, sheet Câu hỏi, dòng 2: Tiêu đề cột bị trùng hoặc không thuộc mẫu.');
@@ -56,6 +67,8 @@ function sourceRows(matrix:string[][],rowNumbers:number[],inspect=false):Fields[
   return matrix.slice(2).map((cells,index)=>{
     const number=rowNumbers[index+2]??index+3;
     const row:Fields={};headers.forEach((header,i)=>{if(cells[i]?.trim())row[header as keyof Fields]=cells[i].trim();});sourceLocations.set(row,{row:number});
+    normalizeMissing(row);
+    if(cellErrors[number]?.length){const message=cellErrors[number].join(' ');if(!inspect)atSource(row,()=>fail(message));sourceProblems.set(row,message);}
     if(cells.length>headers.length&&cells.slice(headers.length).some(Boolean)){if(!inspect)atSource(row,()=>fail('có ô nằm ngoài mẫu.'));sourceProblems.set(row,'Có ô nằm ngoài mẫu.');}
     return row;
   });
@@ -134,14 +147,14 @@ function wordRows(bytes:Uint8Array,inspect=false):{rows:Fields[];title?:string} 
       const [name,value]=cellsRow;try{atSource(row,()=>{if(cellsRow.length!==2||!ONLINE_DOCUMENT_HEADERS.includes(name as typeof ONLINE_DOCUMENT_HEADERS[number])||names.has(name))fail(`Trường ${name??'?'} không hợp lệ hoặc trùng tên.`);
       names.add(name);if(value)row[name as keyof Fields]=required(value,name,name==='passage'||name==='audioTranscript'?8000:4000);});}
       catch(error){if(!inspect||!(error instanceof SourceRowError))throw error;if(!sourceProblems.has(row))sourceProblems.set(row,error.detail);}
-    }rows.push(row);
+    }normalizeMissing(row);rows.push(row);
   }
   if(!marker)fail('Word thiếu bảng schema baoan-online-week phiên bản 1.');
   return {rows,title};
 }
 function findAsset(name:string,catalog:OnlineMediaAsset[],assetKind:'image'|'audio'):OnlineMediaAsset {
   if(!name||/[\\/]/.test(name))fail('Tên tệp đa phương tiện chỉ gồm tên tệp đã tải lên.');
-  const matches=catalog.filter(asset=>asset.name.normalize('NFC')===name.normalize('NFC')&&asset.kind===assetKind);
+  const matches=catalog.filter(asset=>asset.name.normalize('NFC').toLocaleLowerCase('vi')===name.normalize('NFC').toLocaleLowerCase('vi')&&asset.kind===assetKind);
   if(matches.length!==1)fail(`Tệp ${name}: cần tải lên đúng một tệp ${assetKind==='image'?'hình ảnh':'âm thanh'} có tên này.`);
   const asset=matches[0];if(!/^[a-zA-Z0-9._-]{1,120}$/.test(asset.id)||!/^[a-f0-9]{64}$/.test(asset.sha256))fail(`Tệp ${name}: catalog không hợp lệ.`);
   if(assetKind==='image'&&!['image/png','image/jpeg','image/webp'].includes(asset.mime))fail('Hình ảnh chỉ nhận PNG, JPEG hoặc WebP.');return asset;
@@ -172,7 +185,7 @@ function packValidationFailure(rows:Fields[],message:string):never {
 }
 function groupPack(rows:Fields[],packKind:OnlineDocumentKind,id:string,version:number,title:string,grade:number,catalog:OnlineMediaAsset[],diagnoseSingleton=false):ContentPack {
   if(rows.length<(diagnoseSingleton?1:2)||rows.length>30)fail(`${rows[0].subjectLabel}: mỗi môn và dạng câu cần 2–30 câu hỏi.`);
-  const shared=['subjectLabel','kind','title','topic','week','competition','level','imageFile','imageAlt','audioFile','audioTranscript','source','rights','itemId','objectiveId'];
+  const shared=['subjectLabel','kind','title','topic','week','competition','level','imageFile','imageAlt','audioFile','audioTranscript','source','rights','itemId','objectiveId','allowedGameIds','difficulty'];
   const specifics=packKind==='pairs'?['left','right']:packKind==='sentences'?['prompt','words','answer']
     :packKind==='numeric-answer'?['prompt','answer','unit']:['fill-blank','listening-gap'].includes(packKind)?['prompt','answer','acceptedAnswers','caseSensitive']
     :['prompt','A','B','C','D','answer',...(packKind==='reading-choice'?['passage','passageTitle']:[])];
@@ -247,12 +260,12 @@ function documentSource(bytes:Uint8Array,fileName:string,context:OnlineWeekConte
   if(!Array.isArray(media)||media.some(asset=>!asset||typeof asset.name!=='string'||typeof asset.id!=='string'||typeof asset.sha256!=='string'||typeof asset.mime!=='string'||!['image','audio'].includes(asset.kind)))fail('Catalog đa phương tiện không hợp lệ.');
   const extension=fileName.toLowerCase().split('.').pop();let rows:Fields[];let sourceTitle:string|undefined;
   if(extension==='xlsx'){
-    const workbook=parseQuestionWorkbookBytes(bytes);rows=sourceRows(workbook.sheets['Câu hỏi'],workbook.rowNumbers['Câu hỏi'],inspect);
+    const workbook=parseQuestionWorkbookBytes(bytes);rows=sourceRows(workbook.sheets['Câu hỏi'],workbook.rowNumbers['Câu hỏi'],inspect,workbook.cellErrors['Câu hỏi']);
     const info=workbook.sheets['Thông tin bộ'];if(info[0]?.[0]!=='schema'||info[0]?.[1]!=='baoan-online-week'||info.find(row=>row[0]==='formatVersion')?.[1]!=='1')fail('Thông tin bộ thiếu schema hoặc phiên bản mẫu.');
     sourceTitle=info.find(row=>row[0]==='title')?.[1];
   }else if(extension==='docx'){const parsed=wordRows(bytes,inspect);rows=parsed.rows;sourceTitle=parsed.title;}else fail('Chỉ nhận mẫu Word .docx hoặc Excel .xlsx.');
   if(!/^[a-z0-9-]{3,77}$/.test(context.idPrefix)||!Number.isInteger(context.grade)||context.grade<1||context.grade>12)fail('Thông tin lớp hoặc mã tuần không hợp lệ.');
-  const filled=rows.filter(row=>sourceProblems.has(row)||Object.keys(row).some(key=>!['kind','title','subjectLabel','week','topic','competition','level','source','rights'].includes(key)));
+  const filled=rows.filter(row=>sourceProblems.has(row)||sourceNulls.has(row)||Object.keys(row).some(key=>!['kind','title','subjectLabel','week','topic','competition','level','source','rights','difficulty'].includes(key)));
   if(!filled.length)fail('Mẫu chưa có câu hỏi. Điền nội dung và đáp án, tối thiểu 2 câu cho mỗi môn và dạng câu.');
   const weeks=new Set(filled.map(row=>row.week).filter(Boolean));if(weeks.size>1)fail('Một tệp chỉ chứa một tuần.');
   const title=required([...weeks][0]??(sourceTitle||context.title),'Tên tuần',90);
@@ -262,6 +275,11 @@ function documentSource(bytes:Uint8Array,fileName:string,context:OnlineWeekConte
 }
 
 /** Only text tables and supplied media catalog references are interpreted. */
+export function onlineDocumentMediaNames(bytes:Uint8Array,fileName:string):string[]{
+  const {filled}=documentSource(bytes,fileName,{idPrefix:'online',grade:3,title:'Tuần học'},[],true);
+  return [...new Set(filled.flatMap(row=>[row.imageFile,row.audioFile]).filter((name):name is string=>!!name))];
+}
+
 export async function parseOnlineDocument(bytes:Uint8Array,fileName:string,context:OnlineWeekContext,media:OnlineMediaAsset[]):Promise<OnlineWeek> {
   const {filled,title,sourceCode,version}=documentSource(bytes,fileName,context,media);
   const groups=new Map<string,{label:string;kind:OnlineDocumentKind;title:string;rows:Fields[]}>();

@@ -6,14 +6,17 @@ type Props = {
   title: string;
   summary: string;
   onExit: () => void;
+  questionMode?:boolean;
 };
 
 /** A celebratory layer over the existing game, never a page replacement. */
-export default function GameCompletion({title,summary,onExit}:Props) {
+export default function GameCompletion({title,summary,onExit,questionMode=false}:Props) {
   const exitButton = useRef<HTMLButtonElement>(null);
   const { setMood } = useGameScene();
   useEffect(() => { setMood('victory'); return () => setMood('idle'); }, [setMood]);
   useEffect(() => { exitButton.current?.focus({preventScroll:true}); playCompletionFanfare(); }, []);
+  // Per-question stars have already been awarded by the host's saved receipts.
+  if(questionMode)return <div className="reward-curtain question-completion"><div className="reward-panel question-completion-panel" role="dialog" aria-modal="true" aria-labelledby="question-completion-title"><h2 id="question-completion-title">{title}</h2><p>{summary}</p><button type="button" className="button primary" ref={exitButton} onClick={onExit}>Trở về hành trình</button></div></div>;
   return <div className="reward-curtain ba37-reward-curtain" aria-label="Hoàn thành trò chơi">
     <div className="reward-scrim" aria-hidden="true"/>
     <div className="premium-reward-confetti" aria-hidden="true">

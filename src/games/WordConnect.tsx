@@ -1,36 +1,46 @@
+import {useQuestionSpeech} from './useQuestionSpeech';
 import {saveFailureMessage} from './save-failure-message';
 import QuestionMedia,{QuestionImageRecovery} from '../components/QuestionMedia';
 import GameMascot from './GameMascot';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import type { GameHostProps, PairsPack } from '../core/contracts';
+import type { AttemptInput, GameHostProps, PairsPack } from '../core/contracts';
 import { shuffle } from '../core/utils';
 import { playFeedbackTone } from '../core/experience';
-import { speakText, stopSpeaking } from '../core/speech';
+import { stopSpeaking } from '../core/speech';
 import GameCompletion from './GameCompletion';
 import FeedbackEffects from './FeedbackEffects';
+import {useQuestionLayout} from './useQuestionLayout';
+import {createPairRounds,initialPairRoundLimit} from './pair-rounds';
+import {stopQuestionAudio} from '../core/question-audio';
 
 interface ConnectItem {
   id: string;
   label: string;
   objectiveId: string;
 }
+type PendingConnection={input:AttemptInput;leftId:string;rightId:string;move:number};
 
-export default function WordConnect({ pack, onAttempt, onComplete, onExit }: GameHostProps) {
+export default function WordConnect({ pack, onAttempt, onComplete, onExit,questionMode=false }: GameHostProps) {
   const content = pack as PairsPack;
+  const [rounds]=useState(()=>createPairRounds(content.items,initialPairRoundLimit()));
+  const [roundIndex,setRoundIndex]=useState(0);
+  const roundItems=rounds[roundIndex]??[];
+  const speech=useQuestionSpeech(pack.subject,`${pack.id}:${roundIndex}`);
+  const layout=useQuestionLayout({kind:'word-connect',questionKey:`${content.id}@${content.version}:${roundIndex}`,textLength:Math.max(0,...roundItems.flatMap(item=>[item.left.length,item.right.length])),hasImage:roundItems.some(item=>!!item.media?.imageId),itemCount:roundItems.length});
 
   const leftDeck = useMemo<ConnectItem[]>(() => 
-    shuffle(content.items.map(item => ({
+    shuffle(roundItems.map(item => ({
       id: item.id,
       label: item.left,
       objectiveId: item.objectiveId
-    }))), [content]);
+    }))), [roundItems]);
 
   const rightDeck = useMemo<ConnectItem[]>(() => 
-    shuffle(content.items.map(item => ({
+    shuffle(roundItems.map(item => ({
       id: item.id,
       label: item.right,
       objectiveId: item.objectiveId
-    }))), [content]);
+    }))), [roundItems]);
 
   const [selectedLeft, setSelectedLeft] = useState<string | null>(null);
   const [selectedRight, setSelectedRight] = useState<string | null>(null);
@@ -42,6 +52,8 @@ export default function WordConnect({ pack, onAttempt, onComplete, onExit }: Gam
   const [error, setError] = useState('');
   const [finishing, setFinishing] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [pending,setPending]=useState<PendingConnection|null>(null);
+  const pendingRef=useRef<PendingConnection|null>(null);
 
   const started = useRef(performance.now());
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -49,6 +61,14 @@ export default function WordConnect({ pack, onAttempt, onComplete, onExit }: Gam
   const closed = useRef(false);
   const moveRef = useRef(0);
   const matchedCountRef = useRef(0);
+  const roundDone=roundItems.every(item=>matched.includes(item.id));
+
+  function nextRound(){
+    if(!roundDone||roundIndex>=rounds.length-1||busyRef.current||saving||locked||error||finishing)return;
+    stopSpeaking();stopQuestionAudio();
+    setSelectedLeft(null);setSelectedRight(null);setFeedback(null);
+    setRoundIndex(index=>index+1);
+  }
 
   useEffect(() => {
     closed.current = false;
@@ -62,40 +82,38 @@ export default function WordConnect({ pack, onAttempt, onComplete, onExit }: Gam
   }, []);
 
   const checkMatch = useCallback(async (leftId: string, rightId: string) => {
+    if(busyRef.current)return;
     busyRef.current = true;
+    setError('');
     setLocked(true);
     setSaving(true);
-    const correct = leftId === rightId;
-    const move = ++moveRef.current;
+    const stored=questionMode?pendingRef.current:null;
+    const move=stored?.move??++moveRef.current;
     setMoves(move);
 
     const targetItem = content.items.find(item => item.id === leftId)!;
+    const input:AttemptInput=stored?.input??{
+      attemptKey:`connect-${move}`,itemId:targetItem.id,objectiveId:targetItem.objectiveId,correct:leftId===rightId,
+      response:{kind:'pair',first:{itemId:leftId,side:'left'},second:{itemId:rightId,side:'right'}},hintsUsed:0,
+      elapsedMs:Math.max(0,Math.round(performance.now()-started.current))
+    };
+    const correct=input.correct;
+    if(questionMode){const nextPending={input,leftId,rightId,move};pendingRef.current=nextPending;setPending(nextPending);}
     try {
-      await onAttempt({
-        attemptKey: `connect-${move}`,
-        itemId: targetItem.id,
-        objectiveId: targetItem.objectiveId,
-        correct,
-        response: { kind: 'pair', first: { itemId: leftId, side: 'left' }, second: { itemId: rightId, side: 'right' } },
-        hintsUsed: 0,
-        elapsedMs: Math.max(0, Math.round(performance.now() - started.current))
-      });
+      await onAttempt(input);
     } catch(failure) {
       if (!closed.current) {
         setFeedback(null);
         setError(saveFailureMessage(failure));
-        setSelectedLeft(null);
-        setSelectedRight(null);
-        setLocked(false);
-        moveRef.current--;
-        setMoves(moveRef.current);
+        if(!questionMode){setSelectedLeft(null);setSelectedRight(null);setLocked(false);moveRef.current--;setMoves(moveRef.current);}
+        setSaving(false);
       }
-      setSaving(false);
       busyRef.current = false;
       return;
     }
 
     if (closed.current) return;
+    pendingRef.current=null;setPending(null);
     setSaving(false);
     setFeedback(correct ? 'correct' : 'retry');
     playFeedbackTone(correct ? 'success' : 'retry');
@@ -129,29 +147,31 @@ export default function WordConnect({ pack, onAttempt, onComplete, onExit }: Gam
         timerRef.current = null;
       }, 700);
     }
-  }, [content.items, onAttempt, onComplete]);
+  }, [content.items, onAttempt, onComplete,questionMode]);
 
   const onSelectLeft = (item: ConnectItem) => {
-    if (locked || busyRef.current || matched.includes(item.id) || status === 'done') return;
+    if (locked || busyRef.current || !!error || matched.includes(item.id) || status === 'done') return;
     if (selectedLeft === item.id) {
       setSelectedLeft(null);
       return;
     }
     setSelectedLeft(item.id);
-    speakText(item.label, { lang: pack.subject === 'english' ? 'en-US' : 'vi-VN' });
+    stopQuestionAudio();
+    speech.read(item.label);
     if (selectedRight) {
       void checkMatch(item.id, selectedRight);
     }
   };
 
   const onSelectRight = (item: ConnectItem) => {
-    if (locked || busyRef.current || matched.includes(item.id) || status === 'done') return;
+    if (locked || busyRef.current || !!error || matched.includes(item.id) || status === 'done') return;
     if (selectedRight === item.id) {
       setSelectedRight(null);
       return;
     }
     setSelectedRight(item.id);
-    speakText(item.label, { lang: 'vi-VN' });
+    stopQuestionAudio();
+    speech.read(item.label);
     if (selectedLeft) {
       void checkMatch(selectedLeft, item.id);
     }
@@ -172,9 +192,10 @@ export default function WordConnect({ pack, onAttempt, onComplete, onExit }: Gam
   }
 
   return (
-    <section className="play-panel word-connect-panel world-stage world-sentence">
+    <section ref={layout.ref} {...layout.layoutProps} className="play-panel word-connect-panel world-stage world-sentence">
       <div className="stage-backdrop" aria-hidden="true" />
       <div className="stage-overlay" aria-hidden="true" />
+      {speech.notice&&<p className="notice speech-notice" role="status">{speech.notice}</p>}
       <div className="world-hud">
         <span className="hud-label">
           <span className="ba37-hud-symbol" aria-hidden="true">🔗</span> XƯỞNG NGÔN TỪ · NỐI TỪ
@@ -191,7 +212,7 @@ export default function WordConnect({ pack, onAttempt, onComplete, onExit }: Gam
         />
         {error ? (
           <div className="notice error" role="alert">
-            {error} <button type="button" onClick={() => setError('')}>Đóng</button>
+            {error} {pending?<button type="button" disabled={saving} onClick={()=>void checkMatch(pending.leftId,pending.rightId)}>Thử gửi lại lượt nối</button>:<button type="button" onClick={() => setError('')}>Đóng</button>}
             {matched.length === content.items.length && (
               <button type="button" onClick={() => void retryCompletion()} disabled={finishing}>
                 Thử lưu lại
@@ -233,12 +254,14 @@ export default function WordConnect({ pack, onAttempt, onComplete, onExit }: Gam
         </aside>
 
         <div className="connect-board">
+          {rounds.length>1&&<div className="pair-round-navigation" aria-label="Tiến độ các màn ghép cặp"><span aria-live="polite">Màn {roundIndex+1}/{rounds.length} · {roundItems.length} cặp</span>{roundIndex<rounds.length-1&&<button type="button" className="button primary" disabled={!roundDone||saving||locked||!!error||finishing} onClick={nextRound}>Sang màn tiếp theo →</button>}</div>}
           <div className="connect-topline">
             <span>✦ BẢNG NỐI TỪ TRÍ TUỆ</span>
             <strong>{moves} lượt nối</strong>
           </div>
+          {questionMode&&<p className="small-note">Mỗi cặp có tối đa 3 sao. Nối sai giảm 1 mức sao của các câu liên quan; nối đúng nhận ít nhất 1 sao. Chơi lại chỉ cộng phần sao tiến bộ.</p>}
           <div className="pair-question-audio" aria-label="Âm thanh câu hỏi đang chọn">{selectedLeft&&<QuestionMedia key={selectedLeft} media={content.items.find(item=>item.id===selectedLeft)?.media} audioOnly/>}</div>
-          <QuestionImageRecovery><div className="connect-columns" aria-label="Bảng hai cột nối từ">
+          <QuestionImageRecovery key={roundIndex}><div className="connect-columns" aria-label="Bảng hai cột nối từ">
             <div className="connect-col connect-col-left" aria-label="Cột từ vựng bên trái">
               <div className="connect-col-header">CỘT A</div>
               {leftDeck.map(item => {
@@ -247,6 +270,7 @@ export default function WordConnect({ pack, onAttempt, onComplete, onExit }: Gam
                 return (
                   <button
                     key={`L-${item.id}`}
+                    data-pair-id={item.id}
                     type="button"
                     className={`connect-card ${isSelected ? 'selected' : ''} ${isMatched ? 'matched' : ''}`}
                     disabled={locked || isMatched || !!error}
@@ -254,7 +278,7 @@ export default function WordConnect({ pack, onAttempt, onComplete, onExit }: Gam
                     aria-label={`Thẻ A: ${item.label}`}
                     aria-pressed={isSelected}
                   >
-                    <QuestionMedia media={content.items.find(row=>row.id===item.id)?.media} imageOnly/><span className="connect-card-text">{item.label}</span>
+                    <QuestionMedia media={roundItems.find(row=>row.id===item.id)?.media} imageOnly/><span className="connect-card-text">{item.label}</span>
                   </button>
                 );
               })}
@@ -272,6 +296,7 @@ export default function WordConnect({ pack, onAttempt, onComplete, onExit }: Gam
                 return (
                   <button
                     key={`R-${item.id}`}
+                    data-pair-id={item.id}
                     type="button"
                     className={`connect-card ${isSelected ? 'selected' : ''} ${isMatched ? 'matched' : ''}`}
                     disabled={locked || isMatched || !!error}
@@ -290,6 +315,7 @@ export default function WordConnect({ pack, onAttempt, onComplete, onExit }: Gam
 
       {status === 'done' && (
         <GameCompletion
+          questionMode={questionMode}
           title="Nhà thông thái nối từ!"
           summary={`Con đã hoàn thành ghép nối tất cả ${content.items.length} cặp thẻ sau ${moves} lượt! Rất xuất sắc!`}
           onExit={onExit}

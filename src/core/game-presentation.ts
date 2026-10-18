@@ -1,4 +1,5 @@
 import type { ContentPack, ModuleId, PairsPack, QuizPack } from './contracts.ts';
+import {gameAllowedByAuthor} from './game-policy.ts';
 
 const nativeKinds: Record<ModuleId, ContentPack['kind']> = {
   'math-quest':'quiz', 'memory-match':'pairs', 'word-connect':'pairs',
@@ -10,6 +11,7 @@ const normalize = (text:string) => text.normalize('NFC').trim().replace(/\s+/g,'
  * Version 1 only converts explicit question/answer pairs; it never invents word order,
  * missing answers, audio or reading context. Persist the source, never this view. */
 export function gamePresentation(moduleId:ModuleId, source:ContentPack):ContentPack|undefined {
+  if(!gameAllowedByAuthor(moduleId,source))return;
   const kind=nativeKinds[moduleId];
   if (!kind) return;
   if (source.kind===kind) return source;

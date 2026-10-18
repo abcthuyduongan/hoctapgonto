@@ -1,3 +1,4 @@
+import {seedLegacyWeek} from './helpers/legacy-weeks.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {DatabaseSync} from 'node:sqlite';
@@ -28,7 +29,7 @@ async function fixture(t){
   const png=await readFile(join(root,'public','icons','bao-an-192.png')),wav=waveFixture();
   const image=store.uploadMedia(admin,{name:'recovery-image.png',mime:'image/png',base64:png.toString('base64')}),audio=store.uploadMedia(admin,{name:'recovery-audio.wav',mime:'audio/wav',base64:wav.toString('base64')});
   const pack={id:'recovery-questions',version:1,title:'Bộ cần phục hồi',subject:'thinking',grade:3,source:'local',publishedAt:at,kind:'pairs',items:[['Cây cần gì?','Ánh sáng'],['Nước đông thành gì?','Nước đá'],['Con gì có cánh?','Chim'],['Hành tinh chúng ta sống?','Trái Đất']].map(([left,right],index)=>({id:`restore-item-${index}`,kind:'pair',objectiveId:'RECOVERY.PRACTICE',left,right,...(index===0?{media:{imageId:image.id,imageAlt:'Hình khu vườn',audioId:audio.id,audioTranscript:'Hello. My name is Lucy. I am nine.'}}:{})}))};
-  const week=store.publishWeek(admin,{requestId:'recovery-week',title:'Tuần phục hồi',classId:classroom.id,sets:[{subjectLabel:'Tự nhiên do tác giả đặt',pack}]});
+  const week=seedLegacyWeek(store,admin,{requestId:'recovery-week',title:'Tuần phục hồi',classId:classroom.id,sets:[{subjectLabel:'Tự nhiên do tác giả đặt',pack}]});
   const play=store.startPlay(learner,{requestId:'completed-play',moduleId:'math-quest',packId:pack.id,contentVersion:1});
   for(const item of play.presentation.items)store.attempt(learner,play.session.sessionId,{attemptKey:`answer-${item.id}`,itemId:item.id,response:{kind:'choice',choiceIndex:item.correctIndex},hintsUsed:0,elapsedMs:100});
   store.finishPlay(learner,play.session.sessionId);store.configureWallet(admin,{enabled:true,rateVnd:1000});
@@ -50,7 +51,7 @@ async function fixture(t){
 class Client{
   constructor(origin){this.origin=origin;this.cookie='';this.csrf='';}
   async call(route,{method='GET',body,csrf=this.csrf,binary=false}={}){
-    const mutable=method!=='GET',response=await fetch(`${this.origin}/api/online${route}`,{method,headers:{...(this.cookie?{Cookie:this.cookie}:{}),...(mutable?{Origin:this.origin,'Content-Type':'application/json',...(csrf?{'X-CSRF-Token':csrf}:{})}:{})},...(mutable?{body:JSON.stringify(body??{})}:{})});
+    const mutable=method!=='GET',response=await fetch(`${this.origin}/api/online${route}`,{method,headers:{'X-Bao-An-Question-Protocol':'1',...(this.cookie?{Cookie:this.cookie}:{}),...(mutable?{Origin:this.origin,'Content-Type':'application/json',...(csrf?{'X-CSRF-Token':csrf}:{})}:{})},...(mutable?{body:JSON.stringify(body??{})}:{})});
     assert.match(response.headers.get('cache-control')??'',/no-store/);const cookies=response.headers.getSetCookie();if(cookies.length)this.cookie=cookies.map(value=>value.split(';',1)[0]).join('; ');
     const data=binary&&response.ok?Buffer.from(await response.arrayBuffer()):await response.json();if(data.csrfToken)this.csrf=data.csrfToken;return{status:response.status,headers:response.headers,data};
   }
@@ -103,7 +104,7 @@ test('recovery rejects altered schema, broken links, changed media and changed p
     ['foreign-key',db=>db.exec("PRAGMA foreign_keys=OFF; UPDATE students SET class_id='missing-class';")],
     ['media',db=>db.prepare('UPDATE media SET bytes=? WHERE id=?').run(Buffer.from('changed bytes'),f.image.id)],
     ['version',db=>db.exec('UPDATE schema_version SET version=2;')],
-    ['stars',db=>db.exec('UPDATE awards SET tier=1;')],
+    ['stars',db=>db.exec('UPDATE awards SET tier=CASE WHEN tier=1 THEN 2 ELSE 1 END;')],
   ]){
     const damaged=join(f.directory,`damaged-${kind}.sqlite`);await copyFile(snapshot,damaged);const db=new DatabaseSync(damaged);try{change(db);}finally{db.close();}
     assert.throws(()=>inspectOnlineBackup(damaged),error=>error.status===400,kind);

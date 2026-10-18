@@ -5,7 +5,7 @@ export type Subject = 'math' | 'vietnamese' | 'english' | 'thinking';
 export type ModuleId = 'math-quest' | 'memory-match' | 'sentence-builder' | 'word-connect' | 'sequence-trail';
 export type ItemKind = 'multiple-choice' | 'pair' | 'sentence' | 'numeric-answer' | 'fill-blank' | 'reading-choice' | 'listening-choice' | 'listening-gap';
 
-export type QuestionMetadata={knowledgeId:string;difficulty:'easy'|'medium'|'hard';contentRole:'unassigned'|'practice'|'assessment'|'review';source:string;rights:string;reviewStatus:'draft'|'reviewed';formId?:string;topicId?:string;level?:string};
+export type QuestionMetadata={knowledgeId:string;difficulty:'easy'|'medium'|'hard';contentRole:'unassigned'|'practice'|'assessment'|'review';source:string;rights:string;reviewStatus:'draft'|'reviewed';formId?:string;topicId?:string;level?:string;allowedGameIds?:ModuleId[]};
 export type QuestionTemplateInfo={schema:'baoan-question-template';templateVersion:1;contentFormatVersion:2;topicId:string;source:string;rights:string;reviewStatus:'draft'|'reviewed'};
 export type QuestionMedia={imageId?:string;imageAlt?:string;audioId?:string;audioTranscript?:string};
 type BaseItem = { id: string; objectiveId: string;metadata?:QuestionMetadata;media?:QuestionMedia };
@@ -34,6 +34,14 @@ export type RichLearningItem=NumericItem|FillBlankItem|ReadingChoiceItem|Listeni
 export type ReadingPassage={passageId:string;title:string;body:string;source:string;rights:string;approvedAt:string};
 export type LearningPack=PackBase&{kind:'learning';contentFormatVersion:2;items:RichLearningItem[];passages:ReadingPassage[];media:LearningMedia[]};
 export type ContentPack = QuizPack | PairsPack | SentencePack | LearningPack;
+type QuestionView<T>=T extends {options:unknown}?Omit<T,'correctIndex'|'explanation'|'hint'|'options'>&{options:string[]}:Omit<T,'answer'|'acceptedAnswers'|'caseSensitive'|'explanation'|'hint'>;
+export type TimedQuestionView=QuestionView<QuizItem|RichLearningItem>;
+export type StudentQuizPack=Omit<QuizPack,'items'>&{items:QuestionView<QuizItem>[]};
+export type StudentLearningPack=Omit<LearningPack,'items'|'passages'>&{items:QuestionView<RichLearningItem>[];passages:Pick<ReadingPassage,'passageId'|'title'|'body'>[]};
+export type StudentQuestionPack=StudentQuizPack|StudentLearningPack;
+export type QuestionOpenReceipt={openedAt:string;serverNow:string;threeStarMs:number;twoStarMs:number;item?:TimedQuestionView;passage?:Pick<ReadingPassage,'passageId'|'title'|'body'>};
+export type AttemptFeedback={explanation:string;answer?:string;correctIndex?:number;audioTranscript?:string};
+export type AttemptOutcome={correct:boolean;feedback?:AttemptFeedback};
 export type GameManifest = {
   id: ModuleId; label: string; description: string; runtime: 'react' | 'phaser';
   contentKind: ContentPack['kind']; version: string; sdkVersion: typeof GAME_SDK_VERSION;
@@ -61,7 +69,14 @@ export type PlaySession = {
   /** Volatile ownership marker; not transferred in a backup. */
   ownerTabId?: string;
   /** New game sessions only; old boolean-only evidence never earns retroactive stars. */
-  rewardPolicyVersion?: 1;
+  rewardPolicyVersion?: 1|2;
+  /** Server-pinned clocks and selected review questions for per-question rewards. */
+  questionClocks?:Record<string,string>;
+  questionProtocolVersion?:1;
+  questionHints?:Record<string,{used:1;requestedAt:string;afterSequence:number}>;
+  audioReceipts?:Record<string,{mediaId:string;startedAt:string;readyAt:string;durationMs:number}>;
+  requiredItemIds?:string[];
+  journeyWeekId?:string;
   /** Deterministic alternate view of the source pack, without duplicating rewards. */
   presentationVersion?: 1;
 };
@@ -82,10 +97,15 @@ export type LearningEvent = {
 /** attemptKey must be stable for a single logical submission, even on retry after failed storage. */
 export type AttemptInput = Pick<LearningEvent, 'itemId' | 'objectiveId' | 'correct' | 'hintsUsed' | 'elapsedMs' | 'response'> & {attemptKey:string};
 export type GameHostProps = {
-  pack: ContentPack;
-  onAttempt: (attempt: AttemptInput) => Promise<void>;
+  pack: ContentPack|StudentQuestionPack;
+  onAttempt: (attempt: AttemptInput) => Promise<void|AttemptOutcome>;
   onComplete: () => Promise<void>;
   onExit: () => void;
+  questionMode?:boolean;
+  serverScored?:boolean;
+  mediaPlayId?:string;
+  onQuestionOpen?:(itemId:string)=>Promise<QuestionOpenReceipt>;
+  onQuestionHint?:(itemId:string)=>Promise<{hint:string;hintsUsed:number}>;
 };
 
 export interface ReviewCard {

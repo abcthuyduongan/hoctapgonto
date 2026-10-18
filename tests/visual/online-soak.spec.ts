@@ -1,0 +1,31 @@
+import {test,expect} from '@playwright/test';
+import {cloudBrowserFixture} from '../helpers/cloud-browser-fixture.mjs';
+
+test('thirty complete games across five hosts keep the shared question cap and release browser resources',async({page},testInfo)=>{
+ test.setTimeout(240000);const f=await cloudBrowserFixture();
+ try{
+  async function api(route:string,data?:unknown){const me=data&&!['/setup','/login'].includes(route)?await(await page.request.get(f.origin+'/api/online/me')).json():null;const r=data?await page.request.post(f.origin+'/api/online'+route,{headers:{Origin:f.origin,...(me?{'X-CSRF-Token':me.csrfToken}:{})},data}):await page.request.get(f.origin+'/api/online'+route);expect(r.ok(),await r.text()).toBe(true);return r.json();}
+  await api('/setup',{token:f.token,name:'Soak fixture',username:'soak.admin',password:f.password});const cls=await api('/classes',{name:'Lớp 30 lượt',grade:3});await api('/students',{name:'An',classId:cls.id,username:'soak.child',password:f.password});
+  const base={version:1,grade:3,subject:'thinking',source:'local',publishedAt:'2026-10-17T00:00:00.000Z'};
+  const math={...base,id:'soak-math',kind:'quiz',title:'Toán qua ba trò',items:[1,2,3,4].map(i=>({id:'soak-math-'+i,kind:'multiple-choice',objectiveId:'SOAK.MATH',prompt:`${i} cộng hai bằng bao nhiêu?`,options:[`Kết quả ${i+2}`,'100','101','102'],correctIndex:0,explanation:`${i} cộng hai bằng ${i+2}.`}))};
+  const vi={...base,id:'soak-viet',kind:'sentences',title:'Ghép câu tiếng Việt',items:[['Em','chăm','học'],['Tôi','yêu','sách']].map((words,i)=>({id:'soak-vi-'+i,kind:'sentence',objectiveId:'SOAK.VI',prompt:'Sắp xếp thành câu '+i,words,hint:'Đọc theo thứ tự tự nhiên.'}))};
+  const en={...base,id:'soak-english',kind:'sentences',title:'Trình tự tiếng Anh',items:[['Birds','can','fly'],['We','read','books']].map((words,i)=>({id:'soak-en-'+i,kind:'sentence',objectiveId:'SOAK.EN',prompt:'Xếp đúng thứ tự '+i,words,hint:'Đặt chủ ngữ trước.'}))};
+  await api('/weeks',{requestId:'soak-week',classId:cls.id,title:'Tuần 01',sets:[{subjectLabel:'Toán',pack:math},{subjectLabel:'Tiếng Việt',pack:vi},{subjectLabel:'Tiếng Anh',pack:en}]});
+  await page.context().clearCookies();await api('/login',{username:'soak.child',password:f.password});const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));await page.goto(f.origin+'/?online=1&controls=1');await expect(page.locator('.ba3d-render-host')).toHaveAttribute('data-state',/ready|fallback|unavailable/);
+  const cdp=await page.context().newCDPSession(page),samples:any[]=[];
+  const modes=[{game:'math-quest',pack:math},{game:'memory-match',pack:math},{game:'sentence-builder',pack:vi},{game:'word-connect',pack:math},{game:'sequence-trail',pack:en}];
+  for(let round=0;round<30;round++){
+   const {game,pack}=modes[round%5],set=page.locator('.online-week-path > li > ul > li').filter({hasText:pack.title}),details=set.locator('details');if(await details.getAttribute('open')===null)await details.locator('summary').click();await expect(details.locator('.online-question-stars-body')).toBeVisible();
+   if(await set.getByRole('button',{name:'Chọn trò để học hoặc ôn lại',exact:true}).count())await set.getByRole('button',{name:'Chọn trò để học hoặc ôn lại',exact:true}).click();
+   const select=set.getByRole('combobox');await expect(select).toBeVisible();await select.selectOption(game);await set.getByRole('button',{name:/^Học bộ này ·/}).click();await expect(page.locator('.immersive-dialog')).toBeVisible();
+   if(game==='math-quest')for(let i=0;i<math.items.length;i++){await page.locator('.answer-option').nth(0).click();await page.getByRole('button',{name:i===math.items.length-1?'Hoàn thành bộ câu hỏi':'Đến trạm kế tiếp ➜',exact:true}).click();}
+   else if(game==='memory-match')for(const item of math.items){await page.locator('.memory-card').filter({hasText:item.prompt}).click();await page.locator('.memory-card').filter({hasText:item.options[0]}).click();await expect(page.locator('.memory-card.found')).toHaveCount((math.items.indexOf(item)+1)*2);}
+   else if(game==='word-connect')for(const item of math.items){await page.locator('.connect-col-left .connect-card').filter({hasText:item.prompt}).click();await page.locator('.connect-col-right .connect-card').filter({hasText:item.options[0]}).click();}
+   else{const items=pack.items as typeof vi.items;for(let i=0;i<items.length;i++){for(const word of items[i].words)await page.locator(game==='sentence-builder'?'.sentence-bank':'.trail-bank').getByRole('button',{name:word,exact:true}).click();await page.getByRole('button',{name:game==='sentence-builder'?'✓ Kiểm tra câu':'✓ Kiểm tra quy luật',exact:true}).click();await page.getByRole('button',{name:i===items.length-1?'Hoàn thành bộ câu hỏi':game==='sentence-builder'?'Câu tiếp theo ➜':'Bậc tiếp theo ➜',exact:true}).click();}}
+   await page.getByRole('button',{name:'Trở về hành trình',exact:true}).click();await expect(page.locator('.immersive-dialog')).toHaveCount(0);await cdp.send('HeapProfiler.collectGarbage');const heap=await cdp.send('Runtime.getHeapUsage'),dom=await page.evaluate(()=>({nodes:document.querySelectorAll('*').length,audio:document.querySelectorAll('audio').length,canvas:document.querySelectorAll('canvas').length}));samples.push({round:round+1,game,heap:heap.usedSize,...dom});
+  }
+  const state=await api('/student/summary');expect(state.balance.earned).toBe(24);expect(state.currentWeekSummary).toMatchObject({ready:true,total:8,three:8});expect((await f.pool.query("SELECT count(*)::int AS n FROM bao_an.plays WHERE json->>'status'='completed'")).rows[0].n).toBe(30);expect((await f.pool.query("SELECT count(*)::int AS n FROM bao_an.plays WHERE json->>'status'='active'")).rows[0].n).toBe(0);
+  expect(samples.every(row=>row.audio===0)).toBe(true);expect(samples.at(-1).canvas).toBe(samples[4].canvas);expect(samples.at(-1).heap-samples[4].heap).toBeLessThan(16*1024*1024);expect(Math.max(...samples.slice(5).map(row=>row.nodes))-Math.min(...samples.slice(5).map(row=>row.nodes))).toBeLessThan(60);expect(errors).toEqual([]);
+  await testInfo.attach('thirty-games-resource-samples',{body:JSON.stringify({games:30,hostChanges:29,earnedStars:24,samples},null,2),contentType:'application/json'});await cdp.detach();
+ }finally{await f.close();}
+});

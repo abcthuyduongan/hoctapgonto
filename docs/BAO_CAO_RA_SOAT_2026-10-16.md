@@ -1,8 +1,8 @@
 # Báo cáo rà soát Bảo An Learning — 16/10/2026
 
-**Cập nhật 17/10/2026 — RC6:** bổ sung nhập chung tài liệu/ảnh/âm thanh, chọn tuần bằng danh sách, loại câu lỗi và giao phần hợp lệ, cùng bộ mẫu đầy đủ; xem mục 14. Bản Netlify thật chưa được cập nhật vì kết nối GitHub hiện chỉ đọc.
+**Cập nhật 17/10/2026 — RC8:** tải hành trình theo nhu cầu, phân màn, đổi mật khẩu/giọng Việt và sao riêng từng câu, xác nhận chuyển tuần; xem mục 16–17. RC6 đã có commit local `ab202e9`; thay đổi sau đó chưa commit/push/deploy, chưa nghiệm thu tốc độ website thật.
 
-**Cập nhật mới nhất:** đã sửa R05–R09 và đóng gói RC4; bằng chứng trước/sau và kết quả cuối ở mục 12. Các mục 10–11 giữ nguyên phát hiện trước sửa để đối chiếu.
+**Mốc RC4 để đối chiếu:** đã sửa R05–R09 và đóng gói RC4; bằng chứng trước/sau ở mục 12. Các mục 10–11 giữ nguyên phát hiện trước sửa; kết quả RC8 ở mục 16–17.
 
 Các lỗi đã xử lý gồm: R05 kho trên 300 tư liệu, R06 dùng chung khác khối, R07 đồng bộ tư liệu, R08 chữ trên thẻ có ảnh và R09 khôi phục ảnh lỗi. Kết quả kỹ thuật cục bộ PASS; nghiệm thu giáo viên/học sinh và cloud live vẫn UNVERIFIED.
 
@@ -522,3 +522,99 @@ Yêu cầu mới của người dùng thay quy tắc từ chối cả tuần tr�
 - RC6 giữ schema SQLite 1 / PostgreSQL 1; không migration, không đụng dữ liệu thật, không sửa trần sao hoặc lịch sử. RC5 và các gói trước giữ nguyên. Hướng dẫn triển khai: `docs/CAP_NHAT_NETLIFY_RC6.md`.
 - Gói pilot: `releases/bao-an-learning-3.8.0-rc.6.zip`, build ID **2bb9c2c7dbb008a8**, SHA-256 **8fe0a1da34c4b41fd6386864e52590cc3872b653cb8fde71e0847cce49cca393**; 62 tệp, 52 tài nguyên ứng dụng, `pilot:true`, `releaseReady:false`, `humanPilotStatus:UNVERIFIED`. Gói mã nguồn cập nhật GitHub: `releases/bao-an-learning-rc6-cap-nhat-github.zip`; gồm các thay đổi tích lũy và bộ mẫu, không có dữ liệu/biến bí mật.
 - **Chưa commit/push/deploy lên Netlify**. Không lấy kết quả fixture thay nghiệm thu website và mạng thật.
+
+## 15. Căn chỉnh theo trò chơi và giảm chờ/lỗi khi tải · RC7 · 17/10/2026
+
+Người dùng gửi ảnh thẻ Trí Nhớ có hình bị tràn chữ, ảnh trắc nghiệm có chữ/hình lớn, xác nhận muốn thấy trọn đề và đáp án, rồi yêu cầu cơ chế căn chỉnh dùng chung. Người dùng còn gặp chậm/lỗi ở cả mở trang, vào trò và đang chơi/chuyển câu; chưa cung cấp nguyên văn thông báo lỗi. Các nguyên nhân dưới đây được xác minh trong source/fixture, không khẳng định đã tái hiện mọi lỗi production.
+
+### T16 — Thẻ Trí Nhớ giữ trọn nội dung
+
+- Tái hiện thẻ có ảnh và câu 120 ký tự tràn ngoài nút ở viewport 766×471; regression mới thất bại trên bản trước sửa. Nguyên nhân: thẻ có chiều cao cố định, hai mặt đặt absolute, nội dung không thể làm thẻ giãn.
+- Hai mặt nay chồng trong một ô grid có kích thước tự nhiên, thẻ cao theo nội dung, nhãn xuống dòng; giữ perspective, backface và hiệu ứng lật. Dành sẵn 64 px cho ảnh trước khi lật nhưng chỉ tải ảnh khi mở thẻ. Bỏ ba quy tắc media thẻ cũ ở `online.css` để không đổi gap/chiều cao khi ảnh xuất hiện.
+- Màn hình nhỏ có hai cột, trung bình ba, máy tính bốn; cuộn vùng chơi để xem đủ nhiều thẻ. Không cắt chữ/scale toàn giao diện. Front chưa lật có `aria-hidden` để không đọc lộ nội dung cho trình đọc màn hình.
+- Thử ảnh lỗi → tải lại → ảnh giải mã, câu có ảnh và thuần chữ, chiều cao trước/sau lật/tải lại chênh không quá 1 px; ghép một cặp chỉ ghi một attempt.
+
+### T17 — Bộ căn chỉnh dùng chung
+
+- `useQuestionLayout` đo **vùng chơi thực tế** bằng ResizeObserver, cập nhật khi đổi cửa sổ/kích thước. Xuất biến CSS dùng chung cho cỡ chữ, hình, gap, padding và chiều cao nút; có phân biệt loại câu và độ dài nội dung.
+- Áp dụng cho năm game cùng runner đọc/nghe/điền số/từ. Prompt tối thiểu 20 px, đáp án 16 px, chữ thẻ 14 px; nút tối thiểu 44 px. Không sửa đề/đáp án, không bỏ bớt phương án và không nén cả màn hình bằng transform scale.
+- Trắc nghiệm gọn hơn: prompt tối đa 32 px (trước tối đa 47), hình giữ tỷ lệ và ngân sách tối đa 180 px, giảm vùng gợi ý trống 170 px thành chiều cao tự nhiên. Tại 1828×922 và 1219×615, câu mẫu có hình hiện trọn đề và bốn phương án trong viewport; trên điện thoại câu dài cuộn đầy đủ, không tràn ngang.
+- Bài đọc bỏ khung cuộn lồng chiều cao 300 px: toàn đoạn đọc có chiều cao tự nhiên trong vùng chơi. Đổi câu kéo về đầu vùng chơi; chọn đáp án/xem feedback không tự nhảy về đầu. Bộ thẻ chỉ reset khi đổi bộ, không reset mỗi lần chọn thẻ.
+- Hình minh họa và transcript chỉ trình bày theo dữ liệu tác giả; bộ căn chỉnh không đánh giá đúng/sai chuyên môn hoặc tự thay hình.
+
+### T18 — Vào bài không phải đợi cảnh tải xong
+
+- Source trước sửa: cảnh chờ đủ năm GLB (tổng byte gốc 7.271.708) và chuẩn bị renderer; các nút vào bài dự phòng chỉ hiện khi cảnh lỗi. Khi cảnh đang tải, thông báo nói có thể vào ngay nhưng giao diện immersive chưa có nút tương ứng.
+- Nay có nút trò phù hợp ngay ở trạng thái loading; cảnh tải tiếp độc lập. Native/rich game chunk bắt đầu tải song song với POST mở phiên, dùng chung promise với lazy loader; không đợi API trả xong mới bắt đầu tải mã trò. Lỗi warm-up không bỏ qua xác thực/mở phiên và không biến promise hỏng thành cache vĩnh viễn.
+- Danh sách game phù hợp memo theo bộ thay vì dựng lại presentation/validation năm trò mỗi lần chọn đảo. Các refresh tiến độ đang chạy được gộp; burst focus/visibility/focus chỉ có một GET student.
+- Mỗi GLB có giới hạn 15 giây cho fetch và body. Danh mục hai worker vẫn có thể qua ba đợt trước fallback; **không nói toàn cảnh chắc chắn chuyển trong 15 giây**. Nút vào bài đã độc lập với giới hạn này.
+- API thông thường có deadline 30 giây bao gồm đọc JSON, sao lưu/khôi phục 120 giây; hết hạn nhả trạng thái chờ, thông báo thử lại và hủy kết nối. Không tự gửi lại mutation hoặc nhận sao trước khi máy chủ xác nhận. Test giữ nguyên mã lỗi validation/401, không phát sinh ghi đáp án trùng.
+- Auto quality hạ về Nhẹ khi có 30 frame liên tiếp từ 80 ms (giật nghiêm trọng), không bắt đợi cooldown 15 giây thông thường. Một spike ngắn không kích hoạt; giữ chất lượng người dùng chọn tay và hysteresis nâng lại. Không thay GLB hoặc tự xóa cảnh 3D.
+
+### T19 — Giảm vòng truy vấn cloud, giữ phân quyền
+
+- `weeks` đọc một danh sách và một truy vấn set/pack theo workspace/lớp, thay một truy vấn mỗi tuần. Giữ thứ tự tuần/nhóm và phiên bản được giao.
+- `studentState` dùng lại một snapshot thưởng/yêu cầu/tiến độ/balance trong cùng request; không cache chung giữa học sinh hoặc transaction. Chấm/hoàn tất chỉ đọc play/pack đã xác thực một lần; helper events nội bộ là private, API đọc events vẫn xác thực chủ sở hữu.
+- Đo trên ba tuần/sáu bộ: tải tuần **4 → 2** truy vấn; trạng thái học sinh **19 → 7**; gửi đáp án **14 → 12** lượt gọi DB. Lớp rỗng chỉ một truy vấn tuần. Đây là đếm truy vấn fixture, không phải số đo thời gian WAN.
+- Test giữ ranh giới lớp/workspace, đúng version, client transaction, tài khoản, quyền tư liệu, tuần chưa mở, retry/concurrent, sao và lịch sử. Không migration/schema change. Quyền đọc tư liệu đã giao của tuần khóa giữ nguyên chính sách trước; bắt đầu game tuần khóa vẫn bị 403.
+
+### Kiểm chứng cuối và triển khai
+
+- TypeScript/build 109 module, syntax, asset gate năm model đạt. Node **232/232 PASS**: 103 renderer, 9 release, 84 online, 36 cloud. Browser toàn bộ **48/48 PASS** trên Chrome/Edge, khoảng 3,9 phút. Dùng database riêng trong test-results; không đọc/ghi tài khoản thật hoặc file học liệu người dùng.
+- Browser giữ request GLB chưa trả lời mà vẫn vào bài được; game chunk được yêu cầu trước khi POST mở phiên trả về. Lỗi 503 ở đáp án không ghi; thử lại ghi đúng một bản. Cảnh 404 vẫn chơi qua nút, game chunk tải lỗi hiện khôi phục và tải lại mở được. Burst focus/visibility/focus chỉ có một GET student. Các ca luồng tài khoản, tám dạng, năm game, wallet, phân quyền, phiên bản và khôi phục cùng đạt.
+- Ảnh sau sửa ở `test-results/online-browser-output` (full gate); các lượt kiểm tra tập trung có ảnh trong `question-layout-browser` và `shared-layout-regression`. Đã xem ảnh trắc nghiệm 1219×615 và crop thẻ 120 ký tự sau sửa. Các lượt đầu thử mới có lỗi locator dùng nhãn game chưa đúng, đã sửa harness và full gate cuối đạt; không đổi logic sản phẩm để né test.
+- Gói RC6 bất biến giữ nguyên. Hướng dẫn đẩy source RC7: `docs/CAP_NHAT_NETLIFY_RC7.md`; cần triển khai cả UI và Function rồi đo lại website/thiết bị thật. Phiên này chưa commit/push/deploy.
+- Gói RC7: `releases/bao-an-learning-3.8.0-rc.7.zip`, build ID **4a70dcce4d56a272**, SHA-256 **176901dba1ad10346bb2c095ca6b18dfaaf6a58d3e88ae02c08c7f809b485942**; 69 tệp/59 tài nguyên ứng dụng, schema SQLite 1 / PostgreSQL 1, `pilot:true`, `releaseReady:false`, `humanPilotStatus:UNVERIFIED`. Gói source cập nhật riêng: `releases/bao-an-learning-rc7-cap-nhat-github.zip`, cơ sở commit RC6 `ab202e9`; không chứa dữ liệu hoặc biến môi trường riêng.
+## 16. RC8 — tải theo nhu cầu, phân màn và tài khoản học sinh (17/10/2026)
+
+Đã thực hiện kế hoạch `KE_HOACH_TAI_DU_LIEU_VA_PHAN_MAN_2026-10-17.md`, kèm yêu cầu bổ sung khóa tuần tuần tự và kiểm tra đọc tiếng Việt. Giữ các thay đổi RC7, API cũ và schema SQLite/PostgreSQL 1; chưa commit/push/deploy.
+
+- **Hành trình:** UI mới dùng `/student/summary`, tối đa 20 bộ metadata/trang, không có `items`, đoạn đọc hoặc danh mục tư liệu của mọi tuần. Máy chủ dùng SQL projection metadata cho tiến độ, chỉ giải mã bộ hiện tại để tính game; khi chọn chơi lại mới đọc một nguồn để lấy danh sách game. Không gọi luồng `weeks/studentState` đầy nội dung cho summary hoặc khi mở compact play.
+- **Mở/chấm/hoàn tất:** `/play/compact` trả metadata nguồn + một presentation, không gửi cả hai bản đầy đủ. Đáp án trả receipt; `/complete-compact` trả tiến độ tóm tắt. Chấm và bằng chứng vẫn dùng nguồn bất biến trên máy chủ. Giữ API cũ cho trang đang mở; cần triển khai UI và Function cùng commit.
+- **Bộ nhớ:** chỉ giữ presentation đang chơi, không thêm cache bộ đã thoát; 0 bộ nền thay cho LRU hai bộ. Dọn request không còn cần trên logout/unmount, bỏ response cũ theo generation, gộp refresh và không refresh nền khi đang chơi/đổi mật khẩu. Không lưu học liệu/mật khẩu vào Web Storage, IndexedDB hoặc SW.
+- **Phân màn:** Trí Nhớ/Nối Từ tối đa 6 cặp desktop, 4 mobile; cân bằng 7→4+3, 13→5+4+4. Chốt màn lúc mở lượt, resize chỉ đổi bố cục. Next chờ lưu đủ màn, không tạo attempt/award; mỗi câu đúng được sao ngay, hoàn tất không thưởng thêm. Gỡ DOM/media màn cũ, chỉ một audio phát; pause/dỡ src/load khi đổi media/unmount. Giữ mã nguồn/câu/phiên bản và trần 3 sao/câu.
+- **Phù hợp game:** bảng giải thích từng câu và game chung toàn bộ. `metadata.allowedGameIds` tùy chọn (1–5 mã khác nhau) xuyên JSON, Word/Excel, validator, presentation và hai store. Tác giả chỉ bớt game, không ép dữ liệu không hỗ trợ; không tự bỏ câu. Bộ không còn game chung bị chặn trước giao và tại máy chủ. Sửa policy giữ item ID/reward identity, cần phiên bản mới; thử lại/chơi game khác không tạo thêm nguồn sao. Cập nhật mẫu trắng Word/Excel và ZIP đầy đủ; giữ file gốc Downloads/thư mục mẫu người dùng giải nén.
+- **Khóa tuần:** mọi câu tuần hiện tại đạt ít nhất 2 sao mới được xác nhận chuyển tuần kế. Kiểm tra lại lớp/tuần/version/game cả với requestId mở lượt cũ; chặn tái sử dụng sau chuyển lớp. Test hai bộ tuần 1: xong một bộ vẫn không mở tuần 2, đủ mọi câu ở cả hai bộ vẫn chờ xác nhận chuyển; tuần 3 tiếp tục khóa.
+- **Đổi mật khẩu:** dialog tải khi mở, current/new/confirm 10–128 ký tự không trim. Student-only API, Origin/CSRF, quota riêng per-user/IP; sai hiện tại trả 400 giữ phiên. Giao dịch kiểm tra lại phiên/active/hash cũ sau scrypt, cập nhật/thu hồi mọi phiên/kết thúc lượt đang chơi cùng transaction. Reset/logout chen giữa không ghi đè, lỗi ghi rollback; giữ sao, tiến độ và lịch sử. Thành công yêu cầu đăng nhập lại.
+- **Giọng Việt:** nguyên nhân cũ chỉ gán `utterance.lang`, chưa chọn voice; một số lời Việt trong môn Anh bị gán Anh, còn vế phải Nối Từ luôn bị gán Việt. Nay chọn voice cùng ngôn ngữ, ưu tiên đúng locale/local voice, chờ `voiceschanged` tối đa 1,5 giây, không chuyển sang default ngoại ngữ khi thiếu Việt; hiện thông báo thêm giọng Việt/dùng tệp thu sẵn. Text có dấu Việt ưu tiên Việt; vế phải Nối Từ theo ngôn ngữ như vế trái. Hủy lời/hàng chờ khi đổi câu/màn/thoát; bật âm thanh thu sẵn dừng TTS. Kiểm thử mock kiểm tra lựa chọn và cleanup; chất lượng phát âm cần nghe trên thiết bị thật.
+
+Các mô tả sao theo bộ/tự mở tuần trong kế hoạch gốc được thay thế bởi mục 17 dưới đây theo yêu cầu mới. Phân màn vẫn giữ nguyên nguồn; sao được lưu ngay cho từng câu đúng, chuyển màn/hoàn tất không thưởng thêm.
+
+## 17. Sao từng câu, xác nhận chuyển tuần và các đề xuất cần điều chỉnh · RC8
+
+Kế hoạch chi tiết: `docs/KE_HOACH_SAO_TUNG_CAU_VA_KHOA_TUAN_2026-10-17.md`. Người dùng yêu cầu báo lại các đề xuất chưa hợp lý, gây rối hoặc quá tải; các điểm đã xác định và cách xử lý:
+
+- **Thời gian:** không dùng một mốc cho mọi dạng. Trắc nghiệm 30/60 giây, nhập số/từ 45/90, đọc 90/180, nghe 30/60 sau khi nghe hết bắt buộc. Câu có hình chờ tải hình thành công trước mở đồng hồ; hình lỗi có tải lại/thoát. Máy chủ ghi mốc một lần, không tin elapsedMs tự gửi. Sai +15 giây, mỗi gợi ý +30 giây; cần nghiệm thu mốc với học sinh thật. Độ trễ mạng khi mở/gửi đáp án vẫn có thể ảnh hưởng sao, chưa cam kết loại trừ toàn bộ.
+- **Sao dùng chung:** mỗi câu nguồn tối đa 3 sao giữa mọi trò/lượt/phiên bản. Đúng được lưu ngay cùng giao dịch đáp án; 1→3 chỉ thêm 2, gửi lại/cùng mức thêm 0. Trí Nhớ/Nối Từ tính lỗi ghép liên quan từng câu, lật một thẻ không tính lỗi. Ghép Câu/Quy Luật tính lần kiểm tra sai/gợi ý. Giữ credit/số dư cũ bằng mức đã nhận của nguồn, không tự gán thành tích câu hoặc nhân sao ví. Sửa lời giải/gợi ý/policy và mã nhập tự sinh được đối chiếu ý nghĩa để giữ ID câu gốc; nội dung học mới có thể là câu mới.
+- **Chuyển tuần:** mọi câu ở mọi bộ tuần hiện tại phải đạt ít nhất 2 sao. Đủ yêu cầu vẫn ở tuần đó, báo số câu 2/3 sao và cho ôn thêm. Chỉ xác nhận mới chuyển; máy chủ kiểm tra lại và khóa tuần cũ trong cùng giao dịch. Chặn mở lượt cũ, đáp án/hoàn tất đang chờ, thiết bị khác và nhảy tuần. Chưa có tuần kế thì tiếp tục ôn. Tránh thêm câu vào tuần đã đóng: học sinh không được quay lại; lịch sử chuyển tuần ghim phiên bản đã đạt.
+- **Giao diện ôn:** bỏ phương án mỗi câu có 5 nút game (30 câu có thể thành 150 nút). Một ô chọn trò chung, một nút học lại mỗi câu, nút ôn tập hợp các câu 2 sao; chỉ dựng danh sách khi mở chi tiết. Ôn một cặp thêm một cặp nguồn đối chiếu, không tạo câu thưởng mới. Hoàn tất không hiện ba sao trang trí gây hiểu nhầm thành tích.
+- **Tải máy chủ:** một request nhỏ để mở câu tính giờ, không polling đồng hồ. Ghép cặp/xếp câu không gửi request cho lật/chuyển từ. Receipt đúng chỉ có delta và tối đa hai ID+mức sao; không đọc lại mọi award/ví hoặc toàn hành trình trên mỗi đáp án. Phân trang thay danh sách tối đa 20 bộ, không tích lũy các trang vào RAM; không cache học liệu nền.
+- **Ngân sách:** 140 câu tối đa 420 sao thay cho trần cũ theo bộ. Tỷ lệ đổi quà không tự đổi; người quản lý cần đối chiếu ngân sách. Sao cũ và yêu cầu đổi quà giữ nguyên; không suy ra câu đã đạt từ số dư cũ.
+- **Phục hồi:** kiểm chứng lại thời gian, raw answer, ledger câu, credit cũ, số dư khi đổi quà và lịch sử chuyển tuần. Giữ schema SQLite/PostgreSQL 1, bổ sung dữ liệu JSON; không vì cùng schema mà mặc định bản chương trình cũ hiểu được luật mới. Giữ bản sao trước cập nhật.
+
+### Số đo tải và bộ nhớ
+
+Fixture Chrome/PGlite cục bộ, cùng backend hiện tại cho UI RC7 lưu trữ và UI RC8, 30 tuần/365 câu, viewport 1219×615. Đây là số đo cơ chế tải trên máy, không phải website Netlify hoặc RAM/VRAM toàn hệ thống.
+
+| Chỉ số | UI/luồng cũ | RC8 |
+|---|---:|---:|
+| JSON hành trình 30 tuần | 87.148 byte, toàn bộ câu | 19.958 byte, 20 bộ metadata, không `items` |
+| JSON mở bộ 30 cặp | 9.294 byte | 5.221 byte, một presentation |
+| Thẻ dựng khi mở 13 cặp | 26 | 10 (màn đầu 5 cặp) |
+| Thẻ dựng khi mở 30 cặp | 60 | 12 (màn đầu 6 cặp) |
+| Tổng DOM khi mở bộ 30 cặp | 612 | 326 |
+| DOM sau warm-up, 10 lần thoát | 625 cố định | 544 cố định |
+| JS heap sau GC đầu→cuối 10 vòng | 10,253→10,521 MiB | 10,124→10,291 MiB |
+
+Cả hai giữ 1 canvas, 0 audio sau thoát, 91 texture/155 geometry/24 program và ước lượng texture khoảng 28,57 MB ổn định. Listener cố định lần lượt 346/349; không kết luận chỉ từ heap rằng không bao giờ có rò rỉ. Vào bộ lần đầu khoảng 458/466 ms, các bộ sau 74–97/78–87 ms; phép đo này không chứng minh giảm thời gian WAN. Log JSON ở `test-results/question-v2-data-loading-before.json` và `question-v2-data-loading-after.json`.
+
+### Kiểm chứng cuối RC8
+
+- `npm test`: **292/292 PASS** (103 renderer, 9 release, 140 online, 40 cloud). TypeScript, build 118 module, syntax và asset gate năm model đạt. Hai kho dữ liệu đều có kiểm thử ledger/cộng sao ngay, retry đồng thời, con trỏ tuần và khôi phục.
+- Toàn bộ browser **90/90 PASS**, 45 ca mỗi Chrome/Edge, khoảng 6,2 phút; log `test-results/question-v2-final-browser-verified.log`. Phủ ảnh lỗi/tải chậm không mở đồng hồ, chờ xác nhận đồng hồ, nghe hết trước tính giờ, gửi lại nguyên đáp án, 1→3 chỉ thêm 2, đổi trò không vượt trần, số câu 2/3 sao, hủy/xác nhận chuyển tuần, tuần cũ bị khóa cả API và UI, phân màn, mật khẩu, nhập liệu, sao lưu/khôi phục và dữ liệu riêng.
+- Hành trình thử thực tế qua UI: tổng 7→10→12 sao cho bốn câu, chỉ chuyển sang Tuần 02 khi xác nhận; refresh vẫn ở Tuần 02. Khôi phục giữ số dư, ledger và lịch sử đổi quà; phiên cũ phải đăng nhập lại. Đã xem ảnh hành trình sau chuyển tuần.
+- `git diff --check` đạt; chỉ có thông báo chuyển LF/CRLF của Git. Dữ liệu fixture nằm trong `test-results`, không dùng tài khoản/học liệu thật. Bộ mẫu đầy đủ cuối SHA-256 `2af81b3ba14ca662f7369adfc1cf86d0a8374b59a65eb0a338000b6bd6245e9d`.
+- Các việc tiếp theo đã xếp thứ tự ở mục 6–7 của kế hoạch sao: đo request website và cảnh 3D, thử ngưỡng sao/ngân sách với học sinh, đo kho quản trị lớn rồi tách dữ liệu nếu cần, cảnh báo chỉnh tuần đã đóng. Trần sao xuyên các bộ sao chép riêng và độ khó tương đương giữa trò chưa được khẳng định.
+- **Chưa commit/push/deploy.** Kết quả dùng thử giáo viên/học sinh, giọng Việt thiết bị thật và tốc độ Netlify vẫn `UNVERIFIED`; bản đóng gói là pilot, không tự đánh dấu production.
+- Gói RC8: `releases/bao-an-learning-3.8.0-rc.8.zip`, **6.120.912 byte**, build ID **e359ab3f4e79c1d2**, SHA-256 **aa9e30d48ad176e8e98129f69249af21343a00d11bc0eedfef62f0a76e7f2bbf**; 67 tệp/57 tài nguyên ứng dụng, schema SQLite 1 / PostgreSQL 1, `pilot:true`, `releaseReady:false`, `humanPilotStatus:UNVERIFIED`. Không đóng gói bản sao thư mục mẫu người dùng đã giải nén ngoài Git; giữ nguyên thư mục gốc. Các gói RC7 trở về trước không bị ghi đè.
+- Gói mã nguồn cập nhật: `releases/bao-an-learning-rc8-cap-nhat-github.zip`, chứa thay đổi tích lũy từ commit `ab202e9` và các helper máy chủ mới, kèm manifest hash từng tệp; không có dữ liệu thật, bí mật, `outputs` hoặc thư mục mẫu người dùng giải nén. Lệnh đẩy Git và lưu ý nhánh Netlify ở `docs/CAP_NHAT_NETLIFY_RC8.md`.

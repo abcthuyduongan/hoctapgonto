@@ -1,3 +1,5 @@
+import {prepareSuccessfulAttempt,registerStorePlay,fixtureQuestion} from './helpers/secure-play.mjs';
+import {threeSubjectSets} from './helpers/planned-weeks.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
@@ -9,9 +11,9 @@ import {waveFixture} from './helpers/media-fixture.mjs';
 const origin='https://baoan.example.test',setupToken='cloud-fixture-setup-token-2026-private';
 const managerPassword='Manager-cloud-password-2026!',studentPassword='Student-cloud-password-2026!';
 class Client{
-  constructor(api){this.api=api;this.cookie='';this.csrf='';}
+  constructor(api){this.api=api;this.origin=origin;this.cookie='';this.csrf='';}
   async request(route,{method='GET',body,csrf=this.csrf,requestOrigin=origin,headers={},binary=false}={}){
-    const mutable=!['GET','HEAD'].includes(method),h={...headers};if(this.cookie)h.Cookie=this.cookie;
+    const mutable=!['GET','HEAD'].includes(method),h={'X-Bao-An-Question-Protocol':'1',...headers};if(this.cookie)h.Cookie=this.cookie;
     if(mutable){h['Content-Type']='application/json';if(requestOrigin!==null)h.Origin=requestOrigin;if(csrf)h['X-CSRF-Token']=csrf;}
     const response=await this.api(new Request(`${origin}/api/online${route}`,{method,headers:h,...(mutable?{body:JSON.stringify(body??{})}:{})}),{ip:'192.0.2.100'});
     assert.match(response.headers.get('cache-control')??'',/no-store/);assert.equal(response.headers.get('netlify-cdn-cache-control'),'no-store');
@@ -20,14 +22,14 @@ class Client{
     if(response.ok&&typeof data.csrfToken==='string')this.csrf=data.csrfToken;
     return{status:response.status,ok:response.ok,headers:response.headers,data};
   }
-  async ok(route,options){const result=await this.request(route,options);assert.ok(result.ok,`${route}: ${result.status} ${JSON.stringify(result.data)}`);return result.data;}
+  async ok(route,options){await prepareSuccessfulAttempt(this,route,options);const result=await this.request(route,options);assert.ok(result.ok,`${route}: ${result.status} ${JSON.stringify(result.data)}`);if(['/play','/play/compact'].includes(route))await registerStorePlay(this,result.data,this.fixtureStore());return result.data;}
   async denied(route,options,status){assert.equal((await this.request(route,options)).status,status);}
 }
 async function fixture(t){
   const f=await createPostgresFixture(t,{bootstrap:false}),objects=new Map(),removed=[];
   const storage={async upload(path,bytes,mime){assert.ok(!objects.has(path));objects.set(path,{bytes:Buffer.from(bytes),mime});},async download(path){assert.ok(objects.has(path));return Buffer.from(objects.get(path).bytes);},async remove(path){removed.push(path);objects.delete(path);}};
   const api=createCloudApi({store:f.store,storage,publicOrigin:origin,setupToken});
-  return{...f,api,objects,removed,storage,client:()=>new Client(api)};
+  return{...f,api,objects,removed,storage,client:()=>Object.assign(new Client(api),{fixtureStore:()=>f.store})};
 }
 async function bootstrap(f){const manager=f.client();await manager.ok('/setup',{method:'POST',body:{token:setupToken,name:'Lớp học trên máy chủ',username:'manager',password:managerPassword}});return manager;}
 async function classroom(manager,name='Lớp tự nhiên'){return manager.ok('/classes',{method:'POST',body:{name,grade:3}});}
@@ -67,7 +69,7 @@ async function pendingBody(f,client,route){
   f.store.findSession=async(...args)=>{const result=await find(...args);authenticated();return result;};
   const stream=new ReadableStream({start(value){controller=value;}});
   const response=f.api(new Request(origin+'/api/online'+route,{method:'POST',duplex:'half',body:stream,
-    headers:{Origin:origin,'Content-Type':'application/json',Cookie:client.cookie,'X-CSRF-Token':client.csrf}}));
+    headers:{Origin:origin,'Content-Type':'application/json','X-Bao-An-Question-Protocol':'1',Cookie:client.cookie,'X-CSRF-Token':client.csrf}}));
   await entered;f.store.findSession=find;
   return async body=>{controller.enqueue(new TextEncoder().encode(JSON.stringify(body)));controller.close();return response;};
 }
@@ -87,7 +89,7 @@ test('cloud pending mutations cannot outlive logout or session expiry',async t=>
 
 test('cloud pending student play cannot outlive a password reset',async t=>{
   const f=await fixture(t),manager=await bootstrap(f),cls=await classroom(manager),created=await student(manager,cls.id,'pending-child'),source=pack();
-  await manager.ok('/weeks',{method:'POST',body:{requestId:'pending-week',title:'Pending week',classId:cls.id,sets:[{subjectLabel:'Nature',pack:source}]}});
+  await manager.ok('/weeks',{method:'POST',body:{requestId:'pending-week',title:'Pending week',classId:cls.id,sets:threeSubjectSets([{subjectLabel:'Nature',pack:source}])}});
   const learner=f.client();await login(learner,'pending-child');
   const finish=await pendingBody(f,learner,'/play');
   await manager.ok(`/students/${created.student.id}/reset-password`,{method:'POST'});
@@ -109,12 +111,12 @@ test('cloud Request/Response API preserves real scrypt authentication, CSRF, gam
   await manager.denied('/classes',{method:'POST',body:{name:'Foreign origin',grade:3},requestOrigin:'https://foreign.invalid'},403);
   const cls=await classroom(manager),created=await student(manager,cls.id,'cloud-learner');
   assert.equal(created.credentials.password,studentPassword);
-  const source=pack(),week={requestId:'cloud-week',title:'Tuần tự nhiên',classId:cls.id,sets:[{subjectLabel:'Tự nhiên',pack:source}]};
+  const source=pack(),week={requestId:'cloud-week',title:'Tuần tự nhiên',classId:cls.id,sets:threeSubjectSets([{subjectLabel:'Tự nhiên',pack:source}])};
   const published=await manager.ok('/weeks',{method:'POST',body:week});assert.equal((await manager.ok('/weeks',{method:'POST',body:week})).id,published.id);
   const learner=f.client();await login(learner,'cloud-learner');await learner.denied('/dashboard',{},403);
   assert.equal((await learner.ok('/student')).current.subjectLabel,'Tự nhiên');
   const play=await learner.ok('/play',{method:'POST',body:{requestId:'cloud-play',moduleId:'math-quest',packId:source.id,contentVersion:1}});
-  for(const item of play.presentation.items){const input={attemptKey:`answer-${item.id}`,itemId:item.id,response:{kind:'choice',choiceIndex:item.correctIndex},hintsUsed:0,elapsedMs:100};
+  for(const item of play.presentation.items){const input={attemptKey:`answer-${item.id}`,itemId:item.id,response:{kind:'choice',choiceIndex:fixtureQuestion(play,item).correctIndex},hintsUsed:0,elapsedMs:100};
     const receipt=await learner.ok(`/play/${play.session.sessionId}/attempt`,{method:'POST',body:input});assert.equal(receipt.event.correct,true);
     if(item===play.presentation.items[0])assert.equal((await learner.ok(`/play/${play.session.sessionId}/attempt`,{method:'POST',body:input})).duplicate,true);
   }
@@ -163,7 +165,7 @@ test('cloud private media stays assigned and tenant scoped, deduplicates concurr
       {...common,id:'listen',kind:'listening-choice',prompt:'Bạn nhỏ có tên gì?',audioId:audio.id,options:['Mai','Lucy','Nam','Peter'],correctIndex:1},
       {...common,id:'gap',kind:'listening-gap',prompt:'Nghe và điền tên: My name is ___.',audioId:audio.id,acceptedAnswers:['Lucy'],caseSensitive:false},
     ]};
-  const week=await manager.ok('/weeks',{method:'POST',body:{requestId:'rich-cloud-week',title:'Tuần đủ dạng',classId:cls.id,sets:[{subjectLabel:'Tổng hợp',pack:source}]}});
+  const week=await manager.ok('/weeks',{method:'POST',body:{requestId:'rich-cloud-week',title:'Tuần đủ dạng',classId:cls.id,sets:threeSubjectSets([{subjectLabel:'Tổng hợp',pack:source}])}});
   assert.deepEqual(week.sets[0].games.map(row=>row.id),['math-quest']);
   const whole=await learner.request(`/media/${image.id}`,{binary:true});assert.equal(whole.status,200);assert.deepEqual(whole.data,png);
   const range=await learner.request(`/media/${audio.id}`,{headers:{Range:'bytes=0-15'},binary:true});assert.equal(range.status,206);assert.deepEqual(range.data,wav.subarray(0,16));

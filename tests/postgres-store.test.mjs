@@ -1,3 +1,5 @@
+import {threeSubjectSets} from './helpers/planned-weeks.mjs';
+import {seedLegacyWeek} from './helpers/legacy-weeks.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
@@ -65,7 +67,7 @@ test('Supabase SQL starts empty and read-only verification detects actual privil
 });
 
 test('Supabase API roles cannot query private data even with BYPASSRLS; reapplying preserves real data',async t=>{
-  const f=await fixture(t),s=await student(f);await f.store.publishWeek(f.admin,week(s.classroom.id));
+  const f=await fixture(t),s=await student(f);await seedLegacyWeek(f.store,f.admin,week(s.classroom.id));
   await finish(f.store,s.auth);
   await f.db.exec('CREATE ROLE service_role BYPASSRLS;');
   const before=await f.store.dashboard(f.admin),state=await f.store.studentState(s.auth);
@@ -121,18 +123,81 @@ test('PostgreSQL login limits atomically persist account and address limits',asy
 });
 
 test('PostgreSQL publication is immutable, atomic and idempotent under concurrent submissions',async t=>{
-  const f=await fixture(t),s=await student(f),input=week(s.classroom.id);
+  const f=await fixture(t),s=await student(f),input=week(s.classroom.id);input.sets=threeSubjectSets(input.sets);
   const [a,b]=await Promise.all([f.store.publishWeek(f.admin,input),f.store.publishWeek(f.admin,input)]);assert.equal(a.id,b.id);
   assert.equal((await f.store.dashboard(f.admin)).weeks.length,1);
   const altered=pack();altered.items[0].right='Nội dung khác';
   await denied(f.store.publishWeek(f.admin,{...input,title:'Khác'}),409);
   await denied(f.store.publishWeek(f.admin,{...input,requestId:'atomic-failure',sets:[{subjectLabel:'Mới',pack:pack('rolled-back-pack')},{subjectLabel:'Tự nhiên',pack:altered}]}),409);
-  assert.equal((await f.store.dashboard(f.admin)).stats.questions,4);
+  assert.equal((await f.store.dashboard(f.admin)).stats.questions,8);
   assert.equal((await f.store.studentState(s.auth)).current.subjectLabel,'Tự nhiên');
 });
 
+test('PostgreSQL week and student reads stay bounded while preserving class, order and pinned versions',async t=>{
+  const f=await fixture(t),s=await student(f),otherClass=await f.store.createClass(f.admin,{name:'Lớp khác',grade:3}),emptyClass=await f.store.createClass(f.admin,{name:'Lớp trống',grade:3}),expected=[];
+  for(let number=1;number<=3;number++){
+    const sets=[0,1].map(index=>{const source=pack(`bounded-${number}-${index}`);source.items.forEach(item=>{item.right+=` tuần ${number} bộ ${index}`;});return{subjectLabel:`Chủ đề ${index}`,pack:source};});
+    expected.push(await seedLegacyWeek(f.store,f.admin,{requestId:`bounded-week-${number}`,classId:s.classroom.id,title:`Tuần ${number}`,sets}));
+  }
+  const revised=expected[0].sets.map(set=>({subjectLabel:set.subjectLabel,pack:{...set.pack,version:2,items:set.pack.items.map(item=>({...item,id:item.id+'-v2',right:`${item.right} mới`}))}}));
+  expected[0]=await f.store.publishWeek(f.admin,{requestId:'bounded-revision',replaceWeekId:expected[0].id,classId:s.classroom.id,title:'Tuần 1',sets:revised});
+  // Another class keeps version 1 of the same source; a different workspace may
+  // use the very same pack ID. Neither belongs in this student's week list.
+  const v1=pack('bounded-1-0');v1.items.forEach(item=>{item.right+=' tuần 1 bộ 0';});
+  await seedLegacyWeek(f.store,f.admin,{...week(otherClass.id,v1,'bounded-other-class'),sets:[{subjectLabel:'Chủ đề 0',pack:v1}]});
+  const other=await secondTenant(f),foreignClass=await f.store.createClass(other,{name:'Đơn vị khác',grade:3});
+  await seedLegacyWeek(f.store,other,week(foreignClass.id,pack('bounded-1-0'),'bounded-foreign'));
+  await finish(f.store,s.auth,revised[0].pack,'bounded-complete');
+  await f.store.configureWallet(f.admin,{enabled:true,rateVnd:1000});
+  await f.store.requestReward(s.auth,{requestId:'bounded-wish',title:'Bút màu',goalVnd:2000});
+
+  const statements=[],client={query(sql,values){statements.push(sql);return f.pool.query(sql,values);}};
+  const actual=await f.store.weeks(s.auth,s.classroom.id,client),weekQueries=statements.splice(0).length;
+  assert.deepEqual(actual,expected);
+  assert.deepEqual(actual.map(row=>row.sets.map(set=>set.pack.version)),[[2,2],[1,1],[1,1]]);
+  assert.deepEqual(await f.store.weeks(f.admin,emptyClass.id,client),[]);
+  const emptyQueries=statements.splice(0).length;
+  const state=await f.store.studentState(s.auth,client),stateQueries=statements.splice(0).length;
+  assert.deepEqual(state.student,await f.store.publicStudent(s.auth,await f.store.student(s.auth,s.auth.studentId)));
+  assert.deepEqual(state.weeks.map(({sets,done,unlocked,current,closed,ready,...row})=>({...row,sets:sets.map(({stars,done,questionProgress,...set})=>set)})),expected);
+  assert.deepEqual(state.weeks.map(row=>row.unlocked),[true,false,false]);
+  assert.deepEqual(state.balance,{earned:3,available:1,pending:2,redeemed:0});
+  assert.deepEqual(state.student.balance,state.balance);
+  assert.equal(state.current.pack.id,revised[0].pack.id,'legacy wallet stars do not invent mastery on every question');
+  assert.equal(state.requests[0].requestId,'bounded-wish');
+  assert.equal(state.rewards[0].packId,revised[0].pack.id);
+  t.diagnostic(`3 weeks / 6 sets: week reads ${weekQueries}, empty class ${emptyQueries}, student state ${stateQueries}`);
+  assert.deepEqual({weekQueries,emptyQueries,stateQueries},{weekQueries:2,emptyQueries:1,stateQueries:8});
+
+  // The same loader also uses the caller's transaction client when a publish
+  // or completion needs to see writes that are not committed yet.
+  await f.store.transaction(async owned=>{
+    await f.store.exec('UPDATE bao_an.weeks SET title=$3 WHERE workspace_id=$1 AND id=$2',[f.admin.workspaceId,expected[0].id,'Tuần đang cập nhật'],owned);
+    assert.equal((await f.store.weeks(s.auth,s.classroom.id,owned))[0].title,'Tuần đang cập nhật');
+  });
+});
+
+test('PostgreSQL answer evidence loads its authorized play once and still rejects guessed plays',async t=>{
+  const f=await fixture(t),s=await student(f),other=await student(f,'other-learner',s.classroom);
+  await seedLegacyWeek(f.store,f.admin,week(s.classroom.id));
+  const play=await f.store.startPlay(s.auth,{requestId:'bounded-attempt',moduleId:'math-quest',packId:pack().id,contentVersion:1}),item=play.presentation.items[0];
+  const queries=[],countedPool={
+    query(sql,values){queries.push(sql);return f.pool.query(sql,values);},
+    async connect(){const client=await f.pool.connect();return{query(sql,values){queries.push(sql);return client.query(sql,values);},release(){client.release();}};},
+  },store=new PostgresStore({pool:countedPool}),input={attemptKey:'first-answer',itemId:item.id,response:{kind:'choice',choiceIndex:item.correctIndex},hintsUsed:0,elapsedMs:100};
+  const result=await store.attempt(s.auth,play.session.sessionId,input);
+  assert.equal(result.event.correct,true);assert.equal(result.event.gameSequence,1);
+  const playReads=queries.filter(sql=>/FROM bao_an\.plays WHERE/.test(sql)).length,packReads=queries.filter(sql=>/FROM bao_an\.packs WHERE/.test(sql)).length;
+  t.diagnostic(`answer queries ${queries.length}, authorized play reads ${playReads}, pack reads ${packReads}`);
+  assert.deepEqual({playReads,packReads},{playReads:1,packReads:1});
+  await denied(store.events(other.auth,play.session.sessionId),404);
+  await denied(store.attempt(other.auth,play.session.sessionId,{...input,attemptKey:'guessed-answer'}),404);
+  assert.equal((await store.events(s.auth,play.session.sessionId)).length,1);
+  assert.equal((await store.attempt(s.auth,play.session.sessionId,input)).duplicate,true);
+});
+
 test('PostgreSQL raw attempts, ordered evidence and completion award only the best original-pack tier',async t=>{
-  const f=await fixture(t),s=await student(f);await f.store.publishWeek(f.admin,week(s.classroom.id));
+  const f=await fixture(t),s=await student(f);await seedLegacyWeek(f.store,f.admin,week(s.classroom.id));
   const play=await f.store.startPlay(s.auth,{requestId:'raw-play',moduleId:'math-quest',packId:pack().id,contentVersion:1}),item=play.presentation.items[0];
   await denied(f.store.finishPlay(s.auth,play.session.sessionId),400);
   const input={attemptKey:'stable-answer',itemId:item.id,response:{kind:'choice',choiceIndex:item.correctIndex},hintsUsed:0,elapsedMs:100};
@@ -147,7 +212,7 @@ test('PostgreSQL raw attempts, ordered evidence and completion award only the be
 });
 
 test('PostgreSQL concurrent redemptions cannot overspend and retain immutable rates and decisions',async t=>{
-  const f=await fixture(t),s=await student(f);await f.store.publishWeek(f.admin,week(s.classroom.id));await finish(f.store,s.auth);
+  const f=await fixture(t),s=await student(f);await seedLegacyWeek(f.store,f.admin,week(s.classroom.id));await finish(f.store,s.auth);
   await f.store.configureWallet(f.admin,{enabled:true,rateVnd:1000});
   const requests=await Promise.allSettled(['wish-a','wish-b'].map(requestId=>f.store.requestReward(s.auth,{requestId,title:'Bút màu',goalVnd:2000})));
   assert.equal(requests.filter(row=>row.status==='fulfilled').length,1);assert.equal(requests.find(row=>row.status==='rejected').reason.status,400);
@@ -165,7 +230,7 @@ test('PostgreSQL concurrent redemptions cannot overspend and retain immutable ra
 test('PostgreSQL guessed identifiers, same pack IDs and student permissions remain tenant isolated',async t=>{
   const f=await fixture(t),a=await student(f),other=await secondTenant(f),classB=await f.store.createClass(other,{name:'Lớp B',grade:3});
   const rowB=await f.store.createStudent(other,{name:'B',classId:classB.id,username:'student-b'},'salt:b-hash','student-b'),authB=authFor(await f.store.findUserByUsername('student-b'));
-  const packB=pack();packB.items[0].right='Ánh nắng khác';await f.store.publishWeek(f.admin,week(a.classroom.id));await f.store.publishWeek(other,week(classB.id,packB));
+  const packB=pack();packB.items[0].right='Ánh nắng khác';await seedLegacyWeek(f.store,f.admin,week(a.classroom.id));await seedLegacyWeek(f.store,other,week(classB.id,packB));
   assert.equal((await f.store.studentState(a.auth)).current.pack.items[0].right,'Ánh sáng');assert.equal((await f.store.studentState(authB)).current.pack.items[0].right,'Ánh nắng khác');
   await denied(f.store.updateStudent(f.admin,rowB.id,{name:'Foreign mutation'}),404);
   await denied(f.store.publishWeek(f.admin,week(classB.id,pack('foreign-class'),'foreign-week')),404);
@@ -188,8 +253,35 @@ test('PostgreSQL media records store no bytes and enforce tenant, assignment, MI
   await denied(f.store.getMedia(other,media.id),404);await denied(f.store.getMedia(s.auth,media.id),404);
   await denied(f.store.addMedia(f.admin,{id:randomUUID(),name:'fake.wav',mime:'audio/wav',bytes,objectPath:`${f.admin.workspaceId}/another`}),400);
   await denied(f.store.addMedia(f.admin,{id:randomUUID(),name:'bad.png',mime:'image/png',bytes,objectPath:`${other.workspaceId}/${mediaId}`}),400);
-  const source=pack();source.items[0].media={imageId:media.id,imageAlt:'Hình vườn'};await f.store.publishWeek(f.admin,week(s.classroom.id,source));
+  const source=pack();source.items[0].media={imageId:media.id,imageAlt:'Hình vườn'};await seedLegacyWeek(f.store,f.admin,week(s.classroom.id,source));
   assert.equal(await f.store.hasMediaAccess(s.auth,media.id),true);
   const assigned=await f.store.getMedia(s.auth,media.id);assert.equal(assigned.sha256,media.sha256);
   assert.equal((await f.store.listMedia(other)).length,0);
+});
+
+test('PostgreSQL media authorization batches assigned weeks without granting other-class assets or unlocking games',async t=>{
+  const f=await fixture(t),s=await student(f),other=await secondTenant(f),otherClass=await f.store.createClass(f.admin,{name:'Lớp hình khác',grade:3}),media=[];
+  for(const size of[192,512]){
+    const mediaId=randomUUID(),bytes=await readFile(new URL(`../public/icons/bao-an-${size}.png`,import.meta.url));
+    media.push(await f.store.addMedia(f.admin,{id:mediaId,name:`bounded-${size}.png`,mime:'image/png',bytes,objectPath:`${f.admin.workspaceId}/${mediaId}.png`}));
+  }
+  const sources=[];
+  for(let number=1;number<=3;number++){
+    const source=pack(`media-week-${number}`);source.items[0].right+=` tuần ${number}`;
+    if(number===3)source.items[0].media={imageId:media[0].id,imageAlt:'Hình đã giao'};
+    sources.push(source);await seedLegacyWeek(f.store,f.admin,{...week(s.classroom.id,source,`media-week-${number}`),title:`Tuần hình ${number}`});
+  }
+  const foreignSource=pack('other-class-image');foreignSource.items[0].right+=' lớp khác';foreignSource.items[0].media={imageId:media[1].id,imageAlt:'Hình lớp khác'};
+  await seedLegacyWeek(f.store,f.admin,week(otherClass.id,foreignSource,'other-class-image'));
+  const statements=[],client={query(sql,values){statements.push(sql);return f.pool.query(sql,values);}};
+  assert.equal(await f.store.hasMediaAccess(s.auth,media[0].id,client),true);
+  const assignedQueries=statements.splice(0).length;
+  assert.equal(await f.store.hasMediaAccess(s.auth,media[1].id,client),false);
+  const otherClassQueries=statements.splice(0).length;
+  assert.equal(await f.store.hasMediaAccess(other,media[0].id,client),false);
+  const foreignQueries=statements.splice(0).length;
+  assert.equal((await f.store.studentState(s.auth)).weeks[2].unlocked,false);
+  await denied(f.store.startPlay(s.auth,{requestId:'locked-media-game',moduleId:'math-quest',packId:sources[2].id,contentVersion:1}),403);
+  t.diagnostic(`media access across 3 weeks: assigned ${assignedQueries}, other class ${otherClassQueries}, foreign workspace ${foreignQueries}`);
+  assert.deepEqual({assignedQueries,otherClassQueries,foreignQueries},{assignedQueries:3,otherClassQueries:4,foreignQueries:1});
 });

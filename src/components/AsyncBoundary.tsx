@@ -11,7 +11,7 @@ export default class AsyncBoundary extends Component<Props, State> {
     if (!this.state.failed) return this.props.children;
     return <section className="async-error" role="alert">
       <h2>Không tải được {this.props.label}</h2>
-      <p>Dữ liệu chưa tải đủ hoặc kết nối vừa bị gián đoạn. Kết quả đã lưu trên thiết bị vẫn được giữ.</p>
+      <p>Dữ liệu chưa tải đủ hoặc kết nối vừa bị gián đoạn. Thành tích đã được xác nhận vẫn được giữ. Con có thể tải lại để mở ứng dụng.</p>
       <div className="async-error-actions">
         {this.props.onExit && <button type="button" className="button outline" onClick={this.props.onExit}>Thoát về màn hình chính</button>}
         <button type="button" className="button primary" onClick={() => window.location.reload()}>Tải lại ứng dụng</button>

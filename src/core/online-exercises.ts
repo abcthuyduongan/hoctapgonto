@@ -4,9 +4,11 @@ import {gameRewardAwards,gameSessionEvidenceErrors,scoreGameResponse} from './ga
 import {gamePresentation} from './game-presentation.ts';
 import {normalizedNumber,normalizedWord} from './rich-content.ts';
 import {validatePack} from './validation.ts';
+import {gameAllowedByAuthor} from './game-policy.ts';
 
 /** Rich exercises use the question island; matching and ordering retain their native hosts. */
 export function onlinePresentation(moduleId:ModuleId,pack:ContentPack):ContentPack|undefined{
+  if(!gameAllowedByAuthor(moduleId,pack))return;
   return pack.kind==='learning'?(moduleId==='math-quest'?pack:undefined):gamePresentation(moduleId,pack);
 }
 

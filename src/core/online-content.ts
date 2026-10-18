@@ -4,6 +4,7 @@ import { gamePresentation } from './game-presentation.ts';
 import { GAME_REGISTRY } from './registry.ts';
 import { validatePack } from './validation.ts';
 import {onlineGeneratedItemId} from './online-import-identity.ts';
+import {gameRestrictionError} from './game-policy.ts';
 
 export type OnlineQuestionKind = 'quiz' | 'pairs' | 'sentences';
 export type OnlineQuestionContext = {id:string;version:number;title:string;grade:number};
@@ -44,11 +45,12 @@ function checked(pack:ContentPack):ContentPack {
 }
 function metadata(value:unknown):QuestionMetadata {
   const info=object(value,'metadata');
-  keys(info,['knowledgeId','difficulty','contentRole','source','rights','reviewStatus','formId','topicId','level'],'metadata');
+  keys(info,['knowledgeId','difficulty','contentRole','source','rights','reviewStatus','formId','topicId','level','allowedGameIds'],'metadata');
+  const restriction=gameRestrictionError(info.allowedGameIds);if(restriction)fail(restriction);
   const result={knowledgeId:text(info.knowledgeId,'knowledgeId',120),difficulty:text(info.difficulty,'difficulty',10),
     contentRole:text(info.contentRole,'contentRole',20),source:text(info.source,'source',1000),rights:text(info.rights,'rights',1000),
     reviewStatus:text(info.reviewStatus,'reviewStatus',10),...(own(info,'formId')?{formId:text(info.formId,'formId',120)}:{}),
-    ...(own(info,'topicId')?{topicId:text(info.topicId,'topicId',120)}:{}),...(own(info,'level')?{level:text(info.level,'level',120)}:{})};
+    ...(own(info,'topicId')?{topicId:text(info.topicId,'topicId',120)}:{}),...(own(info,'level')?{level:text(info.level,'level',120)}:{}),...(own(info,'allowedGameIds')?{allowedGameIds:[...(info.allowedGameIds as ModuleId[])]}:{})};
   if(!['easy','medium','hard'].includes(result.difficulty)||!['unassigned','practice','assessment','review'].includes(result.contentRole)||!['draft','reviewed'].includes(result.reviewStatus))fail('metadata: giá trị không hợp lệ.');
   return result as QuestionMetadata;
 }

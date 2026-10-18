@@ -28,7 +28,7 @@ test('cloud migration can use a separate owner URI and CA while runtime keeps it
 test('bundled Netlify function has no SQLite dependency and returns a private configuration error before any external connection',async t=>{
   const root=resolve('test-results');await mkdir(root,{recursive:true});const folder=await mkdtemp(join(root,'cloud-bundle-'));
   t.after(async()=>{assert.equal(dirname(folder),root);await rm(folder,{recursive:true,force:true});});
-  const result=await build({entryPoints:['netlify/functions/online.mjs'],bundle:true,platform:'node',format:'esm',target:'node22',write:false,metafile:true,external:['pg','@supabase/supabase-js'],logLevel:'silent'});
+  const result=await build({entryPoints:['netlify/functions/online.mjs'],bundle:true,platform:'node',format:'esm',target:'node22',write:false,metafile:true,external:['pg','@supabase/supabase-js','music-metadata'],logLevel:'silent'});
   assert.equal(Object.keys(result.metafile.inputs).some(path=>path.endsWith('online-store.mjs')),false);
   assert.equal(result.outputFiles[0].text.includes('node:sqlite'),false);
   const path=join(folder,'online.mjs');await writeFile(path,result.outputFiles[0].contents);

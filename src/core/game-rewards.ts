@@ -5,7 +5,7 @@ import { compatible,validatePack } from './validation.ts';
 import { sessionGamePack } from './game-presentation.ts';
 
 export type GameRewardEvidence={sessions:StoredSession[];events:StoredEvent[];packs:ContentPack[]};
-export type GameReward={profileId:string;packId:string;starTier:1|2|3;sessionId:string;completedAt:string;totalItems:number;firstTryCorrect:number};
+export type GameReward={profileId:string;packId:string;starTier:1|2|3;sessionId:string;completedAt:string;totalItems:number;firstTryCorrect:number;questionLedger?:import('./question-rewards.ts').QuestionRewardLedger};
 const validTime=(value:unknown):value is string=>typeof value==='string'&&Number.isFinite(Date.parse(value))&&new Date(value).toISOString()===value;
 const object=(value:unknown,keys:string[]):value is Record<string,unknown>=>!!value&&typeof value==='object'&&!Array.isArray(value)&&Object.getPrototypeOf(value)===Object.prototype&&Reflect.ownKeys(value).every(key=>typeof key==='string'&&keys.includes(key)&&'value'in Object.getOwnPropertyDescriptor(value,key)!);
 const normalize=(value:string)=>value.normalize('NFC').trim().replace(/\s+/g,' ').toLocaleLowerCase('vi');

@@ -1,7 +1,7 @@
 {
   "name": "bao-an-learning-v3-6-3d",
   "private": true,
-  "version": "3.8.0-rc.6",
+  "version": "3.8.0-rc.10",
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0",
@@ -15,8 +15,8 @@
     "test:syntax": "node tests/check-tsx.mjs",
     "test:renderer": "node --experimental-strip-types --test tests/renderer-contract.test.mjs tests/quality-manager.test.mjs tests/model-asset-runtime.test.mjs tests/island-carousel.test.mjs tests/world-carousel-controller.test.mjs tests/guide-viewport.test.mjs tests/asset-catalog.test.mjs tests/game-environments.test.mjs tests/shadow-updates.test.mjs tests/geometry-lod.test.mjs tests/model-transport.test.mjs tests/glb-import.test.mjs tests/glb-guide-integration.test.mjs tests/glb-guide-runtime.test.mjs tests/glb-animation.test.mjs",
     "test:release": "node --test tests/release-package.test.mjs",
-    "test:online": "node --experimental-strip-types --test tests/online-content.test.mjs tests/online-document-import.test.mjs tests/online-exercises.test.mjs tests/online-server.test.mjs tests/online-package.test.mjs tests/online-recovery.test.mjs tests/online-import-identity.test.mjs",
-    "test:cloud": "node --experimental-strip-types --test tests/postgres-store.test.mjs tests/cloud-api.test.mjs tests/cloud-config.test.mjs tests/cloud-deployment.test.mjs tests/supabase-storage.test.mjs",
+    "test:online": "node --experimental-strip-types --test tests/api-diagnostics.test.mjs tests/online-content.test.mjs tests/online-request.test.mjs tests/online-media-budget.test.mjs tests/online-document-import.test.mjs tests/online-exercises.test.mjs tests/online-server.test.mjs tests/online-package.test.mjs tests/online-recovery.test.mjs tests/online-import-identity.test.mjs tests/online-password.test.mjs tests/pair-rounds.test.mjs tests/online-game-compatibility.test.mjs tests/online-summary.test.mjs tests/speech.test.mjs tests/speech-voices.test.mjs tests/question-rewards.test.mjs tests/online-question-store.test.mjs tests/online-question-protocol.test.mjs tests/online-question-recovery.test.mjs tests/weekly-plan.test.mjs",
+    "test:cloud": "node --experimental-strip-types --test tests/postgres-store.test.mjs tests/cloud-api.test.mjs tests/cloud-config.test.mjs tests/cloud-deployment.test.mjs tests/supabase-storage.test.mjs tests/postgres-question-journey.test.mjs",
     "test:assets": "node tests/release-3d-assets.mjs",
     "test:online:browser": "playwright test --config=playwright.online.config.ts",
     "verify:local": "npm run typecheck && npm test && npm run test:assets && npm run build && npm run test:online:browser",
@@ -29,6 +29,7 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.118.0",
     "fflate": "^0.8.3",
+    "music-metadata": "12.2.2",
     "pg": "^8.23.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",

@@ -1,3 +1,18 @@
+export const MAX_IMPORT_MEDIA_FILES=100;
+export const MAX_IMPORT_MEDIA_BYTES=32*1024*1024;
+
+/** Inspect metadata only, before any selected file is decoded or read. */
+export function assertQuestionMediaSelectionBudget(files:readonly Pick<File,'size'>[]):void{
+  let total=0;
+  for(const file of files){
+    if(!Number.isSafeInteger(file.size)||file.size<0)throw new Error('Kích thước tư liệu không hợp lệ. Hãy chọn lại tệp.');
+    total+=file.size;
+    if(total>MAX_IMPORT_MEDIA_BYTES)break;
+  }
+  if(files.length>MAX_IMPORT_MEDIA_FILES||total>MAX_IMPORT_MEDIA_BYTES)
+    throw new Error('Chưa nhận lượt chọn này: tối đa 100 hình / âm thanh, tổng 32 MB mỗi lần. Hãy chia nhỏ bộ tư liệu rồi chọn lại; các tệp đã chọn trước đó vẫn được giữ.');
+}
+
 /** Decode authored media before uploading; MIME signatures alone do not prove it can be used. */
 export async function validateQuestionMediaFile(file:File):Promise<void>{
   if(!file.size)throw new Error(`Tệp “${file.name}” đang trống.`);

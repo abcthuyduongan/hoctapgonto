@@ -7,7 +7,8 @@ export class AssetLoader {
   private loader = new GLTFLoader();
   private pending = new Map<string, Promise<GLTF>>();
   private signal: AbortSignal;
-  constructor(signal: AbortSignal) { this.signal = signal; }
+  private timeoutMs: number;
+  constructor(signal: AbortSignal, timeoutMs = 15_000) { this.signal = signal; this.timeoutMs = timeoutMs; }
   load(path: string): Promise<GLTF> {
     const existing = this.pending.get(path);
     if (existing) return existing;
@@ -17,9 +18,15 @@ export class AssetLoader {
   }
   private async fetchAndParse(path: string) {
     this.signal.throwIfAborted();
-    const response = await fetch(path, { signal: this.signal });
-    if (!response.ok) throw new Error(`${path}: HTTP ${response.status}`);
-    const bytes = await response.arrayBuffer();
+    const timeout = new AbortController();
+    const signal = AbortSignal.any([this.signal, timeout.signal]);
+    const timer = setTimeout(() => timeout.abort(new DOMException('Tải cảnh quá lâu. Đang chuyển sang cảnh nhẹ.', 'TimeoutError')), this.timeoutMs);
+    let bytes: ArrayBuffer;
+    try {
+      const response = await fetch(path, { signal });
+      if (!response.ok) throw new Error(`${path}: HTTP ${response.status}`);
+      bytes = await response.arrayBuffer();
+    } finally { clearTimeout(timer); }
     this.signal.throwIfAborted();
     // Self-contained GLB only, no remote URIs or decoder dependencies.
     if (bytes.byteLength < 20 || bytes.byteLength > 16 * 1024 * 1024) throw new Error(`${path}: kích thước GLB không hợp lệ`);

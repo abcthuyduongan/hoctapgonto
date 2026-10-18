@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto';
 import { readdir, readFile, writeFile } from 'node:fs/promises';
 import { join, relative, resolve, sep } from 'node:path';
+import {BROWSER_NOTICE_PACKAGES,thirdPartyNotices} from './thirdPartyNotices.mjs';
 
 const CACHE_PREFIX = 'bao-an-learning-build-';
 
@@ -34,6 +35,19 @@ const CACHE_PREFIX=${JSON.stringify(CACHE_PREFIX)};
 const BUILD_ID=${JSON.stringify(buildId)};
 const CACHE_NAME=CACHE_PREFIX+BUILD_ID;
 const PRECACHE_URLS=${JSON.stringify(urls)};
+const PREVIOUS_BUILDS_TO_KEEP=2;
+
+function isOwnedBuildCache(name){
+  return name.startsWith(CACHE_PREFIX)&&/^[a-f0-9]{16}$/.test(name.slice(CACHE_PREFIX.length));
+}
+async function previousBuildCaches(){
+  // CacheStorage lists caches in creation order; retain two earlier deployments for old tabs.
+  return (await caches.keys()).filter(name=>isOwnedBuildCache(name)&&name!==CACHE_NAME);
+}
+async function pruneBuildCaches(){
+  const previous=await previousBuildCaches();
+  for(const name of previous.slice(0,Math.max(0,previous.length-PREVIOUS_BUILDS_TO_KEEP)))await caches.delete(name);
+}
 
 async function notify(message){
   const clients=await self.clients.matchAll({type:'window',includeUncontrolled:true});
@@ -43,7 +57,7 @@ async function matchOwned(request){
   const current=await caches.open(CACHE_NAME);
   const direct=await current.match(request,{ignoreSearch:false}) || await current.match(new URL(request.url).pathname);
   if(direct)return direct;
-  const names=(await caches.keys()).filter(name=>name.startsWith(CACHE_PREFIX)&&name!==CACHE_NAME).reverse();
+  const names=(await previousBuildCaches()).slice(-PREVIOUS_BUILDS_TO_KEEP).reverse();
   for(const name of names){const found=await (await caches.open(name)).match(request,{ignoreSearch:false});if(found)return found;}
 }
 self.addEventListener('install',event=>{
@@ -58,6 +72,7 @@ self.addEventListener('install',event=>{
   })());
 });
 self.addEventListener('activate',event=>event.waitUntil((async()=>{
+  await pruneBuildCaches();
   await self.clients.claim();
   await notify({type:'OFFLINE_READY',buildId:BUILD_ID});
 })()));
@@ -103,6 +118,9 @@ export function offlineBuildPlugin() {
     name: 'bao-an-offline-build',
     apply: 'build',
     configResolved(config) { outDir = resolve(config.root, config.build.outDir); },
-    async closeBundle() { await writeOfflineWorker(outDir); },
+    async closeBundle() {
+      await writeFile(join(outDir,'THIRD_PARTY_NOTICES.txt'),await thirdPartyNotices({packageNames:BROWSER_NOTICE_PACKAGES}));
+      await writeOfflineWorker(outDir);
+    },
   };
 }

@@ -3,6 +3,7 @@ export class OnlineError extends Error {
 }
 export const fail = (status, message) => { throw new OnlineError(status, message); };
 export const text = (value, label, max = 120) => {
+  if(value===null||typeof value==='string'&&/^null$/i.test(value.trim()))fail(400,`${label}: thiếu dữ liệu (null).`);
   if (typeof value !== 'string' || !value.trim() || value.trim().length > max || /[\u0000-\u001f\u007f]/u.test(value)) fail(400, `${label} không hợp lệ.`);
   return value.trim();
 };

@@ -8,5 +8,5 @@ export default defineConfig({
   outputDir:'test-results/online-browser-output',
   reporter:[['list'],['json',{outputFile:'test-results/online-browser-report.json'}]],
   projects:channels.map(channel=>({name:`online-${channel}`,use:{channel}})),
-  use:{headless:true,actionTimeout:30000,navigationTimeout:30000,viewport:{width:1440,height:1000},serviceWorkers:'block',trace:'retain-on-failure',screenshot:'only-on-failure'},
+  use:{headless:true,actionTimeout:30000,navigationTimeout:30000,viewport:{width:1440,height:1000},extraHTTPHeaders:{'X-Bao-An-Question-Protocol':'1'},serviceWorkers:'block',trace:'retain-on-failure',screenshot:'only-on-failure'},
 });

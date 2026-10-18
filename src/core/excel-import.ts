@@ -192,8 +192,9 @@ function sharedWorkbookStrings(xml:Map<string,string>):string[]{
   if (sharedStrings.length > EXCEL_IMPORT_LIMITS.rows * EXCEL_IMPORT_LIMITS.columns) throw new Error('Bảng chuỗi XLSX vượt giới hạn.');
   return sharedStrings;
 }
-function parseWorksheetXml(sheet:string,sharedStrings:string[]):{rows:string[][];rowNumbers:number[]}{
+function parseWorksheetXml(sheet:string,sharedStrings:string[],columnLimit:number=EXCEL_IMPORT_LIMITS.columns,diagnoseErrors=false):{rows:string[][];rowNumbers:number[];cellErrors:Record<number,string[]>}{
   const rows:string[][]=[];
+  const cellErrors:Record<number,string[]>={};
   const rowNumbers:number[]=[];const seenRows=new Set<number>();
   let rowCount=0;
   for (const row of sheet.matchAll(/<row\b([^>]*?)(?:\/>|>(.*?)<\/row>)/gs)) {
@@ -207,7 +208,7 @@ function parseWorksheetXml(sheet:string,sharedStrings:string[]):{rows:string[][]
       const address=/^([A-Z]+)(\d+)$/.exec(attribute(cell[1],'r')??'');
       if (!address) throw new Error('Địa chỉ ô XLSX không hợp lệ.');
       const column=colLettersToIndex(address[1]);
-      if (column>=EXCEL_IMPORT_LIMITS.columns || cellCount>EXCEL_IMPORT_LIMITS.columns) throw new Error('Bảng tính vượt giới hạn 32 cột.');
+      if (column>=columnLimit || cellCount>columnLimit) throw new Error(`Bảng tính vượt giới hạn ${columnLimit} cột.`);
       if (Number(address[2])!==rowAddress) throw new Error('Địa chỉ ô không khớp hàng XLSX.');
       if (values.has(column)) throw new Error('Tệp XLSX có ô trùng địa chỉ.');
       const body=cell[2]??'';const type=attribute(cell[1],'t');
@@ -218,14 +219,19 @@ function parseWorksheetXml(sheet:string,sharedStrings:string[]):{rows:string[][]
         const index=Number(value);
         if (!/^\d+$/.test(value) || !Number.isSafeInteger(index) || index>=sharedStrings.length) throw new Error('Ô XLSX tham chiếu chuỗi không tồn tại.');
         text=sharedStrings[index];
-      } else text=type==='inlineStr' ? xmlTextRuns(body) : decodeXml(value);
+      } else text=type==='inlineStr' ? xmlTextRuns(body) : type==='b'&&/^[01]$/.test(value)?value==='1'?'true':'false':decodeXml(value);
+      if(type==='e'||/^#(?:NULL!|DIV\/0!|VALUE!|REF!|NAME\?|NUM!|N\/A|SPILL!|CALC!)$/i.test(text.trim())){
+        const message=`Ô ${address[0]}: lỗi Excel ${text||'(không có giá trị)'}; hãy sửa ô rồi nhập lại.`;
+        if(!diagnoseErrors)throw new Error(message);
+        (cellErrors[rowAddress]??=[]).push(message);
+      }
       if (text.length>EXCEL_IMPORT_LIMITS.cellCharacters) throw new Error('Mỗi ô tối đa 4000 ký tự.');
       values.set(column,text.trim());maxCol=Math.max(maxCol,column);
     }
     const cells=Array.from({length:maxCol+1},(_,column)=>values.get(column)??'');
-    if(cells.some(Boolean)){rows.push(cells);rowNumbers.push(rowAddress);}
+    if(cells.some(Boolean)||cellErrors[rowAddress]?.length){rows.push(cells);rowNumbers.push(rowAddress);}
   }
-  return {rows,rowNumbers};
+  return {rows,rowNumbers,cellErrors};
 }
 
 /** Legacy spreadsheets may omit workbook.xml; their first sheet remains readable. */
@@ -235,7 +241,7 @@ export function parseXlsxBytes(bytes: Uint8Array): string[][] {
   return parseWorksheetXml(xml.get(path)!,shared).rows;
 }
 
-export interface QuestionWorkbook {sheets:Record<string,string[][]>;rowNumbers:Record<string,number[]>}
+export interface QuestionWorkbook {sheets:Record<string,string[][]>;rowNumbers:Record<string,number[]>;cellErrors:Record<string,Record<number,string[]>>}
 /** New question templates resolve named sheets through workbook relationships, never by sheet number. */
 export function parseQuestionWorkbookBytes(bytes:Uint8Array):QuestionWorkbook{
   const xml=readWorkbookXml(bytes),workbook=xml.get('xl/workbook.xml'),relationships=xml.get('xl/_rels/workbook.xml.rels');
@@ -249,15 +255,17 @@ export function parseQuestionWorkbookBytes(bytes:Uint8Array):QuestionWorkbook{
     if(!/^xl\/worksheets\/[a-zA-Z0-9._-]+\.xml$/.test(path))throw new Error('Đường dẫn sheet XLSX không hợp lệ.');
     refs.set(id,path);
   }
-  const sheets:Record<string,string[][]>=Object.create(null),rowNumbers:Record<string,number[]>=Object.create(null),shared=sharedWorkbookStrings(xml);
+  const sheets:Record<string,string[][]>=Object.create(null),rowNumbers:Record<string,number[]>=Object.create(null),cellErrors:QuestionWorkbook['cellErrors']=Object.create(null),shared=sharedWorkbookStrings(xml);
   for(const match of workbook.matchAll(/<sheet\b([^>]*?)(?:\/>|>.*?<\/sheet>)/gs)){
     const name=decodeXml(attribute(match[1],'name')??''),id=attribute(match[1],'r:id');
     if(!name||Object.hasOwn(sheets,name)||!id||!refs.has(id))throw new Error('Tên hoặc quan hệ sheet XLSX không hợp lệ.');
     const sheet=xml.get(refs.get(id)!);if(!sheet)throw new Error(`Không tìm thấy nội dung sheet “${name}”.`);
-    const parsed=parseWorksheetXml(sheet,shared);sheets[name]=parsed.rows;rowNumbers[name]=parsed.rowNumbers;
+    // The 33-column authoring schema leaves one diagnostic column so an extra
+    // cell can be attributed to its source row during partial preview.
+    const parsed=parseWorksheetXml(sheet,shared,EXCEL_IMPORT_LIMITS.columns+2,name==='Câu hỏi');sheets[name]=parsed.rows;rowNumbers[name]=parsed.rowNumbers;cellErrors[name]=parsed.cellErrors;
   }
   for(const name of ['Thông tin bộ','Câu hỏi'])if(!Object.hasOwn(sheets,name))throw new Error(`Mẫu XLSX thiếu sheet “${name}”.`);
-  return {sheets,rowNumbers};
+  return {sheets,rowNumbers,cellErrors};
 }
 
 /** Kiểm tra xem hàng đầu tiên có phải là hàng tiêu đề (header) không */

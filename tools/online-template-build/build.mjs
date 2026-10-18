@@ -1,13 +1,11 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import {spawnSync} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
 import {Workbook,SpreadsheetFile} from '@oai/artifact-tool';
 const here=path.dirname(fileURLToPath(import.meta.url));
 const root=path.resolve(here,'../..');
 const output=path.join(root,'public/question-templates');
 const qa=path.join(root,'test-results/online-template-qa');
-const python='C:/Users/abcth/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe';
 const source=await fs.readFile(path.join(root,'src/core/online-document-import.ts'),'utf8');
 const headers=JSON.parse('['+source.match(/ONLINE_DOCUMENT_HEADERS=\[([^\]]+)\]/)[1].replaceAll("'",'"')+']');
 const kinds=['quiz','pairs','sentences','numeric-answer','fill-blank','reading-choice','listening-choice','listening-gap'];
@@ -22,8 +20,6 @@ const explanations=[
   ['listening-gap','Nghe và điền','audioFile, audioTranscript, prompt, acceptedAnswers','Các đáp án chấp nhận tách bằng dấu |.'],
 ];
 await fs.mkdir(output,{recursive:true});await fs.mkdir(qa,{recursive:true});
-const doc=spawnSync(python,[path.join(here,'create-docx.py'),path.join(output,'online-week.docx')],{encoding:'utf8'});
-if(doc.status!==0)throw new Error(doc.stderr||doc.stdout);console.log(doc.stdout.trim());
 const wb=Workbook.create();
 const questions=wb.worksheets.add('Câu hỏi'),info=wb.worksheets.add('Thông tin bộ'),guide=wb.worksheets.add('Hướng dẫn');
 for(const sheet of [questions,info,guide])sheet.showGridLines=false;
@@ -31,26 +27,28 @@ questions.getRange('A1:B1').values=[['baoan-online-week','1']];
 questions.getRangeByIndexes(1,0,1,headers.length).values=[headers];
 const blankRows=kinds.flatMap(kind=>[1,2].map(()=>headers.map(header=>header==='kind'?kind:'')));
 questions.getRangeByIndexes(2,0,blankRows.length,headers.length).values=blankRows;
-const body=questions.getRange('A1:AE18');body.format.font={name:'Arial',size:10,color:'#172033'};body.format.verticalAlignment='center';body.format.columnWidth=22;body.format.rowHeight=30;
-questions.getRange('A2:AE2').format={fill:'#233C61',font:{name:'Arial',size:10,bold:true,color:'#FFFFFF'},rowHeight:36,horizontalAlignment:'center',verticalAlignment:'center',wrapText:true};
+const body=questions.getRange('A1:AG18');body.format.font={name:'Arial',size:10,color:'#172033'};body.format.verticalAlignment='center';body.format.columnWidth=22;body.format.rowHeight=30;
+questions.getRange('A2:AG2').format={fill:'#233C61',font:{name:'Arial',size:10,bold:true,color:'#FFFFFF'},rowHeight:36,horizontalAlignment:'center',verticalAlignment:'center',wrapText:true};
 questions.getRange('A1:B1').format.font={name:'Arial',size:10,italic:true,color:'#526579'};
-questions.getRange('A3:AE18').format.fill='#FFF8E6';questions.getRange('B3:B18').format.fill='#EDF2F8';
+questions.getRange('A3:AG18').format.fill='#FFF8E6';questions.getRange('B3:B18').format.fill='#EDF2F8';
+questions.getRange('AF1:AG18').format.columnWidth=64;
 for(const column of ['C','H','R','W','AA'])questions.getRange(`${column}1:${column}18`).format.columnWidth=42;
 questions.getRange('W1:W18').format.columnWidth=60;
 questions.freezePanes.freezeRows(2);questions.freezePanes.freezeColumns(2);questions.tabColor='#233C61';
 questions.getRange('B3:B902').dataValidation={rule:{type:'list',values:kinds}};
 questions.getRange('U3:U902').dataValidation={rule:{type:'list',values:['true','false']}};
+questions.getRange('AG3:AG902').dataValidation={rule:{type:'list',values:['easy','medium','hard']}};questions.getRange('AG1:AG18').format.columnWidth=20;
 info.getRange('A1:B3').values=[['schema','baoan-online-week'],['formatVersion','1'],['title','']];
 info.getRange('A1:B3').format.font={name:'Arial',size:11,color:'#172033'};info.getRange('A1:A3').format.font.bold=true;info.getRange('A1:A3').format.columnWidth=22;info.getRange('B1:B3').format.columnWidth=66;info.getRange('A1:B3').format.rowHeight=32;info.getRange('B3').format.fill='#FFF0BA';
 guide.getRange('A2').values=[['Mẫu học liệu tuần']];guide.getRange('A2').format.font={name:'Arial',size:15,bold:true,color:'#000000'};
 const guidance=[
   ['Cách dùng','Điền tên tuần ở Thông tin bộ, rồi soạn nội dung trong Câu hỏi. Giữ nguyên hai hàng đầu và tên các sheet.'],
-  ['Bộ câu hỏi','Mỗi subjectLabel và kind cần 2–30 câu. Một tuần tối đa 30 bộ. Các dòng còn trống được bỏ qua.'],
-  ['Môn và chủ đề','subjectLabel, topic, competition, level và week là tên do người soạn tự đặt. Không có danh mục môn bắt buộc.'],
-  ['Tệp đa phương tiện','Tải ảnh PNG/JPEG/WebP và âm thanh MP3/WAV/OGG riêng trong ứng dụng trước khi nhập tài liệu. Điền đúng tên tệp.'],
+  ['Bộ câu hỏi','Tuần mới có 3–4 môn, tối đa 12 câu/môn qua mọi bộ. Mỗi môn/dạng cần ít nhất 2 câu. Dòng trống được bỏ qua.'],
+  ['Môn và chủ đề','subjectLabel là tên môn; chọn/xếp môn tại phần xem trước. topic, competition, level và week giữ nhãn tác giả.'],
+  ['Tệp đa phương tiện','Chọn một file Excel cùng ảnh PNG/JPEG/WebP và âm thanh MP3/WAV/OGG trong cùng một lần chọn. Điền đúng tên tệp ở imageFile/audioFile.'],
   ['Mô tả tệp','Ảnh cần imageAlt. Âm thanh cần audioTranscript. Không nhúng ảnh hoặc âm thanh vào file mẫu.'],
   ['Nguồn nội dung','source và rights ghi nguồn cùng quyền sử dụng. Nội dung được nhập ở trạng thái bản nháp.'],
-  ['Ô nhập','Nền vàng nhạt là ô người soạn điền. kind đã điền sẵn để gợi ý dạng câu, không phải câu hỏi mẫu.'],
+  ['Ô nhập','Nền vàng nhạt là ô người soạn điền. null (không phân biệt hoa thường) nghĩa là thiếu dữ liệu: cột bắt buộc báo lỗi dòng; cột tùy chọn coi như trống. Lỗi Excel như #NULL! luôn báo lỗi.'],
   ['Công thức','Chỉ nhập giá trị văn bản hoặc số. Không nhập công thức Excel. Tệp tài liệu tối đa 1 MB.'],
 ];
 const typeRows=explanations.map(([kind,label,fields,note])=>[`${label} (${kind})`,`${fields}. ${note}`]);
@@ -63,24 +61,25 @@ const fieldRows=[
   ['imageFile / imageAlt','Tên tệp ảnh đã tải lên và mô tả thay thế, có thể thêm vào mọi dạng câu.'],
   ['audioFile / audioTranscript','Tên tệp âm thanh đã tải lên và lời thoại. Bắt buộc với hai dạng nghe.'],
   ['source / rights','Nguồn nội dung và quyền sử dụng do người soạn chịu trách nhiệm cung cấp.'],
+  ['difficulty','Độ khó từng câu: easy (nền tảng), medium (vận dụng), hard (nâng cao). Gợi ý 4/5/3 trong 12 câu; không chia bộ theo độ khó.'],
+  ['allowedGameIds','Tùy chọn giới hạn trò cho từng câu. Để trống dùng mọi trò hỗ trợ. Tách mã bằng |. Ví dụ: memory-match|word-connect.'],
+  ['Mã trò được nhận','math-quest, memory-match, sentence-builder, word-connect, sequence-trail. Bộ chỉ mở trò chung cho tất cả câu; giới hạn không ép được trò sai cấu trúc.'],
 ];
 guide.getRange('A4:B4').values=[['Nội dung','Hướng dẫn điền']];guide.getRange('A5:B12').values=guidance;
 guide.getRange('A14:B14').values=[['Dạng câu','Trường cần điền và quy tắc']];guide.getRange('A15:B22').values=typeRows;
-guide.getRange('A24:B24').values=[['Trường bổ sung','Ý nghĩa']];guide.getRange('A25:B32').values=fieldRows;
-guide.getRange('A4:B32').format.font={name:'Arial',size:10,color:'#172033'};guide.getRange('A4:A32').format.columnWidth=37;guide.getRange('B4:B32').format.columnWidth=108;
-guide.getRange('A4:B32').format.wrapText=true;guide.getRange('A4:B32').format.verticalAlignment='center';guide.getRange('A4:B32').format.rowHeight=46;
+guide.getRange('A24:B24').values=[['Trường bổ sung','Ý nghĩa']];guide.getRange('A25:B35').values=fieldRows;
+guide.getRange('A4:B35').format.font={name:'Arial',size:10,color:'#172033'};guide.getRange('A4:A35').format.columnWidth=37;guide.getRange('B4:B35').format.columnWidth=108;
+guide.getRange('A4:B35').format.wrapText=true;guide.getRange('A4:B35').format.verticalAlignment='center';guide.getRange('A4:B35').format.rowHeight=46;
+guide.getRange('A35:B35').format.rowHeight=58;
 for(const row of [4,14,24])guide.getRange(`A${row}:B${row}`).format={fill:'#233C61',font:{name:'Arial',size:10,bold:true,color:'#FFFFFF'},rowHeight:28};
 guide.tabColor='#7B8DA5';
 wb.recalculate();
 console.log((await wb.inspect({kind:'table',range:'Câu hỏi!A1:H6',include:'values,formulas',tableMaxRows:6,tableMaxCols:8,maxChars:2000})).ndjson);
 console.log((await wb.inspect({kind:'match',searchTerm:'#REF!|#DIV/0!|#VALUE!|#NAME\\?|#N/A',options:{useRegex:true,maxResults:20},maxChars:1000})).ndjson);
 for(const [name,sheetName,range] of [
-  ['questions-a','Câu hỏi','A1:H10'],['questions-b','Câu hỏi','I1:P10'],['questions-c','Câu hỏi','Q1:W10'],['questions-d','Câu hỏi','X1:AE10'],
-  ['metadata','Thông tin bộ','A1:B5'],['instructions-a','Hướng dẫn','A1:B22'],['instructions-b','Hướng dẫn','A24:B32'],
+  ['questions-a','Câu hỏi','A1:H10'],['questions-b','Câu hỏi','I1:P10'],['questions-c','Câu hỏi','Q1:W10'],['questions-d','Câu hỏi','X1:AG10'],
+  ['metadata','Thông tin bộ','A1:B5'],['instructions-a','Hướng dẫn','A1:B22'],['instructions-b','Hướng dẫn','A24:B35'],
 ]){const preview=await wb.render({sheetName,range,scale:1,format:'png'});await fs.writeFile(path.join(qa,`${name}.png`),new Uint8Array(await preview.arrayBuffer()));}
 await (await SpreadsheetFile.exportXlsx(wb)).save(path.join(output,'online-week.xlsx'));
 try{await fs.rename(path.join(output,'online-week.xlsx.inspect.ndjson'),path.join(qa,'workbook-inspection.ndjson'));}catch(error){if(error.code!=='ENOENT')throw error;}
-console.log('Created online-week.docx and online-week.xlsx');
-// All writes and renders have completed. End this CLI explicitly because the
-// bundled Windows renderer otherwise leaves a failing native shutdown status.
-process.exit(0);
+console.log('Created online-week.xlsx');

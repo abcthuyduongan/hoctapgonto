@@ -1,10 +1,22 @@
+import {seedLegacyWeek} from './helpers/legacy-weeks.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createHash,randomUUID} from 'node:crypto';
 import {readFile} from 'node:fs/promises';
 import {OnlineStore} from '../server/online-store.mjs';
 import {createPostgresFixture} from './helpers/postgres-fixture.mjs';
-import {onlineIdentityHash,onlineGeneratedItemId,onlineGeneratedPackId,onlineSourceCode} from '../src/core/online-import-identity.ts';
+import {onlineIdentityHash,onlineGeneratedItemId,onlineGeneratedPackId,onlineSourceCode,onlinePreserveQuestionIds} from '../src/core/online-import-identity.ts';
+
+test('Editorial revisions retain source question IDs without conflating new meaning or duplicate rows',()=>{
+  const original=quiz(),incoming=structuredClone(original);incoming.version=2;
+  incoming.items.reverse();incoming.items.forEach((item,index)=>{item.id='regenerated-'+index;item.explanation='Lời giải mới';item.metadata={allowedGameIds:['memory-match']};});
+  const normalized=onlinePreserveQuestionIds(original,incoming);
+  assert.deepEqual(normalized.items.map(item=>item.id),['author-02','author-01']);assert.equal(incoming.items[0].id,'regenerated-0');
+  const changed=structuredClone(incoming);changed.items[0].prompt='Nội dung câu hoàn toàn mới';
+  assert.equal(onlinePreserveQuestionIds(original,changed).items[0].id,'regenerated-0');
+  const duplicated=structuredClone(incoming);duplicated.items=[incoming.items[0],{...incoming.items[0],id:'duplicate-row'}];
+  assert.equal(new Set(onlinePreserveQuestionIds(original,duplicated).items.map(item=>item.id)).size,2);
+});
 
 test('Portable SHA-256 source identities match independent Node cryptographic vectors',()=>{
   for(const value of ['', 'abc','Tiếng Việt có dấu và 😀','x'.repeat(4001)])assert.equal(onlineIdentityHash(value),createHash('sha256').update(value).digest('hex'));
@@ -24,12 +36,12 @@ for(const [name,fixture] of [['SQLite',sqliteFixture],['PostgreSQL',createPostgr
   const beforeMedia=await upload('bao-an-192.png'),afterMedia=await upload('bao-an-512.png');
   const source=quiz();source.items[0].media={imageId:beforeMedia.id,imageAlt:'Hình trước khi sửa'};
   const original={requestId:'revision-initial',classId:classroom.id,title:'Tuần cần cập nhật',sets:[{subjectLabel:'Môn do tác giả đặt',pack:source}]};
-  const published=await store.publishWeek(admin,original);
+  const published=await seedLegacyWeek(store,admin,original);
   async function start(auth,requestId,version){return store.startPlay(auth,{requestId,moduleId:'math-quest',packId:source.id,contentVersion:version});}
   async function finish(auth,play){for(const item of play.presentation.items)await store.attempt(auth,play.session.sessionId,{attemptKey:`answer-${item.id}`,itemId:item.id,response:{kind:'choice',choiceIndex:item.correctIndex},hintsUsed:0,elapsedMs:100});return store.finishPlay(auth,play.session.sessionId);}
   const completedPlay=await start(completed,'completed-before-revision',1);assert.equal((await finish(completed,completedPlay)).gained,3);
   const activePlay=await start(active,'active-before-revision',1);
-  const changed=structuredClone(source);changed.version=2;changed.items[0].correctIndex=0;changed.items[0].explanation='Lời giải phiên bản mới';changed.items[0].media={imageId:afterMedia.id,imageAlt:'Hình sau khi sửa'};
+  const changed=structuredClone(source);changed.version=2;changed.items[0].id='author-01-v2';changed.items[0].correctIndex=0;changed.items[0].explanation='Lời giải phiên bản mới';changed.items[0].media={imageId:afterMedia.id,imageAlt:'Hình sau khi sửa'};
   const revision={requestId:'explicit-week-revision',replaceWeekId:published.id,classId:classroom.id,title:'Tuần đã cập nhật',sets:[{subjectLabel:'Môn do tác giả đặt',pack:changed}]};
   const revised=await store.publishWeek(admin,revision);assert.equal(revised.id,published.id);assert.equal(revised.position,published.position);assert.equal(revised.createdAt,published.createdAt);assert.equal(revised.title,'Tuần đã cập nhật');
   assert.equal(revised.sets[0].pack.id,source.id);assert.equal(revised.sets[0].pack.version,2);
@@ -44,7 +56,7 @@ for(const [name,fixture] of [['SQLite',sqliteFixture],['PostgreSQL',createPostgr
   await assert.rejects(Promise.resolve().then(()=>start(observer,'new-play-old-version',1)),error=>error.status===403);
   const retry=structuredClone(revision);retry.sets[0].pack.items.reverse();assert.equal((await store.publishWeek(admin,retry)).id,published.id);
   const binding=structuredClone(revision);binding.sets[0].pack.items[0].correctIndex=1;await assert.rejects(Promise.resolve().then(()=>store.publishWeek(admin,binding)),error=>error.status===409);
-  const stale={...binding,requestId:'stale-revision'};await assert.rejects(Promise.resolve().then(()=>store.publishWeek(admin,stale)),error=>error.status===409&&/phiên bản 3/.test(error.message));
+  const stale=structuredClone(revision);stale.requestId='stale-revision';stale.sets[0].pack.items[0].explanation='Một lời giải mới nữa';await assert.rejects(Promise.resolve().then(()=>store.publishWeek(admin,stale)),error=>error.status===409&&/phiên bản 3/.test(error.message));
   await assert.rejects(Promise.resolve().then(()=>store.publishWeek(admin,{...revision,requestId:'wrong-week',replaceWeekId:randomUUID()})),error=>error.status===404);
   const added={...revision,requestId:'changed-groups',sets:[...revision.sets,{subjectLabel:'Nhóm mới',pack:pairs()}]};await assert.rejects(Promise.resolve().then(()=>store.publishWeek(admin,added)),error=>error.status===409);
   const wrongKind={...revision,requestId:'changed-kind',sets:[{subjectLabel:'Môn do tác giả đặt',pack:{...pairs(),id:source.id,version:3}}]};await assert.rejects(Promise.resolve().then(()=>store.publishWeek(admin,wrongKind)),error=>error.status===409);
@@ -65,11 +77,32 @@ async function sqliteFixture(t){
   store.db.prepare("INSERT INTO users(id,workspace_id,username,password_hash,role,created_at) VALUES(?,?,?,?,'admin',?)").run(userId,workspaceId,'manager','salt:manager',at);
   t.after(()=>store.close());return{store,admin:{id:userId,workspaceId,username:'manager',role:'admin'}};
 }
+for(const [name,fixture] of [['SQLite',sqliteFixture],['PostgreSQL',createPostgresFixture]])test(`${name}: editorial import IDs preserve per-question stars on revision and replay`,async t=>{
+  const {store,admin}=await fixture(t),cls=await store.createClass(admin,{name:'Lớp giữ sao từng câu',grade:3});
+  const student=await store.createStudent(admin,{name:'An',classId:cls.id,username:'editorial.child'},'salt:student','editorial.child');
+  const user=name==='SQLite'?store.db.prepare("SELECT * FROM users WHERE username='editorial.child'").get():await store.findUserByUsername('editorial.child');
+  const auth={id:user.id,workspaceId:admin.workspaceId,username:user.username,role:'student',studentId:student.id},source=quiz();
+  const input={requestId:'editorial-first',classId:cls.id,title:'Tuần giữ sao',sets:[{subjectLabel:'Tư duy',pack:source}]},week=await seedLegacyWeek(store,admin,input);
+  async function finish(version,requestId){const play=await store.startPlay(auth,{requestId,moduleId:'memory-match',packId:source.id,contentVersion:version},true);
+    for(const item of play.presentation.items)await store.attempt(auth,play.session.sessionId,{attemptKey:item.id,itemId:item.id,response:{kind:'pair',first:{itemId:item.id,side:'left'},second:{itemId:item.id,side:'right'}},hintsUsed:0,elapsedMs:1});
+    return store.finishPlay(auth,play.session.sessionId,false,true);}
+  assert.equal((await finish(1,'editorial-play-1')).state.balance.earned,6);
+  const changed=structuredClone(source);changed.version=2;changed.items.forEach((item,index)=>{item.id='new-import-'+index;item.explanation='Chỉnh lời giải, không đổi câu hỏi.';});
+  const revision={...input,requestId:'editorial-revision',replaceWeekId:week.id,sets:[{subjectLabel:'Tư duy',pack:changed}]};
+  const revised=await store.publishWeek(admin,revision);assert.deepEqual(revised.sets[0].pack.items.map(item=>item.id),source.items.map(item=>item.id));
+  assert.equal((await store.publishWeek(admin,{...revision,requestId:'editorial-retry'})).id,week.id);
+  const result=await finish(2,'editorial-play-2');assert.equal(result.state.balance.earned,6);assert.equal(result.state.current.questionProgress.three,2);assert.equal(result.gained,0);
+  const replaced=structuredClone(revised.sets[0].pack);replaced.version=3;replaced.items[0]={...replaced.items[0],id:'temporary-new-question',prompt:'Câu khác hoàn toàn thay tạm thời?'};
+  await store.publishWeek(admin,{...input,requestId:'temporary-replace',replaceWeekId:week.id,sets:[{subjectLabel:'Tư duy',pack:replaced}]});
+  const restored=structuredClone(changed);restored.version=4;restored.items[0].id='restored-import-question';
+  const back=await store.publishWeek(admin,{...input,requestId:'restore-old-question',replaceWeekId:week.id,sets:[{subjectLabel:'Tư duy',pack:restored}]});
+  assert.deepEqual(back.sets[0].pack.items.map(item=>item.id),source.items.map(item=>item.id));assert.equal((await finish(4,'editorial-play-4')).state.balance.earned,6);
+});
 for(const [name,fixture] of [['SQLite',sqliteFixture],['PostgreSQL',createPostgresFixture]])test(`${name}: a shared source retains its published grade across class assignment, revision and transfer`,async t=>{
   const {store,admin}=await fixture(t),classes=[];
   for(const grade of [3,3,4])classes.push(await store.createClass(admin,{name:`Lớp ${classes.length}`,grade}));
   const input={title:'Tuần ôn tập dùng chung',sets:[{subjectLabel:'Ôn tập',pack:quiz()}]},weeks=[];
-  for(const [index,cls]of classes.entries())weeks.push(await store.publishWeek(admin,{...structuredClone(input),classId:cls.id,requestId:`shared-${index}`}));
+  for(const [index,cls]of classes.entries())weeks.push(await seedLegacyWeek(store,admin,{...structuredClone(input),classId:cls.id,requestId:`shared-${index}`}));
   for(const week of weeks)assert.deepEqual(week.sets[0].pack,weeks[0].sets[0].pack);
   const student=await store.createStudent(admin,{name:'An',classId:classes[0].id,username:'shared.learner'},'salt:student','shared.learner');
   const user=name==='SQLite'?store.db.prepare("SELECT * FROM users WHERE username='shared.learner'").get():await store.findUserByUsername('shared.learner');
@@ -98,7 +131,7 @@ for(const [name,fixture] of [['SQLite',sqliteFixture],['PostgreSQL',createPostgr
   const user=name==='SQLite'?store.db.prepare("SELECT * FROM users WHERE username='learner'").get():await store.findUserByUsername('learner');
   const learner={id:user.id,workspaceId:admin.workspaceId,username:'learner',role:'student',studentId:student.id};
   const original={requestId:'first-preview',classId:classroom.id,title:'Tuần nhập đầu tiên',sets:[{subjectLabel:'Môn tự chọn',pack:quiz()},{subjectLabel:'Môn khác',pack:pairs()}]};
-  const published=await store.publishWeek(admin,original);
+  const published=await seedLegacyWeek(store,admin,original);
   const replay=structuredClone(original);replay.requestId='another-preview';replay.sets.reverse();
   for(const set of replay.sets){set.pack.id='copy-'+randomUUID();set.pack.items.reverse();set.pack.items.forEach(item=>{item.id='copied-'+randomUUID();});set.pack.publishedAt=new Date().toISOString();}
   const [a,b]=await Promise.all([Promise.resolve().then(()=>store.publishWeek(admin,replay)),Promise.resolve().then(()=>store.publishWeek(admin,{...replay,requestId:'concurrent-preview'}))]);
@@ -114,7 +147,7 @@ for(const [name,fixture] of [['SQLite',sqliteFixture],['PostgreSQL',createPostgr
   const partial=structuredClone(changed);partial.requestId='atomic-correction';partial.sets.unshift({subjectLabel:'Mới',pack:{...quiz('new-not-inserted'),title:'Câu khác',items:quiz().items.map(item=>({...item,prompt:item.prompt+' nội dung mới'}))}});await assertConflict(partial);
   assert.equal((await store.dashboard(admin)).stats.questions,4);
   const later=await store.createClass(admin,{name:'Lớp nhận phiên bản mới',grade:3}),revision=quiz(undefined,2);revision.items[0].options[2]='Đáp án phiên bản hai';
-  const revised=await store.publishWeek(admin,{requestId:'explicit-revision-new-class',classId:later.id,title:'Tuần phiên bản hai',sets:[{subjectLabel:'Môn tự chọn',pack:revision}]});
+  const revised=await seedLegacyWeek(store,admin,{requestId:'explicit-revision-new-class',classId:later.id,title:'Tuần phiên bản hai',sets:[{subjectLabel:'Môn tự chọn',pack:revision}]});
   assert.equal(revised.sets[0].pack.id,'legacy-random-source');assert.equal(revised.sets[0].pack.version,2);
   const old=(await store.dashboard(admin)).weeks.find(week=>week.id===published.id);assert.equal(old.sets[0].pack.version,1);assert.equal(old.sets[0].pack.items[0].options[2],'Nắng');
   assert.equal((await store.studentState(learner)).balance.earned,3);

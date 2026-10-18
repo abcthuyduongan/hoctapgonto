@@ -1,5 +1,6 @@
 import type { ContentPack, ModuleId, PairItem, QuizItem, SentenceItem } from './contracts.ts';
 import { validateRichPack } from './rich-content.ts';
+import {gameRestrictionError} from './game-policy.ts';
 
 const validSubjects = new Set(['math', 'vietnamese', 'english', 'thinking']);
 const limits = { title: 90, prompt: 320, answer: 120, explanation: 500 };
@@ -35,9 +36,10 @@ export function validatePack(pack: ContentPack): string[] {
         ||media.imageId===undefined&&media.imageAlt!==undefined||media.audioId===undefined&&media.audioTranscript!==undefined)errors.push(`Mục ${n}: hình/âm thanh cần mã tệp và văn bản thay thế hợp lệ.`);
     }
     if(item.metadata!==undefined){const info=item.metadata;
-      if(!metadataObject(info,['knowledgeId','difficulty','contentRole','source','rights','reviewStatus','formId','topicId','level'])||!metadataText(info.knowledgeId,120)||!['easy','medium','hard'].includes(info.difficulty)
+      if(!metadataObject(info,['knowledgeId','difficulty','contentRole','source','rights','reviewStatus','formId','topicId','level','allowedGameIds'])||!metadataText(info.knowledgeId,120)||!['easy','medium','hard'].includes(info.difficulty)
         ||!['unassigned','practice','assessment','review'].includes(info.contentRole)||!metadataText(info.source)||!metadataText(info.rights)||!['draft','reviewed'].includes(info.reviewStatus)
         ||info.formId!==undefined&&!metadataText(info.formId,120)||info.topicId!==undefined&&!metadataText(info.topicId,120)||info.level!==undefined&&!metadataText(info.level,120))errors.push(`Mục ${n}: metadata kiến thức/độ khó/nguồn/quyền/trạng thái không hợp lệ.`);
+      const restriction=gameRestrictionError(info?.allowedGameIds);if(restriction)errors.push(`Mục ${n}: ${restriction}`);
     }
     if (!item.id?.trim() || idSet.has(item.id)) errors.push(`Mục ${n}: mã câu hỏi thiếu hoặc trùng.`);
     if (!/^[a-zA-Z0-9._:-]{1,80}$/.test(item.id ?? '')) errors.push(`Mục ${n}: mã câu hỏi chỉ dùng chữ, số, dấu chấm, gạch và gạch dưới.`);

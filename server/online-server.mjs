@@ -1,10 +1,13 @@
 import {createServer} from 'node:http';
+import {adminSummary,adminWeek,adminMedia,adminWeekCheck} from './admin-data.mjs';
+import {audioDurationMs,validateUploadedAudio} from './audio-duration.mjs';
+import {createFailureReporter,ONLINE_RUNTIME_VERSION} from './api-diagnostics.mjs';
 import {createReadStream} from 'node:fs';
 import {stat,realpath,readFile} from 'node:fs/promises';
 import {resolve,relative,extname,sep,isAbsolute} from 'node:path';
 import {randomBytes,randomUUID,createHash,scrypt as scryptCallback,scryptSync,timingSafeEqual} from 'node:crypto';
 import {promisify} from 'node:util';
-import {OnlineStore,OnlineError,fail,shape,text} from './online-store.mjs';
+import {OnlineStore,OnlineError,fail,shape,text,integer} from './online-store.mjs';
 import {MAX_RECOVERY_UPLOAD_BYTES,acquireOnlineDatabaseLock,recoverInterruptedOnlineRestore,inspectOnlineBackup,snapshotOnlineDatabase,restoreOnlineDatabase,createRecoveryTemporary,createRecoveryUpload} from './online-recovery.mjs';
 
 const scrypt=promisify(scryptCallback),scryptOptions={N:32768,r:8,p:1,maxmem:64*1024*1024};
@@ -40,7 +43,7 @@ export function createOnlineServer({databasePath,staticRoot=resolve('dist'),publ
     const workspaces=db.prepare('SELECT id FROM workspaces').all();if(workspaces.length!==1||workspaces[0].id!==auth.workspaceId)fail(409,'Phục hồi toàn máy cần kho cục bộ của một đơn vị. Dùng công cụ phục hồi khi máy chủ đã dừng.');
   }
   function clearExpiredPreviews(){for(const[token,preview]of recoveryPreviews)if(preview.expires<=Date.now()){preview.temporary.remove();recoveryPreviews.delete(token);}}
-  const json=(res,status,value)=>{res.writeHead(status,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store, private','Pragma':'no-cache','Vary':'Cookie'});res.end(JSON.stringify(value));};
+  const json=(res,status,value)=>{res.writeHead(status,{'X-Bao-An-Question-Protocol':'1','Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store, private','Pragma':'no-cache','Vary':'Cookie'});res.end(JSON.stringify(value));};
   function originFor(req){const host=req.headers.host??'';
     if(configuredOrigin){if(host!==new URL(configuredOrigin).host)fail(421,'Địa chỉ máy chủ không đúng cấu hình.');return configuredOrigin;}
     if(!/^(?:127\.0\.0\.1|localhost|\[::1\])(?::\d{1,5})?$/.test(host))fail(421,'Cần cấu hình origin trước khi truy cập ngoài máy chủ.');return`http://${host}`;
@@ -60,14 +63,16 @@ export function createOnlineServer({databasePath,staticRoot=resolve('dist'),publ
   }
   /** A request can stay open while its cookie is revoked or its account is locked. */
   async function authenticatedBody(req,expectedRole,maxBytes=MAX_BODY){const input=await body(req,maxBytes);return{input,auth:authenticatedActor(req,expectedRole)};}
-  function rateLimit(req,name){const address=req.socket.remoteAddress??'local',keys=[hash(`ip:${address}`),hash(`user:${name}`)],time=Date.now();
+  function rateLimit(req,name,passwordChange=false){const address=req.socket.remoteAddress??'local',keys=[hash(`${passwordChange?'password-ip':'ip'}:${address}`),hash(`${passwordChange?'password-user':'user'}:${name}`)],time=Date.now();
     store.tx(()=>{for(const [index,key]of keys.entries()){const row=db.prepare('SELECT * FROM login_limits WHERE key=?').get(key),count=row&&row.reset_at>time?row.count:0;
-      if(count>=(index===0?100:12))fail(429,'Đã thử đăng nhập quá nhiều lần. Hãy đợi 15 phút rồi thử lại.');
+      if(count>=(index===0?100:12))fail(429,passwordChange?'Đã thử đổi mật khẩu quá nhiều lần. Hãy đợi 15 phút rồi thử lại.':'Đã thử đăng nhập quá nhiều lần. Hãy đợi 15 phút rồi thử lại.');
       db.prepare('INSERT INTO login_limits VALUES(?,?,?) ON CONFLICT(key) DO UPDATE SET count=excluded.count,reset_at=excluded.reset_at').run(key,count+1,row&&row.reset_at>time?row.reset_at:time+900000);
     }});
     return()=>db.prepare('DELETE FROM login_limits WHERE key=?').run(keys[1]);
   }
+  const reportFailure=createFailureReporter();
   const server=createServer(async(req,res)=>{
+    const started=performance.now();
     res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('X-Frame-Options','DENY');res.setHeader('Referrer-Policy','same-origin');
     try{
       if((req.url??'').length>4096)fail(414,'Đường dẫn quá dài.');const origin=originFor(req),url=new URL(req.url,origin),path=url.pathname,method=req.method??'GET';
@@ -78,7 +83,7 @@ export function createOnlineServer({databasePath,staticRoot=resolve('dist'),publ
         if(mutable&&(req.headers.origin!==origin||req.headers['sec-fetch-site']==='cross-site'))fail(403,'Yêu cầu phải xuất phát từ chính website này.');
         if(method==='OPTIONS')fail(405,'API chỉ dùng cùng origin.');
         const route=path.slice('/api/online'.length);
-        if(method==='GET'&&route==='/status')return json(res,200,{available:true,configured:store.configured()});
+        if(method==='GET'&&route==='/status')return json(res,200,{available:true,configured:store.configured(),runtimeVersion:ONLINE_RUNTIME_VERSION,questionProtocolVersion:1});
         if(method==='POST'&&route==='/setup'){
           const input=shape(await body(req),['token','name','username','password']);available();if(store.configured())fail(409,'Máy chủ đã được khởi tạo. Hãy đăng nhập.');
           rateLimit(req,'bootstrap');if(!setupToken||!sameSecret(input.token,setupToken))fail(403,'Mã khởi tạo không đúng. Lấy mã riêng từ quản trị máy chủ.');
@@ -124,18 +129,38 @@ export function createOnlineServer({databasePath,staticRoot=resolve('dist'),publ
         }
         if(method==='GET'&&route==='/me')return json(res,200,identity(auth));
         if(method==='POST'&&route==='/logout'){const{input,auth:current}=await authenticatedBody(req);shape(input,[]);db.prepare('DELETE FROM auth_sessions WHERE token_hash=?').run(current.tokenHash);cookie(res,'',origin,true);return json(res,200,{ok:true});}
+        if(method==='POST'&&route==='/account/password'){
+          role(auth,'student');const{input:raw,auth:current}=await authenticatedBody(req,'student'),input=shape(raw,['currentPassword','newPassword']);rateLimit(req,current.id,true);
+          for(const value of [input.currentPassword,input.newPassword])if(typeof value!=='string'||value.length<10||value.length>128)fail(400,'Mật khẩu cần từ 10–128 ký tự.');
+          if(sameSecret(input.currentPassword,input.newPassword))fail(400,'Mật khẩu mới cần khác mật khẩu hiện tại.');
+          const user=db.prepare('SELECT password_hash FROM users WHERE workspace_id=? AND id=?').get(current.workspaceId,current.id);
+          if(!await verifyPassword(input.currentPassword,user?.password_hash))fail(400,'Mật khẩu hiện tại chưa đúng.');
+          const nextHash=await passwordHash(input.newPassword),result=store.changeOwnPassword(current,user.password_hash,nextHash);cookie(res,'',origin,true);return json(res,200,result);
+        }
+        if(method==='GET'&&route==='/admin/summary')return json(res,200,await adminSummary(store,auth,Object.fromEntries(url.searchParams)));
+        const adminWeekMatch=route.match(/^\/admin\/weeks\/([^/]+)$/);
+        if(method==='GET'&&adminWeekMatch)return json(res,200,await adminWeek(store,auth,decodeURIComponent(adminWeekMatch[1])));
+        if(method==='GET'&&route==='/admin/media')return json(res,200,await adminMedia(store,auth,Object.fromEntries(url.searchParams)));
+        if(method==='POST'&&route==='/admin/media/lookup'){const{input,auth:current}=await authenticatedBody(req,'admin');return json(res,200,await adminMedia(store,current,input));}
+        if(method==='POST'&&route==='/admin/week-check'){const{input,auth:current}=await authenticatedBody(req,'admin');return json(res,200,await adminWeekCheck(store,current,input));}
         if(method==='GET'&&route==='/dashboard'){role(auth,'admin');return json(res,200,store.dashboard(auth));}
         if(method==='GET'&&route==='/media'){role(auth,'admin');return json(res,200,store.listMedia(auth));}
-        if(method==='POST'&&route==='/media'){role(auth,'admin');const{input,auth:current}=await authenticatedBody(req,'admin',12*1024*1024);return json(res,201,store.uploadMedia(current,input));}
+        if(method==='POST'&&route==='/media'){role(auth,'admin');const{input}=await authenticatedBody(req,'admin',12*1024*1024);await validateUploadedAudio(input,8*1024*1024);return json(res,201,store.uploadMedia(authenticatedActor(req,'admin'),input));}
         const mediaMatch=route.match(/^\/media\/([A-Za-z0-9-]{1,100})$/);
         if(['GET','HEAD'].includes(method)&&mediaMatch){const asset=store.readMedia(auth,mediaMatch[1]),bytes=Buffer.from(asset.bytes);let start=0,end=bytes.length-1,status=200;
           if(req.headers.range){const range=/^bytes=(\d*)-(\d*)$/.exec(req.headers.range);if(!range||!range[1]&&!range[2]){res.setHeader('Content-Range',`bytes */${bytes.length}`);fail(416,'Khoảng dữ liệu không hợp lệ.');}
             if(!range[1])start=Math.max(0,bytes.length-Number(range[2]));else start=Number(range[1]);if(range[2]&&range[1])end=Math.min(end,Number(range[2]));
             if(!Number.isSafeInteger(start)||!Number.isSafeInteger(end)||start<0||start>end||start>=bytes.length){res.setHeader('Content-Range',`bytes */${bytes.length}`);fail(416,'Khoảng dữ liệu không hợp lệ.');}status=206;
           }
+          if(method==='GET'&&auth.role==='student'&&asset.kind==='audio'&&url.searchParams.has('playId')&&start===0&&end===bytes.length-1){const duration=await audioDurationMs(bytes,asset.mime,8*1024*1024);store.recordAudioDelivery(actor(req),url.searchParams.get('playId'),url.searchParams.get('itemId'),mediaMatch[1],duration);}
           res.writeHead(status,{'Content-Type':asset.mime,'Cache-Control':'no-store, private','Vary':'Cookie','Accept-Ranges':'bytes','Content-Length':end-start+1,'Content-Disposition':`inline; filename*=UTF-8''${encodeURIComponent(asset.name)}`,...(status===206?{'Content-Range':`bytes ${start}-${end}/${bytes.length}`}:{})});res.end(method==='HEAD'?undefined:bytes.subarray(start,end+1));return;
         }
-        if(method==='GET'&&route==='/student'){role(auth,'student');return json(res,200,store.studentState(auth));}
+        if(method==='GET'&&route==='/student'){role(auth,'student');if(req.headers['x-bao-an-question-protocol']!=='1')fail(409,'Ứng dụng đã được cập nhật. Hãy tải lại trang; sao đã lưu vẫn được giữ.');return json(res,200,store.studentSummary(auth));}
+        if(method==='GET'&&route==='/student/summary'){role(auth,'student');const cursor=url.searchParams.get('cursor')??'0';if(cursor!=='current'&&!/^(0|[1-9]\d{0,6})$/.test(cursor))fail(400,'Trang hành trình không hợp lệ.');return json(res,200,store.studentSummary(auth,cursor));}
+        if(method==='POST'&&route==='/student/journey'){const{input,auth:current}=await authenticatedBody(req,'student');return json(res,200,store.ensureJourney(current,input));}
+        if(method==='POST'&&route==='/student/advance-week'){const{input,auth:current}=await authenticatedBody(req,'student');return json(res,200,store.advanceWeek(current,input));}
+        const gamesMatch=route.match(/^\/student\/pack\/([^/]+)\/(\d+)\/games$/);
+        if(method==='GET'&&gamesMatch){role(auth,'student');return json(res,200,store.packGames(auth,text(decodeURIComponent(gamesMatch[1]),'Mã bộ',80),integer(Number(gamesMatch[2]),'Phiên bản')));}
         if(method==='POST'&&route==='/classes'){role(auth,'admin');const{input,auth:current}=await authenticatedBody(req,'admin');return json(res,201,store.createClass(current,input));}
         if(method==='POST'&&route==='/students'){
           role(auth,'admin');const{input}=await authenticatedBody(req,'admin'),name=username(input.username),password=input.password||randomBytes(12).toString('base64url'),hashed=await passwordHash(password);
@@ -149,10 +174,10 @@ export function createOnlineServer({databasePath,staticRoot=resolve('dist'),publ
         }
         if(method==='POST'&&route==='/weeks'){role(auth,'admin');const{input,auth:current}=await authenticatedBody(req,'admin');return json(res,201,store.publishWeek(current,input));}
         if(method==='POST'&&route==='/wallet'){role(auth,'admin');const{input,auth:current}=await authenticatedBody(req,'admin');return json(res,200,store.configureWallet(current,input));}
-        if(method==='POST'&&route==='/play'){role(auth,'student');const{input,auth:current}=await authenticatedBody(req,'student');return json(res,201,store.startPlay(current,input));}
-        const playMatch=route.match(/^\/play\/([^/]+)\/(attempt|complete|abandon)$/);
+        if(method==='POST'&&['/play','/play/compact'].includes(route)){role(auth,'student');if(req.headers['x-bao-an-question-protocol']!=='1')fail(409,'Ứng dụng đã được cập nhật. Hãy tải lại trang trước khi mở trò chơi; sao đã lưu vẫn được giữ.');const{input,auth:current}=await authenticatedBody(req,'student');return json(res,201,store.startPlay(current,input,route==='/play/compact',true));}
+        const playMatch=route.match(/^\/play\/([^/]+)\/(attempt|question-open|question-hint|complete|complete-compact|abandon)$/);
         if(method==='POST'&&playMatch){role(auth,'student');const{input,auth:current}=await authenticatedBody(req,'student'),playId=decodeURIComponent(playMatch[1]);
-          if(playMatch[2]==='attempt')return json(res,200,store.attempt(current,playId,input));shape(input,[]);return json(res,200,store.finishPlay(current,playId,playMatch[2]==='abandon'));
+          if(playMatch[2]==='attempt')return json(res,200,store.attempt(current,playId,input,true));if(playMatch[2]==='question-hint')return json(res,200,store.questionHint(current,playId,input));if(playMatch[2]==='question-open')return json(res,200,store.openQuestion(current,playId,input,true));shape(input,[]);return json(res,200,store.finishPlay(current,playId,playMatch[2]==='abandon',true,true));
         }
         if(method==='POST'&&route==='/redemptions'){role(auth,'student');const{input,auth:current}=await authenticatedBody(req,'student');return json(res,201,store.requestReward(current,input));}
         const redemption=route.match(/^\/redemptions\/([^/]+)\/(transition|cancel)$/);
@@ -167,7 +192,7 @@ export function createOnlineServer({databasePath,staticRoot=resolve('dist'),publ
       res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; worker-src 'self' blob:; connect-src 'self' blob:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'");
       res.writeHead(200,{'Content-Type':MIME[extname(file)]??'application/octet-stream','Content-Length':info.size,'Cache-Control':/[/\\]assets[/\\]/.test(file)?'public, max-age=31536000, immutable':'no-cache'});
       if(method==='HEAD')res.end();else{const stream=createReadStream(file);stream.on('error',()=>res.destroy());stream.pipe(res);}
-    }catch(error){if(res.headersSent){res.destroy();return;}json(res,error instanceof OnlineError?error.status:error instanceof URIError?400:500,{error:error instanceof OnlineError?error.message:error instanceof URIError?'Đường dẫn không hợp lệ.':'Máy chủ chưa xử lý được yêu cầu. Vui lòng thử lại.'});}
+    }catch(error){if(res.headersSent){res.destroy();return;}const status=error instanceof OnlineError?error.status:error instanceof URIError?400:500,supportId=reportFailure(req.url,req.method,status,performance.now()-started);json(res,status,{error:error instanceof OnlineError?error.message:error instanceof URIError?'Đường dẫn không hợp lệ.':'Máy chủ chưa xử lý được yêu cầu. Vui lòng thử lại.',...(supportId?{supportId}:{})});}
   });
   server.requestTimeout=30000;server.headersTimeout=15000;server.maxHeadersCount=80;
   server.onlineStore=store;server.onlineClose=()=>{if(!closed){closed=true;try{store?.close();}finally{for(const preview of recoveryPreviews.values())preview.temporary.remove();recoveryPreviews.clear();releaseDatabaseLock();}}};return server;

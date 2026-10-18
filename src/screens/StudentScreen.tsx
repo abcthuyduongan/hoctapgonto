@@ -1,19 +1,19 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { ContentPack, ModuleId } from '../core/contracts';
+import type { ModuleId } from '../core/contracts';
+import type {OnlinePackSummary} from '../core/online-contracts';
 import { GAME_REGISTRY } from '../core/registry';
 import WorldCanvas, { type SceneInfo } from '../world3d/WorldCanvas';
 import type { WorldId } from '../world3d/engine';
 import { getSceneForModule } from '../world3d/scenes/sceneCatalog';
 import type { GuideMood, QualityChoice } from '../world3d/renderer/types';
 import { playClickSound, playIslandSelectSound } from '../core/sound';
-import { onlinePresentation } from '../core/online-exercises';
 import '../styles/student-assigned-games.css';
 
 interface Props {
   availableStars: number;
   /** An online host supplies author-labelled content without a fixed subject curriculum. */
-  practiceContext:{title:string;detail:string;pack:ContentPack|null;complete:boolean};
-  onPlay: (id:ModuleId,pack:ContentPack)=>Promise<void>;
+  practiceContext:{title:string;detail:string;pack:OnlinePackSummary|null;games:{id:ModuleId;label:string}[];complete:boolean};
+  onPlay: (id:ModuleId,pack:OnlinePackSummary)=>Promise<void>;
   starting: boolean;
   onOpenWallet: () => void;
   worldActive: boolean;
@@ -39,16 +39,15 @@ export default function StudentScreen({availableStars,practiceContext,onPlay,sta
   const [quality,setQuality]=useState<QualityChoice>('auto');
   const assignedMode=true;
   const currentPack=practiceContext.pack;
-  const canPlay=(gameId:ModuleId,pack:ContentPack)=>!!onlinePresentation(gameId,pack);
   const worldName=(worldId:string)=>worldId==='math-quest'?'Đảo Câu Hỏi':themes[worldId].world;
-  const playable=currentPack?GAME_REGISTRY.filter(game=>canPlay(game.id,currentPack)):[];
-  const assignedFallback=!!practiceContext&&(sceneState==='fallback'||sceneState==='unavailable');
+  const playable=practiceContext.games;
+  const assignedFallback=sceneState!=='ready';
   const selectIsland = (id: WorldId | null) => {
     if (id && id !== focused) playIslandSelectSound();
     setFocused(id);
   };
   const sceneChanged=useCallback((info:SceneInfo)=>{setSceneState(info.state);onSceneChange(info);},[onSceneChange]);
-  function packFor(gameId:ModuleId){return currentPack&&canPlay(gameId,currentPack)?currentPack:undefined;}
+  function packFor(gameId:ModuleId){return currentPack&&playable.some(game=>game.id===gameId)?currentPack:undefined;}
   const enterWorld=(id:WorldId)=>{const game=GAME_REGISTRY.find(row=>getSceneForModule(row.id)===id);if(!game||starting)return;const pack=packFor(game.id);if(pack)void onPlay(game.id,pack);};
   return <div className={`ba3d-home premium-world game-hub ${simpleControls?'':'immersive-world'} ${focused ? 'has-focused-island' : 'overview-mode'}`} id="home">
     <section className="ba3d-world" aria-label="Bảo An Learning: thế giới game 3D tương tác">
@@ -81,7 +80,7 @@ export default function StudentScreen({availableStars,practiceContext,onPlay,sta
             focused&&assignedMode&&!packFor(GAME_REGISTRY.find(game=>getSceneForModule(game.id)===focused)!.id)?`Bộ này chơi được ở: ${playable.map(game=>themes[game.id].short).join(', ')}. Hãy chọn đảo phù hợp nhé.`:
             focused?'Khi Cáo tới đảo, bấm lại đảo hoặc nhấn Enter để vào chơi.':'Bấm vào một đảo để Cáo dẫn đường.'}</span>
         </div>}
-        {assignedFallback&&<section className="assigned-game-fallback" aria-label="Trò chơi phù hợp bộ được giao"><strong>{currentPack?'Chọn trò để vào bộ được giao':practiceContext?.complete?'Con đã hoàn thành học liệu được giao':'Đang chờ học liệu từ lớp'}</strong>{currentPack&&<p>{currentPack.title}</p>}<div>{playable.map(game=><button key={game.id} type="button" disabled={starting} aria-label={`Chơi ${game.label} bằng bộ được giao`} onClick={()=>currentPack&&void onPlay(game.id,currentPack)}>{themes[game.id].symbol} {game.label} →</button>)}</div>{!currentPack&&<p>{practiceContext?.detail}</p>}</section>}
+        {assignedFallback&&<section className="assigned-game-fallback" aria-label="Trò chơi phù hợp bộ được giao"><strong>{currentPack?'Chọn trò để vào bộ được giao':practiceContext?.complete?'Con đã hoàn thành học liệu được giao':'Đang chờ học liệu từ lớp'}</strong>{currentPack&&<p>{currentPack.title}</p>}{sceneState==='loading'&&<p>Cảnh đang tải. Con có thể vào bài ngay bằng các nút dưới đây.</p>}<div>{playable.map(game=><button key={game.id} type="button" disabled={starting} aria-label={`Chơi ${game.label} bằng bộ được giao`} onClick={()=>currentPack&&void onPlay(game.id,currentPack)}>{themes[game.id].symbol} {game.label} →</button>)}</div>{!currentPack&&<p>{practiceContext?.detail}</p>}</section>}
       </div>
       {simpleControls&&<div className="game-hub-bottom">
         {focused ? <div className="ba3d-anchors" aria-label="Chọn trò chơi 3D">
@@ -94,7 +93,7 @@ export default function StudentScreen({availableStars,practiceContext,onPlay,sta
               <select id={`ba3d-pack-${game.id}`} aria-label={`Chọn bộ học liệu cho ${game.label}`} value={pack?`${pack.id}@${pack.version}`:''} disabled={!pack||starting}
                 >
                 {!pack&&<option value="">{assignedMode?'Bộ ôn chưa phù hợp đảo này':'Chưa có học liệu'}</option>}
-                {options.map(p=><option key={`${p.id}@${p.version}`} value={`${p.id}@${p.version}`}>{p.title} · {p.items.length} câu</option>)}
+                {options.map(p=><option key={`${p.id}@${p.version}`} value={`${p.id}@${p.version}`}>{p.title} · {p.itemCount} câu</option>)}
               </select>
               <button type="button" className="ba3d-play" disabled={!pack||starting} onClick={()=>pack&&void onPlay(game.id,pack)}>{starting?'Đang mở…':'Bắt đầu'} <span aria-hidden="true">▶</span></button>
             </article>;

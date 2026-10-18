@@ -64,6 +64,7 @@ table([['schema','baoan-online-week'], ['formatVersion','1'], ['title','']], Fal
 doc.add_paragraph('Cách điền mẫu', 'Heading 1')
 doc.add_paragraph('Giữ nguyên tên trường ở cột field và nhập nội dung ở cột value. subjectLabel là tên môn tự đặt. topic, competition và level là nhãn tự chọn. title là tên bộ câu hỏi. Tên tuần được điền trong bảng thông tin ở trên hoặc trường week của câu hỏi.')
 doc.add_paragraph('Để dùng hình ảnh hoặc âm thanh, tải tệp riêng trong ứng dụng rồi ghi đúng tên tệp vào imageFile hoặc audioFile. Hình ảnh cần imageAlt. Âm thanh cần audioTranscript. Không nhúng tệp vào Word. source và rights ghi nguồn cùng quyền sử dụng của nội dung.')
+doc.add_paragraph('allowedGameIds giới hạn trò cho từng câu, có thể để trống. Dùng mã math-quest, memory-match, sentence-builder, word-connect, sequence-trail và tách bằng dấu |. Ví dụ memory-match|word-connect. Bộ chỉ mở trò chung cho tất cả câu và vẫn kiểm tra cấu trúc dữ liệu.')
 doc.add_paragraph('Các dạng câu hỗ trợ', 'Heading 1')
 descriptions = [
  ('quiz','Trắc nghiệm có bốn lựa chọn và một đáp án A–D'),
@@ -78,7 +79,7 @@ descriptions = [
 table([['Mã dạng câu','Nội dung'], *descriptions])
 doc.add_paragraph('Mẫu này phục vụ nội dung luyện tập do người soạn cung cấp. Nhãn cuộc thi không xác nhận đây là đề chính thức hay đã theo một cấu trúc kỳ thi cụ thể.')
 
-common = ['subjectLabel','title','topic','week','competition','level']
+common = ['subjectLabel','title','topic','week','competition','level','allowedGameIds']
 media = ['imageFile','imageAlt','audioFile','audioTranscript','source','rights']
 definitions = [
  ('quiz','Trắc nghiệm','Điền prompt, bốn phương án A B C D khác nhau và answer là A, B, C hoặc D.', ['prompt','A','B','C','D','answer','explanation']),

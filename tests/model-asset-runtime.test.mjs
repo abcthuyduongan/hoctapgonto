@@ -263,7 +263,7 @@ function instrumentAssetLoad(t, controller, { failImage = 0, afterParse } = {}) 
   });
   t.mock.method(globalThis, 'fetch', async (path, opts) => {
     if (path === '/models/fox-guide.glb') {
-      assert.equal(opts.signal, controller.signal);
+      assert.equal(opts.signal.aborted, controller.signal.aborted);
       return new Response(bytes, { status: 200 });
     }
     return nativeFetch(path, opts);
@@ -335,4 +335,36 @@ test('AssetLoader accepts correctly decoded PBR maps and shares one pending pars
   assert.ok(probe.images.every(image => image.closed === 0), 'successful textures stay available until owner disposal');
   disposeScene(result.scene);
   probe.assertDisposed();
+});
+
+test('AssetLoader bounds a stalled request before headers and a stalled response body', async t => {
+  for (const stage of ['headers', 'body']) {
+    await t.test(stage, async t => {
+      let requestSignal;
+      t.mock.method(globalThis, 'fetch', async (_path, options) => {
+        requestSignal = options.signal;
+        const stalled = () => new Promise((_resolve, reject) => {
+          options.signal.addEventListener('abort', () => reject(options.signal.reason), {once:true});
+        });
+        return stage === 'headers' ? stalled() : {ok:true, arrayBuffer:stalled};
+      });
+      const loader = new AssetLoader(new AbortController().signal, 20);
+      await assert.rejects(loader.load('/models/stalled.glb'), error => error.name === 'TimeoutError');
+      assert.equal(requestSignal.aborted, true);
+    });
+  }
+});
+
+test('AssetLoader forwards host cancellation while the model response is pending', async t => {
+  const controller = new AbortController(), reason = new Error('screen was closed');
+  let started;
+  const requestStarted = new Promise(resolve => {started = resolve;});
+  t.mock.method(globalThis, 'fetch', (_path, options) => new Promise((_resolve, reject) => {
+    options.signal.addEventListener('abort', () => reject(options.signal.reason), {once:true});
+    started();
+  }));
+  const work = new AssetLoader(controller.signal).load('/models/pending.glb');
+  await requestStarted;
+  controller.abort(reason);
+  await assert.rejects(work, error => error === reason);
 });

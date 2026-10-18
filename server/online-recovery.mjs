@@ -4,8 +4,9 @@ import {copyFileSync,chmodSync,existsSync,lstatSync,mkdirSync,mkdtempSync,readFi
 import {resolve,dirname,join,basename} from 'node:path';
 import {OnlineStore,OnlineError} from './online-store.mjs';
 import {validatePack} from '../src/core/validation.ts';
-import {onlineAward,onlineEvidenceErrors} from '../src/core/online-exercises.ts';
 import {rewardBalance,validateRewardWallet,rewardStatus} from '../src/core/reward-wallet.ts';
+import {inspectQuestionRewardEvidence} from './question-recovery.mjs';
+import {validateWeeklyPlan} from '../src/core/weekly-plan.ts';
 
 export const MAX_RECOVERY_UPLOAD_BYTES=32*1024*1024;
 export const MAX_RECOVERY_FILE_BYTES=512*1024*1024;
@@ -62,31 +63,23 @@ export function inspectOnlineBackup(file,{maxBytes=MAX_RECOVERY_FILE_BYTES,works
       for(const catalog of pack.media??[]){const asset=media.get(JSON.stringify([row.workspace_id,catalog.mediaId]));if(!asset||asset.kind!=='audio'||asset.sha256!==catalog.sha256)fail(400,'Catalog âm thanh không khớp tư liệu trong bản sao.');}
       packs.set(JSON.stringify([row.workspace_id,pack.id,pack.version]),pack);counts.questions+=pack.items.length;
     }
+    const plannedWeeks=new Set();for(const row of db.prepare("SELECT workspace_id,target_id FROM audit WHERE action='week.policy'").iterate()){
+      const marker=JSON.parse(row.target_id),key=JSON.stringify([row.workspace_id,marker.weekId]);
+      if(plannedWeeks.has(key)||!db.prepare('SELECT 1 FROM weeks WHERE workspace_id=? AND id=?').get(row.workspace_id,marker.weekId))fail(400,'Cấu hình môn của tuần không khớp bản sao.');plannedWeeks.add(key);
+      const sets=db.prepare('SELECT p.json,p.subject_label FROM week_sets s JOIN packs p ON p.workspace_id=s.workspace_id AND p.pack_id=s.pack_id AND p.version=s.version WHERE s.workspace_id=? AND s.week_id=? ORDER BY s.position').all(row.workspace_id,marker.weekId).map(set=>({pack:JSON.parse(set.json),subjectLabel:set.subject_label}));
+      if(!validateWeeklyPlan(marker.plan,sets))fail(400,'Cấu hình tuần trong bản sao không đảm bảo 3–4 môn và tối đa 12 câu/môn.');
+    }
     const events=new Map();for(const row of db.prepare('SELECT workspace_id,play_id,attempt_key,json FROM attempts').iterate()){
       const event=JSON.parse(row.json);if(event.eventId!==`${row.play_id}:${row.attempt_key}`||event.sessionId!==row.play_id)fail(400,'Lượt trả lời trong bản sao không khớp khóa lưu.');const key=JSON.stringify([row.workspace_id,row.play_id]),rows=events.get(key)??[];rows.push(event);events.set(key,rows);
     }
-    const best=new Map(),awardsBySession=new Map(),awardTimelines=new Map();let activePlays=0;
-    for(const row of db.prepare('SELECT id,workspace_id,student_id,json FROM plays').iterate()){
-      const session=JSON.parse(row.json),pack=packs.get(JSON.stringify([row.workspace_id,session.packId,session.contentVersion])),rows=events.get(JSON.stringify([row.workspace_id,row.id]))??[];
-      if(session.sessionId!==row.id||session.profileId!==row.student_id||!['active','completed','abandoned'].includes(session.status)||!pack||onlineEvidenceErrors(session,rows,pack,session.status==='completed').length)fail(400,'Phiên chơi hoặc đáp án trong bản sao không hợp lệ.');
-      if(session.status==='active')activePlays++;const award=onlineAward(session,rows,pack);if(award){const key=JSON.stringify([row.workspace_id,row.student_id,pack.id]),prior=best.get(key);if(!prior||award.starTier>prior.starTier)best.set(key,award);
-        awardsBySession.set(JSON.stringify([row.workspace_id,row.id]),award);const owner=JSON.stringify([row.workspace_id,row.student_id]),timeline=awardTimelines.get(owner)??[];timeline.push(award);awardTimelines.set(owner,timeline);}
-    }
-    const earned=new Map();let awardRows=0;for(const row of db.prepare('SELECT workspace_id,student_id,pack_id,tier,json FROM awards').iterate()){
-      const key=JSON.stringify([row.workspace_id,row.student_id,row.pack_id]),expected=best.get(key),award=JSON.parse(row.json);
-      // Equal-tier sessions may keep either immutable, valid completion.
-      const pinned=awardsBySession.get(JSON.stringify([row.workspace_id,award.sessionId]));
-      if(!expected||row.tier!==expected.starTier||canonical(pinned)!==canonical(award))fail(400,'Số sao không khớp bằng chứng học tập trong bản sao.');
-      const owner=JSON.stringify([row.workspace_id,row.student_id]);earned.set(owner,(earned.get(owner)??0)+row.tier);awardRows++;
-    }
-    if(awardRows!==best.size)fail(400,'Bản sao thiếu sổ sao của kết quả hoàn tất.');
+    const {earned,timelines:awardTimelines,activePlays}=inspectQuestionRewardEvidence(db,packs,events);
     for(const workspace of workspaces)for(const student of db.prepare('SELECT id FROM students WHERE workspace_id=?').all(workspace.id)){
       const requests=db.prepare('SELECT status,json FROM redemptions WHERE workspace_id=? AND student_id=? ORDER BY rowid').all(workspace.id,student.id).map(row=>{const request=JSON.parse(row.json);if(rewardStatus(request)!==row.status)fail(400,'Trạng thái đổi thưởng không khớp lịch sử.');return request;});
       const updatedAt=requests.flatMap(request=>request.history.map(step=>step.at)).reduce((latest,at)=>at>latest?at:latest,new Date().toISOString()),wallet={schemaVersion:1,enabled:true,rateVnd:workspace.rate_vnd,updatedAt,requests};
       if(validateRewardWallet(wallet).length||rewardBalance(earned.get(JSON.stringify([workspace.id,student.id]))??0,wallet).available<0)fail(400,'Lịch sử đổi thưởng hoặc số sao giữ chỗ không hợp lệ.');
-      const awards=(awardTimelines.get(JSON.stringify([workspace.id,student.id]))??[]).sort((a,b)=>a.completedAt.localeCompare(b.completedAt)),groups=new Map();let next=0,availableEarned=0,held=0;
+      const awards=awardTimelines.get(JSON.stringify([workspace.id,student.id]))??[];let next=0,availableEarned=0,held=0;
       const history=requests.flatMap((request,order)=>request.history.map((step,index)=>({request,step,order,index}))).sort((a,b)=>a.step.at.localeCompare(b.step.at)||a.order-b.order||a.index-b.index);
-      for(const{request,step,index}of history){while(next<awards.length&&awards[next].completedAt<=step.at){const award=awards[next++],old=groups.get(award.packId)??0,tier=Math.max(old,award.starTier);groups.set(award.packId,tier);availableEarned+=tier-old;}
+      for(const{request,step,index}of history){while(next<awards.length&&awards[next].at<=step.at)availableEarned+=awards[next++].gained;
         if(index===0)held+=request.stars;else if(['cancelled','rejected'].includes(step.status))held-=request.stars;if(held>availableEarned)fail(400,'Yêu cầu đổi thưởng dùng sao trước thời điểm học sinh đạt được.');}
     }
     return{sha256:hash(bytes),bytes:info.size,schemaVersion:1,counts,workspaceNames:workspaces.map(row=>row.name),workspaceIds:workspaces.map(row=>row.id),activePlays,sessionsToRevoke:db.prepare('SELECT count(*) AS n FROM auth_sessions').get().n};

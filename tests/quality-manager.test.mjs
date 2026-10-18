@@ -38,6 +38,17 @@ test('auto degrades only after sustained slow frames and ignores a short spike',
   assert.equal(manager.tier, 'low');
 });
 
+test('automatic quality responds to sustained severe stalls before the ordinary cooldown, but keeps a brief decode spike',()=>{
+  const manager=new QualityManager('auto',false);
+  assert.equal(samples(manager,29,90,2600),null);assert.equal(manager.tier,'balanced');
+  assert.equal(manager.observe(16,2700),null);
+  assert.equal(samples(manager,29,90,5400),null);assert.equal(manager.tier,'balanced');
+  assert.equal(manager.observe(90,5490),'low');assert.equal(manager.tier,'low');
+  assert.equal(samples(manager,600,16,10_000),null);assert.equal(manager.tier,'low');
+  assert.equal(manager.observe(16,20_490),'balanced');
+  const manual=new QualityManager('high',false);assert.equal(samples(manual,60,120,7200),null);assert.equal(manual.tier,'high');
+});
+
 test('hysteresis requires enough fast samples, resets interrupted streaks, and caps automatic upgrades', () => {
   const manager = new QualityManager('auto', true);
   assert.equal(samples(manager, 599, 18, 15000), null);

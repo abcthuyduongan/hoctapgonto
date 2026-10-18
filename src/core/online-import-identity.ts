@@ -27,6 +27,10 @@ export function onlineIdentityHash(value:string):string {
 }
 export function onlineGeneratedItemId(item:unknown):string {
   const {id,...content}=item as Record<string,unknown>;void id;
+  // A teaching policy changes the source version, not the question identity.
+  if(content.metadata&&typeof content.metadata==='object'&&!Array.isArray(content.metadata)){
+    const {allowedGameIds,...metadata}=content.metadata as Record<string,unknown>;void allowedGameIds;content.metadata=metadata;
+  }
   return 'online-'+onlineIdentityHash(onlineCanonical(content)).slice(0,32);
 }
 export function onlineSourceCode(title:string,explicit?:string):string {
@@ -83,6 +87,23 @@ export function onlineSemanticPackIdentity(pack:ContentPack,hashes:MediaHashes={
 export function onlineWeekIdentity(week:{title:string;sets:{subjectLabel:string;pack:ContentPack}[]},hashes:MediaHashes={}):string {
   return onlineCanonical({title:onlineIdentityText(week.title),sets:week.sets.map(set=>onlineCanonical({label:onlineIdentityText(set.subjectLabel),content:onlineReplayPackIdentity(set.pack,hashes)})).sort()});
 }
+/** Reimported editorial changes must retain the original source question's reward key. */
+export function onlinePreserveQuestionIds(current:ContentPack,incoming:ContentPack,hashes:MediaHashes={}):ContentPack {
+  if(current.id!==incoming.id||current.kind!==incoming.kind)return incoming;
+  const originalIds=new Set(current.items.map(item=>item.id)),used=new Set(incoming.items.filter(item=>originalIds.has(item.id)).map(item=>item.id));
+  const meaning=(pack:ContentPack,item:ContentPack['items'][number])=>onlineSemanticPackIdentity({...pack,items:[item]} as ContentPack,hashes);
+  const byMeaning=new Map<string,string[]>();
+  for(const item of current.items){const key=meaning(current,item),ids=byMeaning.get(key)??[];ids.push(item.id);byMeaning.set(key,ids);}
+  return {...incoming,items:incoming.items.map(item=>{
+    if(originalIds.has(item.id)){
+      const original=current.items.find(row=>row.id===item.id)!;
+      if(meaning(current,original)!==meaning(incoming,item))throw new Error(`Mã câu ${item.id} đã công bố với nội dung chấm khác. Câu mới cần mã itemId mới; không dùng sao của câu cũ. Chỉnh lời giải hoặc trình bày vẫn giữ mã cũ.`);
+      return item;
+    }
+    const id=byMeaning.get(meaning(incoming,item))?.find(candidate=>!used.has(candidate));
+    if(!id)return item;used.add(id);return {...item,id};
+  })} as ContentPack;
+}
 export function onlineRevisionOrder(current:{title:string;sets:{subjectLabel:string;pack:ContentPack}[]},incoming:{title:string;sets:{subjectLabel:string;pack:ContentPack}[]},hashes:MediaHashes={}) {
   if(current.sets.length!==incoming.sets.length)throw new Error('Cập nhật tuần phải giữ nguyên số nhóm môn và dạng câu. Hãy tạo tuần mới cho nhóm mới.');
   const sets=current.sets.map(old=>{
@@ -95,4 +116,11 @@ export function onlineRevisionOrder(current:{title:string;sets:{subjectLabel:str
   if(!unchanged)sets.forEach((set,index)=>{const expected=current.sets[index].pack.version+1;
     if(set.pack.version!==expected)throw new Error(`Bộ ${set.pack.id}: hiện ở phiên bản ${expected-1}, cập nhật cần phiên bản ${expected}. Hãy tải lại tuần gốc; không trộn các phiên bản cũ.`);});
   return {sets,unchanged};
+}
+export function onlineRevisionComparison(current:{sets:{pack:ContentPack}[]},incoming:{sets:{pack:ContentPack}[]},hashes:MediaHashes={}){
+  let retained=0,added=0,removed=0;
+  for(const set of incoming.sets){const original=current.sets.find(row=>row.pack.id===set.pack.id)?.pack;if(!original){added+=set.pack.items.length;continue;}
+    const normalized=onlinePreserveQuestionIds(original,set.pack,hashes),oldIds=new Set(original.items.map(item=>item.id)),nextIds=new Set(normalized.items.map(item=>item.id));
+    retained+=normalized.items.filter(item=>oldIds.has(item.id)).length;added+=normalized.items.filter(item=>!oldIds.has(item.id)).length;removed+=original.items.filter(item=>!nextIds.has(item.id)).length;
+  }return{retained,added,removed};
 }

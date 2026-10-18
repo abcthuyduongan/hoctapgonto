@@ -7,7 +7,7 @@ import {createCloudApi} from '../../server/cloud-api.mjs';
 import {setTimeout as delay} from 'node:timers/promises';
 
 /** Real cloud Request/Response adapter and PostgreSQL fixture, served with the production UI. */
-export async function cloudBrowserFixture({staticRoot=path.resolve('dist'),queryDelayMs=0}={}){
+export async function cloudBrowserFixture({staticRoot=path.resolve(process.env.BAO_AN_STATIC_ROOT??'dist'),queryDelayMs=0}={}){
   const cleanups=[],root=path.resolve('test-results');await mkdir(root,{recursive:true});const directory=await mkdtemp(path.join(root,'cloud-browser-'));
   const f=await createPostgresFixture({after:fn=>cleanups.push(fn)},{bootstrap:false}),objects=new Map();
   if(queryDelayMs){const query=f.pool.query.bind(f.pool),connect=f.pool.connect.bind(f.pool);

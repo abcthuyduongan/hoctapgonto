@@ -1,3 +1,5 @@
+import {prepareSuccessfulAttempt,registerStorePlay,fixtureQuestion} from './helpers/secure-play.mjs';
+import {seedLegacyWeek} from './helpers/legacy-weeks.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {mkdtemp,mkdir,writeFile,readFile,rm} from 'node:fs/promises';
@@ -22,7 +24,7 @@ class Client {
   constructor(origin){this.origin=origin;this.cookie='';this.csrfToken='';}
   async request(route,{method='GET',body,csrf=this.csrfToken,origin=this.origin,headers={}}={}){
     const mutation=!['GET','HEAD'].includes(method);
-    const requestHeaders={...headers};
+    const requestHeaders={'X-Bao-An-Question-Protocol':'1',...headers};
     if(this.cookie)requestHeaders.Cookie=this.cookie;
     if(mutation){
       requestHeaders['Content-Type']='application/json';
@@ -42,8 +44,9 @@ class Client {
     return {status:response.status,ok:response.ok,data,headers:response.headers};
   }
   async ok(route,options){
-    const result=await this.request(route,options);
+    await prepareSuccessfulAttempt(this,route,options);const result=await this.request(route,options);
     assert.ok(result.ok,`${options?.method??'GET'} ${route}: ${result.status} ${JSON.stringify(result.data)}`);
+    if(['/play','/play/compact'].includes(route))await registerStorePlay(this,result.data,this.fixtureStore());
     return result.data;
   }
   async denied(route,options,statuses=[400,401,403,404,409]){
@@ -83,12 +86,12 @@ async function fixture(t){
     await rm(absolute,{recursive:true,force:true});
   });
   return {
-    client:()=>new Client(origin),
+    client:()=>Object.assign(new Client(origin),{fixtureStore:()=>server.onlineStore}),
     database:()=>server.onlineStore.db,
     server:()=>server,
     async restart(){await close();await start();},
     async bootstrap(){
-      const manager=new Client(origin);
+      const manager=new Client(origin);manager.fixtureStore=()=>server.onlineStore;
       const identity=await manager.ok('/setup',{method:'POST',body:{token:setupToken,name:'Lớp học thử nghiệm',username:'manager',password:managerPassword}});
       assert.equal(identity.user.role,'admin');
       assert.ok(identity.user.workspaceId);
@@ -139,7 +142,7 @@ function slowPost(f,client,route,body){
   }));
   let request;
   const response=new Promise((resolve,reject)=>{
-    request=httpRequest(`${client.origin}${apiPrefix}${route}`,{method:'POST',headers:{Cookie:client.cookie,Origin:client.origin,'X-CSRF-Token':client.csrfToken,'Content-Type':'application/json'}},res=>{
+    request=httpRequest(`${client.origin}${apiPrefix}${route}`,{method:'POST',headers:{Cookie:client.cookie,Origin:client.origin,'X-CSRF-Token':client.csrfToken,'Content-Type':'application/json','X-Bao-An-Question-Protocol':'1'}},res=>{
       const chunks=[];res.on('data',chunk=>chunks.push(chunk));res.on('end',()=>{
         try{resolve({status:res.statusCode,data:JSON.parse(Buffer.concat(chunks).toString('utf8'))});}catch(error){reject(error);}
       });res.on('error',reject);
@@ -148,9 +151,12 @@ function slowPost(f,client,route,body){
   return{started,response,finish:()=>request.end(rest),destroy:()=>request.destroy()};
 }
 async function publish(manager,classId,{requestId='week-01',title='Tuần khám phá đầu tiên',sets=[{subjectLabel:'Tự nhiên',pack:pairs()}]}={}){
+  const store=manager.fixtureStore(),auth=(await manager.ok('/me')).user;
+  if(!store.db.prepare('SELECT id FROM weeks WHERE workspace_id=? AND request_id=?').get(auth.workspaceId,requestId))seedLegacyWeek(store,auth,{requestId,title,classId,sets});
   return manager.ok('/weeks',{method:'POST',body:{requestId,title,classId,sets}});
 }
 function answer(play,item,correct=true){
+  item=fixtureQuestion(play,item);
   if(play.presentation.kind==='quiz')return {kind:'choice',choiceIndex:correct?item.correctIndex:(item.correctIndex+1)%4};
   if(play.presentation.kind==='pairs')return {kind:'pair',first:{itemId:item.id,side:'left'},second:{itemId:correct?item.id:play.presentation.items.find(row=>row.id!==item.id).id,side:'right'}};
   if(play.presentation.kind==='learning'){
@@ -260,8 +266,10 @@ test('online resources and identically named packs remain isolated across worksp
   await firstManager.denied('/weeks',{method:'POST',body:{requestId:'foreign-class-week',title:'Foreign week',classId:classB.id,sets:[{subjectLabel:'Tự nhiên',pack:pairs('foreign-class-pack')}]}},[404]);
   const a=f.client(),b=f.client();await login(a,'tenant-a-student');await login(b,'tenant-b-student');
   const aState=await a.ok('/student'),bState=await b.ok('/student');
-  assert.equal(aState.current.pack.items[0].right,packA.items[0].right);
-  assert.equal(bState.current.pack.items[0].right,packB.items[0].right);
+  assert.equal(aState.current.pack.items,undefined);
+  assert.equal(bState.current.pack.items,undefined);
+  assert.equal(aState.current.pack.itemCount,packA.items.length);
+  assert.equal(bState.current.pack.itemCount,packB.items.length);
   const aPlay=await startPlay(a,aState.current.pack,{requestId:'same-play-key'});
   await b.denied(`/play/${aPlay.session.sessionId}/attempt`,{method:'POST',body:{attemptKey:'foreign-attempt',itemId:aPlay.presentation.items[0].id,response:answer(aPlay,aPlay.presentation.items[0]),hintsUsed:0,elapsedMs:100}},[404]);
   await b.denied(`/play/${aPlay.session.sessionId}/complete`,{method:'POST'},[404]);
@@ -312,7 +320,7 @@ test('online raw responses are graded by the host, retries commit once and pack 
   assert.equal(revision.result.gained,0);assert.equal(revision.result.state.balance.earned,3);
 });
 
-test('online weekly progression requires two stars in every authored subject before opening the next week',async t=>{
+test('online weekly progression requires every question to pass and a manual advance before closing the old week',async t=>{
   const f=await fixture(t),manager=await f.bootstrap(),classroom=await makeClass(manager);
   await makeStudent(manager,classroom.id,'weekly-learner');
   const first=pairs('nature-first'),second=pairs('safety-first'),future=pairs('creative-next');
@@ -325,18 +333,23 @@ test('online weekly progression requires two stars in every authored subject bef
   let state=await learner.ok('/student');
   assert.deepEqual(state.weeks.map(week=>week.unlocked),[true,false]);
   await learner.denied('/play',{method:'POST',body:{requestId:'skip-week',moduleId:'math-quest',packId:future.id,contentVersion:1}},[403,409]);
-  const practice=await startPlay(learner,first,{requestId:'one-star'});
-  for(const [index,item] of practice.presentation.items.entries())await submit(learner,practice,item,{response:answer(practice,item,index!==0)});
-  const low=await learner.ok(`/play/${practice.session.sessionId}/complete`,{method:'POST'});
-  assert.equal(low.tier,1);assert.equal(low.state.current.pack.id,first.id);
+  async function learn(pack,requestId,poor=false){const play=await learner.ok('/play/compact',{method:'POST',body:{requestId,moduleId:'memory-match',packId:pack.id,contentVersion:pack.version}});
+    const pair=(a,b,key)=>learner.ok(`/play/${play.session.sessionId}/attempt`,{method:'POST',body:{attemptKey:key,itemId:b,response:{kind:'pair',first:{itemId:a,side:'left'},second:{itemId:b,side:'right'}},hintsUsed:0,elapsedMs:1}});
+    if(poor)for(let i=0;i<2;i++)await pair(pack.items[0].id,pack.items[1].id,'wrong-'+i);
+    for(const item of pack.items)await pair(item.id,item.id,'right-'+item.id);
+    return learner.ok(`/play/${play.session.sessionId}/complete-compact`,{method:'POST'});}
+  const low=await learn(first,'one-star',true);
+  assert.equal(low.gained,0);assert.equal(low.state.current.pack.id,first.id);assert.equal(low.state.current.questionProgress.one,2);
   assert.equal(low.state.weeks[1].unlocked,false);
-  await finish(learner,first,{requestId:'first-set-passed'});
+  await learn(first,'first-set-passed');
   state=await learner.ok('/student');
   assert.equal(state.current.pack.id,second.id);assert.equal(state.current.subjectLabel,'Kỹ năng sống');
   assert.equal(state.weeks[0].done,false);assert.equal(state.weeks[1].unlocked,false);
-  await finish(learner,second,{requestId:'second-set-passed'});
+  await learn(second,'second-set-passed');
   state=await learner.ok('/student');
-  assert.equal(state.weeks[0].done,true);assert.equal(state.weeks[1].unlocked,true);
+  assert.equal(state.weeks[0].done,true);assert.equal(state.weeks[1].unlocked,false);assert.equal(state.currentWeekSummary.ready,true);
+  state=await learner.ok('/student/advance-week',{method:'POST',body:{weekId:state.weeks[0].id,requestId:'confirmed-next-week'}});
+  assert.equal(state.weeks[0].id,state.currentWeekSummary.weekId);assert.equal(state.weeks[0].unlocked,true);
   assert.equal(state.current.pack.id,future.id);assert.equal(state.current.subjectLabel,'Sáng tạo');
 });
 

@@ -1,4 +1,4 @@
-# Nhập học liệu Word và Excel
+# Nhập học liệu Excel
 
 Mở **[Quản lý lớp & học liệu](http://127.0.0.1:4180/?online=1)** sau khi chạy `npm run build` và `npm run online`, hoặc mở `MO_BAO_AN.cmd` trong ZIP đã giải nén. Đăng nhập quản trị viên, chọn lớp rồi mở **Học liệu tuần**.
 
@@ -15,9 +15,9 @@ Tải một trong hai mẫu ở mục quản trị: `public/question-templates/o
 3. Bấm **Kiểm tra & xem trước**. Tư liệu được kiểm tra và tải theo lô; câu hỏi được ghép theo đúng tên tệp. Mỗi môn và loại câu được gom thành một bộ, cần từ 2 đến 30 câu hợp lệ. Một tuần tối đa 30 bộ. Toàn tệp chỉ chứa một tuần nguồn.
 4. Xem tổng câu hợp lệ và mục **Câu hỏi không được tải lên**. Câu lỗi có vị trí dòng Excel/bảng Word, mã câu nếu có và lý do; các câu này bị loại khỏi nội dung giao cho lớp. Mở các câu hợp lệ để kiểm tra đáp án, đoạn đọc, hình/âm thanh và thử trả lời, rồi chọn **Giao N câu hợp lệ cho lớp**. Việc xem trước và thử câu chưa đưa câu hỏi vào lớp, không ghi sao.
 
-Ứng dụng nhận các tệp độc lập, chưa nhận ZIP làm đầu vào. Nút **Tải bộ mẫu đầy đủ (.zip)** cung cấp file Excel đã điền đủ tám dạng, ảnh, âm thanh có lời đọc và hướng dẫn. Giải nén, chọn file Excel cùng tất cả ảnh/âm thanh bên trong, chọn tuần rồi kiểm tra. Không cần nhập tay tên tuần. Hai mẫu Word/Excel trống vẫn có thể tải riêng.
+Ứng dụng nhận các tệp độc lập, chưa nhận ZIP làm đầu vào. Nút **Tải bộ mẫu đầy đủ (.zip)** cung cấp file Excel đã điền đủ tám dạng, ảnh, âm thanh có lời đọc và hướng dẫn. Giải nén, chọn file Excel cùng tất cả ảnh/âm thanh bên trong, chọn tuần rồi kiểm tra. Không cần nhập tay tên tuần. Chỉ cung cấp mẫu Excel trống; tệp Word phiên bản cũ vẫn đọc được để giữ tương thích.
 
-Các bảng Word và dòng Excel còn trống được bỏ qua. Hai mẫu chỉ chứa khung nhập, không có câu mẫu tự động đưa vào lớp. Nếu chưa điền câu hỏi, hệ thống báo mẫu trống.
+Các bảng Word và dòng Excel còn trống được bỏ qua. Mẫu trống chỉ chứa khung nhập, không có câu mẫu tự động đưa vào lớp. Nếu chưa điền câu hỏi, hệ thống báo mẫu trống.
 
 ## Tám loại câu
 
@@ -48,7 +48,7 @@ Trong Excel, giữ ba sheet `Thông tin bộ`, `Câu hỏi`, `Hướng dẫn`. S
 
 Trong **Tùy chọn bộ câu hỏi**, **Mã bộ tuần** tùy chọn nhận 3–48 chữ thường, số hoặc dấu gạch nối. Để trống để tạo mã ổn định từ thông tin bộ nguồn trong tài liệu (hoặc tuần đã chọn nếu tài liệu không có tên). Đổi tuần trên danh sách không đổi mã của một bộ đã có thông tin nguồn. Mã câu tác giả điền được giữ lại; mã tự sinh không đổi khi chỉ đảo thứ tự dòng. Nhập lại cùng nội dung không tạo tuần hoặc cấp sao thêm; đổi tên/mã một bộ cũ cũng không tạo nguồn thưởng mới.
 
-Để sửa nội dung đã giao, chọn **Cập nhật tuần này** trong hành trình. Giữ nguyên các nhóm nhãn môn/dạng, mã bộ; ứng dụng tăng một phiên bản và cho đối chiếu nội dung cũ trước khi xác nhận. Tuần giữ vị trí, lượt chơi cũ giữ đáp án và tư liệu phiên bản cũ, lượt mới dùng bản mới. Sao tối đa vẫn tính chung theo bộ nguồn. Thêm/bớt nhóm thì tạo tuần mới; nội dung trùng một bộ cũ sẽ được báo để tránh nguồn sao lặp.
+Để sửa nội dung đã giao, chọn **Cập nhật tuần này** trong hành trình. Giữ nguyên các nhóm nhãn môn/dạng, mã bộ; ứng dụng tăng một phiên bản và cho đối chiếu nội dung cũ trước khi xác nhận. Tuần giữ vị trí, lượt chơi cũ giữ đáp án và tư liệu phiên bản cũ, lượt mới dùng bản mới. Mỗi câu nguồn tối đa 3 sao dùng chung mọi trò và phiên bản; giữ mã câu khi sửa. Thêm/bớt nhóm thì tạo tuần mới; nội dung trùng một bộ cũ sẽ được báo để tránh nguồn sao lặp. Học sinh đã xác nhận sang tuần mới không quay lại tuần cũ; tránh thêm câu vào tuần đã đóng, nên giao nội dung bổ sung ở tuần chưa học.
 
 Có thể giao cùng mã bộ và phiên bản cho nhiều lớp, kể cả khác khối. Thông tin khối của bộ giữ theo bản đã công bố; hồ sơ học sinh theo khối của lớp đang học. Chuyển lớp hoặc chơi lại bộ nguồn đã đạt sao không cấp lại sao từ đầu. Cập nhật tuần chỉ đổi phiên bản của tuần được chọn; các lớp khác tiếp tục giữ phiên bản đang được giao cho đến khi giáo viên cập nhật riêng.
 
@@ -70,4 +70,16 @@ Trên cloud, các tệp nhỏ được gom tối đa 24 tệp và 2 MB mỗi đ�
 
 Ô không dùng phải để trống, không điền chữ `null`. Ví dụ, câu `fill-blank` cần `acceptedAnswers`, còn các cột A/B/C/D và tên tệp không sử dụng để trống. Lỗi nhập liệu chỉ rõ dòng/bảng, được đưa vào vùng nhìn để có thể sửa ngay.
 
+RC8 bổ sung trường tùy chọn `allowedGameIds` trong Word/Excel và metadata JSON. Để trống thì dùng mọi trò hỗ trợ dữ liệu; nhiều mã tách bằng `|`: `math-quest`, `memory-match`, `word-connect`, `sentence-builder`, `sequence-trail`. Ví dụ câu 2 ghi `memory-match|word-connect` thì cả bộ chỉ dùng hai trò này nếu mọi câu còn lại đều phù hợp. Người soạn chỉ được bớt trò; không thể ép câu đọc/nghe vào trò không hỗ trợ. Bảng xem trước giải thích từng câu và game chung của cả bộ; không tự bỏ câu để mở thêm game. Bộ không còn game chung phải sửa hoặc tách trước khi giao. Sửa giới hạn cho bộ đã giao cần tăng phiên bản qua tuần gốc, vẫn giữ trần ba sao cho mỗi câu nguồn.
+
 `source` và `rights` ghi nguồn cùng quyền sử dụng. Khi bỏ trống, hệ thống ghi “Nội dung do người soạn cung cấp” và “Người soạn chịu trách nhiệm”. Nội dung nhập ở trạng thái bản nháp; việc nhập không tự xác nhận thẩm định chuyên môn.
+
+## Quy tắc RC9
+
+Tuần mới có 3–4 môn, tối đa 12 câu/môn cộng chung mọi dạng/bộ; không tự cắt câu. Tuần đã giao trước RC9 giữ cấu hình cũ. Mỗi câu tối đa 3 sao dùng chung các game. Trước khi giao, chọn số môn và xếp các nhóm về đúng môn; bản xem trước hiện số câu theo độ khó và trần sao. Gợi ý 12 câu/môn: 4 easy, 5 medium, 3 hard; đây là nhãn biên soạn, cần giáo viên duyệt.
+
+Thêm cột tùy chọn `difficulty`: `easy`, `medium`, `hard`; bỏ trống mặc định `medium`. `level` vẫn là nhãn tác giả. Chỉ cung cấp mẫu Excel trống và ZIP đầy đủ (36 câu/3 môn/10 bộ + 2 PNG + 2 WAV + hướng dẫn). Không tạo mẫu Word mới.
+
+`null` không phân biệt hoa thường, có thể có khoảng trắng, được nhận là thiếu dữ liệu. Trường bắt buộc thiếu báo vị trí dòng/cột và loại câu khỏi nội dung giao. Trường tùy chọn coi như trống, áp dụng giá trị mặc định nếu có. `#NULL!`, `#VALUE!`, `#REF!` và ô lỗi Excel luôn bị báo lỗi, kể cả ở cột tùy chọn. Giá trị số `0` và boolean `false` được giữ nguyên. Dòng chưa điền nội dung trong mẫu trống được bỏ qua.
+
+Danh sách quản trị/thư viện tải tối đa 20 mục mỗi lần. Khi xem trước, hệ thống tra metadata của đúng tên tệp tài liệu tham chiếu, không phụ thuộc trang thư viện đang xem. Mở chi tiết mới tải nội dung một tuần. Tuần đã có học sinh đóng không được thêm/bớt/đổi nội dung chấm điểm; chỉ cập nhật trình bày/lời giải, giữ ID và sao.

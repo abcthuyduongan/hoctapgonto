@@ -5,14 +5,18 @@ import {fileURLToPath,pathToFileURL} from 'node:url';
 import {unzipSync,zipSync} from 'fflate';
 import {build} from 'esbuild';
 import {setTimeout as delay} from 'node:timers/promises';
+import {BROWSER_NOTICE_PACKAGES,thirdPartyNotices} from './thirdPartyNotices.mjs';
 
-export const RELEASE_VERSION='3.8.0-rc.6';
+export const RELEASE_VERSION='3.8.0-rc.10';
 export const RELEASE_STORAGE_SCHEMAS=Object.freeze({localSqlite:1,cloudPostgres:1});
 const PROJECT_ROOT=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const MAX_FILES=3000,MAX_FILE_BYTES=64*1024*1024,MAX_TOTAL_BYTES=256*1024*1024;
 const hash=bytes=>createHash('sha256').update(bytes).digest('hex');
 const within=(root,path)=>{const rel=relative(root,path);return rel===''||(!isAbsolute(rel)&&rel!=='..'&&!rel.startsWith(`..${sep}`));};
 const portable=path=>path.split(sep).join('/');
+// file-type's optional file reader hides this constant dependency from bundlers.
+// Resolve its sole target statically so the offline ZIP needs no node_modules.
+const standaloneMediaModules={name:'standalone-media-modules',setup(builder){builder.onLoad({filter:/file-type[\\/]source[\\/]index\.js$/},async({path})=>{const source=await readFile(path,'utf8'),needle='return import(/* @vite-ignore */ /* webpackIgnore: true */ specifier);';if(!source.includes(needle))throw new Error('Bộ đọc tư liệu đã đổi; cần kiểm tra lại cách đóng gói độc lập.');return{loader:'js',contents:source.replace(needle,"if(specifier!=='strtok3')throw new Error('Unsupported optional module');return import('strtok3');")};});}};
 async function exists(path){try{await lstat(path);return true;}catch(error){if(error.code==='ENOENT')return false;throw error;}}
 async function finalizeRename(source,destination){
   for(let attempt=0;;attempt++){
@@ -47,13 +51,14 @@ async function buildPayload(distDir){
   if(!buildId)throw new Error('Không tìm thấy build ID do công cụ offline tạo.');
   for(const [name,source] of [['serve_release.mjs','serve_release.mjs'],['MO_BAO_AN.cmd','release-files/MO_BAO_AN.cmd'],['MO_QUAN_LY.cmd','release-files/MO_QUAN_LY.cmd'],['SAO_LUU_QUAN_LY.cmd','release-files/SAO_LUU_QUAN_LY.cmd'],['HUONG_DAN_SU_DUNG.html','release-files/HUONG_DAN_SU_DUNG.html']])
     payload.set(name,await readFile(join(PROJECT_ROOT,'tools',source)));
-  const serverBundle=await build({absWorkingDir:PROJECT_ROOT,entryPoints:['server/run-online.mjs'],bundle:true,platform:'node',format:'esm',target:'node22',write:false,logLevel:'silent'});
+  const serverBundle=await build({absWorkingDir:PROJECT_ROOT,entryPoints:['server/run-online.mjs'],bundle:true,platform:'node',format:'esm',target:'node22',plugins:[standaloneMediaModules],banner:{js:"import {createRequire as baoanCreateRequire} from 'node:module';const require=baoanCreateRequire(import.meta.url);"},write:false,metafile:true,logLevel:'silent'});
   payload.set('online-local.mjs',Buffer.from(serverBundle.outputFiles[0].contents));
-  const restoreBundle=await build({absWorkingDir:PROJECT_ROOT,entryPoints:['server/restore-online.mjs'],bundle:true,platform:'node',format:'esm',target:'node22',write:false,logLevel:'silent'});
+  const restoreBundle=await build({absWorkingDir:PROJECT_ROOT,entryPoints:['server/restore-online.mjs'],bundle:true,platform:'node',format:'esm',target:'node22',write:false,metafile:true,logLevel:'silent'});
   payload.set('restore-online.mjs',Buffer.from(restoreBundle.outputFiles[0].contents));
+  payload.set('THIRD_PARTY_NOTICES.txt',await thirdPartyNotices({inputs:[...Object.keys(serverBundle.metafile.inputs),...Object.keys(restoreBundle.metafile.inputs)],packageNames:BROWSER_NOTICE_PACKAGES}));
   payload.set('backup-online.mjs',await readFile(join(PROJECT_ROOT,'server/backup-online.mjs')));
   payload.set('QUAN_LY_CUC_BO.md',await readFile(join(PROJECT_ROOT,'docs/QUAN_LY_CUC_BO.md')));
-  payload.set('NGHIEM_THU_CUC_BO_RC6.md',await readFile(join(PROJECT_ROOT,'docs/NGHIEM_THU_CUC_BO_RC6.md')));
+  payload.set('NGHIEM_THU_CUC_BO_RC10.md',await readFile(join(PROJECT_ROOT,'docs/NGHIEM_THU_CUC_BO_RC10.md')));
   const assetCount=files.length;
   const entries=[...payload].sort(([a],[b])=>a.localeCompare(b)).map(([path,bytes])=>({path,bytes:bytes.byteLength,sha256:hash(bytes)}));
   return {payload,buildId,assetCount,entries,payloadHash:hash(Buffer.from(JSON.stringify(entries)))};
@@ -93,7 +98,7 @@ export async function packageRelease({distDir=join(PROJECT_ROOT,'dist'),outputRo
   const temporary=join(output,`.${name}.${process.pid}.${randomUUID()}.pending`),temporaryZip=`${temporary}.zip`;
   await mkdir(temporary);
   const manifest={schemaVersion:1,version:RELEASE_VERSION,pilot:true,releaseReady:false,
-    humanPilotStatus:'UNVERIFIED',humanPilotTarget:'Quản lý và học sinh, Windows Edge/Chrome: Word/Excel, tám dạng câu, năm game, đổi sao, sao lưu và khôi phục',
+    humanPilotStatus:'UNVERIFIED',humanPilotTarget:'Quản lý và học sinh, Windows Edge/Chrome: Excel, tám dạng câu, năm game, đổi sao, sao lưu và khôi phục',
     createdAt:new Date().toISOString(),buildId:expected.buildId,databaseSchemaVersion:1,storageSchemas:RELEASE_STORAGE_SCHEMAS,
     assetCount:expected.assetCount,payloadSha256:expected.payloadHash,files:expected.entries};
   const manifestBytes=Buffer.from(JSON.stringify(manifest,null,2)+'\n','utf8');

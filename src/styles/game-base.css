@@ -4205,3 +4205,87 @@ html[data-motion='off'] .ba3d-island-control,html[data-motion='off'] .ba3d-play{
   .game-character-hint { left: auto; right: 12px; bottom: 10px; transform: none; max-width: calc(100% - 136px); padding: 6px 10px; border-radius: 13px; font-size: 10px; }
   .parent-game-pack-grid { grid-template-columns: minmax(0,1fr); }
 }
+
+/* Both faces share a grid cell so the full label and reserved image set the
+   card height before it is flipped. Long questions scroll with the board. */
+.world-memory .memory-card,
+.immersive-dialog.premium-game .world-memory .memory-card {
+  height:auto;
+  min-height:112px;
+  align-self:stretch;
+  place-items:stretch;
+}
+.world-memory .memory-inner {
+  display:grid;
+  height:auto;
+  min-height:0;
+}
+.world-memory .memory-face {
+  position:relative;
+  inset:auto;
+  grid-area:1 / 1;
+  min-width:0;
+}
+.world-memory .memory-front,
+.immersive-dialog.premium-game .world-memory .memory-front {
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:8px;
+  padding:12px;
+  font-size:clamp(14px,1.3vw,19px);
+  line-height:1.4;
+}
+.world-memory .memory-card-label {
+  display:block;
+  flex:0 0 auto;
+  width:100%;
+  min-width:0;
+  white-space:normal;
+  overflow-wrap:anywhere;
+}
+.world-memory .memory-card-media {
+  display:grid;
+  place-items:center;
+  flex:0 0 64px;
+  height:64px;
+  width:100%;
+  min-width:0;
+}
+.world-memory .memory-card-media .question-media-image-only {
+  width:100%;
+  max-height:64px;
+  margin:0;
+}
+.world-memory .memory-card-media .question-media-image-only>img {
+  max-height:64px;
+  max-width:100%;
+}
+.premium-game .world-memory .memory-grid { align-items:stretch; }
+@media(max-width:1000px) {
+  .premium-game .world-memory .memory-grid { grid-template-columns:repeat(3,minmax(0,1fr)); }
+}
+@media(max-width:600px) {
+  .premium-game .world-memory .memory-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+/* Bounded pair rounds retain one source/session and mount only this screen. */
+.memory-panel .pair-round-navigation,
+.word-connect-panel .pair-round-navigation {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:8px 16px;
+  margin:0 0 12px;
+  color:#294d51;
+  font-size:16px;
+  font-weight:800;
+}
+.memory-panel .pair-round-navigation .button,
+.word-connect-panel .pair-round-navigation .button {min-height:44px;padding:8px 14px;font-size:16px;}
+.memory-panel .pair-round-navigation .button:disabled,
+.word-connect-panel .pair-round-navigation .button:disabled {opacity:.6;cursor:default;}
+.memory-panel .pair-question-audio>.question-media,
+.word-connect-panel .pair-question-audio>.question-media {flex:0 1 320px;width:320px;min-width:0;max-width:100%;}
+/* Speech failures remain readable above decorative scene layers. */
+.world-stage .speech-notice{position:relative;z-index:3;max-width:900px;margin:8px auto;padding:12px 16px;font-size:16px;line-height:1.5;background:#fff8dc;color:#263e48;overflow-wrap:anywhere}

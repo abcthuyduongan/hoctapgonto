@@ -2,3 +2,18 @@
 
 .online-student-empty{max-width:900px;margin:32px auto;padding:40px 24px;border:1px solid #cde2df;border-radius:24px;background:#fff;text-align:center;color:#173b40}.online-student-empty>span{font-size:48px;color:#13747a}.online-student-empty h1{font-size:clamp(25px,4vw,36px);line-height:1.25}.online-student-empty p{max-width:560px;margin:18px auto;line-height:1.7}.online-student-empty button{min-height:44px;padding:10px 20px;border:1px solid #13747a;border-radius:12px;background:#13747a;color:white;font-weight:700}@media(max-width:600px){.online-student-empty{margin:20px 12px;padding:28px 18px}}
 .online-import-issues>ol{padding-left:24px}.online-import-issues li{margin:12px 0;overflow-wrap:anywhere}.online-import-issues li>strong,.online-import-issues li>small,.online-import-issues li>span{display:block}.online-form details>label{display:grid;gap:8px;margin:14px 0}.online-form summary{cursor:pointer;line-height:1.6}.online-preview h4{margin:0 0 10px}
+.online-subject-summary{margin-block:1rem;overflow-x:auto;max-width:100%}
+.online-subject-summary:focus-visible{outline:3px solid #db951d;outline-offset:3px}
+.online-subject-scroll-help{display:none;font-size:.78rem;color:#526b7d}
+@media(max-width:620px){.online-subject-scroll-help{display:block}}
+.online-form{min-width:0;grid-template-columns:minmax(0,1fr)}
+.online-form>*{min-width:0}
+.online-import-filename,.online-media-list span{overflow-wrap:anywhere}
+.online-preview{min-width:0;overflow-wrap:anywhere}
+.online-preview>ol{grid-template-columns:minmax(0,1fr)}
+.online-preview>ol>li{min-width:0}
+.online-preview button{max-width:100%;white-space:normal}
+.online-subject-summary table{width:100%;min-width:560px;border-collapse:collapse;font-size:.9rem;overflow-wrap:normal}
+.online-subject-summary th,.online-subject-summary td{padding:.65rem;text-align:left;border-bottom:1px solid #d3e1e4}
+.online-subject-label span{display:block;margin-bottom:.35rem}
+.online-subject-label select{min-height:44px;max-width:180px}
