@@ -1,4 +1,4 @@
-# Bảo An Learning · 3.8.0-rc.10
+# Bảo An Learning · 3.8.0-rc.11
 
 Ứng viên phát hành cục bộ cho Windows Edge/Chrome. Giáo viên quản lý nhiều lớp, tự soạn câu hỏi nhiều môn theo tuần; ứng dụng nhận dạng câu và đưa vào trò phù hợp. Chờ nghiệm thu thực tế trước khi công bố production.
 
@@ -26,6 +26,8 @@ RC9 bổ sung tuần mới 3–4 môn, tối đa 12 câu/môn, nhãn độ khó 
 
 RC10 chỉ giao câu trắc nghiệm/đọc/nghe/nhập hiện tại khi mở đồng hồ, chưa gửi đáp án hoặc lời giải; gợi ý và thời lượng âm thanh có biên nhận máy chủ. Câu thay đổi nội dung chấm phải dùng ID mới; sửa lời giải giữ sao. Khắc phục tràn tên file/cỡ chữ lớn, thêm kiểm tra UI/API cùng giao thức và mã hỗ trợ lỗi. Không tự sửa ô Excel lỗi hoặc đặt lại sao cũ.
 
+RC11 giảm số lượt trao đổi PostgreSQL khi đăng nhập, mở tiến độ và vào trò chơi; tải trạng thái máy chủ và phiên đăng nhập đồng thời, gộp yêu cầu làm mới trùng nhau. Xem [đo độ trễ và kiểm tra RC11](docs/DO_TRE_VA_TOI_UU_RC11_2026-10-18.md). Gói ZIP RC10 bên dưới là bản bàn giao trước bản vá này.
+
 ## Dữ liệu và phục hồi
 
 Mã nguồn dùng .online/bao-an.sqlite; ZIP dùng data/bao-an.sqlite. Tư liệu cùng lưu trong SQLite. Dùng mục **Sao lưu & khôi phục** để tải bản sao nhất quán, kiểm tra trước rồi xác nhận phục hồi. Công cụ tự sao lưu trước khi thay, thu hồi phiên cũ và đóng lượt đang dở.
@@ -43,7 +45,7 @@ npm run package:pilot
 
 verify:local chạy TypeScript, kiểm thử renderer/học liệu/dữ liệu/khôi phục/cloud cục bộ/ZIP, kiểm tra tài nguyên, build và các ca trình duyệt máy chủ thật. Cần Chrome và Edge cho Playwright; BAO_AN_BROWSER_CHANNEL có thể chọn riêng chrome hoặc msedge. Nhóm hiện hành mặc định chạy cả hai trình duyệt. CI được cấu hình cho Node 22.22.2 và 24 trên Windows; kết quả chạy cục bộ được ghi riêng trong báo cáo bàn giao.
 
-Gói bất biến ở releases/bao-an-learning-3.8.0-rc.10.zip; manifest ghi build ID, hash từng tệp và schema riêng: SQLite 1, PostgreSQL 1. releaseReady:false và humanPilotStatus:UNVERIFIED được giữ tới khi người dùng nghiệm thu. Không ghi đè cùng phiên bản bằng nội dung khác. Dùng RC10 trở lên để khôi phục bản sao RC10, không hạ bản.
+Gói mới ở releases/bao-an-learning-3.8.0-rc.11.zip; gói RC10 giữ nguyên. Manifest ghi build ID, hash từng tệp và schema riêng: SQLite 1, PostgreSQL 1. releaseReady:false và humanPilotStatus:UNVERIFIED được giữ tới khi người dùng nghiệm thu. Không ghi đè cùng phiên bản bằng nội dung khác. Dùng RC10 trở lên để khôi phục bản sao RC10, không hạ bản.
 
 ## Tài liệu
 

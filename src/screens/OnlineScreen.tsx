@@ -32,18 +32,23 @@ function AdminDashboard({identity,onLogout,onRestored}:{identity:OnlineIdentity;
   const setTab=(value:typeof tab)=>{setOffset(0);changeTab(value);};
   const setClassId=(value:string)=>{setOffset(0);setSelectedWeek(null);changeQuery('');changeClassId(value);};
   const setQuery=(value:string)=>{setOffset(0);changeQuery(value);};
-  const operating=useRef(false),fileInput=useRef<HTMLInputElement>(null),generation=useRef(0),readController=useRef<AbortController|null>(null);
+  const operating=useRef(false),fileInput=useRef<HTMLInputElement>(null),generation=useRef(0),readController=useRef<AbortController|null>(null),readRequest=useRef<{key:string;work:Promise<void>}|null>(null);
   const options=useRef({classId,section:tab,offset,query});options.current={classId,section:tab,offset,query};
-  const refresh=useCallback(async()=>{
+  const refresh=useCallback((force=false)=>{
+    const input={...options.current,...(!options.current.classId?{classId:undefined}:{})},key=JSON.stringify(input);
+    if(!force&&readRequest.current?.key===key)return readRequest.current.work;
     readController.current?.abort();const controller=new AbortController();readController.current=controller;const current=++generation.current;setLoading(true);
-    try{const result=await onlineApi.adminSummary({...options.current,...(!options.current.classId?{classId:undefined}:{})},controller.signal);if(current!==generation.current)return;setData(result);setLibrary(null);setPreview(null);setWeekCheck(null);}
-    catch(error){if(!controller.signal.aborted)throw error;}finally{if(current===generation.current)setLoading(false);}
+    const work=(async()=>{
+      try{const result=await onlineApi.adminSummary(input,controller.signal);if(current!==generation.current)return;setData(result);setLibrary(null);setPreview(null);setWeekCheck(null);}
+      catch(error){if(!controller.signal.aborted)throw error;}finally{if(current===generation.current)setLoading(false);}
+    })().finally(()=>{if(readRequest.current?.work===work)readRequest.current=null;});
+    readRequest.current={key,work};return work;
   },[]);
   useEffect(()=>{const timer=window.setTimeout(()=>void refresh().catch(error=>setError(messageOf(error))),query?250:0);return()=>window.clearTimeout(timer);},[classId,tab,offset,query,refresh]);
-  useEffect(()=>{const update=()=>{if(document.visibilityState==='visible'&&!operating.current)void refresh().catch(error=>setError(messageOf(error)));};window.addEventListener('focus',update);document.addEventListener('visibilitychange',update);return()=>{++generation.current;readController.current?.abort();window.removeEventListener('focus',update);document.removeEventListener('visibilitychange',update);};},[refresh]);
+  useEffect(()=>{let timer:number|undefined;const update=()=>{if(document.visibilityState!=='visible'||operating.current)return;window.clearTimeout(timer);timer=window.setTimeout(()=>{if(document.visibilityState==='visible'&&!operating.current)void refresh().catch(error=>setError(messageOf(error)));},100);};window.addEventListener('focus',update);document.addEventListener('visibilitychange',update);return()=>{window.clearTimeout(timer);++generation.current;readController.current?.abort();window.removeEventListener('focus',update);document.removeEventListener('visibilitychange',update);};},[refresh]);
   useEffect(()=>{if(data){setWalletEnabled(data.wallet.enabled);setRate(String(data.wallet.rateVnd));}},[data?.wallet.enabled,data?.wallet.rateVnd]);
   useEffect(()=>{if(error)document.querySelector('.online-admin [role="alert"]')?.scrollIntoView({block:'center'});},[error]);
-  async function run(action:()=>Promise<string>,reload=true){if(operating.current)return;operating.current=true;setBusy(true);setError('');setNotice('');try{const result=await action();setNotice(result);if(reload)await refresh();}catch(error){setError(messageOf(error));}finally{operating.current=false;setBusy(false);setUploadProgress('');}}
+  async function run(action:()=>Promise<string>,reload=true){if(operating.current)return;operating.current=true;setBusy(true);setError('');setNotice('');try{const result=await action();setNotice(result);if(reload)await refresh(true);}catch(error){setError(messageOf(error));}finally{operating.current=false;setBusy(false);setUploadProgress('');}}
   function selectImportFiles(files:FileList|null){
     const selected=Array.from(files??[]);if(!selected.length)return;
     invalidate();setError('');setNotice('');setMediaIssues([]);
@@ -205,10 +210,18 @@ function AdminDashboard({identity,onLogout,onRestored}:{identity:OnlineIdentity;
 
 export default function OnlineScreen(){
   const [phase,setPhase]=useState<'loading'|'unavailable'|'setup'|'login'|'ready'>('loading'),[identity,setIdentity]=useState<OnlineIdentity|null>(null),[error,setError]=useState(''),[busy,setBusy]=useState(false),[token,setToken]=useState(''),[name,setName]=useState(''),[username,setUsername]=useState(''),[password,setPassword]=useState('');
-  const operating=useRef(false);
+  const operating=useRef(false),loadRequest=useRef<Promise<void>|null>(null);
   const localHost=window.location.hostname;
   const localAddress=window.location.protocol==='http:'||['localhost','127.0.0.1','[::1]'].includes(localHost);
-  const load=useCallback(async()=>{setError('');setPhase('loading');try{const status=await onlineApi.status();if(status.available!==true)throw new Error('Máy chủ trực tuyến chưa sẵn sàng.');if(!status.configured){setPhase('setup');return;}try{setIdentity(await onlineApi.me());setPhase('ready');}catch(error){if(error instanceof OnlineError&&error.status===401){setPhase('login');return;}throw error;}}catch(error){setError(messageOf(error));setPhase('unavailable');}},[]);
+  const load=useCallback(()=>{
+    if(loadRequest.current)return loadRequest.current;
+    setError('');setPhase('loading');
+    // Start both independent checks together. Capture identity errors immediately,
+    // including when an unconfigured server can show setup before /me finishes.
+    const identityResult=onlineApi.me().then(value=>({value}),error=>({error}));
+    const work=(async()=>{try{const status=await onlineApi.status();if(status.available!==true)throw new Error('Máy chủ trực tuyến chưa sẵn sàng.');if(!status.configured){setPhase('setup');return;}const result=await identityResult;if('error'in result){if(result.error instanceof OnlineError&&result.error.status===401){setPhase('login');return;}throw result.error;}setIdentity(result.value);setPhase('ready');}catch(error){setError(messageOf(error));setPhase('unavailable');}})().finally(()=>{if(loadRequest.current===work)loadRequest.current=null;});
+    loadRequest.current=work;return work;
+  },[]);
   useEffect(()=>{void load();return subscribeOnlineSessionExpired(()=>{setIdentity(null);setPassword('');setError('Phiên đăng nhập đã hết hạn hoặc tài khoản đã được khóa. Hãy đăng nhập lại; học sinh có thể liên hệ quản trị viên lớp.');setPhase('login');});},[load]);
   async function logout(){await onlineApi.logout();setIdentity(null);setUsername('');setPassword('');setPhase('login');}
   if(phase==='ready'&&identity)return identity.user.role==='admin'?<AdminDashboard identity={identity} onLogout={logout} onRestored={()=>{setIdentity(null);setUsername('');setPassword('');setError('Đã khôi phục dữ liệu. Hãy đăng nhập bằng tài khoản trong bản sao.');setPhase('login');}}/>:<OnlineStudentWorld key={identity.user.id} identity={identity} onLogout={logout} onPasswordChanged={()=>{setIdentity(null);setPassword('');setError('Đã đổi mật khẩu. Hãy đăng nhập bằng mật khẩu mới; tiến độ và sao vẫn được giữ nguyên.');setPhase('login');}}/>;

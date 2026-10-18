@@ -1,5 +1,5 @@
 import {randomUUID} from 'node:crypto';
-export const ONLINE_RUNTIME_VERSION='3.8.0-rc.10';
+export const ONLINE_RUNTIME_VERSION='3.8.0-rc.11';
 /** Log only server failures, with fixed labels and a bounded per-instance budget.
  * Never accept an error object, body, cookie, account ID or authored text. */
 export function createFailureReporter({logger=value=>console.error(value),now=Date.now,limit=30}={}){
