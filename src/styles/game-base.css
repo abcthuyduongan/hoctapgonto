@@ -1774,8 +1774,8 @@ html[data-motion="off"] .ba-scene *,html[data-motion="off"] .ba-scene *::before,
  .ba-scene .portal273-bottom-actions{height:32px!important;min-height:32px!important;max-height:32px!important;overflow:visible!important;align-self:end!important}
  .ba-scene .portal273-bottom-actions button,.ba-scene .portal273-bottom-actions .ba-shortcut-progress{height:30px!important;min-height:30px!important;max-height:30px!important;padding:3px 4px!important}
 }
-/* Remove the unused permanent scrollbar gutter while World Frame is active. */
-html:has(.ba-frame-shell),body:has(.ba-frame-shell){overflow:hidden!important;scrollbar-gutter:auto!important}
+/* Only the standalone World Frame fills the viewport; the online journey must scroll. */
+html:has(.ba-frame-shell:not(.online-student)),body:has(.ba-frame-shell:not(.online-student)){overflow:hidden!important;scrollbar-gutter:auto!important}
 @media (min-width:371px) and (max-width:700px){
  .ba-scene .portal273-bottom-actions{height:45px!important;min-height:45px!important;max-height:45px!important;align-self:end!important}
  .ba-scene .portal273-bottom-actions button,.ba-scene .portal273-bottom-actions .ba-shortcut-progress{min-height:39px!important;max-height:39px!important;height:39px!important;padding:5px!important}

@@ -32,7 +32,7 @@ test.beforeAll(async()=>{
     const root=createRoot(document.getElementById('root'));
     const Component=kind==='quiz'||kind==='legacy'?MathQuest:kind==='sentence'?SentenceBuilder:kind==='sequence'?SequenceTrail:kind==='memory'?MemoryMatch:kind==='connect'?WordConnect:OnlineExerciseRunner;
     root.render(React.createElement(Component,props));
-  `,resolveDir:path.resolve('.'),loader:'tsx'},bundle:true,write:false,outdir:'clock-harness',entryNames:'app',format:'esm',jsx:'automatic',logLevel:'silent'});
+  `,resolveDir:path.resolve('.'),loader:'tsx'},bundle:true,write:false,external:['/art/*'],outdir:'clock-harness',entryNames:'app',format:'esm',jsx:'automatic',logLevel:'silent'});
   const script=bundle.outputFiles.find(file=>file.path.endsWith('.js'))!.contents;
   const css=bundle.outputFiles.find(file=>file.path.endsWith('.css'))?.contents;
   server=createServer((request,response)=>{
@@ -43,7 +43,7 @@ test.beforeAll(async()=>{
   });
   server.listen(0,'127.0.0.1');await once(server,'listening');origin='http://127.0.0.1:'+(server.address() as {port:number}).port;
 });
-test.afterAll(async()=>{server.closeAllConnections?.();await new Promise<void>(resolve=>server.close(()=>resolve()));});
+test.afterAll(async()=>{if(!server)return;server.closeAllConnections?.();await new Promise<void>(resolve=>server.close(()=>resolve()));});
 
 async function snapshot(page:Page){return page.evaluate(()=>{const h=(window as any).clockHarness;return{opens:h.opens,attempts:h.attempts,committed:h.committed,completed:h.completed};});}
 async function releaseClock(page:Page){await expect.poll(async()=>(await snapshot(page)).opens.length).toBeGreaterThan(0);await page.evaluate(()=>(window as any).clockHarness.releaseClock());await expect(page.locator('.question-clock')).toContainText('Đã dùng khoảng');}

@@ -7,3 +7,5 @@
 @media(max-width:620px){.student-light-hub{width:calc(100% - 24px);margin:16px 12px;padding:20px 16px}.student-light-heading{flex-wrap:wrap;gap:12px}.student-light-hub .student-light-games>div{grid-template-columns:1fr}.student-light-games>div>button{padding:16px}.student-display-choice{justify-content:space-between}.student-display-choice-3d{bottom:8px;right:8px}}
 
 .student-light-guide{width:88px;height:112px;object-fit:contain;flex:0 0 auto}.student-light-heading>div{flex:1;min-width:0}@media(max-width:620px){.student-light-guide{display:none}}
+.student-light-heading>div{overflow-wrap:anywhere}
+@media(max-width:620px){.student-light-heading>div{flex-basis:100%}.student-light-heading .game-wallet-button{width:100%;justify-content:center}}

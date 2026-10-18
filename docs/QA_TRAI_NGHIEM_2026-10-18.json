@@ -1,0 +1,198 @@
+{
+  "date": "2026-10-18",
+  "timezone": "Asia/Saigon",
+  "scope": "Local production build, SQLite fixtures, local PostgreSQL cloud fixtures, Chrome and Edge",
+  "unit": {
+    "tests": 335,
+    "passed": 335,
+    "failed": 0
+  },
+  "browser": {
+    "effective": {
+      "passed": 142,
+      "skipped": 2
+    },
+    "browsers": {
+      "online-chrome": {
+        "passed": 71,
+        "skipped": 1
+      },
+      "online-msedge": {
+        "passed": 71,
+        "skipped": 1
+      }
+    },
+    "runs": [
+      {
+        "report": "test-results/site-audit-final-report.json",
+        "stats": {
+          "startTime": "2026-10-18T13:20:12.222Z",
+          "duration": 668643.9619999999,
+          "expected": 141,
+          "skipped": 2,
+          "unexpected": 1,
+          "flaky": 0
+        }
+      },
+      {
+        "report": "test-results/student-completion-focus-report.json",
+        "stats": {
+          "startTime": "2026-10-18T13:26:19.863Z",
+          "duration": 4323.722,
+          "expected": 1,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        }
+      }
+    ],
+    "rerunReason": "One Chrome assertion incorrectly expected focus on main after completion. The source game button remains available for review, so the correct expectation is focus on that original button. The corrected assertion passed; application code was unchanged."
+  },
+  "performance": [
+    {
+      "browser": "online-chrome",
+      "check": "loading-evidence",
+      "enterMs": 1005,
+      "modelsHeld": 4,
+      "modelFinished": 0,
+      "gameChunkRequestedBeforePlayResponse": true,
+      "studentRequests": 1,
+      "committedAttempts": 1
+    },
+    {
+      "browser": "online-msedge",
+      "check": "loading-evidence",
+      "enterMs": 984,
+      "modelsHeld": 4,
+      "modelFinished": 0,
+      "gameChunkRequestedBeforePlayResponse": true,
+      "studentRequests": 1,
+      "committedAttempts": 1
+    },
+    {
+      "browser": "online-chrome",
+      "check": "role-bundle-and-lite",
+      "jsGzip": 75762,
+      "cssGzip": 5700,
+      "glbRequests": 0,
+      "webglContexts": 0
+    },
+    {
+      "browser": "online-msedge",
+      "check": "role-bundle-and-lite",
+      "jsGzip": 75762,
+      "cssGzip": 5700,
+      "glbRequests": 0,
+      "webglContexts": 0
+    },
+    {
+      "browser": "online-chrome",
+      "check": "thirty-games-resource-samples",
+      "games": 30,
+      "earnedStars": 24,
+      "heapGrowthAfterWarmupBytes": 566804,
+      "canvasCount": 0,
+      "audioCount": 0,
+      "frameSamples": [
+        {
+          "game": "math-quest",
+          "frames": 72,
+          "p95FrameMs": 17.09999999999991,
+          "maxFrameMs": 17.200000000000273,
+          "longTasks": []
+        },
+        {
+          "game": "memory-match",
+          "frames": 71,
+          "p95FrameMs": 17.199999999999818,
+          "maxFrameMs": 32.30000000000018,
+          "longTasks": []
+        },
+        {
+          "game": "sentence-builder",
+          "frames": 72,
+          "p95FrameMs": 17,
+          "maxFrameMs": 17.100000000000364,
+          "longTasks": []
+        },
+        {
+          "game": "word-connect",
+          "frames": 72,
+          "p95FrameMs": 16.899999999999636,
+          "maxFrameMs": 17.100000000000364,
+          "longTasks": []
+        },
+        {
+          "game": "sequence-trail",
+          "frames": 72,
+          "p95FrameMs": 17,
+          "maxFrameMs": 17.399999999999636,
+          "longTasks": []
+        }
+      ]
+    },
+    {
+      "browser": "online-msedge",
+      "check": "thirty-games-resource-samples",
+      "games": 30,
+      "earnedStars": 24,
+      "heapGrowthAfterWarmupBytes": 524984,
+      "canvasCount": 0,
+      "audioCount": 0,
+      "frameSamples": [
+        {
+          "game": "math-quest",
+          "frames": 72,
+          "p95FrameMs": 17,
+          "maxFrameMs": 17.09999999999991,
+          "longTasks": []
+        },
+        {
+          "game": "memory-match",
+          "frames": 72,
+          "p95FrameMs": 17.099999999999454,
+          "maxFrameMs": 17.100000000000364,
+          "longTasks": []
+        },
+        {
+          "game": "sentence-builder",
+          "frames": 71,
+          "p95FrameMs": 17.100000000000364,
+          "maxFrameMs": 33.134000000000015,
+          "longTasks": []
+        },
+        {
+          "game": "word-connect",
+          "frames": 72,
+          "p95FrameMs": 17.100000000000364,
+          "maxFrameMs": 17.399999999999636,
+          "longTasks": []
+        },
+        {
+          "game": "sequence-trail",
+          "frames": 72,
+          "p95FrameMs": 17,
+          "maxFrameMs": 17.100000000000364,
+          "longTasks": []
+        }
+      ]
+    }
+  ],
+  "remaining": [],
+  "skipped": [
+    {
+      "browser": "online-chrome",
+      "title": "the supplied Excel 140-question file and sixteen WAV files preview without publishing invalid rows",
+      "status": "skipped",
+      "file": "online-importfile.spec.ts"
+    },
+    {
+      "browser": "online-msedge",
+      "title": "the supplied Excel 140-question file and sixteen WAV files preview without publishing invalid rows",
+      "status": "skipped",
+      "file": "online-importfile.spec.ts"
+    }
+  ],
+  "build": "npm run build passed",
+  "deployed": false
+}

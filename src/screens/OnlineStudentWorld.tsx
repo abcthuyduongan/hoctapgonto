@@ -56,32 +56,115 @@ function OnlineWallet({state,onRefresh,onClose}:{state:OnlineStudentSummary;onRe
 export default function OnlineStudentWorld({identity,onLogout,onPasswordChanged}:{identity:OnlineIdentity;onLogout:()=>Promise<void>;onPasswordChanged:()=>void}){
   const [state,setState]=useState<OnlineStudentSummary|null>(null),[error,setError]=useState(''),[loading,setLoading]=useState(true),[starting,setStarting]=useState(false),[active,setActive]=useState<OnlineCompactPlay|null>(null),[walletOpen,setWalletOpen]=useState(false),[passwordOpen,setPasswordOpen]=useState(false),[loadingMore,setLoadingMore]=useState(false),[motionOn,setMotionOn]=useState(()=>!window.matchMedia('(prefers-reduced-motion: reduce)').matches),[soundOn,setSoundOn]=useState(false),[reward,setReward]=useState<{gained:number;tier:number}|null>(null);
   const [advanceOpen,setAdvanceOpen]=useState(false),[reviewEpoch,setReviewEpoch]=useState(0),[questionNotice,setQuestionNotice]=useState('');
+  const [refreshing,setRefreshing]=useState(false),[selectingPack,setSelectingPack]=useState<string|null>(null),[gameAction,setGameAction]=useState<'answer'|'complete'|'exit'|null>(null);
+  const savingAttempt=useRef(false);
+  const studentMain=useRef<HTMLElement|null>(null);
   const journeyInitialized=useRef(false),advanceRequest=useRef<{weekId:string;requestId:string}|null>(null),activeSession=useRef<string|null>(null);
   const gameDialog=useRef<HTMLDivElement>(null),previousFocus=useRef<HTMLElement|null>(null),startingGuard=useRef(false),closing=useRef(false),complete=useRef(false),completionPromise=useRef<Promise<void>|null>(null),startRequest=useRef<{key:string;id:string}|null>(null),generation=useRef(0),refreshInFlight=useRef<Promise<void>|null>(null);
   const requests=useRef(new Set<AbortController>()),mounted=useRef(true),moreGuard=useRef(false),backgroundBlocked=useRef(false);
-  backgroundBlocked.current=!!active||starting||walletOpen||passwordOpen||advanceOpen;
-  function openPassword(){if(startingGuard.current||active)return;++generation.current;requests.current.forEach(controller=>controller.abort());requests.current.clear();refreshInFlight.current=null;setPasswordOpen(true);}
-  const refresh=useCallback(()=>{if(refreshInFlight.current)return refreshInFlight.current;const nextGeneration=++generation.current,controller=new AbortController();requests.current.add(controller);const work=(journeyInitialized.current?onlineApi.studentSummary('current',controller.signal):onlineApi.studentJourney('current',controller.signal)).then(next=>{if(nextGeneration===generation.current&&mounted.current){journeyInitialized.current=true;setState(next);setError('');}}).finally(()=>{requests.current.delete(controller);if(refreshInFlight.current===work)refreshInFlight.current=null;});refreshInFlight.current=work;return work;},[]);
+  backgroundBlocked.current=!!active||starting||loadingMore||walletOpen||passwordOpen||advanceOpen;
+  function cancelJourneyReads(){
+    ++generation.current;
+    requests.current.forEach(controller=>controller.abort());requests.current.clear();
+    refreshInFlight.current=null;setRefreshing(false);
+  }
+  function openPassword(){if(startingGuard.current||active)return;cancelJourneyReads();setPasswordOpen(true);}
+  const refresh=useCallback(()=>{
+    if(refreshInFlight.current)return refreshInFlight.current;
+    setRefreshing(true);
+    const nextGeneration=++generation.current,controller=new AbortController();requests.current.add(controller);
+    const work=(journeyInitialized.current?onlineApi.studentSummary('current',controller.signal):onlineApi.studentJourney('current',controller.signal)).then(next=>{
+      if(nextGeneration===generation.current&&mounted.current){journeyInitialized.current=true;setState(next);setError('');}
+    }).finally(()=>{
+      requests.current.delete(controller);
+      if(refreshInFlight.current===work){refreshInFlight.current=null;if(mounted.current)setRefreshing(false);}
+    });
+    refreshInFlight.current=work;return work;
+  },[]);
   useEffect(()=>{let alive=true;mounted.current=true;void refresh().catch(error=>{if(alive&&error?.name!=='AbortError')setError(messageOf(error));}).finally(()=>{if(alive)setLoading(false);});const update=()=>{if(!backgroundBlocked.current&&document.visibilityState==='visible')void refresh().catch(error=>{if(alive&&error?.name!=='AbortError')setError(messageOf(error));});};window.addEventListener('focus',update);document.addEventListener('visibilitychange',update);return()=>{alive=false;mounted.current=false;++generation.current;requests.current.forEach(controller=>controller.abort());requests.current.clear();refreshInFlight.current=null;window.removeEventListener('focus',update);document.removeEventListener('visibilitychange',update);};},[refresh,identity.user.id,identity.user.workspaceId]);
-  async function loadPage(cursor:string){if(!state||moreGuard.current)return;moreGuard.current=true;setLoadingMore(true);const nextGeneration=generation.current,controller=new AbortController();requests.current.add(controller);try{const next=await onlineApi.studentSummary(cursor,controller.signal);if(nextGeneration!==generation.current||!mounted.current)return;setState(next);setError('');}catch(error){if(mounted.current&&error instanceof Error&&error.name!=='AbortError')setError(messageOf(error));}finally{requests.current.delete(controller);moreGuard.current=false;if(mounted.current)setLoadingMore(false);}}
+  async function loadPage(cursor:string){if(!state||moreGuard.current)return;cancelJourneyReads();moreGuard.current=true;setLoadingMore(true);const nextGeneration=generation.current,controller=new AbortController();requests.current.add(controller);try{const next=await onlineApi.studentSummary(cursor,controller.signal);if(nextGeneration!==generation.current||!mounted.current)return;setState(next);setError('');}catch(error){if(mounted.current&&error instanceof Error&&error.name!=='AbortError')setError(messageOf(error));}finally{requests.current.delete(controller);moreGuard.current=false;if(mounted.current)setLoadingMore(false);}}
   async function advanceWeek(){const week=state?.currentWeekSummary;if(!week?.ready||!week.hasNext)return;if(advanceRequest.current?.weekId!==week.weekId)advanceRequest.current={weekId:week.weekId,requestId:newId()};const next=await onlineApi.advanceWeek(advanceRequest.current);if(mounted.current){++generation.current;setState(next);setAdvanceOpen(false);setReviewEpoch(0);setError('');advanceRequest.current=null;}}
-  async function chooseReplay(pack:OnlinePackSummary){if(startingGuard.current)return;startingGuard.current=true;setStarting(true);const nextGeneration=generation.current,controller=new AbortController();requests.current.add(controller);try{const result=await onlineApi.packGames(pack.id,pack.version,controller.signal);if(mounted.current&&nextGeneration===generation.current)setState(previous=>previous?{...previous,weeks:previous.weeks.map(week=>({...week,sets:week.sets.map(set=>set.pack.id===pack.id&&set.pack.version===pack.version?{...set,games:result.games}:set)}))}:previous);}catch(error){if(mounted.current&&error instanceof Error&&error.name!=='AbortError')setError(messageOf(error));}finally{requests.current.delete(controller);startingGuard.current=false;if(mounted.current)setStarting(false);}}
+  async function chooseReplay(pack:OnlinePackSummary){if(startingGuard.current)return;cancelJourneyReads();startingGuard.current=true;setSelectingPack(pack.id);setStarting(true);const nextGeneration=generation.current,controller=new AbortController();requests.current.add(controller);try{const result=await onlineApi.packGames(pack.id,pack.version,controller.signal);if(mounted.current&&nextGeneration===generation.current)setState(previous=>previous?{...previous,weeks:previous.weeks.map(week=>({...week,sets:week.sets.map(set=>set.pack.id===pack.id&&set.pack.version===pack.version?{...set,games:result.games}:set)}))}:previous);}catch(error){if(mounted.current&&error instanceof Error&&error.name!=='AbortError')setError(messageOf(error));}finally{requests.current.delete(controller);startingGuard.current=false;if(mounted.current){setStarting(false);setSelectingPack(null);}}}
   useEffect(()=>{document.documentElement.dataset.sound=soundOn?'on':'off';document.documentElement.dataset.motion=motionOn?'on':'off';return()=>{delete document.documentElement.dataset.sound;delete document.documentElement.dataset.motion;};},[soundOn,motionOn]);
-  useEffect(()=>{if(!active)return;const previousOverflow=document.body.style.overflow,previousGutter=document.documentElement.style.scrollbarGutter;document.body.style.overflow='hidden';if(active)document.documentElement.style.scrollbarGutter='auto';const dialog=gameDialog.current;dialog?.focus({preventScroll:true});const trap=(event:KeyboardEvent)=>{if(event.key!=='Tab'||!dialog)return;const scope=dialog.querySelector<HTMLElement>('.reward-panel')??dialog;const controls=[...scope.querySelectorAll<HTMLElement>('button:not(:disabled),input:not(:disabled),select:not(:disabled),textarea:not(:disabled),a[href],[tabindex="0"]')].filter(element=>element.getClientRects().length>0);const first=controls[0],last=controls.at(-1);if(!first||!last){event.preventDefault();scope.focus();return;}if(!scope.contains(document.activeElement)||event.shiftKey&&document.activeElement===first||!event.shiftKey&&document.activeElement===last){event.preventDefault();(event.shiftKey?last:first).focus();}};document.addEventListener('keydown',trap);return()=>{document.body.style.overflow=previousOverflow;document.documentElement.style.scrollbarGutter=previousGutter;document.removeEventListener('keydown',trap);requestAnimationFrame(()=>{if(previousFocus.current?.isConnected)previousFocus.current.focus({preventScroll:true});});};},[active?.session.sessionId]);
-  async function startGame(moduleId:ModuleId,pack:OnlinePackSummary,reviewItemIds?:string[]){if(startingGuard.current||active||passwordOpen||advanceOpen)return;startingGuard.current=true;setStarting(true);setError('');void (pack.kind==='learning'?preloadExercise():preloadGameComponent(moduleId)).catch(()=>{/* The game boundary retains its retry/exit UI if loading still fails. */});const key=`${moduleId}:${pack.id}@${pack.version}:${reviewItemIds?.join(',')??'all'}`;if(startRequest.current?.key!==key)startRequest.current={key,id:newId()};const controller=new AbortController();requests.current.add(controller);try{const play=await onlineApi.playCompact({moduleId,packId:pack.id,contentVersion:pack.version,requestId:startRequest.current.id,...(reviewItemIds?{reviewItemIds}:{})},controller.signal);if(!mounted.current)return;previousFocus.current=document.activeElement instanceof HTMLElement?document.activeElement:null;complete.current=false;completionPromise.current=null;setReward(null);setQuestionNotice('');activeSession.current=play.session.sessionId;setActive(play);startRequest.current=null;}catch(error){if(mounted.current&&error instanceof Error&&error.name!=='AbortError')setError(messageOf(error));}finally{requests.current.delete(controller);startingGuard.current=false;if(mounted.current)setStarting(false);}}
-  async function recordAttempt(input:AttemptInput){if(!active||complete.current||closing.current)throw new Error('Phiên chơi đã kết thúc hoặc đang đóng.');const receipt=await onlineApi.attempt(active.session.sessionId,input);if(!mounted.current||activeSession.current!==active.session.sessionId)return;if(receipt.questionRewards){const committed=receipt.questionRewards;setState(previous=>previous?applyQuestionReceipt(previous,active.pack.id,committed):previous);setQuestionNotice(receipt.event.correct?`${committed.questions.map(q=>`${q.tier}/3 sao`).join(', ')} · ${committed.gained?`+${committed.gained} sao mới`:'Giữ mức cao nhất đã đạt'}. Máy chủ đã lưu.`:'Câu này chưa đúng. Con thử lại để hoàn thành.');}return{correct:receipt.event.correct,feedback:receipt.feedback};}
-  function completeGame():Promise<void>{if(!active||complete.current)return Promise.resolve();if(completionPromise.current)return completionPromise.current;const work=(async()=>{try{const result=await onlineApi.completeCompact(active.session.sessionId);complete.current=true;if(mounted.current){++generation.current;setState(result.state);setReward(active.session.rewardPolicyVersion===2?null:{gained:result.gained,tier:result.tier});setError('');}}catch(error){if(mounted.current)setError(messageOf(error));throw error;}finally{completionPromise.current=null;}})();completionPromise.current=work;return work;}
-  async function leaveGame(){if(!active||closing.current||completionPromise.current)return;closing.current=true;stopSpeaking();stopQuestionAudio();try{if(!complete.current)await onlineApi.abandon(active.session.sessionId);activeSession.current=null;setActive(null);setError('');await refresh();}catch(error){setError(messageOf(error));}finally{closing.current=false;}}
+  useEffect(()=>{
+    if(!active)return;
+    const previousOverflow=document.body.style.overflow,previousGutter=document.documentElement.style.scrollbarGutter;
+    document.body.style.overflow='hidden';document.documentElement.style.scrollbarGutter='auto';
+    const dialog=gameDialog.current;dialog?.focus({preventScroll:true});
+    const trap=(event:KeyboardEvent)=>{
+      if(event.key!=='Tab'||!dialog)return;
+      if(closing.current){event.preventDefault();dialog.focus({preventScroll:true});return;}
+      const scope=dialog.querySelector<HTMLElement>('.reward-panel')??dialog;
+      const controls=[...scope.querySelectorAll<HTMLElement>('button:not(:disabled),input:not(:disabled),select:not(:disabled),textarea:not(:disabled),a[href],[tabindex="0"]')].filter(element=>element.getClientRects().length>0);
+      const first=controls[0],last=controls.at(-1);
+      if(!first||!last){event.preventDefault();scope.focus();return;}
+      if(!scope.contains(document.activeElement)||event.shiftKey&&document.activeElement===first||!event.shiftKey&&document.activeElement===last){event.preventDefault();(event.shiftKey?last:first).focus();}
+    };
+    document.addEventListener('keydown',trap);
+    return()=>{
+      document.body.style.overflow=previousOverflow;document.documentElement.style.scrollbarGutter=previousGutter;
+      document.removeEventListener('keydown',trap);
+      requestAnimationFrame(()=>{if(activeSession.current)return;const target=previousFocus.current?.isConnected?previousFocus.current:studentMain.current;target?.focus({preventScroll:true});});
+    };
+  },[active?.session.sessionId]);
+  async function startGame(moduleId:ModuleId,pack:OnlinePackSummary,reviewItemIds?:string[]){
+    if(startingGuard.current||active||passwordOpen||advanceOpen)return;
+    previousFocus.current=document.activeElement instanceof HTMLElement?document.activeElement:null;
+    cancelJourneyReads();startingGuard.current=true;setStarting(true);setError('');
+    void (pack.kind==='learning'?preloadExercise():preloadGameComponent(moduleId)).catch(()=>{/* The game boundary retains its retry/exit UI if loading still fails. */});
+    const key=`${moduleId}:${pack.id}@${pack.version}:${reviewItemIds?.join(',')??'all'}`;
+    if(startRequest.current?.key!==key)startRequest.current={key,id:newId()};
+    const controller=new AbortController();requests.current.add(controller);
+    try{
+      const play=await onlineApi.playCompact({moduleId,packId:pack.id,contentVersion:pack.version,requestId:startRequest.current.id,...(reviewItemIds?{reviewItemIds}:{})},controller.signal);
+      if(!mounted.current)return;
+      complete.current=false;completionPromise.current=null;setReward(null);setQuestionNotice('');setGameAction(null);
+      activeSession.current=play.session.sessionId;setActive(play);startRequest.current=null;
+    }catch(error){if(mounted.current&&error instanceof Error&&error.name!=='AbortError')setError(messageOf(error));}
+    finally{requests.current.delete(controller);startingGuard.current=false;if(mounted.current)setStarting(false);}
+  }
+  async function recordAttempt(input:AttemptInput){
+    if(!active||complete.current||closing.current)throw new Error('Phiên chơi đã kết thúc hoặc đang đóng.');
+    savingAttempt.current=true;setGameAction('answer');
+    try{
+      const receipt=await onlineApi.attempt(active.session.sessionId,input);
+      if(!mounted.current||activeSession.current!==active.session.sessionId)return;
+      if(receipt.questionRewards){const committed=receipt.questionRewards;setState(previous=>previous?applyQuestionReceipt(previous,active.pack.id,committed):previous);setQuestionNotice(receipt.event.correct?`${committed.questions.map(q=>`${q.tier}/3 sao`).join(', ')} · ${committed.gained?`+${committed.gained} sao mới`:'Giữ mức cao nhất đã đạt'}. Máy chủ đã lưu.`:'Câu này chưa đúng. Con thử lại để hoàn thành.');}
+      return{correct:receipt.event.correct,feedback:receipt.feedback};
+    }finally{savingAttempt.current=false;if(mounted.current&&activeSession.current===active.session.sessionId)setGameAction(null);}
+  }
+  function completeGame():Promise<void>{
+    if(!active||complete.current)return Promise.resolve();if(completionPromise.current)return completionPromise.current;
+    setGameAction('complete');
+    const work=(async()=>{
+      try{const result=await onlineApi.completeCompact(active.session.sessionId);complete.current=true;if(mounted.current){++generation.current;setState(result.state);setReward(active.session.rewardPolicyVersion===2?null:{gained:result.gained,tier:result.tier});setError('');}}
+      catch(error){if(mounted.current)setError(messageOf(error));throw error;}
+      finally{completionPromise.current=null;if(mounted.current&&activeSession.current===active.session.sessionId)setGameAction(null);}
+    })();completionPromise.current=work;return work;
+  }
+  async function leaveGame(){
+    if(!active||closing.current||savingAttempt.current||completionPromise.current)return;
+    closing.current=true;setGameAction('exit');gameDialog.current?.focus({preventScroll:true});stopSpeaking();stopQuestionAudio();
+    try{
+      const needsRefresh=!complete.current;
+      if(needsRefresh)await onlineApi.abandon(active.session.sessionId);
+      if(!mounted.current)return;
+      activeSession.current=null;setActive(null);setError('');
+      // Completing already returned fresh progress. Only interrupted games need a read.
+      if(needsRefresh)void refresh().catch(error=>{if(mounted.current&&error?.name!=='AbortError')setError(messageOf(error));});
+    }catch(error){if(mounted.current)setError(messageOf(error));}
+    finally{closing.current=false;if(mounted.current)setGameAction(null);}
+  }
   const GameComponent=active?(active.presentation.kind==='learning'?OnlineExerciseRunner:GAME_COMPONENTS[active.session.moduleId]):null;
   const gameProps:GameHostProps|null=active?{pack:active.presentation,onAttempt:recordAttempt,onComplete:completeGame,onExit:()=>void leaveGame(),questionMode:active.session.rewardPolicyVersion===2,serverScored:active.session.questionProtocolVersion===1,mediaPlayId:active.session.sessionId,onQuestionHint:(itemId)=>onlineApi.questionHint(active.session.sessionId,itemId),onQuestionOpen:(itemId)=>onlineApi.openQuestion(active.session.sessionId,itemId)}:null;
   return <div className="app-shell focused-games-app ba-frame-shell online-app online-student">
     <header className="online-header" inert={!!active||walletOpen||passwordOpen||advanceOpen}><a href="?online=1" className="online-brand">✦ BẢO AN <span>LEARNING</span></a><div><strong>{identity.workspace.name}</strong><span>{state?.student.name??identity.user.username}{state?` · ${state.className}`:''}</span></div><div className="online-header-actions"><button aria-pressed={soundOn} onClick={()=>setSoundOn(value=>!value)}>{soundOn?'🔊':'🔇'} Âm thanh</button><button aria-pressed={motionOn} onClick={()=>setMotionOn(value=>!value)}>Hiệu ứng {motionOn?'bật':'tắt'}</button><button disabled={starting} onClick={openPassword}>Đổi mật khẩu</button><button disabled={starting} onClick={()=>void onLogout().catch(error=>setError(messageOf(error)))}>Đăng xuất</button></div></header>
-    <main className="site-main site-main-gameworld" inert={!!active||walletOpen||passwordOpen||advanceOpen}>
+    <main ref={studentMain} tabIndex={-1} className="site-main site-main-gameworld" aria-busy={starting||refreshing||loadingMore} inert={!!active||walletOpen||passwordOpen||advanceOpen}>
       {error&&!active&&<div className="online-notice online-error" role="alert">{error}<button onClick={()=>void refresh().catch(error=>setError(messageOf(error)))}>Thử kết nối lại</button></div>}
       {loading?<p className="online-loading" role="status">Đang mở hành trình của con…</p>:state?<>
         {state.weeks.length>0?<StudentScreen availableStars={state.balance.available} practiceContext={{title:state.current?.weekTitle??'Hành trình của con',detail:state.current?`${state.current.subjectLabel} · ${state.current.pack.title}`:state.weeks.length?'Con đã hoàn thành tất cả học liệu được giao.':'Quản trị viên đang chuẩn bị học liệu cho lớp.',pack:state.current?.pack??null,games:state.current?.games??[],complete:state.weeks.length>0&&!state.current}} onPlay={startGame} starting={starting||!!active} onOpenWallet={()=>setWalletOpen(true)} worldActive={!starting&&!walletOpen&&!passwordOpen&&!advanceOpen} motionOn={motionOn} gameWorld={active?getSceneForModule(active.session.moduleId):null} guideMood="idle" guideCue={0}/>:<section className="online-student-empty" aria-label="Chờ giáo viên giao học liệu"><span aria-hidden="true">✦</span><h1>Chờ bộ câu hỏi của thầy cô</h1><p>Khi giáo viên giao bộ câu hỏi tuần cho lớp, bài học và trò chơi phù hợp sẽ xuất hiện ở đây.</p><p>⭐ {state.balance.available} sao</p><button onClick={()=>setWalletOpen(true)}>Ví đổi sao</button></section>}
         <section className="online-student-weeks" aria-label="Học liệu được giao">
-          <div className="online-section-head"><h2>Hành trình theo tuần</h2><button disabled={starting} onClick={()=>void refresh().catch(error=>setError(messageOf(error)))}>Làm mới tiến độ</button></div>
+          <div className="online-section-head"><h2>Hành trình theo tuần</h2><button disabled={starting||refreshing||loadingMore} onClick={()=>void refresh().catch(error=>{if(error?.name!=='AbortError')setError(messageOf(error));})}>{refreshing?'Đang làm mới…':'Làm mới tiến độ'}</button></div>
           <p>Mỗi câu cần ít nhất 2 sao để hoàn thành tuần. Con có thể ôn lên 3 sao trước khi xác nhận sang tuần mới; tuần đã qua sẽ khóa.</p>
           {state.currentWeekSummary&&<div className="online-week-progress" aria-label="Tiến độ tuần hiện tại"><strong>{state.currentWeekSummary.title}: {state.currentWeekSummary.total-state.currentWeekSummary.zero-state.currentWeekSummary.one}/{state.currentWeekSummary.total} câu đạt yêu cầu</strong><p>{state.currentWeekSummary.two} câu 2 sao · {state.currentWeekSummary.three} câu 3 sao</p>{state.currentWeekSummary.ready?<><p>Con đã hoàn thành yêu cầu của tuần.{state.currentWeekSummary.two>0?` Còn ${state.currentWeekSummary.two} câu 2 sao; con có muốn ôn để kiếm 3 sao không?`:' Tất cả câu đã đạt 3 sao.'}</p><div className="online-actions">{state.currentWeekSummary.two>0&&<button type="button" disabled={starting||loadingMore} onClick={()=>{setReviewEpoch(value=>value+1);if(state.page.cursor!==state.currentWeekSummary!.cursor)void loadPage('current');}}>Ôn lại các câu 2 sao</button>}<button type="button" className="online-primary" disabled={!state.currentWeekSummary.hasNext||starting} onClick={()=>setAdvanceOpen(true)}>{state.currentWeekSummary.hasNext?`Sang ${state.currentWeekSummary.nextWeekTitle}`:'Chưa có tuần tiếp theo'}</button></div></>:<p>Còn {state.currentWeekSummary.zero+state.currentWeekSummary.one} câu chưa đạt 2 sao. Sao của từng câu được giữ khi con đổi trò hoặc học lại.</p>}</div>}
           {state.weeks.length?<ol className="online-week-path">{state.weeks.map(week=><li key={week.id} id={`online-week-${week.id}`} className={week.closed?'is-done':week.current?'is-current':'is-locked'}><strong>{week.closed?'🔒 Đã qua · ':week.current?'▶ ':'🔒 '}{week.title}</strong>{week.closed&&<p>Tuần này đã khóa sau khi chuyển tuần.</p>}<ul>{week.sets.map(set=><li key={`${set.pack.id}@${set.pack.version}`}><span>{set.subjectLabel} · {set.pack.title}</span><span>{set.questionProgress.two} câu 2 sao · {set.questionProgress.three} câu 3 sao</span>{week.current&&<OnlineQuestionStars set={set} disabled={starting||!!active} reviewEpoch={reviewEpoch} onChooseGames={()=>chooseReplay(set.pack)} onPlay={(game,ids)=>void startGame(game,set.pack,ids)}/>}</li>)}</ul></li>)}</ol>:<p>Lớp chưa có tuần học nào. Con quay lại sau khi quản trị viên giao học liệu nhé.</p>}
@@ -89,7 +172,18 @@ export default function OnlineStudentWorld({identity,onLogout,onPasswordChanged}
         </section>
       </>:<div className="online-loading"><p>Chưa mở được thông tin tài khoản.</p><button onClick={()=>void refresh().catch(error=>setError(messageOf(error)))}>Thử lại</button></div>}
     </main>
-    {active&&GameComponent&&gameProps&&<div className="overlay immersive-overlay" role="presentation"><div className={`game-dialog adventure-dialog immersive-dialog premium-game dialog-${active.session.moduleId}`} data-scene-engine="html" data-scene-state="ready" ref={gameDialog} tabIndex={-1} role="dialog" aria-modal="true" aria-label={`Đang chơi ${active.pack.title}`}><div id="ba37-game-scene-slot" className="ba37-game-scene-slot" aria-hidden="true"/><div className="game-dialog-head"><div><span className="eyebrow">{state?.weeks.flatMap(week=>week.sets).find(set=>set.pack.id===active.pack.id)?.subjectLabel??'HỌC LIỆU ĐƯỢC GIAO'}</span><h2>{active.pack.title}</h2></div><button className="button outline" onClick={()=>void leaveGame()}>← Thoát trò chơi</button></div>{error&&<p className="online-notice online-error" role="alert">{error} Con dùng nút thử lại trong trò chơi để gửi lại kết quả.</p>}{questionNotice&&active.session.rewardPolicyVersion===2&&<div className="game-star-receipt question-star-receipt" role="status">{questionNotice}</div>}{reward&&<div className="game-star-receipt" role="status">{reward.gained?`⭐ +${reward.gained} sao mới`:'Đã giữ mức sao cao nhất'} · Bộ này đạt {reward.tier}/3 sao. Máy chủ đã lưu thành tích.</div>}<AsyncBoundary key={active.session.sessionId} label="trò chơi" onExit={()=>void leaveGame()}><Suspense fallback={<p className="loading-state">Đang tải trò chơi…</p>}><GameComponent key={active.session.sessionId} {...gameProps}/></Suspense></AsyncBoundary></div></div>}
+    {starting&&<div className="online-student-status" role="status">{selectingPack?'Đang tải trò phù hợp…':'Đang mở trò chơi…'}</div>}
+    {active&&GameComponent&&gameProps&&<div className="overlay immersive-overlay" role="presentation">
+      <div className={`game-dialog adventure-dialog immersive-dialog premium-game dialog-${active.session.moduleId}`} data-scene-engine="html" data-scene-state="ready" ref={gameDialog} tabIndex={-1} role="dialog" aria-modal="true" aria-busy={gameAction!==null} aria-label={`Đang chơi ${active.pack.title}`}>
+        <div id="ba37-game-scene-slot" className="ba37-game-scene-slot" aria-hidden="true"/>
+        <div className="game-dialog-head"><div><span className="eyebrow">{state?.weeks.flatMap(week=>week.sets).find(set=>set.pack.id===active.pack.id)?.subjectLabel??'HỌC LIỆU ĐƯỢC GIAO'}</span><h2>{active.pack.title}</h2></div><button className="button outline" disabled={gameAction!==null} onClick={()=>void leaveGame()}>{gameAction==='exit'?'Đang trở về…':'← Thoát trò chơi'}</button></div>
+        {gameAction&&<div className={`online-game-request-status ${gameAction==='exit'?'is-leaving':''}`} role="status">{gameAction==='answer'?'Đang lưu câu trả lời…':gameAction==='complete'?'Đang lưu kết quả hoàn thành…':'Đang trở về hành trình…'}</div>}
+        {error&&<p className="online-notice online-error" role="alert">{error} Con có thể thử lại thao tác vừa rồi.</p>}
+        {questionNotice&&active.session.rewardPolicyVersion===2&&<div className="game-star-receipt question-star-receipt" role="status">{questionNotice}</div>}
+        {reward&&<div className="game-star-receipt" role="status">{reward.gained?`⭐ +${reward.gained} sao mới`:'Đã giữ mức sao cao nhất'} · Bộ này đạt {reward.tier}/3 sao. Máy chủ đã lưu thành tích.</div>}
+        <AsyncBoundary key={active.session.sessionId} label="trò chơi" onExit={()=>void leaveGame()}><Suspense fallback={<p className="loading-state">Đang tải trò chơi…</p>}><GameComponent key={active.session.sessionId} {...gameProps}/></Suspense></AsyncBoundary>
+      </div>
+    </div>}
     {advanceOpen&&state?.currentWeekSummary&&<AsyncBoundary label="xác nhận chuyển tuần" onExit={()=>setAdvanceOpen(false)}><Suspense fallback={<p className="online-loading" role="status">Đang mở xác nhận chuyển tuần…</p>}><OnlineWeekAdvanceDialog week={state.currentWeekSummary} onClose={()=>setAdvanceOpen(false)} onConfirm={advanceWeek}/></Suspense></AsyncBoundary>}
     {passwordOpen&&<AsyncBoundary label="biểu mẫu đổi mật khẩu" onExit={()=>setPasswordOpen(false)}><Suspense fallback={<p className="online-loading" role="status">Đang mở biểu mẫu đổi mật khẩu…</p>}><OnlinePasswordDialog onClose={()=>{setPasswordOpen(false);void refresh().catch(error=>setError(messageOf(error)));}} onChanged={onPasswordChanged}/></Suspense></AsyncBoundary>}
     {walletOpen&&state&&<OnlineWallet state={state} onRefresh={refresh} onClose={()=>setWalletOpen(false)}/>}
