@@ -13,9 +13,11 @@ import {readWeekPolicies,closedStudentCount,changesQuestionMeaning} from './week
 import {journeyProgress,selectReviewItems,filterPlayPresentation,timedQuestion} from './question-journey.mjs';
 import {initializeQuestionRewardLedger,applyQuestionRewardCandidates,questionRewardCandidates,questionRewardProgress,questionRewardThresholds,earnedQuestionRewardStars,v2QuestionCompletionErrors} from '../src/core/question-rewards.ts';
 import {openProtocolQuestion,protocolAudioDelivery,protocolHint,answerFeedback} from './question-protocol.mjs';
+import {measureApiSpan} from './api-diagnostics.mjs';
 
 const now=()=>new Date().toISOString(),id=()=>randomUUID(),json=JSON.stringify;
 const parse=value=>typeof value==='string'?JSON.parse(value):value;
+const currentMarker=(values,student)=>(values??[]).flatMap(value=>{try{const marker=parse(value);return marker?.studentId===student.id&&marker.classId===student.class_id?[marker]:[];}catch{return[];}}).sort((a,b)=>b.position-a.position)[0]??null;
 const stable=value=>JSON.stringify(value,(_key,row)=>row&&typeof row==='object'&&!Array.isArray(row)?Object.fromEntries(Object.entries(row).sort(([a],[b])=>a.localeCompare(b))):row);
 const digest=value=>createHash('sha256').update(stable(value)).digest('hex');
 const contentIdentity=pack=>{const{publishedAt,source,...content}=pack;void publishedAt;void source;return digest(content);};
@@ -34,14 +36,15 @@ export class PostgresStore{
   }
   async ready(){const row=await this.one('SELECT max(version) AS version FROM bao_an.schema_version');if(row?.version!==1)fail(500,'Cần chạy migration dữ liệu online phiên bản 1.');return this;}
   async close(){if(this.ownsPool)await this.pool.end();}
-  async rows(sql,values=[],client=this.pool){return(await client.query(sql,values)).rows;}
+  async query(sql,values=[],client=this.pool){return measureApiSpan('sql',()=>/\bFOR UPDATE\b/i.test(sql)?measureApiSpan('lockingSql',()=>client.query(sql,values)):client.query(sql,values));}
+  async rows(sql,values=[],client=this.pool){return(await this.query(sql,values,client)).rows;}
   async one(sql,values=[],client=this.pool){return(await this.rows(sql,values,client))[0];}
-  async exec(sql,values=[],client=this.pool){return client.query(sql,values);}
+  async exec(sql,values=[],client=this.pool){return this.query(sql,values,client);}
   async transaction(action){
     for(let attempt=0;;attempt++){
-      const client=await this.pool.connect();
-      try{await client.query('BEGIN');await client.query("SELECT set_config('statement_timeout','15000ms',true),set_config('lock_timeout','10000ms',true)");const result=await action(client);await client.query('COMMIT');return result;}
-      catch(error){await client.query('ROLLBACK').catch(()=>{});if(attempt<2&&['40001','40P01'].includes(error?.code))continue;throw databaseError(error);}
+      const client=await measureApiSpan('pool',()=>this.pool.connect());
+      try{await this.exec('BEGIN',[],client);await this.exec("SELECT set_config('statement_timeout','15000ms',true),set_config('lock_timeout','10000ms',true)",[],client);const result=await action(client);await this.exec('COMMIT',[],client);return result;}
+      catch(error){await this.exec('ROLLBACK',[],client).catch(()=>{});if(attempt<2&&['40001','40P01'].includes(error?.code))continue;throw databaseError(error);}
       finally{client.release();}
     }
   }
@@ -84,14 +87,14 @@ export class PostgresStore{
   async findSession(tokenHash,nowMs=Date.now()){
     return this.one('SELECT u.*,s.csrf_token,s.token_hash FROM bao_an.auth_sessions s JOIN bao_an.users u ON u.id=s.user_id WHERE s.token_hash=$1 AND s.expires_at>$2 AND u.active=true',[tokenHash,nowMs]);
   }
-  async createSession({tokenHash,userId,csrfToken,expiresAt,passwordHash}){
+  async createSession({tokenHash,userId,csrfToken,expiresAt,passwordHash,workspaceId}){
     text(tokenHash,'Mã phiên',64);text(csrfToken,'Mã biểu mẫu',200);integer(expiresAt,'Hạn phiên',1,Number.MAX_SAFE_INTEGER);
-    const snapshot=await this.findUserById(userId);if(!snapshot)fail(401,'Tên đăng nhập hoặc mật khẩu chưa đúng.');
+    const expectedWorkspace=workspaceId??(await this.findUserById(userId))?.workspace_id;if(!expectedWorkspace)fail(401,'Tên đăng nhập hoặc mật khẩu chưa đúng.');
     return this.transaction(async client=>{
-      await this.workspace(snapshot.workspace_id,client,true);const user=await this.one('SELECT * FROM bao_an.users WHERE id=$1 FOR UPDATE',[userId],client);
-      if(!user?.active||typeof passwordHash!=='string'||user.password_hash!==passwordHash)fail(401,'Tên đăng nhập hoặc mật khẩu chưa đúng.');
+      const workspace=await this.workspace(expectedWorkspace,client,true),user=await this.one('SELECT * FROM bao_an.users WHERE id=$1 FOR UPDATE',[userId],client);
+      if(!user?.active||user.workspace_id!==expectedWorkspace||typeof passwordHash!=='string'||user.password_hash!==passwordHash)fail(401,'Tên đăng nhập hoặc mật khẩu chưa đúng.');
       await this.exec('DELETE FROM bao_an.auth_sessions WHERE expires_at<$1',[Date.now()],client);
-      await this.exec('INSERT INTO bao_an.auth_sessions(token_hash,user_id,csrf_token,expires_at) VALUES($1,$2,$3,$4)',[tokenHash,userId,csrfToken,expiresAt],client);return user;
+      await this.exec('INSERT INTO bao_an.auth_sessions(token_hash,user_id,csrf_token,expires_at) VALUES($1,$2,$3,$4)',[tokenHash,userId,csrfToken,expiresAt],client);return{...user,session_workspace:{id:workspace.id,name:workspace.name}};
     });
   }
   async revokeSession(tokenHash){
@@ -173,13 +176,20 @@ export class PostgresStore{
     });
   }
   referencedMedia(pack){return new Set([...(pack.media??[]).map(asset=>asset.mediaId),...pack.items.flatMap(item=>[item.media?.imageId,item.media?.audioId,...('audioId'in item?[item.audioId]:[])])].filter(Boolean));}
-  async hasMediaAccess(auth,mediaId,client=this.pool){
-    const row=await this.one('SELECT id FROM bao_an.media WHERE workspace_id=$1 AND id=$2',[auth.workspaceId,mediaId],client);if(!row)return false;
-    if(auth.role==='admin')return true;const student=await this.student(auth,auth.studentId,client),ref="(EXISTS(SELECT 1 FROM jsonb_array_elements(p.json->'items') item WHERE item#>>'{media,imageId}'=$3 OR item#>>'{media,audioId}'=$3 OR item->>'audioId'=$3) OR EXISTS(SELECT 1 FROM jsonb_array_elements(p.json->'media') asset WHERE asset->>'mediaId'=$3))";
-    if(await this.one(`SELECT 1 FROM bao_an.weeks w JOIN bao_an.week_sets s ON s.workspace_id=w.workspace_id AND s.week_id=w.id JOIN bao_an.packs p ON p.workspace_id=s.workspace_id AND p.pack_id=s.pack_id AND p.version=s.version WHERE w.workspace_id=$1 AND w.class_id=$2 AND ${ref} LIMIT 1`,[auth.workspaceId,student.class_id,mediaId],client))return true;
-    return!!await this.one(`SELECT 1 FROM bao_an.plays s JOIN bao_an.packs p ON p.workspace_id=s.workspace_id AND p.pack_id=s.json->>'packId' AND p.version=(s.json->>'contentVersion')::integer WHERE s.workspace_id=$1 AND s.student_id=$2 AND s.json->>'profileId'=$2 AND s.json->>'status' IN ('active','completed') AND ${ref} LIMIT 1`,[auth.workspaceId,student.id,mediaId],client);
+  async authorizedMedia(auth,mediaId,client=this.pool){
+    if(auth.role==='admin')return this.one('SELECT * FROM bao_an.media WHERE workspace_id=$1 AND id=$2',[auth.workspaceId,mediaId],client);
+    if(auth.role!=='student')return undefined;
+    const ref="(EXISTS(SELECT 1 FROM jsonb_array_elements(p.json->'items') item WHERE item#>>'{media,imageId}'=$2 OR item#>>'{media,audioId}'=$2 OR item->>'audioId'=$2) OR EXISTS(SELECT 1 FROM jsonb_array_elements(p.json->'media') asset WHERE asset->>'mediaId'=$2))";
+    return this.one(`SELECT m.* FROM bao_an.media m JOIN bao_an.students learner ON learner.workspace_id=m.workspace_id AND learner.id=$3
+      WHERE m.workspace_id=$1 AND m.id=$2 AND (EXISTS(
+        SELECT 1 FROM bao_an.weeks w JOIN bao_an.week_sets s ON s.workspace_id=w.workspace_id AND s.week_id=w.id
+        JOIN bao_an.packs p ON p.workspace_id=s.workspace_id AND p.pack_id=s.pack_id AND p.version=s.version
+        WHERE w.workspace_id=m.workspace_id AND w.class_id=learner.class_id AND ${ref}) OR EXISTS(
+        SELECT 1 FROM bao_an.plays s JOIN bao_an.packs p ON p.workspace_id=s.workspace_id AND p.pack_id=s.json->>'packId' AND p.version=(s.json->>'contentVersion')::integer
+        WHERE s.workspace_id=m.workspace_id AND s.student_id=learner.id AND s.json->>'profileId'=learner.id AND s.json->>'status' IN ('active','completed') AND ${ref}))`,[auth.workspaceId,mediaId,auth.studentId],client);
   }
-  async getMedia(auth,mediaId){if(!await this.hasMediaAccess(auth,mediaId))fail(404,'Không tìm thấy tệp hình/âm thanh.');return this.one('SELECT * FROM bao_an.media WHERE workspace_id=$1 AND id=$2',[auth.workspaceId,mediaId]);}
+  async hasMediaAccess(auth,mediaId,client=this.pool){return!!await this.authorizedMedia(auth,mediaId,client);}
+  async getMedia(auth,mediaId){return await this.authorizedMedia(auth,mediaId)??fail(404,'Không tìm thấy tệp hình/âm thanh.');}
   async readMedia(auth,mediaId){return this.getMedia(auth,mediaId);}
   async validateMedia(auth,pack,client){for(const mediaId of this.referencedMedia(pack)){
     const asset=await this.one('SELECT * FROM bao_an.media WHERE workspace_id=$1 AND id=$2',[auth.workspaceId,mediaId],client);if(!asset)fail(400,`Tệp ${mediaId} chưa được tải lên kho của đơn vị.`);
@@ -283,8 +293,17 @@ export class PostgresStore{
     });
   }
   async journeyMarker(auth,student,client=this.pool){
-    const markers=(await this.rows("SELECT target_id FROM bao_an.audit WHERE workspace_id=$1 AND user_id=$2 AND action IN ('student.journey.init','student.journey.advance')",[auth.workspaceId,student.user_id],client)).flatMap(row=>{try{const marker=parse(row.target_id);return marker?.studentId===student.id&&marker.classId===student.class_id?[marker]:[];}catch{return[];}});
-    return markers.sort((a,b)=>b.position-a.position)[0]??null;
+    return currentMarker((await this.rows("SELECT target_id FROM bao_an.audit WHERE workspace_id=$1 AND user_id=$2 AND action IN ('student.journey.init','student.journey.advance')",[auth.workspaceId,student.user_id],client)).map(row=>row.target_id),student);
+  }
+  /** A transaction-local snapshot. Never retained across requests or used instead of activeActor. */
+  async studentPlayContext(auth,client,{requestId=null,packId=null}={}){
+    const row=await this.one(`SELECT s.*,u.username,
+      coalesce((SELECT jsonb_agg(a.target_id) FROM bao_an.audit a WHERE a.workspace_id=s.workspace_id AND a.user_id=s.user_id AND a.action IN ('student.journey.init','student.journey.advance')),'[]'::jsonb) AS journey_markers,
+      (SELECT p.id FROM bao_an.plays p WHERE p.workspace_id=s.workspace_id AND p.student_id=s.id AND p.request_id=$3) AS prior_id,
+      coalesce((SELECT jsonb_agg(jsonb_build_object('weekId',w.id,'version',ws.version)) FROM bao_an.week_sets ws JOIN bao_an.weeks w ON w.workspace_id=ws.workspace_id AND w.id=ws.week_id WHERE ws.workspace_id=s.workspace_id AND w.class_id=s.class_id AND ws.pack_id=$4),'[]'::jsonb) AS assignments
+      FROM bao_an.students s JOIN bao_an.users u ON u.id=s.user_id AND u.workspace_id=s.workspace_id WHERE s.workspace_id=$1 AND s.id=$2`,[auth.workspaceId,auth.studentId,requestId,packId],client);
+    if(!row)fail(404,'Không tìm thấy học sinh.');
+    const{journey_markers,prior_id,assignments,...student}=row;return{student,marker:currentMarker(journey_markers,student),prior:prior_id?{id:prior_id}:null,assignments};
   }
   async progress(auth,student,client=this.pool,awards){return journeyProgress(await this.weeks(auth,student.class_id,client),awards??await this.rewards(auth,student.id,client),await this.journeyMarker(auth,student,client));}
   async studentState(auth,client=this.pool){role(auth,'student');const student=await this.student(auth,auth.studentId,client),cls=await this.class(auth,student.class_id,client),workspace=await this.workspace(auth.workspaceId,client),rewards=await this.rewards(auth,student.id,client),requests=await this.requests(auth,student.id,client),progress=await this.progress(auth,student,client,rewards),balance=rewardBalance(earnedQuestionRewardStars(rewards),{requests});
@@ -300,18 +319,19 @@ export class PostgresStore{
     const row=await this.one(`SELECT s.*,u.username,row_to_json(c) AS class_row,row_to_json(w) AS workspace_row,
       coalesce((SELECT jsonb_agg(a.json ORDER BY a.pack_id) FROM bao_an.awards a WHERE a.workspace_id=s.workspace_id AND a.student_id=s.id),'[]'::jsonb) AS rewards,
       coalesce((SELECT jsonb_agg(r.json ORDER BY r.created_order) FROM bao_an.redemptions r WHERE r.workspace_id=s.workspace_id AND r.student_id=s.id),'[]'::jsonb) AS requests
+      ,coalesce((SELECT jsonb_agg(a.target_id) FROM bao_an.audit a WHERE a.workspace_id=s.workspace_id AND a.user_id=s.user_id AND a.action IN ('student.journey.init','student.journey.advance')),'[]'::jsonb) AS journey_markers
       FROM bao_an.students s JOIN bao_an.users u ON u.id=s.user_id AND u.workspace_id=s.workspace_id
       JOIN bao_an.classes c ON c.workspace_id=s.workspace_id AND c.id=s.class_id JOIN bao_an.workspaces w ON w.id=s.workspace_id
       WHERE s.workspace_id=$1 AND s.id=$2`,[auth.workspaceId,auth.studentId],client);
     if(!row)fail(404,'Không tìm thấy học sinh.');
-    const{class_row:cls,workspace_row:workspace,rewards:rewardRows,requests:requestRows,...student}=row,rewards=rewardRows.map(parse),requests=requestRows.map(parse),progress=summaryPage(await this.summaryProgress(auth,student,client,rewards),cursor),balance=rewardBalance(earnedQuestionRewardStars(rewards),{requests});
+    const{class_row:cls,workspace_row:workspace,rewards:rewardRows,requests:requestRows,journey_markers,...student}=row,rewards=rewardRows.map(parse),requests=requestRows.map(parse),progress=summaryPage(await this.summaryProgress(auth,student,client,rewards,currentMarker(journey_markers,student)),cursor),balance=rewardBalance(earnedQuestionRewardStars(rewards),{requests});
     const keys=progress.current?[progress.current.pack]:[];
     const values=[auth.workspaceId,...keys.flatMap(p=>[p.id,p.version])],games=new Map(keys.length?(await this.rows(`SELECT * FROM bao_an.packs WHERE workspace_id=$1 AND (${keys.map((_,i)=>`(pack_id=$${2+i*2} AND version=$${3+i*2})`).join(' OR ')})`,values,client)).map(row=>[`${row.pack_id}@${row.version}`,this.packRecord(row).games]):[]);
     const decorate=set=>({...set,games:games.get(`${set.pack.id}@${set.pack.version}`)??[]});progress.weeks=progress.weeks.map(w=>({...w,sets:w.sets.map(decorate)}));if(progress.current)progress.current=decorate(progress.current);
     return{student:this.studentRecord(student,progress.current,balance),profile:{profileId:student.id,name:student.name,avatar:'fox',grade:cls.grade,colorTheme:'teal',createdAt:student.created_at,updatedAt:student.created_at},className:cls.name,...progress,balance,wallet:{enabled:!!workspace.wallet_enabled,rateVnd:workspace.rate_vnd},requests};
   }
   async pinJourney(auth,student,client,context={}){
-    let marker=await this.journeyMarker(auth,student,client);context.marker=marker;if(marker)return marker;
+    let marker=Object.hasOwn(context,'marker')?context.marker:await this.journeyMarker(auth,student,client);context.marker=marker;if(marker)return marker;
     const progress=await this.summaryProgress(auth,student,client,undefined,null);context.progress=progress;if(!progress.journey)return null;
     marker={studentId:student.id,classId:student.class_id,...progress.journey};await this.audit(auth,'student.journey.init',json(marker),client);context.marker=marker;return marker;
   }
@@ -328,6 +348,11 @@ export class PostgresStore{
     });
   }
   async assignedPack(auth,packId,version,client=this.pool,context={}){
+    if(context.marker){
+      const row=await this.one(`SELECT p.* FROM bao_an.packs p JOIN bao_an.week_sets s ON s.workspace_id=p.workspace_id AND s.pack_id=p.pack_id AND s.version=p.version JOIN bao_an.weeks w ON w.workspace_id=s.workspace_id AND w.id=s.week_id
+        WHERE p.workspace_id=$1 AND p.pack_id=$2 AND p.version=$3 AND s.week_id=$4 AND w.class_id=$5`,[auth.workspaceId,packId,version,context.marker.weekId,context.student.class_id],client);
+      if(!row)fail(403,'Con chỉ được học bộ câu hỏi thuộc tuần hiện tại. Tuần đã đóng và tuần chưa mở không thể chơi.');return this.packRecord(row);
+    }
     const student=context.student??await this.student(auth,auth.studentId,client),progress=context.progress??await this.summaryProgress(auth,student,client,undefined,context.marker),assigned=progress.weeks.filter(week=>week.unlocked).flatMap(week=>week.sets).find(set=>set.pack.id===packId&&set.pack.version===version);
     if(!assigned)fail(403,'Con chỉ được học bộ câu hỏi thuộc tuần hiện tại. Tuần đã đóng và tuần chưa mở không thể chơi.');return this.packRecord(await this.one('SELECT * FROM bao_an.packs WHERE workspace_id=$1 AND pack_id=$2 AND version=$3',[auth.workspaceId,packId,version],client));
   }
@@ -338,20 +363,18 @@ export class PostgresStore{
     const redemptions=(await this.rows('SELECT r.json,s.id AS student_id,s.name,s.class_id FROM bao_an.redemptions r JOIN bao_an.students s ON s.workspace_id=r.workspace_id AND s.id=r.student_id WHERE r.workspace_id=$1 ORDER BY r.created_order DESC',[auth.workspaceId])).map(row=>({...parse(row.json),studentId:row.student_id,studentName:row.name,classId:row.class_id})),workspace=await this.workspace(auth.workspaceId);
     return{classes,students,weeks,redemptions,wallet:{enabled:!!workspace.wallet_enabled,rateVnd:workspace.rate_vnd},stats:{students:students.length,classes:classes.length,questions:(await this.rows('SELECT json FROM bao_an.packs WHERE workspace_id=$1',[auth.workspaceId])).reduce((sum,row)=>sum+parse(row.json).items.length,0),pendingRequests:redemptions.filter(row=>['pending','approved'].includes(rewardStatus(row))).length}};
   }
-  async play(auth,playId,client=this.pool){const row=await this.one(`SELECT p.json,pack.json AS pack_json
+  async play(auth,playId,client=this.pool,{includeEvents=false}={}){const row=await this.one(`SELECT p.json,pack.json AS pack_json${includeEvents?",coalesce((SELECT jsonb_agg(a.json ORDER BY a.sequence) FROM bao_an.attempts a WHERE a.workspace_id=p.workspace_id AND a.play_id=p.id),'[]'::jsonb) AS events":''}
     FROM (SELECT * FROM bao_an.plays WHERE workspace_id=$1 AND id=$2 AND student_id=$3) p
     LEFT JOIN LATERAL (SELECT json FROM bao_an.packs WHERE workspace_id=p.workspace_id AND pack_id=p.json->>'packId' AND version=(p.json->>'contentVersion')::integer) pack ON true`,[auth.workspaceId,playId,auth.studentId],client);if(!row)fail(404,'Không tìm thấy lượt chơi.');
-    if(!row.pack_json)fail(409,'Bộ câu hỏi của lượt chơi không còn sẵn sàng.');return{session:parse(row.json),pack:parse(row.pack_json)};
+    if(!row.pack_json)fail(409,'Bộ câu hỏi của lượt chơi không còn sẵn sàng.');return{session:parse(row.json),pack:parse(row.pack_json),...(includeEvents?{events:row.events.map(parse)}:{})};
   }
   async abandonActive(auth,studentId,client){
     if(!client)return this.mutate(auth,async owned=>{await this.student(auth,studentId,owned);await this.abandonActive(auth,studentId,owned);await this.audit(auth,'play.abandon-active',studentId,owned);});
-    for(const row of await this.rows('SELECT id,json FROM bao_an.plays WHERE workspace_id=$1 AND student_id=$2',[auth.workspaceId,studentId],client)){
-    const session=parse(row.json);if(session.status==='active'){session.status='abandoned';session.endedAt=now();await this.exec('UPDATE bao_an.plays SET json=$3::jsonb WHERE workspace_id=$1 AND id=$2',[auth.workspaceId,row.id,json(session)],client);}
-  }}
+    await this.exec("UPDATE bao_an.plays SET json=json || jsonb_build_object('status','abandoned','endedAt',$3::text) WHERE workspace_id=$1 AND student_id=$2 AND json->>'status'='active'",[auth.workspaceId,studentId,now()],client);
+  }
   async startPlay(auth,input,compact=false,secure=false){role(auth,'student');shape(input,compact?['requestId','moduleId','packId','contentVersion','reviewItemIds']:['requestId','moduleId','packId','contentVersion']);const requestId=text(input.requestId,'Mã lượt chơi',100),moduleId=text(input.moduleId,'Trò chơi',80),packId=text(input.packId,'Mã bộ',80),version=integer(input.contentVersion,'Phiên bản');
     return this.mutate(auth,async client=>{
-      const student=await this.student(auth,auth.studentId,client),context={student},marker=await this.pinJourney(auth,student,client,context);
-      const prior=await this.one('SELECT id FROM bao_an.plays WHERE workspace_id=$1 AND student_id=$2 AND request_id=$3',[auth.workspaceId,auth.studentId,requestId],client);
+      const context=await this.studentPlayContext(auth,client,{requestId}),{student,prior}=context,marker=await this.pinJourney(auth,student,client,context);
       const choice=await this.assignedPack(auth,packId,version,client,context);if(!choice.games.some(game=>game.id===moduleId))fail(400,'Dạng câu của bộ này chưa phù hợp với trò chơi đã chọn.');
       const presentation=onlinePresentation(moduleId,choice.pack),requiredItemIds=compact?selectReviewItems(input.reviewItemIds,choice.pack,presentation):undefined;
       if(prior){const value=await this.play(auth,prior.id,client);if(secure&&value.session.questionProtocolVersion!==1)fail(409,'Lượt cũ cần mở lại trên ứng dụng mới. Sao đã lưu vẫn được giữ.');if(value.session.packId!==packId||value.session.contentVersion!==version||value.session.moduleId!==moduleId||value.session.journeyWeekId&&value.session.journeyWeekId!==marker?.weekId||compact&&(value.session.rewardPolicyVersion!==2||json(value.session.requiredItemIds)!==json(requiredItemIds)))fail(409,'Mã lượt chơi đã dùng cho nội dung khác.');if(value.session.status==='abandoned')fail(409,'Lượt chơi đã thoát. Hãy mở lượt mới.');const result={...value,presentation:filterPlayPresentation(value.session,value.pack,onlinePresentation(moduleId,value.pack))};return compact||secure?compactPlay(result):result;}
@@ -361,18 +384,18 @@ export class PostgresStore{
     });
   }
   async assertCurrentPlay(auth,session,client){
-    const student=await this.student(auth,auth.studentId,client),marker=await this.journeyMarker(auth,student,client);
-    if(marker){if(session.journeyWeekId&&session.journeyWeekId!==marker.weekId)fail(403,'Tuần của lượt chơi này đã đóng hoặc chưa được mở.');const assigned=await this.one('SELECT s.version FROM bao_an.week_sets s JOIN bao_an.weeks w ON w.workspace_id=s.workspace_id AND w.id=s.week_id WHERE s.workspace_id=$1 AND s.week_id=$2 AND w.class_id=$3 AND s.pack_id=$4',[auth.workspaceId,marker.weekId,student.class_id,session.packId],client);if(!assigned)fail(403,'Tuần của lượt chơi này đã đóng hoặc chưa được mở.');if(session.rewardPolicyVersion===2&&assigned.version!==session.contentVersion)fail(409,'Bộ câu hỏi vừa được cập nhật. Thoát rồi mở lại bài; sao đã lưu vẫn được giữ nguyên.');return;}
+    const{student,marker,assignments}=await this.studentPlayContext(auth,client,{packId:session.packId});
+    if(marker){if(session.journeyWeekId&&session.journeyWeekId!==marker.weekId)fail(403,'Tuần của lượt chơi này đã đóng hoặc chưa được mở.');const assigned=assignments.find(row=>row.weekId===marker.weekId);if(!assigned)fail(403,'Tuần của lượt chơi này đã đóng hoặc chưa được mở.');if(session.rewardPolicyVersion===2&&assigned.version!==session.contentVersion)fail(409,'Bộ câu hỏi vừa được cập nhật. Thoát rồi mở lại bài; sao đã lưu vẫn được giữ nguyên.');return;}
     const progress=await this.summaryProgress(auth,student,client);if(session.journeyWeekId&&session.journeyWeekId!==progress.journey?.weekId)fail(403,'Tuần của lượt chơi này đã đóng hoặc chưa được mở.');const assigned=progress.weeks.find(week=>week.current)?.sets.find(set=>set.pack.id===session.packId);if(!assigned)fail(403,'Tuần của lượt chơi này đã đóng hoặc chưa được mở.');if(session.rewardPolicyVersion===2&&assigned.pack.version!==session.contentVersion)fail(409,'Bộ câu hỏi vừa được cập nhật. Thoát rồi mở lại bài; sao đã lưu vẫn được giữ nguyên.');
   }
-  async questionHint(auth,playId,input){if(auth.role!=='student')fail(403,'Hãy dùng tài khoản học sinh.');shape(input,['itemId']);const itemId=text(input.itemId,'Mã câu',80);return this.mutate(auth,async client=>{const{session,pack}=await this.play(auth,playId,client);await this.assertCurrentPlay(auth,session,client);if(session.status!=='active'||session.questionProtocolVersion!==1||Date.now()-Date.parse(session.startedAt)>86400000)fail(409,'Lượt chơi cần được mở lại.');const result=protocolHint(session,pack,await this.#playEvents(auth,playId,client),itemId);await this.exec('UPDATE bao_an.plays SET json=$3::jsonb WHERE workspace_id=$1 AND id=$2',[auth.workspaceId,playId,json(session)],client);return result;});}
-  async recordAudioDelivery(auth,playId,itemId,mediaId,durationMs){if(auth.role!=='student')fail(403,'Hãy dùng tài khoản học sinh.');text(playId,'Mã lượt',100);text(itemId,'Mã câu',80);return this.mutate(auth,async client=>{const{session,pack}=await this.play(auth,playId,client);await this.assertCurrentPlay(auth,session,client);if(session.status!=='active'||session.questionProtocolVersion!==1||Date.now()-Date.parse(session.startedAt)>86400000)fail(409,'Lượt chơi cần được mở lại.');protocolAudioDelivery(session,pack,await this.#playEvents(auth,playId,client),itemId,mediaId,durationMs);await this.exec('UPDATE bao_an.plays SET json=$3::jsonb WHERE workspace_id=$1 AND id=$2',[auth.workspaceId,playId,json(session)],client);});}
+  async questionHint(auth,playId,input){if(auth.role!=='student')fail(403,'Hãy dùng tài khoản học sinh.');shape(input,['itemId']);const itemId=text(input.itemId,'Mã câu',80);return this.mutate(auth,async client=>{const{session,pack,events}=await this.play(auth,playId,client,{includeEvents:true});await this.assertCurrentPlay(auth,session,client);if(session.status!=='active'||session.questionProtocolVersion!==1||Date.now()-Date.parse(session.startedAt)>86400000)fail(409,'Lượt chơi cần được mở lại.');const result=protocolHint(session,pack,events,itemId);await this.exec('UPDATE bao_an.plays SET json=$3::jsonb WHERE workspace_id=$1 AND id=$2',[auth.workspaceId,playId,json(session)],client);return result;});}
+  async recordAudioDelivery(auth,playId,itemId,mediaId,durationMs){if(auth.role!=='student')fail(403,'Hãy dùng tài khoản học sinh.');text(playId,'Mã lượt',100);text(itemId,'Mã câu',80);return this.mutate(auth,async client=>{const{session,pack,events}=await this.play(auth,playId,client,{includeEvents:true});await this.assertCurrentPlay(auth,session,client);if(session.status!=='active'||session.questionProtocolVersion!==1||Date.now()-Date.parse(session.startedAt)>86400000)fail(409,'Lượt chơi cần được mở lại.');protocolAudioDelivery(session,pack,events,itemId,mediaId,durationMs);await this.exec('UPDATE bao_an.plays SET json=$3::jsonb WHERE workspace_id=$1 AND id=$2',[auth.workspaceId,playId,json(session)],client);});}
   async openQuestion(auth,playId,input,requireProtocol=false){role(auth,'student');shape(input,['itemId']);const itemId=text(input.itemId,'Mã câu',80);
     return this.mutate(auth,async client=>{
-      const{session,pack}=await this.play(auth,playId,client);await this.assertCurrentPlay(auth,session,client);
+      const{session,pack,events}=await this.play(auth,playId,client,{includeEvents:true});await this.assertCurrentPlay(auth,session,client);
       if(session.status!=='active'||Date.now()-Date.parse(session.startedAt)>86400000)fail(409,'Lượt chơi đã kết thúc hoặc quá hạn.');
       if(requireProtocol&&session.questionProtocolVersion!==1)fail(409,'Lượt cũ cần mở lại trên ứng dụng mới. Sao đã lưu vẫn được giữ.');
-      if(session.questionProtocolVersion===1){const receipt=openProtocolQuestion(session,pack,await this.#playEvents(auth,playId,client),itemId);await this.exec('UPDATE bao_an.plays SET json=$3::jsonb WHERE workspace_id=$1 AND id=$2',[auth.workspaceId,playId,json(session)],client);return receipt;}
+      if(session.questionProtocolVersion===1){const receipt=openProtocolQuestion(session,pack,events,itemId);await this.exec('UPDATE bao_an.plays SET json=$3::jsonb WHERE workspace_id=$1 AND id=$2',[auth.workspaceId,playId,json(session)],client);return receipt;}
       const presentation=onlinePresentation(session.moduleId,pack),item=presentation?.items.find(item=>item.id===itemId);
       if(!timedQuestion(session,presentation)||!item||!session.requiredItemIds?.includes(itemId))fail(400,'Câu hỏi không dùng bộ đếm thời gian của lượt chơi này.');
       const clock=session.questionClocks??{},openedAt=Object.hasOwn(clock,itemId)?clock[itemId]:now();if(!Object.hasOwn(clock,itemId)){
@@ -386,10 +409,10 @@ export class PostgresStore{
   async attempt(auth,playId,input,requireProtocol=false){role(auth,'student');shape(input,['attemptKey','itemId','response','hintsUsed','elapsedMs']);const key=text(input.attemptKey,'Mã lần trả lời',120);if(!/^[a-zA-Z0-9._:-]+$/.test(key))fail(400,'Mã lần trả lời không hợp lệ.');const itemId=text(input.itemId,'Mã câu',80),hintsUsed=integer(input.hintsUsed??0,'Số gợi ý',0,20);
     const hash=digest({key,itemId,response:input.response,hintsUsed});
     return this.mutate(auth,async client=>{
-      const{session,pack}=await this.play(auth,playId,client);await this.assertCurrentPlay(auth,session,client);if(requireProtocol&&session.questionProtocolVersion!==1)fail(409,'Lượt cũ cần mở lại trên ứng dụng mới. Sao đã lưu vẫn được giữ.');const prior=await this.one('SELECT payload_hash,json FROM bao_an.attempts WHERE workspace_id=$1 AND play_id=$2 AND attempt_key=$3',[auth.workspaceId,playId,key],client);
+      const{session,pack,events}=await this.play(auth,playId,client,{includeEvents:true});await this.assertCurrentPlay(auth,session,client);if(requireProtocol&&session.questionProtocolVersion!==1)fail(409,'Lượt cũ cần mở lại trên ứng dụng mới. Sao đã lưu vẫn được giữ.');const prior=await this.one('SELECT payload_hash,json FROM bao_an.attempts WHERE workspace_id=$1 AND play_id=$2 AND attempt_key=$3',[auth.workspaceId,playId,key],client);
       if(prior){if(prior.payload_hash!==hash)fail(409,'Lần trả lời đã được lưu với đáp án khác.');if(session.status==='abandoned')fail(409,'Lượt chơi đã thoát.');const event=parse(prior.json);let questionRewards;if(session.rewardPolicyVersion===2){questionRewards={gained:0,questions:[]};if(event.correct){const previous=await this.one('SELECT json FROM bao_an.awards WHERE workspace_id=$1 AND student_id=$2 AND pack_id=$3',[auth.workspaceId,auth.studentId,pack.id],client),reward=previous?parse(previous.json):null,touched=onlineScoreResponse(pack,session.moduleId,event.itemId,event.response).touchedItemIds;questionRewards.questions=questionRewardProgress(pack,reward?.questionLedger??initializeQuestionRewardLedger(pack.id,reward?.starTier??0)).questions.filter(q=>touched.includes(q.itemId));}}return{event,duplicate:true,...(session.questionProtocolVersion===1&&event.correct?{feedback:answerFeedback(pack,session,event)}:{}),...(questionRewards?{questionRewards}:{})};}
       if(session.status!=='active')fail(409,'Lượt chơi đã kết thúc hoặc được thay bằng lượt mới ở thiết bị khác.');if(Date.now()-Date.parse(session.startedAt)>86400000)fail(409,'Lượt chơi đã quá hạn. Hãy mở lượt mới.');
-      const events=await this.#playEvents(auth,playId,client);if(events.length>=5000)fail(400,'Lượt chơi đã đạt giới hạn số lần thử.');const item=pack.items.find(row=>row.id===itemId);if(!item)fail(400,'Câu hỏi không thuộc lượt chơi.');let outcome;try{outcome=onlineScoreResponse(pack,session.moduleId,itemId,input.response);}catch(error){fail(400,error.message);}
+      if(events.length>=5000)fail(400,'Lượt chơi đã đạt giới hạn số lần thử.');const item=pack.items.find(row=>row.id===itemId);if(!item)fail(400,'Câu hỏi không thuộc lượt chơi.');let outcome;try{outcome=onlineScoreResponse(pack,session.moduleId,itemId,input.response);}catch(error){fail(400,error.message);}
       if(session.rewardPolicyVersion===2&&outcome.touchedItemIds.some(id=>!session.requiredItemIds?.includes(id)))fail(400,'Câu trả lời nằm ngoài các câu đã chọn cho lượt học lại.');
       const occurredAt=now();let elapsedMs=input.elapsedMs;if(timedQuestion(session,onlinePresentation(session.moduleId,pack))){const openedAt=session.questionClocks&&Object.hasOwn(session.questionClocks,itemId)&&session.questionClocks[itemId];if(!openedAt)fail(400,'Cần mở câu hỏi trước khi trả lời.');elapsedMs=Date.parse(occurredAt)-Date.parse(openedAt);}
       else if(session.rewardPolicyVersion===2)elapsedMs=0;
@@ -404,9 +427,9 @@ export class PostgresStore{
     });
   }
   async finishPlay(auth,playId,abandon=false,compact=false,requireProtocol=false){role(auth,'student');return this.mutate(auth,async client=>{
-    const{session,pack}=await this.play(auth,playId,client);if(!abandon)await this.assertCurrentPlay(auth,session,client);if(!abandon&&requireProtocol&&session.questionProtocolVersion!==1)fail(409,'Lượt cũ cần mở lại trên ứng dụng mới. Sao đã lưu vẫn được giữ.');if(session.status==='abandoned'){if(abandon)return{};fail(409,'Lượt chơi đã thoát.');}
+    const{session,pack,events}=await this.play(auth,playId,client,{includeEvents:!abandon});if(!abandon)await this.assertCurrentPlay(auth,session,client);if(!abandon&&requireProtocol&&session.questionProtocolVersion!==1)fail(409,'Lượt cũ cần mở lại trên ứng dụng mới. Sao đã lưu vẫn được giữ.');if(session.status==='abandoned'){if(abandon)return{};fail(409,'Lượt chơi đã thoát.');}
     if(session.status==='completed')return{state:compact?await this.studentSummary(auth,'current',client):await this.studentState(auth,client),gained:0,tier:(await this.rewards(auth,auth.studentId,client)).find(row=>row.packId===pack.id)?.starTier??0};
-    const completed={...session,status:abandon?'abandoned':'completed',endedAt:now()},events=await this.#playEvents(auth,playId,client);let gained=0,tier=0;
+    const completed={...session,status:abandon?'abandoned':'completed',endedAt:now()};let gained=0,tier=0;
     if(!abandon){const errors=session.rewardPolicyVersion===2?v2QuestionCompletionErrors(completed,events,pack):onlineEvidenceErrors(completed,events,pack,true);if(errors.length)fail(400,errors[0]);const previous=await this.one('SELECT json FROM bao_an.awards WHERE workspace_id=$1 AND student_id=$2 AND pack_id=$3',[auth.workspaceId,auth.studentId,pack.id],client),prior=previous?parse(previous.json):null;
       if(session.rewardPolicyVersion===2){tier=questionRewardProgress(pack,prior?.questionLedger??initializeQuestionRewardLedger(pack.id,prior?.starTier??0)).bestTier;}
       else{const award=onlineAward(completed,events,pack);if(!award)fail(400,'Chưa đủ dữ liệu để xác nhận sao.');const legacyStars=Math.max(award.starTier,prior?.questionLedger?.legacyStars??prior?.starTier??0),result=applyQuestionRewardCandidates(prior?.questionLedger??initializeQuestionRewardLedger(pack.id,prior?.starTier??0),[],legacyStars);gained=result.gained;tier=legacyStars;

@@ -1,0 +1,1030 @@
+{
+  "version": "3.8.0-rc.12",
+  "buildId": "de06e2fc1718f734",
+  "scope": "Local Windows Chrome/Edge HTTP fixture and PGlite. Not production Netlify/Supabase; not a 4/8 GB device certification.",
+  "nodeTests": {
+    "passed": 335,
+    "failed": 0,
+    "renderer": 110,
+    "release": 10,
+    "online": 173,
+    "cloudFixture": 42
+  },
+  "browserTests": {
+    "uniqueCases": 130,
+    "passed": 130,
+    "unresolved": [],
+    "method": "Latest result per project/file/title from initial regression, affected-case rerun and final visual/resource verification",
+    "reports": [
+      "rc12-browser-initial.json",
+      "rc12-browser-final-affected.json",
+      "rc12-browser-visual-final.json"
+    ]
+  },
+  "metrics": [
+    {
+      "project": "online-chrome",
+      "name": "role-bundle-and-lite",
+      "data": {
+        "authAssets": [
+          {
+            "name": "/assets/index-DaRcpkAD.css",
+            "bytes": 778,
+            "gzip": 460
+          },
+          {
+            "name": "/assets/index-B4VBcUjO.js",
+            "bytes": 226193,
+            "gzip": 71118
+          },
+          {
+            "name": "/assets/OnlineScreen-DjUj2hoz.css",
+            "bytes": 21038,
+            "gzip": 5039
+          },
+          {
+            "name": "/assets/OnlineScreen-CgUnLP8K.js",
+            "bytes": 11568,
+            "gzip": 4647
+          }
+        ],
+        "jsGzip": 75765,
+        "cssGzip": 5499,
+        "glbRequests": 0,
+        "webglContexts": 0
+      }
+    },
+    {
+      "project": "online-chrome",
+      "name": "optional-3d-resource-budget",
+      "data": {
+        "models": [
+          "/models/optimized/fox-guide-e1d672826fd39e69.glb",
+          "/models/optimized/environment-f9e76637e6459041.glb",
+          "/models/optimized/memory-world-573442da4a4e8745.glb"
+        ],
+        "measured": {
+          "engine": "three-webgl",
+          "frames": 54,
+          "fpsMedian": 20.4,
+          "fpsP95FrameMs": 50,
+          "tier": "low",
+          "selectedWorld": "memory-match",
+          "carouselMoving": false,
+          "rotation": -1.2566370614359172,
+          "islands": [
+            {
+              "id": "math-quest",
+              "x": -4.3748599749577055,
+              "y": 0,
+              "z": 0.118381852336092,
+              "scale": 0.88
+            },
+            {
+              "id": "memory-match",
+              "x": 0,
+              "y": 0.1,
+              "z": 2.842766496711705,
+              "scale": 1.18
+            },
+            {
+              "id": "sentence-builder",
+              "x": 4.3748599749577055,
+              "y": 0,
+              "z": 0.118381852336092,
+              "scale": 0.88
+            },
+            {
+              "id": "word-connect",
+              "x": 2.7038121605453767,
+              "y": 0,
+              "z": -4.289765100691945,
+              "scale": 0.88
+            },
+            {
+              "id": "sequence-trail",
+              "x": -2.7038121605453758,
+              "y": 0,
+              "z": -4.289765100691945,
+              "scale": 0.88
+            }
+          ],
+          "mascotLocation": "memory-match",
+          "mascotState": "on-island",
+          "mascotPosition": {
+            "x": -1.121,
+            "y": 0.1472,
+            "z": 4.317766496711704
+          },
+          "jumpProgress": 1,
+          "dpr": 1,
+          "drawCalls": 42,
+          "shadowUpdates": 0,
+          "gpuGeometries": 44,
+          "gpuTextures": 47,
+          "gpuPrograms": 5,
+          "shaderPreparationMs": 76.40000000596046,
+          "parallelShaderCompile": true,
+          "geometryDetail": "reduced",
+          "lodState": "ready",
+          "geometryBytesEstimate": 1564896,
+          "activeAssetBytes": 2000688,
+          "renderPending": false,
+          "triangles": 38676,
+          "textureBytesEstimate": 3932160.0000000023,
+          "assetErrors": [],
+          "readyAssets": [
+            "fox-guide",
+            "environment",
+            "memory-world"
+          ],
+          "animationClips": [
+            "Idle",
+            "Cheer",
+            "Victory"
+          ],
+          "skeletalMeshes": 10,
+          "bones": 14,
+          "animationTime": 2.5164999999999997,
+          "activeClip": "Idle",
+          "motion": true,
+          "paused": false,
+          "sceneMode": "home",
+          "gameWorld": null,
+          "guideMood": "idle",
+          "guideViewport": null,
+          "guideVisible": true
+        },
+        "modeChanges": 20,
+        "samples": [
+          {
+            "cycle": 0,
+            "heap": 6869708,
+            "canvases": 0
+          },
+          {
+            "cycle": 1,
+            "heap": 6994776,
+            "canvases": 0
+          },
+          {
+            "cycle": 2,
+            "heap": 7082488,
+            "canvases": 0
+          },
+          {
+            "cycle": 3,
+            "heap": 7185864,
+            "canvases": 0
+          },
+          {
+            "cycle": 4,
+            "heap": 7222948,
+            "canvases": 0
+          },
+          {
+            "cycle": 5,
+            "heap": 7262288,
+            "canvases": 0
+          },
+          {
+            "cycle": 6,
+            "heap": 7303136,
+            "canvases": 0
+          },
+          {
+            "cycle": 7,
+            "heap": 7586728,
+            "canvases": 0
+          },
+          {
+            "cycle": 8,
+            "heap": 7633728,
+            "canvases": 0
+          },
+          {
+            "cycle": 9,
+            "heap": 7699044,
+            "canvases": 0
+          }
+        ]
+      }
+    },
+    {
+      "project": "online-msedge",
+      "name": "role-bundle-and-lite",
+      "data": {
+        "authAssets": [
+          {
+            "name": "/assets/index-DaRcpkAD.css",
+            "bytes": 778,
+            "gzip": 460
+          },
+          {
+            "name": "/assets/index-B4VBcUjO.js",
+            "bytes": 226193,
+            "gzip": 71118
+          },
+          {
+            "name": "/assets/OnlineScreen-DjUj2hoz.css",
+            "bytes": 21038,
+            "gzip": 5039
+          },
+          {
+            "name": "/assets/OnlineScreen-CgUnLP8K.js",
+            "bytes": 11568,
+            "gzip": 4647
+          }
+        ],
+        "jsGzip": 75765,
+        "cssGzip": 5499,
+        "glbRequests": 0,
+        "webglContexts": 0
+      }
+    },
+    {
+      "project": "online-msedge",
+      "name": "optional-3d-resource-budget",
+      "data": {
+        "models": [
+          "/models/optimized/fox-guide-e1d672826fd39e69.glb",
+          "/models/optimized/environment-f9e76637e6459041.glb",
+          "/models/optimized/memory-world-573442da4a4e8745.glb"
+        ],
+        "measured": {
+          "engine": "three-webgl",
+          "frames": 54,
+          "fpsMedian": 20.3,
+          "fpsP95FrameMs": 50.59999999999991,
+          "tier": "low",
+          "selectedWorld": "memory-match",
+          "carouselMoving": false,
+          "rotation": -1.2566370614359172,
+          "islands": [
+            {
+              "id": "math-quest",
+              "x": -4.3748599749577055,
+              "y": 0,
+              "z": 0.118381852336092,
+              "scale": 0.88
+            },
+            {
+              "id": "memory-match",
+              "x": 0,
+              "y": 0.1,
+              "z": 2.842766496711705,
+              "scale": 1.18
+            },
+            {
+              "id": "sentence-builder",
+              "x": 4.3748599749577055,
+              "y": 0,
+              "z": 0.118381852336092,
+              "scale": 0.88
+            },
+            {
+              "id": "word-connect",
+              "x": 2.7038121605453767,
+              "y": 0,
+              "z": -4.289765100691945,
+              "scale": 0.88
+            },
+            {
+              "id": "sequence-trail",
+              "x": -2.7038121605453758,
+              "y": 0,
+              "z": -4.289765100691945,
+              "scale": 0.88
+            }
+          ],
+          "mascotLocation": "memory-match",
+          "mascotState": "on-island",
+          "mascotPosition": {
+            "x": -1.121,
+            "y": 0.1472,
+            "z": 4.317766496711704
+          },
+          "jumpProgress": 1,
+          "dpr": 1,
+          "drawCalls": 42,
+          "shadowUpdates": 0,
+          "gpuGeometries": 44,
+          "gpuTextures": 47,
+          "gpuPrograms": 5,
+          "shaderPreparationMs": 84.7999999821186,
+          "parallelShaderCompile": true,
+          "geometryDetail": "reduced",
+          "lodState": "ready",
+          "geometryBytesEstimate": 1564896,
+          "activeAssetBytes": 2000688,
+          "renderPending": false,
+          "triangles": 38676,
+          "textureBytesEstimate": 3932160.0000000023,
+          "assetErrors": [],
+          "readyAssets": [
+            "fox-guide",
+            "environment",
+            "memory-world"
+          ],
+          "animationClips": [
+            "Idle",
+            "Cheer",
+            "Victory"
+          ],
+          "skeletalMeshes": 10,
+          "bones": 14,
+          "animationTime": 2.524500000000002,
+          "activeClip": "Idle",
+          "motion": true,
+          "paused": false,
+          "sceneMode": "home",
+          "gameWorld": null,
+          "guideMood": "idle",
+          "guideViewport": null,
+          "guideVisible": true
+        },
+        "modeChanges": 20,
+        "samples": [
+          {
+            "cycle": 0,
+            "heap": 6896796,
+            "canvases": 0
+          },
+          {
+            "cycle": 1,
+            "heap": 7011844,
+            "canvases": 0
+          },
+          {
+            "cycle": 2,
+            "heap": 7104512,
+            "canvases": 0
+          },
+          {
+            "cycle": 3,
+            "heap": 7209304,
+            "canvases": 0
+          },
+          {
+            "cycle": 4,
+            "heap": 7277628,
+            "canvases": 0
+          },
+          {
+            "cycle": 5,
+            "heap": 7288676,
+            "canvases": 0
+          },
+          {
+            "cycle": 6,
+            "heap": 7330816,
+            "canvases": 0
+          },
+          {
+            "cycle": 7,
+            "heap": 7609528,
+            "canvases": 0
+          },
+          {
+            "cycle": 8,
+            "heap": 7650732,
+            "canvases": 0
+          },
+          {
+            "cycle": 9,
+            "heap": 7718060,
+            "canvases": 0
+          }
+        ]
+      }
+    },
+    {
+      "project": "online-chrome",
+      "name": "thirty-games-resource-samples",
+      "data": {
+        "games": 30,
+        "hostChanges": 29,
+        "earnedStars": 24,
+        "samples": [
+          {
+            "round": 1,
+            "game": "math-quest",
+            "heap": 3930620,
+            "nodes": 112,
+            "audio": 0,
+            "canvas": 0
+          },
+          {
+            "round": 2,
+            "game": "memory-match",
+            "heap": 4161912,
+            "nodes": 114,
+            "audio": 0,
+            "canvas": 0
+          },
+          {
+            "round": 3,
+            "game": "sentence-builder",
+            "heap": 4310628,
+            "nodes": 126,
+            "audio": 0,
+            "canvas": 0
+          },
+          {
+            "round": 4,
+            "game": "word-connect",
+            "heap": 4488292,
+            "nodes": 127,
+            "audio": 0,
+            "canvas": 0
+          },
+          {
+            "round": 5,
+            "game": "sequence-trail",
+            "heap": 4695900,
+            "nodes": 152,
+            "audio": 0,
+            "canvas": 0
+          },
+          {
+            "round": 6,
+            "game": "math-quest",
+            "heap": 4747340,
+            "nodes": 152,
+            "audio": 0,
+            "canvas": 0
+          },
+          {
+            "round": 7,
+            "game": "memory-match",
+            "heap": 4802252,
+            "nodes": 152,
+            "audio": 0,
+            "canvas": 0
+          },
+          {
+            "round": 8,
+            "game": "sentence-builder",
+            "heap": 4832708,
+            "nodes": 152,
+            "audio": 0,
+            "canvas": 0
+          },
+          {
+            "round": 9,
+            "game": "word-connect",
+            "heap": 4888304,
+            "nodes": 152,
+            "audio": 0,
+            "canvas": 0
+          },
+          {
+            "round": 10,
+            "game": "sequence-trail",
+            "heap": 4882884,
+            "nodes": 152,
+            "audio": 0,
+            "canvas": 0
+          },
+          {
+            "round": 11,
+            "game": "math-quest",
+            "heap": 4905560,
+            "nodes": 152,
+            "audio": 0,
+            "canvas": 0
+          },
+          {
+            "round": 12,
+            "game": "memory-match",
+            "heap": 4917200,
+            "nodes": 152,
+            "audio": 0,
+            "canvas": 0
+          },
+          {
+            "round": 13,
+            "game": "sentence-builder",
+            "heap": 4954708,
+            "nodes": 152,
+            "audio": 0,
+            "canvas": 0
+          },
+          {
+            "round": 14,
+            "game": "word-connect",
+            "heap": 4996824,
+            "nodes": 152,
+            "audio": 0,
+            "canvas": 0
+          },
+          {
+            "round": 15,
+            "game": "sequence-trail",
+            "heap": 5014848,
+            "nodes": 152,
+            "audio": 0,
+            "canvas": 0
+          },
+          {
+            "round": 16,
+            "game": "math-quest",
+            "heap": 5034492,
+            "nodes": 152,
+            "audio": 0,
+            "canvas": 0
+          },
+          {
+            "round": 17,
+            "game": "memory-match",
+            "heap": 5055792,
+            "nodes": 152,
+            "audio": 0,
+            "canvas": 0
+          },
+          {
+            "round": 18,
+            "game": "sentence-builder",
+            "heap": 5085444,
+            "nodes": 152,
+            "audio": 0,
+            "canvas": 0
+          },
+          {
+            "round": 19,
+            "game": "word-connect",
+            "heap": 5093896,
+            "nodes": 152,
+            "audio": 0,
+            "canvas": 0
+          },
+          {
+            "round": 20,
+            "game": "sequence-trail",
+            "heap": 5132992,
+            "nodes": 152,
+            "audio": 0,
+            "canvas": 0
+          },
+          {
+            "round": 21,
+            "game": "math-quest",
+            "heap": 5160416,
+            "nodes": 152,
+            "audio": 0,
+            "canvas": 0
+          },
+          {
+            "round": 22,
+            "game": "memory-match",
+            "heap": 5175284,
+            "nodes": 152,
+            "audio": 0,
+            "canvas": 0
+          },
+          {
+            "round": 23,
+            "game": "sentence-builder",
+            "heap": 5216136,
+            "nodes": 152,
+            "audio": 0,
+            "canvas": 0
+          },
+          {
+            "round": 24,
+            "game": "word-connect",
+            "heap": 5197304,
+            "nodes": 152,
+            "audio": 0,
+            "canvas": 0
+          },
+          {
+            "round": 25,
+            "game": "sequence-trail",
+            "heap": 5203380,
+            "nodes": 152,
+            "audio": 0,
+            "canvas": 0
+          },
+          {
+            "round": 26,
+            "game": "math-quest",
+            "heap": 5196824,
+            "nodes": 152,
+            "audio": 0,
+            "canvas": 0
+          },
+          {
+            "round": 27,
+            "game": "memory-match",
+            "heap": 5235080,
+            "nodes": 152,
+            "audio": 0,
+            "canvas": 0
+          },
+          {
+            "round": 28,
+            "game": "sentence-builder",
+            "heap": 5273060,
+            "nodes": 152,
+            "audio": 0,
+            "canvas": 0
+          },
+          {
+            "round": 29,
+            "game": "word-connect",
+            "heap": 5277692,
+            "nodes": 152,
+            "audio": 0,
+            "canvas": 0
+          },
+          {
+            "round": 30,
+            "game": "sequence-trail",
+            "heap": 5322612,
+            "nodes": 152,
+            "audio": 0,
+            "canvas": 0
+          }
+        ],
+        "frameSamples": [
+          {
+            "game": "math-quest",
+            "frames": 35,
+            "p95FrameMs": 24.90000000000009,
+            "maxFrameMs": 476.9999999999998,
+            "longTasks": []
+          },
+          {
+            "game": "memory-match",
+            "frames": 47,
+            "p95FrameMs": 25,
+            "maxFrameMs": 246.30000000000018,
+            "longTasks": []
+          },
+          {
+            "game": "sentence-builder",
+            "frames": 41,
+            "p95FrameMs": 25.100000000000364,
+            "maxFrameMs": 250.59999999999945,
+            "longTasks": []
+          },
+          {
+            "game": "word-connect",
+            "frames": 38,
+            "p95FrameMs": 25.099999999998545,
+            "maxFrameMs": 336.60000000000036,
+            "longTasks": []
+          },
+          {
+            "game": "sequence-trail",
+            "frames": 41,
+            "p95FrameMs": 25.200000000000728,
+            "maxFrameMs": 294.60000000000036,
+            "longTasks": []
+          }
+        ],
+        "profile": "local headless Chromium; not a 4/8 GB device certification"
+      }
+    },
+    {
+      "project": "online-msedge",
+      "name": "thirty-games-resource-samples",
+      "data": {
+        "games": 30,
+        "hostChanges": 29,
+        "earnedStars": 24,
+        "samples": [
+          {
+            "round": 1,
+            "game": "math-quest",
+            "heap": 3940180,
+            "nodes": 112,
+            "audio": 0,
+            "canvas": 0
+          },
+          {
+            "round": 2,
+            "game": "memory-match",
+            "heap": 4182272,
+            "nodes": 114,
+            "audio": 0,
+            "canvas": 0
+          },
+          {
+            "round": 3,
+            "game": "sentence-builder",
+            "heap": 4352392,
+            "nodes": 126,
+            "audio": 0,
+            "canvas": 0
+          },
+          {
+            "round": 4,
+            "game": "word-connect",
+            "heap": 4488836,
+            "nodes": 127,
+            "audio": 0,
+            "canvas": 0
+          },
+          {
+            "round": 5,
+            "game": "sequence-trail",
+            "heap": 4696520,
+            "nodes": 152,
+            "audio": 0,
+            "canvas": 0
+          },
+          {
+            "round": 6,
+            "game": "math-quest",
+            "heap": 4770824,
+            "nodes": 152,
+            "audio": 0,
+            "canvas": 0
+          },
+          {
+            "round": 7,
+            "game": "memory-match",
+            "heap": 4806028,
+            "nodes": 152,
+            "audio": 0,
+            "canvas": 0
+          },
+          {
+            "round": 8,
+            "game": "sentence-builder",
+            "heap": 4819856,
+            "nodes": 152,
+            "audio": 0,
+            "canvas": 0
+          },
+          {
+            "round": 9,
+            "game": "word-connect",
+            "heap": 4862300,
+            "nodes": 152,
+            "audio": 0,
+            "canvas": 0
+          },
+          {
+            "round": 10,
+            "game": "sequence-trail",
+            "heap": 4879668,
+            "nodes": 152,
+            "audio": 0,
+            "canvas": 0
+          },
+          {
+            "round": 11,
+            "game": "math-quest",
+            "heap": 4893412,
+            "nodes": 152,
+            "audio": 0,
+            "canvas": 0
+          },
+          {
+            "round": 12,
+            "game": "memory-match",
+            "heap": 4974104,
+            "nodes": 152,
+            "audio": 0,
+            "canvas": 0
+          },
+          {
+            "round": 13,
+            "game": "sentence-builder",
+            "heap": 5023080,
+            "nodes": 152,
+            "audio": 0,
+            "canvas": 0
+          },
+          {
+            "round": 14,
+            "game": "word-connect",
+            "heap": 4990656,
+            "nodes": 152,
+            "audio": 0,
+            "canvas": 0
+          },
+          {
+            "round": 15,
+            "game": "sequence-trail",
+            "heap": 5041860,
+            "nodes": 152,
+            "audio": 0,
+            "canvas": 0
+          },
+          {
+            "round": 16,
+            "game": "math-quest",
+            "heap": 5008276,
+            "nodes": 152,
+            "audio": 0,
+            "canvas": 0
+          },
+          {
+            "round": 17,
+            "game": "memory-match",
+            "heap": 5038032,
+            "nodes": 152,
+            "audio": 0,
+            "canvas": 0
+          },
+          {
+            "round": 18,
+            "game": "sentence-builder",
+            "heap": 5069192,
+            "nodes": 152,
+            "audio": 0,
+            "canvas": 0
+          },
+          {
+            "round": 19,
+            "game": "word-connect",
+            "heap": 5071784,
+            "nodes": 152,
+            "audio": 0,
+            "canvas": 0
+          },
+          {
+            "round": 20,
+            "game": "sequence-trail",
+            "heap": 5117916,
+            "nodes": 152,
+            "audio": 0,
+            "canvas": 0
+          },
+          {
+            "round": 21,
+            "game": "math-quest",
+            "heap": 5163304,
+            "nodes": 152,
+            "audio": 0,
+            "canvas": 0
+          },
+          {
+            "round": 22,
+            "game": "memory-match",
+            "heap": 5152612,
+            "nodes": 152,
+            "audio": 0,
+            "canvas": 0
+          },
+          {
+            "round": 23,
+            "game": "sentence-builder",
+            "heap": 5161980,
+            "nodes": 152,
+            "audio": 0,
+            "canvas": 0
+          },
+          {
+            "round": 24,
+            "game": "word-connect",
+            "heap": 5165328,
+            "nodes": 152,
+            "audio": 0,
+            "canvas": 0
+          },
+          {
+            "round": 25,
+            "game": "sequence-trail",
+            "heap": 5172572,
+            "nodes": 152,
+            "audio": 0,
+            "canvas": 0
+          },
+          {
+            "round": 26,
+            "game": "math-quest",
+            "heap": 5166380,
+            "nodes": 152,
+            "audio": 0,
+            "canvas": 0
+          },
+          {
+            "round": 27,
+            "game": "memory-match",
+            "heap": 5177500,
+            "nodes": 152,
+            "audio": 0,
+            "canvas": 0
+          },
+          {
+            "round": 28,
+            "game": "sentence-builder",
+            "heap": 5188792,
+            "nodes": 152,
+            "audio": 0,
+            "canvas": 0
+          },
+          {
+            "round": 29,
+            "game": "word-connect",
+            "heap": 5191812,
+            "nodes": 152,
+            "audio": 0,
+            "canvas": 0
+          },
+          {
+            "round": 30,
+            "game": "sequence-trail",
+            "heap": 5196040,
+            "nodes": 152,
+            "audio": 0,
+            "canvas": 0
+          }
+        ],
+        "frameSamples": [
+          {
+            "game": "math-quest",
+            "frames": 51,
+            "p95FrameMs": 25.899999999999636,
+            "maxFrameMs": 26,
+            "longTasks": []
+          },
+          {
+            "game": "memory-match",
+            "frames": 51,
+            "p95FrameMs": 25.799999999999272,
+            "maxFrameMs": 26,
+            "longTasks": []
+          },
+          {
+            "game": "sentence-builder",
+            "frames": 37,
+            "p95FrameMs": 26.100000000000364,
+            "maxFrameMs": 383.59999999999945,
+            "longTasks": []
+          },
+          {
+            "game": "word-connect",
+            "frames": 38,
+            "p95FrameMs": 49.5,
+            "maxFrameMs": 302.5,
+            "longTasks": []
+          },
+          {
+            "game": "sequence-trail",
+            "frames": 51,
+            "p95FrameMs": 25.80000000000109,
+            "maxFrameMs": 26.100000000000364,
+            "longTasks": []
+          }
+        ],
+        "profile": "local headless Chromium; not a 4/8 GB device certification"
+      }
+    },
+    {
+      "project": "online-chrome",
+      "name": "real-file-import-timing",
+      "data": {
+        "fileCount": 17,
+        "selectedBytes": 1039466,
+        "previewIncludingUploadMs": 524,
+        "accepted": 139,
+        "total": 140,
+        "excelErrorCell": "F122",
+        "uploadBatches": 1,
+        "uploadedObjects": 16,
+        "published": 0
+      }
+    },
+    {
+      "project": "online-msedge",
+      "name": "real-file-import-timing",
+      "data": {
+        "fileCount": 17,
+        "selectedBytes": 1039466,
+        "previewIncludingUploadMs": 497,
+        "accepted": 139,
+        "total": 140,
+        "excelErrorCell": "F122",
+        "uploadBatches": 1,
+        "uploadedObjects": 16,
+        "published": 0
+      }
+    }
+  ],
+  "productionReady": false,
+  "unverified": [
+    "isolated Netlify/Supabase staging",
+    "30-100 concurrent cloud students",
+    "60-minute mixed session",
+    "physical Windows 4/8 GB UAT",
+    "PostgreSQL + Storage restore",
+    "52-week production-like history trace"
+  ],
+  "actualZipSmoke": {
+    "version": "3.8.0-rc.12",
+    "zipSha256": "a05ff1cb58c581820a9711b9ac33e03adbc814d92076405c72497b1b3ac31ef2",
+    "verifiedFiles": 99,
+    "standaloneOutsideWorkspace": true,
+    "configuredEmptyDatabase": true,
+    "questionCount": 0,
+    "mediaDecoderVerified": true,
+    "logoutVerified": true,
+    "passed": true
+  }
+}

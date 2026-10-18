@@ -11,6 +11,12 @@
   external_node_modules = ["pg", "@supabase/supabase-js", "music-metadata"]
 
 [[headers]]
+  for = "/models/optimized/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+    Content-Type = "model/gltf-binary"
+
+[[headers]]
   for = "/api/*"
   [headers.values]
     Cache-Control = "no-store, private"

@@ -1,3 +1,4 @@
+import {startAssignedGame} from '../helpers/student-ui';
 import {seedLegacyApiWeek} from '../helpers/legacy-weeks.mjs';
 import path from 'node:path';
 import {mkdir,mkdtemp,readFile,rm} from 'node:fs/promises';
@@ -25,7 +26,7 @@ test('quiz fits its question, image and four readable answers on desktop and all
   const f=await fixture(page),errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
   try{
     await f.api('/weeks',{requestId:'layout-quiz-week',classId:f.cls.id,title:'Tuần 01',sets:[{subjectLabel:'Công nghệ',pack:f.quiz}]});await f.login();
-    await page.getByRole('button',{name:'Chọn Đảo Câu Hỏi',exact:true}).click();await page.getByRole('button',{name:/^Bắt đầu/}).click();
+    await startAssignedGame(page,'Đảo Câu Hỏi');
     const stage=page.locator('.world-math');await expect(stage).toBeVisible();
     for(const viewport of [{width:1828,height:922},{width:1219,height:615}]){
       await page.setViewportSize(viewport);await expect.poll(()=>stage.getAttribute('data-question-layout')).toBe('quiz');
@@ -55,7 +56,7 @@ test('reading exercise keeps its complete passage, prompt and controls reachable
     const body='Mỗi sáng, Lan tưới cây rồi quan sát những chiếc lá mới mọc. Bạn ghi chép những điều nhìn thấy vào một cuốn sổ nhỏ. '.repeat(12).trim();
     const pack={...f.base,id:'layout-reading',title:'Đọc và quan sát',kind:'learning',contentFormatVersion:2,passages:[{passageId:'layout-passage',title:'Vườn cây nhỏ',body,source:'Tác giả thử nghiệm',rights:'Được phép sử dụng',approvedAt:'2026-10-17T00:00:00.000Z'}],media:[],items:[1,2].map(i=>({id:'layout-reading-'+i,kind:'reading-choice',objectiveId:'LAYOUT.READING',passageId:'layout-passage',prompt:i===1?'Lan làm gì vào mỗi sáng?':'Lan ghi chép vào đâu?',options:i===1?['Tưới cây và quan sát','Đi ngủ','Xem ti vi','Chơi bóng']:['Một cuốn sổ nhỏ','Một chiếc lá','Bức tường','Bàn tay'],correctIndex:0,explanation:'Chi tiết được nêu trong đoạn đọc.',hint:'Đọc lại đoạn đầu.'}))};
     await f.api('/weeks',{requestId:'layout-reading-week',classId:f.cls.id,title:'Tuần 01',sets:[{subjectLabel:'Đọc hiểu',pack}]});await f.login();
-    await page.getByRole('button',{name:'Chọn Đảo Câu Hỏi',exact:true}).click();await page.getByRole('button',{name:/^Bắt đầu/}).click();
+    await startAssignedGame(page,'Đảo Câu Hỏi');
     const stage=page.locator('.online-exercise');await expect(stage).toHaveAttribute('data-question-layout','reading-choice');await page.setViewportSize({width:390,height:740});
     await expect(stage.getByLabel('Đoạn đọc')).toContainText(body);expect(await stage.locator('.online-reading p').evaluate(element=>element.scrollHeight<=element.clientHeight+1)).toBe(true);
     await expect(stage.locator('.answer-option.correct')).toHaveCount(0);

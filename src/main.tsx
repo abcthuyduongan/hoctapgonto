@@ -2,7 +2,7 @@ import React,{lazy,Suspense} from 'react';
 import {createRoot} from 'react-dom/client';
 import AsyncBoundary from './components/AsyncBoundary';
 import {prepareOnlineBrowser} from './core/online-bootstrap';
-import './styles/game-base.css';
+import './styles/base.css';
 
 const root=document.getElementById('root');
 if(!root)throw new Error('Không tìm thấy phần tử root');

@@ -43,3 +43,14 @@ export function estimateTextureBytes(root: Object3D) {
     return sum + (image?.width ?? 0) * (image?.height ?? 0) * 4 * 4 / 3;
   }, 0);
 }
+
+/** Shared geometry attributes/index buffers are counted once, including skin data. */
+export function estimateGeometryBytes(root:Object3D){
+  const arrays=new Set<ArrayBufferView>();
+  root.traverse(node=>{
+    const mesh=node as Mesh;if(!mesh.isMesh)return;
+    for(const attribute of Object.values(mesh.geometry.attributes))arrays.add('data'in attribute?attribute.data.array:attribute.array);
+    if(mesh.geometry.index)arrays.add(mesh.geometry.index.array);
+  });
+  return [...arrays].reduce((sum,array)=>sum+array.byteLength,0);
+}

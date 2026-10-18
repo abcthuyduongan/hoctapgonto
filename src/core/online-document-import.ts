@@ -253,11 +253,14 @@ export function onlineDocumentGameChoices(pack:ContentPack) {
   return GAME_REGISTRY.filter(game=>{const presentation=onlinePresentation(game.id,pack);return presentation&&validatePack(presentation).length===0;}).map(({id,label})=>({id,label}));
 }
 
-function documentSource(bytes:Uint8Array,fileName:string,context:OnlineWeekContext,media:OnlineMediaAsset[],inspect=false) {
-  if(!(bytes instanceof Uint8Array)||bytes.byteLength<22||bytes.byteLength>1024*1024)fail('Word hoặc Excel cần dung lượng dưới 1 MB; tải ảnh và âm thanh riêng.');
+function assertMediaCatalog(media:OnlineMediaAsset[]):void {
   // The catalog spans the workspace, not just this document. Its storage quota is
   // enforced by the host; references below still require a unique, valid asset.
   if(!Array.isArray(media)||media.some(asset=>!asset||typeof asset.name!=='string'||typeof asset.id!=='string'||typeof asset.sha256!=='string'||typeof asset.mime!=='string'||!['image','audio'].includes(asset.kind)))fail('Catalog đa phương tiện không hợp lệ.');
+}
+function documentSource(bytes:Uint8Array,fileName:string,context:OnlineWeekContext,media:OnlineMediaAsset[],inspect=false) {
+  if(!(bytes instanceof Uint8Array)||bytes.byteLength<22||bytes.byteLength>1024*1024)fail('Word hoặc Excel cần dung lượng dưới 1 MB; tải ảnh và âm thanh riêng.');
+  assertMediaCatalog(media);
   const extension=fileName.toLowerCase().split('.').pop();let rows:Fields[];let sourceTitle:string|undefined;
   if(extension==='xlsx'){
     const workbook=parseQuestionWorkbookBytes(bytes);rows=sourceRows(workbook.sheets['Câu hỏi'],workbook.rowNumbers['Câu hỏi'],inspect,workbook.cellErrors['Câu hỏi']);
@@ -280,6 +283,17 @@ export function onlineDocumentMediaNames(bytes:Uint8Array,fileName:string):strin
   return [...new Set(filled.flatMap(row=>[row.imageFile,row.audioFile]).filter((name):name is string=>!!name))];
 }
 
+/** Keep one parsed source for the current preview; catalogs are checked afresh on every inspection. */
+export function prepareOnlineDocument(bytes:Uint8Array,fileName:string,context:OnlineWeekContext){
+  const fixedContext={...context,...(context.packIds?{packIds:{...context.packIds}}:{})};
+  const source=documentSource(bytes,fileName,fixedContext,[],true);
+  const mediaNames=[...new Set(source.filled.flatMap(row=>[row.imageFile,row.audioFile]).filter((name):name is string=>!!name))];
+  return {mediaNames,async inspect(media:OnlineMediaAsset[],options:{weekTitle?:string}={}){
+    assertMediaCatalog(media);
+    return inspectDocumentSource(source,fixedContext,media,options);
+  }};
+}
+
 export async function parseOnlineDocument(bytes:Uint8Array,fileName:string,context:OnlineWeekContext,media:OnlineMediaAsset[]):Promise<OnlineWeek> {
   const {filled,title,sourceCode,version}=documentSource(bytes,fileName,context,media);
   const groups=new Map<string,{label:string;kind:OnlineDocumentKind;title:string;rows:Fields[]}>();
@@ -297,7 +311,10 @@ export async function parseOnlineDocument(bytes:Uint8Array,fileName:string,conte
 
 /** Preview valid, playable groups and keep every excluded source question visible. */
 export async function inspectOnlineDocument(bytes:Uint8Array,fileName:string,context:OnlineWeekContext,media:OnlineMediaAsset[],options:{weekTitle?:string}={}):Promise<OnlineDocumentInspection> {
-  const {filled,title:documentTitle,sourceCode,version}=documentSource(bytes,fileName,context,media,true);
+  return inspectDocumentSource(documentSource(bytes,fileName,context,media,true),context,media,options);
+}
+function inspectDocumentSource(source:ReturnType<typeof documentSource>,context:OnlineWeekContext,media:OnlineMediaAsset[],options:{weekTitle?:string}):OnlineDocumentInspection {
+  const {filled,title:documentTitle,sourceCode,version}=source;
   const title=options.weekTitle===undefined?documentTitle:required(options.weekTitle,'Tên tuần',90);
   const issues:OnlineDocumentIssue[]=[],excluded=new Set<Fields>();
   const exclude=(row:Fields,message:string)=>{if(excluded.has(row))return;excluded.add(row);issues.push({location:sourceLocation(row),message,

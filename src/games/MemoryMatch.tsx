@@ -11,7 +11,7 @@ import {useQuestionLayout} from './useQuestionLayout';
 import {createPairRounds,initialPairRoundLimit} from './pair-rounds';
 
 type Card = {id: string; pairId: string; side: 'left' | 'right'; label: string; objectiveId: string};
-type PendingMove={input:AttemptInput;card:Card;move:number};
+type PendingMove={input:AttemptInput;card:Card;move:number;revealedAt:number};
 
 export default function MemoryMatch({pack, onAttempt, onComplete, onExit,questionMode=false}: GameHostProps) {
   const content = pack as PairsPack;
@@ -74,10 +74,11 @@ export default function MemoryMatch({pack, onAttempt, onComplete, onExit,questio
     setLocked(true);
     setSaving(true);
     const stored=questionMode?pendingRef.current:null;
+    const revealedAt=stored?.revealedAt??performance.now();
     const move=stored?.move??++moveRef.current;
     const input:AttemptInput=stored?.input??{attemptKey:`move-${move}`,itemId:card.pairId,objectiveId:card.objectiveId,correct:previous.pairId===card.pairId&&previous.side!==card.side,hintsUsed:0,elapsedMs:Math.max(0,Math.round(performance.now()-started.current)),response:{kind:'pair',first:{itemId:previous.pairId,side:previous.side},second:{itemId:card.pairId,side:card.side}}};
     const correct=input.correct;
-    if(questionMode){const nextPending={input,card,move};pendingRef.current=nextPending;setPending(nextPending);}
+    if(questionMode){const nextPending={input,card,move,revealedAt};pendingRef.current=nextPending;setPending(nextPending);}
     setMoves(move);
     try {
       await onAttempt(input);
@@ -107,12 +108,12 @@ export default function MemoryMatch({pack, onAttempt, onComplete, onExit,questio
         finally {if (!closed.current) setFinishing(false);}
       }
     } else {
-      // Both cards remain visible briefly, then the board unlocks automatically.
+      // The reveal time overlaps the request, but the board never unlocks before ACK.
       timerRef.current = setTimeout(() => {
         if (closed.current) return;
         firstRef.current=null;setFirst(null);setSecond(null);setLocked(false);busyRef.current=false;
         timerRef.current = null;
-      },700);
+      },Math.max(0,700-(performance.now()-revealedAt)));
     }
   },[locked,status,matched,deck,onAttempt,onComplete,content.items.length,error,questionMode]);
 

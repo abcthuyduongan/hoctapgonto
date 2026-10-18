@@ -283,5 +283,5 @@ test('PostgreSQL media authorization batches assigned weeks without granting oth
   assert.equal((await f.store.studentState(s.auth)).weeks[2].unlocked,false);
   await denied(f.store.startPlay(s.auth,{requestId:'locked-media-game',moduleId:'math-quest',packId:sources[2].id,contentVersion:1}),403);
   t.diagnostic(`media access across 3 weeks: assigned ${assignedQueries}, other class ${otherClassQueries}, foreign workspace ${foreignQueries}`);
-  assert.deepEqual({assignedQueries,otherClassQueries,foreignQueries},{assignedQueries:3,otherClassQueries:4,foreignQueries:1});
+  assert.deepEqual({assignedQueries,otherClassQueries,foreignQueries},{assignedQueries:1,otherClassQueries:1,foreignQueries:1});
 });

@@ -25,17 +25,17 @@ test('a student starts before slow 3D assets finish, warms the game during sessi
   const modelsHeld=new Promise<void>(resolve=>{releaseModels=resolve;}),playHeld=new Promise<void>(resolve=>{releasePlay=resolve;});
   let modelRequests=0,modelFinished=0,playRequested=false,gameChunkRequested=false;
   page.on('request',request=>{if(/\/assets\/MathQuest-[^/]+\.js$/.test(request.url()))gameChunkRequested=true;});
-  await page.route('**/models/*.glb',async route=>{modelRequests++;await modelsHeld;await route.continue();modelFinished++;});
+  await page.route('**/*.glb',async route=>{modelRequests++;await modelsHeld;await route.continue();modelFinished++;});
   await page.route('**/api/online/play/compact',async route=>{playRequested=true;await playHeld;await route.continue();});
   try{
-    await page.goto(f.origin+'/');
+    await page.goto(f.origin+'/');await page.getByRole('button',{name:'Khám phá 3D',exact:true}).click();
     const host=page.locator('.ba3d-render-host'),start=page.getByRole('button',{name:'Chơi Đảo Câu Hỏi bằng bộ được giao',exact:true});
     await expect(host).toHaveAttribute('data-state','loading');await expect(start).toBeVisible();
     await expect.poll(()=>modelRequests).toBeGreaterThan(0);
     const started=Date.now();await start.click();await expect.poll(()=>playRequested).toBe(true);
     await expect.poll(()=>gameChunkRequested).toBe(true);expect(modelFinished).toBe(0);
     releasePlay();await expect(page.locator('.quiz-question')).toHaveText('Chọn câu trả lời 1');
-    const enterMs=Date.now()-started;expect(modelFinished).toBe(0);await expect(host).toHaveAttribute('data-state','loading');
+    const enterMs=Date.now()-started;expect(modelFinished).toBe(0);await expect(host).toHaveCount(0);
     let failures=0;await page.route('**/api/online/play/*/attempt',async route=>{if(failures++===0)await route.fulfill({status:503,contentType:'application/json',body:JSON.stringify({error:'Kết nối thử nghiệm bị gián đoạn. Vui lòng thử lại.'})});else await route.continue();});
     await page.locator('.answer-option').first().click();await expect(page.locator('.notice.error')).toContainText('Kết nối thử nghiệm bị gián đoạn');
     expect((await f.pool.query('SELECT count(*)::int AS n FROM bao_an.attempts')).rows[0].n).toBe(0);
@@ -56,9 +56,9 @@ test('a student starts before slow 3D assets finish, warms the game during sessi
 
 test('failed scene downloads retain a working direct start and the fallback scene',async({page})=>{
   const f=await studentFixture(page);
-  await page.route('**/models/*.glb',route=>route.fulfill({status:404,contentType:'text/plain',body:'Fixture scene unavailable'}));
+  await page.route('**/*.glb',route=>route.fulfill({status:404,contentType:'text/plain',body:'Fixture scene unavailable'}));
   try{
-    await page.goto(f.origin+'/');await expect(page.locator('.ba3d-render-host')).toHaveAttribute('data-state','fallback');
+    await page.goto(f.origin+'/');await page.getByRole('button',{name:'Khám phá 3D',exact:true}).click();await expect(page.locator('[data-hub-mode="light"]')).toBeVisible();await expect(page.locator('.ba3d-render-host')).toHaveCount(0);
     await page.getByRole('button',{name:'Chơi Đảo Câu Hỏi bằng bộ được giao',exact:true}).click();
     await expect(page.locator('.quiz-question')).toHaveText('Chọn câu trả lời 1');await page.locator('.answer-option').first().click();await expect(page.locator('.feedback-win')).toBeVisible();
     await page.getByRole('button',{name:'← Thoát trò chơi',exact:true}).click();await expect(page.getByRole('button',{name:'Chơi Đảo Câu Hỏi bằng bộ được giao',exact:true})).toBeEnabled();
@@ -67,7 +67,7 @@ test('failed scene downloads retain a working direct start and the fallback scen
 
 test('an interrupted game chunk displays recovery controls and reload can start a new working session',async({page})=>{
   const f=await studentFixture(page);
-  await page.route('**/models/*.glb',route=>route.fulfill({status:404,contentType:'text/plain',body:'Fixture scene unavailable'}));
+  await page.route('**/*.glb',route=>route.fulfill({status:404,contentType:'text/plain',body:'Fixture scene unavailable'}));
   await page.route('**/assets/MathQuest-*.js',route=>route.abort('failed'));
   try{
     await page.goto(f.origin+'/');await page.getByRole('button',{name:'Chơi Đảo Câu Hỏi bằng bộ được giao',exact:true}).click();

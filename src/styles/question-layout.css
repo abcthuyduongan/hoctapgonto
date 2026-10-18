@@ -1,5 +1,19 @@
 /* Shared readable sizes are computed from the actual game stage by
    useQuestionLayout. Natural content height remains available by scrolling. */
+.online-student .premium-game .world-particles{display:none!important}
+.online-student .premium-game .stage-backdrop,
+.online-student .premium-game .stage-overlay,
+.online-student .premium-game .ba37-mascot-window,
+.online-student .premium-game .ba37-mascot-fallback{animation:none!important;filter:none}
+.online-student .immersive-dialog.premium-game[data-scene-engine='html'] .stage-backdrop{
+  display:block;background-size:cover;background-position:center;filter:none;
+}
+.online-student .premium-game[data-scene-engine='html'] .stage-backdrop::before,
+.online-student .premium-game[data-scene-engine='html'] .stage-backdrop::after{display:none}
+.online-student .premium-game[data-scene-engine='html'] .world-math .stage-backdrop{background-image:url('/art/original-math.webp')}
+.online-student .premium-game[data-scene-engine='html'] .world-memory .stage-backdrop{background-image:url('/art/original-memory.webp')}
+.online-student .premium-game[data-scene-engine='html'] .world-sentence .stage-backdrop{background-image:url('/art/original-sentence.webp')}
+.online-student .premium-game[data-scene-engine='html'] .trail-panel .stage-backdrop{background-image:url('/art/original-world.webp')}
 .immersive-dialog.premium-game .world-stage[data-question-layout],
 .world-stage[data-question-layout] {
   padding:var(--question-stage-padding) clamp(10px,2vw,28px)!important;

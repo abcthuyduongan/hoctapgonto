@@ -1,3 +1,4 @@
+import {startAssignedGame} from '../helpers/student-ui';
 import {seedLegacyApiWeek} from '../helpers/legacy-weeks.mjs';
 import path from 'node:path';
 import {mkdir,mkdtemp,readFile,rm} from 'node:fs/promises';
@@ -21,7 +22,7 @@ async function fixture(page:Page,count:number){
   const pack={id:'pair-rounds-source',version:1,title:`Bộ ${count} cặp`,kind:'pairs',grade:3,subject:'thinking',source:'local',publishedAt:'2026-10-17T00:00:00.000Z',items:Array.from({length:count},(_,i)=>({id:`round-item-${i+1}`,kind:'pair',objectiveId:'ROUNDS.TEST',left:`Câu hỏi số ${i+1}`,right:`Đáp án số ${i+1}`,media:{imageId:image.id,imageAlt:`Hình ${i+1}`,audioId:audio.id,audioTranscript:`Âm thanh câu ${i+1}`}}))};
   await api('/weeks',{requestId:'pair-rounds-week',classId:cls.id,title:'Tuần chia màn',sets:[{subjectLabel:'Ghép cặp',pack}]});
   await page.context().clearCookies();await api('/login',{username:'rounds.child',password});
-  return{api,origin,pack,server,attempts:()=>Number(server.onlineStore.db.prepare('SELECT count(*) AS n FROM attempts').get().n),awards:()=>Number(server.onlineStore.db.prepare('SELECT count(*) AS n FROM awards').get().n),async open(game:string){await page.goto(origin+'/?online=1&controls=1');await page.getByRole('button',{name:'Chọn '+game,exact:true}).click();await page.getByRole('button',{name:/^Bắt đầu/}).click();},async close(){server.closeAllConnections?.();await new Promise<void>(resolve=>server.close(()=>resolve()));server.onlineClose();expect(path.dirname(path.resolve(directory))).toBe(root);expect(path.basename(directory)).toMatch(/^pair-rounds-/);await rm(directory,{recursive:true,force:true});}};
+  return{api,origin,pack,server,attempts:()=>Number(server.onlineStore.db.prepare('SELECT count(*) AS n FROM attempts').get().n),awards:()=>Number(server.onlineStore.db.prepare('SELECT count(*) AS n FROM awards').get().n),async open(game:string){await page.goto(origin+'/?online=1&controls=1');await startAssignedGame(page,game);},async close(){server.closeAllConnections?.();await new Promise<void>(resolve=>server.close(()=>resolve()));server.onlineClose();expect(path.dirname(path.resolve(directory))).toBe(root);expect(path.basename(directory)).toMatch(/^pair-rounds-/);await rm(directory,{recursive:true,force:true});}};
 }
 
 for(const game of ['Khu Rừng Trí Nhớ','Đảo Nối Từ'])test(`${game}: balanced rounds wait for saved answers, release media and complete the whole source once`,async({page},testInfo)=>{

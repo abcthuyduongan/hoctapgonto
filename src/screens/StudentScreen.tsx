@@ -1,13 +1,21 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import type { ModuleId } from '../core/contracts';
 import type {OnlinePackSummary} from '../core/online-contracts';
 import { GAME_REGISTRY } from '../core/registry';
-import WorldCanvas, { type SceneInfo } from '../world3d/WorldCanvas';
+import type { SceneInfo } from '../world3d/WorldCanvas';
+import AsyncBoundary from '../components/AsyncBoundary';
 import type { WorldId } from '../world3d/engine';
 import { getSceneForModule } from '../world3d/scenes/sceneCatalog';
 import type { GuideMood, QualityChoice } from '../world3d/renderer/types';
 import { playClickSound, playIslandSelectSound } from '../core/sound';
 import '../styles/student-assigned-games.css';
+
+const WorldCanvas=lazy(()=>import('../world3d/WorldCanvas'));
+const displayKey='bao-an-display-mode-v1';
+type DisplayMode='light'|'3d';
+function initialDisplayMode():DisplayMode {
+  try{return localStorage.getItem(displayKey)==='3d'?'3d':'light';}catch{return 'light';}
+}
 
 interface Props {
   availableStars: number;
@@ -21,7 +29,7 @@ interface Props {
   gameWorld: WorldId | null;
   guideMood: GuideMood;
   guideCue: number;
-  onSceneChange: (info: SceneInfo) => void;
+  onSceneChange?: (info: SceneInfo) => void;
 }
 const themes:Record<string,{world:string,symbol:string,short:string,intro:string}>= {
   'math-quest': {world:'Đảo Toán Học',symbol:'∑',short:'Chọn đáp án',intro:'Vượt từng câu hỏi bằng cách chọn đáp án đúng.'},
@@ -32,11 +40,12 @@ const themes:Record<string,{world:string,symbol:string,short:string,intro:string
 };
 export default function StudentScreen({availableStars,practiceContext,onPlay,starting,onOpenWallet,worldActive,motionOn,gameWorld,guideMood,guideCue,onSceneChange}:Props){
   const [focused,setFocused]=useState<WorldId|null>(null);
+  const [displayMode,setDisplayMode]=useState<DisplayMode>(initialDisplayMode);
   const [simpleControls,setSimpleControls]=useState(()=>new URLSearchParams(window.location.search).get('controls')==='1');
   const [sceneState,setSceneState]=useState<SceneInfo['state']>('loading');
   const overview = useRef<HTMLDivElement>(null);
   useEffect(() => { if (gameWorld) setFocused(gameWorld); }, [gameWorld]);
-  const [quality,setQuality]=useState<QualityChoice>('auto');
+  const [quality,setQuality]=useState<QualityChoice>('low');
   const assignedMode=true;
   const currentPack=practiceContext.pack;
   const worldName=(worldId:string)=>worldId==='math-quest'?'Đảo Câu Hỏi':themes[worldId].world;
@@ -46,10 +55,27 @@ export default function StudentScreen({availableStars,practiceContext,onPlay,sta
     if (id && id !== focused) playIslandSelectSound();
     setFocused(id);
   };
-  const sceneChanged=useCallback((info:SceneInfo)=>{setSceneState(info.state);onSceneChange(info);},[onSceneChange]);
+  function changeDisplayMode(mode:DisplayMode){
+    setDisplayMode(mode);setSceneState('loading');
+    try{localStorage.setItem(displayKey,mode);}catch{/* Display preferences are optional. */}
+  }
+  const sceneChanged=useCallback((info:SceneInfo)=>{
+    setSceneState(info.state);onSceneChange?.(info);
+    if(info.state==='fallback'||info.state==='unavailable'){
+      setDisplayMode('light');
+      try{localStorage.setItem(displayKey,'light');}catch{/* A failed scene must still fall back. */}
+    }
+  },[onSceneChange]);
   function packFor(gameId:ModuleId){return currentPack&&playable.some(game=>game.id===gameId)?currentPack:undefined;}
   const enterWorld=(id:WorldId)=>{const game=GAME_REGISTRY.find(row=>getSceneForModule(row.id)===id);if(!game||starting)return;const pack=packFor(game.id);if(pack)void onPlay(game.id,pack);};
-  return <div className={`ba3d-home premium-world game-hub ${simpleControls?'':'immersive-world'} ${focused ? 'has-focused-island' : 'overview-mode'}`} id="home">
+  if(displayMode==='light')return <section id="home" className="game-hub student-light-hub" data-hub-mode="light" aria-label="Chọn trò chơi phù hợp">
+    <div className="student-light-heading"><img className="student-light-guide" src="/art/fox-guide-common.webp" alt="Cáo nhỏ đồng hành" width="88" height="112" decoding="async"/><div><p className="online-eyebrow">HÀNH TRÌNH CỦA CON</p><h1>{practiceContext.title}</h1><p>{practiceContext.detail}</p></div><button type="button" className="game-wallet-button" aria-label="Ví đổi sao" onClick={onOpenWallet} disabled={starting}>⭐ {availableStars} sao · Đổi thưởng →</button></div>
+    <section className="assigned-game-fallback student-light-games" aria-label="Trò chơi phù hợp bộ được giao"><strong>{currentPack?'Chọn trò để vào bộ được giao':practiceContext.complete?'Con đã hoàn thành học liệu được giao':'Đang chờ học liệu từ lớp'}</strong>{currentPack&&<p>{currentPack.title} · {currentPack.itemCount} câu</p>}<div>{playable.map(game=><button key={game.id} type="button" disabled={starting} aria-label={`Chơi ${game.label} bằng bộ được giao`} onClick={()=>currentPack&&void onPlay(game.id,currentPack)}><span aria-hidden="true">{themes[game.id].symbol}</span><span><strong>{game.label}</strong><small>{themes[game.id].intro}</small></span><span aria-hidden="true">→</span></button>)}</div>{!currentPack&&<p>{practiceContext.detail}</p>}</section>
+    <div className="student-display-choice"><span>Chế độ nhẹ</span><button type="button" disabled={starting} onClick={()=>changeDisplayMode('3d')}>Khám phá 3D</button></div>
+    {starting&&<p className="student-starting" role="status">Đang mở trò chơi…</p>}
+  </section>;
+  return <div data-hub-mode="3d" className={`ba3d-home premium-world game-hub ${simpleControls?'':'immersive-world'} ${focused ? 'has-focused-island' : 'overview-mode'}`} id="home">
+    <div className="student-display-choice student-display-choice-3d"><span>Khám phá 3D</span><button type="button" disabled={starting} onClick={()=>changeDisplayMode('light')}>Chế độ nhẹ</button></div>
     <section className="ba3d-world" aria-label="Bảo An Learning: thế giới game 3D tương tác">
       <div className="game-hub-top">
         <div className="game-journey-brief"><strong>{practiceContext.title}</strong><span>{practiceContext.detail}</span></div>
@@ -67,9 +93,9 @@ export default function StudentScreen({availableStars,practiceContext,onPlay,sta
         })}
       </nav>}
       <div className="game-hub-stage">
-        <WorldCanvas selected={focused} onSelect={selectIsland} active={worldActive} motionOn={motionOn}
+        {!gameWorld&&worldActive&&<AsyncBoundary label="cảnh 3D" onExit={()=>changeDisplayMode('light')}><Suspense fallback={<p className="online-loading" role="status">Đang mở cảnh 3D… Con vẫn có thể chọn trò bên dưới.</p>}><WorldCanvas selected={focused} onSelect={selectIsland} active={worldActive} motionOn={motionOn}
           quality={quality} gameWorld={gameWorld} guideMood={guideMood} guideCue={guideCue} onSceneChange={sceneChanged}
-          onEnterWorld={enterWorld} onOverview={()=>selectIsland(null)}/>
+          onEnterWorld={enterWorld} onOverview={()=>selectIsland(null)}/></Suspense></AsyncBoundary>}
         <div ref={overview} tabIndex={-1} role="group" aria-label="Tổng quan các đảo" className="ba3d-island-overview">
           <span className="ba3d-sr-only" role="status">{focused?`Đã chọn ${worldName(focused)}`:'Chọn một trò ở phía trên hoặc chạm vào một đảo.'}</span>
           {focused&&<button type="button" className="ba3d-overview-reset" aria-label="Xem tất cả các đảo" onClick={()=>{playClickSound();setFocused(null);overview.current?.focus();}}><span aria-hidden="true">↻</span> Tổng quan</button>}

@@ -7,7 +7,7 @@ import {build} from 'esbuild';
 import {setTimeout as delay} from 'node:timers/promises';
 import {BROWSER_NOTICE_PACKAGES,thirdPartyNotices} from './thirdPartyNotices.mjs';
 
-export const RELEASE_VERSION='3.8.0-rc.11';
+export const RELEASE_VERSION='3.8.0-rc.12';
 export const RELEASE_STORAGE_SCHEMAS=Object.freeze({localSqlite:1,cloudPostgres:1});
 const PROJECT_ROOT=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const MAX_FILES=3000,MAX_FILE_BYTES=64*1024*1024,MAX_TOTAL_BYTES=256*1024*1024;
@@ -60,6 +60,7 @@ async function buildPayload(distDir){
   payload.set('QUAN_LY_CUC_BO.md',await readFile(join(PROJECT_ROOT,'docs/QUAN_LY_CUC_BO.md')));
   payload.set('NGHIEM_THU_CUC_BO_RC10.md',await readFile(join(PROJECT_ROOT,'docs/NGHIEM_THU_CUC_BO_RC10.md')));
   payload.set('NGHIEM_THU_CUC_BO_RC11.md',await readFile(join(PROJECT_ROOT,'docs/NGHIEM_THU_CUC_BO_RC11.md')));
+  payload.set('NGHIEM_THU_CUC_BO_RC12.md',await readFile(join(PROJECT_ROOT,'docs/NGHIEM_THU_CUC_BO_RC12.md')));
   const assetCount=files.length;
   const entries=[...payload].sort(([a],[b])=>a.localeCompare(b)).map(([path,bytes])=>({path,bytes:bytes.byteLength,sha256:hash(bytes)}));
   return {payload,buildId,assetCount,entries,payloadHash:hash(Buffer.from(JSON.stringify(entries)))};

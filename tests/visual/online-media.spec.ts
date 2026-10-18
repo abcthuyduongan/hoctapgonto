@@ -1,3 +1,4 @@
+import {startAssignedGame} from '../helpers/student-ui';
 import {seedLegacyApiWeek} from '../helpers/legacy-weeks.mjs';
 import path from 'node:path';
 import {mkdtemp,mkdir,rm,readFile} from 'node:fs/promises';
@@ -60,7 +61,7 @@ test('matching cards keep their question text visible alongside images at mobile
   const f=await fixture(page);
   try{
     await f.api(page.request,'/weeks',{requestId:'image-text-week',classId:f.cls.id,title:'Tuần có hình',sets:[{subjectLabel:'Quan sát',pack:f.pack}]});
-    await page.context().clearCookies();await f.login(page,'media.child');await page.getByRole('button',{name:'Chọn Đảo Nối Từ',exact:true}).click();await page.getByRole('button',{name:/^Bắt đầu/}).click();
+    await page.context().clearCookies();await f.login(page,'media.child');await startAssignedGame(page,'Đảo Nối Từ');
     for(const width of [360,768,1440]){
       await page.setViewportSize({width,height:1000});const labels=page.locator('.connect-col-left .connect-card-text');await expect(labels).toHaveCount(4);
       for(const label of await labels.all()){await expect(label).toBeVisible();const rect=await label.boundingBox();expect(rect!.height).toBeGreaterThan(15);}
@@ -96,7 +97,7 @@ test('memory cards contain long labels and images without clipping at short, mob
     expect(imageLabel).toHaveLength(120);expect(plainLabel).toHaveLength(120);
     const pack={...f.pack,items:f.pack.items.map((item,index)=>index===0?{...item,left:imageLabel,right:'Xe đạp'}:index===1?{...item,left:plainLabel,right:'Thư viện',media:undefined}:item)};
     await f.api(page.request,'/weeks',{requestId:'long-memory-week',classId:f.cls.id,title:'Tuần thẻ có câu dài',sets:[{subjectLabel:'Quan sát',pack}]});
-    await page.context().clearCookies();await f.login(page,'media.child');await page.getByRole('button',{name:'Chọn Khu Rừng Trí Nhớ',exact:true}).click();await page.getByRole('button',{name:/^Bắt đầu/}).click();
+    await page.context().clearCookies();await f.login(page,'media.child');await startAssignedGame(page,'Khu Rừng Trí Nhớ');
     await page.route(`**/api/online/media/${f.image.id}*`,route=>route.abort());
     await page.setViewportSize(viewports[0]);const longCard=page.locator('.memory-card').filter({hasText:imageLabel});
     await longCard.evaluate(()=>new Promise<void>(resolve=>requestAnimationFrame(()=>requestAnimationFrame(()=>resolve()))));const closedHeight=(await longCard.boundingBox())!.height;await longCard.click();
@@ -123,7 +124,7 @@ for(const game of ['Đảo Nối Từ','Khu Rừng Trí Nhớ'])test(`${game}: f
   try{
     await f.api(page.request,'/weeks',{requestId:'image-retry-week',classId:f.cls.id,title:'Tuần tải lại hình',sets:[{subjectLabel:'Quan sát',pack:f.pack}]});
     await page.context().clearCookies();await f.login(page,'media.child');await page.route(`**/api/online/media/${f.image.id}*`,route=>route.abort());
-    await page.getByRole('button',{name:'Chọn '+game,exact:true}).click();await page.getByRole('button',{name:/^Bắt đầu/}).click();
+    await startAssignedGame(page,game);
     if(game==='Khu Rừng Trí Nhớ'){expect(f.server.onlineStore.db.prepare('SELECT count(*) AS n FROM attempts').get().n).toBe(0);const card=page.locator('.memory-card').filter({hasText:'Vế trái 1'});await card.click();}
     await expect(page.getByRole('button',{name:'Tải lại hình',exact:true})).toBeVisible();await expect(page.locator('button button')).toHaveCount(0);
     const attempts=Number(f.server.onlineStore.db.prepare('SELECT count(*) AS n FROM attempts').get().n);

@@ -18,7 +18,7 @@ interface ConnectItem {
   label: string;
   objectiveId: string;
 }
-type PendingConnection={input:AttemptInput;leftId:string;rightId:string;move:number};
+type PendingConnection={input:AttemptInput;leftId:string;rightId:string;move:number;revealedAt:number};
 
 export default function WordConnect({ pack, onAttempt, onComplete, onExit,questionMode=false }: GameHostProps) {
   const content = pack as PairsPack;
@@ -88,6 +88,7 @@ export default function WordConnect({ pack, onAttempt, onComplete, onExit,questi
     setLocked(true);
     setSaving(true);
     const stored=questionMode?pendingRef.current:null;
+    const revealedAt=stored?.revealedAt??performance.now();
     const move=stored?.move??++moveRef.current;
     setMoves(move);
 
@@ -98,7 +99,7 @@ export default function WordConnect({ pack, onAttempt, onComplete, onExit,questi
       elapsedMs:Math.max(0,Math.round(performance.now()-started.current))
     };
     const correct=input.correct;
-    if(questionMode){const nextPending={input,leftId,rightId,move};pendingRef.current=nextPending;setPending(nextPending);}
+    if(questionMode){const nextPending={input,leftId,rightId,move,revealedAt};pendingRef.current=nextPending;setPending(nextPending);}
     try {
       await onAttempt(input);
     } catch(failure) {
@@ -145,7 +146,7 @@ export default function WordConnect({ pack, onAttempt, onComplete, onExit,questi
         setLocked(false);
         busyRef.current = false;
         timerRef.current = null;
-      }, 700);
+      },Math.max(0,700-(performance.now()-revealedAt)));
     }
   }, [content.items, onAttempt, onComplete,questionMode]);
 

@@ -34,7 +34,6 @@ export default function WorldCanvas({ selected, onSelect, active, motionOn, qual
   const current = useRef({ selected, onSelect, active, motionOn, quality, gameWorld, guideMood, guideCue, onSceneChange, onEnterWorld, onOverview });
   current.current = { selected, onSelect, active, motionOn, quality, gameWorld, guideMood, guideCue, onSceneChange, onEnterWorld, onOverview };
   const [state, setState] = useState<SceneInfo['state']>('loading');
-  const [recovery, setRecovery] = useState(0);
   const updateDiagnostics = useCallback(() => {
     const stats = runtime.current?.getDiagnostics();
     if (stats && host.current) {
@@ -57,7 +56,6 @@ export default function WorldCanvas({ selected, onSelect, active, motionOn, qual
     const container = host.current;
     if (!container) return;
     let cancelled = false;
-    let recovering = false;
     const abort = new AbortController();
     const media = window.matchMedia('(prefers-reduced-motion: reduce)');
     const keyboard=(event:KeyboardEvent)=>{
@@ -94,13 +92,13 @@ export default function WorldCanvas({ selected, onSelect, active, motionOn, qual
     };
     const canvas = replaceCanvas();
     setState('loading');
-    void createWorldRenderer({ canvas, premium3DEnabled: recovery === 0,
+    void createWorldRenderer({ canvas, premium3DEnabled:true,fallbackToLegacy:false,
       replaceCanvas, onSelect: id => current.current.onSelect(id),
       onEnterWorld:id=>current.current.onEnterWorld?.(id),
       motionOn: current.current.motionOn && !media.matches,
       paused: !current.current.active || document.hidden, quality: current.current.quality,
       signal: abort.signal, onContextLost: () => {
-        if (!cancelled && !recovering) { recovering = true; setRecovery(value => value + 1); }
+        if (!cancelled) { abort.abort();runtime.current?.dispose();runtime.current=null;container.replaceChildren();setState('unavailable'); }
       },
     }).then(renderer => {
       if (cancelled) { renderer.dispose(); return; }
@@ -122,7 +120,7 @@ export default function WorldCanvas({ selected, onSelect, active, motionOn, qual
       window.clearInterval(diagnosticsTimer);
       container.replaceChildren();
     };
-  }, [recovery, updateDiagnostics]);
+  }, [updateDiagnostics]);
 
   useEffect(() => {
     onSceneChange?.({ state, engine: runtime.current?.getDiagnostics().engine ?? null });

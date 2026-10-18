@@ -1,3 +1,4 @@
+import {startAssignedGame} from '../helpers/student-ui';
 import {seedLegacyApiWeek} from '../helpers/legacy-weeks.mjs';
 import path from 'node:path';
 import {mkdtemp,mkdir,cp,rm} from 'node:fs/promises';
@@ -43,7 +44,7 @@ test('assigned memory, sentence and sequence games complete through server-score
   const sentence={...base,id:'games-authored-sentence',title:'Câu tự soạn',kind:'sentences',items:[['Little','birds','sing'],['Children','read','books']].map((words,i)=>({id:'game-sentence-'+i,kind:'sentence',objectiveId:'AUTHOR.SENTENCE',prompt:'Xếp câu do tác giả đặt '+i,words,hint:'Xếp theo thứ tự do tác giả cung cấp.'}))};
   const trail={...base,id:'games-authored-trail',title:'Trình tự tự soạn',kind:'sentences',items:[['Seed','sprout','plant'],['Morning','noon','night']].map((words,i)=>({id:'game-trail-'+i,kind:'sentence',objectiveId:'AUTHOR.ORDER',prompt:'Xếp trình tự do tác giả đặt '+i,words,hint:'Xếp theo thứ tự do tác giả cung cấp.'}))};
   await api('/weeks',{requestId:'account-five-games',title:'Tuần tự soạn game',classId:cls.id,sets:[pairs,sentence,trail].map(pack=>({subjectLabel:'Lĩnh vực do giáo viên đặt',pack}))});await page.context().clearCookies();await page.goto(origin+'/?online=1&controls=1');await page.getByLabel('Tên đăng nhập',{exact:true}).fill('games.child');await page.getByLabel('Mật khẩu',{exact:true}).fill('Games-child-fixture-2026!');await page.getByRole('button',{name:'Đăng nhập',exact:true}).click();
-  async function enter(name:string){await page.getByRole('button',{name:'Chọn '+name,exact:true}).click();await page.getByRole('button',{name:/^Bắt đầu/}).click();await expect(page.locator('.immersive-dialog')).toBeVisible();}
+  async function enter(name:string){await startAssignedGame(page,name);await expect(page.locator('.immersive-dialog')).toBeVisible();}
   async function leave(){await page.getByRole('button',{name:'Trở về hành trình',exact:true}).click();await expect(page.getByRole('button',{name:'Ví đổi sao',exact:true})).toBeEnabled();}
   await enter('Khu Rừng Trí Nhớ');for(const item of pairs.items){await page.locator('.memory-card').filter({hasText:item.left}).click();await page.locator('.memory-card').filter({hasText:item.right}).click();}await leave();expect((await api('/student')).balance.earned).toBe(6);
   await enter('Xưởng Ghép Câu');for(let i=0;i<sentence.items.length;i++){for(const word of sentence.items[i].words)await page.locator('.sentence-bank').getByRole('button',{name:word,exact:true}).click();await page.getByRole('button',{name:'✓ Kiểm tra câu',exact:true}).click();await page.getByRole('button',{name:i?'Hoàn thành bộ câu hỏi':'Câu tiếp theo ➜',exact:true}).click();}await leave();expect((await api('/student')).balance.earned).toBe(12);

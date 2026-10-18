@@ -1,4 +1,4 @@
-# Bảo An Learning · 3.8.0-rc.11
+# Bảo An Learning · 3.8.0-rc.12
 
 Ứng viên phát hành cục bộ cho Windows Edge/Chrome. Giáo viên quản lý nhiều lớp, tự soạn câu hỏi nhiều môn theo tuần; ứng dụng nhận dạng câu và đưa vào trò phù hợp. Chờ nghiệm thu thực tế trước khi công bố production.
 
@@ -28,6 +28,10 @@ RC10 chỉ giao câu trắc nghiệm/đọc/nghe/nhập hiện tại khi mở đ
 
 RC11 giảm số lượt trao đổi PostgreSQL khi đăng nhập, mở tiến độ và vào trò chơi; tải trạng thái máy chủ và phiên đăng nhập đồng thời, gộp yêu cầu làm mới trùng nhau. Xem [đo độ trễ và kiểm tra RC11](docs/DO_TRE_VA_TOI_UU_RC11_2026-10-18.md). Gói ZIP RC10 bên dưới là bản bàn giao trước bản vá này.
 
+RC12 mặc định Chế độ nhẹ không tải GLB/Three.js hoặc tạo WebGL. Khám phá 3D là tùy chọn; vào bài thì dọn cảnh, tải từng đảo bằng tài nguyên nhẹ có hash. Đăng nhập chỉ tải phần xác thực; quản trị và học sinh tải sau đăng nhập. Excel được parse một lần cho mỗi phiên nhập, chỉ kiểm tra/tải media cần cho câu hợp lệ và phân trang xem trước. Xem [kế hoạch tối ưu](docs/KE_HOACH_TOI_UU_TOC_DO_VA_GIU_3D_2026-10-18.md) và [phiếu RC12](docs/NGHIEM_THU_CUC_BO_RC12.md). Chưa có staging riêng để nghiệm thu tải cloud 30–100 học sinh; manifest vẫn là ứng viên chưa nghiệm thu người dùng.
+
+Kết quả RC12: [báo cáo tối ưu và giới hạn nghiệm thu](docs/BAO_CAO_TOI_UU_RC12_2026-10-18.md), [số liệu kiểm thử cục bộ](docs/QA_RC12_SUMMARY.json). Tạo gói nguồn bằng `npm run package:source`; gói loại trừ cấu hình bí mật, cơ sở dữ liệu, node_modules và tệp kết quả chạy.
+
 ## Dữ liệu và phục hồi
 
 Mã nguồn dùng .online/bao-an.sqlite; ZIP dùng data/bao-an.sqlite. Tư liệu cùng lưu trong SQLite. Dùng mục **Sao lưu & khôi phục** để tải bản sao nhất quán, kiểm tra trước rồi xác nhận phục hồi. Công cụ tự sao lưu trước khi thay, thu hồi phiên cũ và đóng lượt đang dở.
@@ -45,7 +49,7 @@ npm run package:pilot
 
 verify:local chạy TypeScript, kiểm thử renderer/học liệu/dữ liệu/khôi phục/cloud cục bộ/ZIP, kiểm tra tài nguyên, build và các ca trình duyệt máy chủ thật. Cần Chrome và Edge cho Playwright; BAO_AN_BROWSER_CHANNEL có thể chọn riêng chrome hoặc msedge. Nhóm hiện hành mặc định chạy cả hai trình duyệt. CI được cấu hình cho Node 22.22.2 và 24 trên Windows; kết quả chạy cục bộ được ghi riêng trong báo cáo bàn giao.
 
-Gói mới ở releases/bao-an-learning-3.8.0-rc.11.zip; gói RC10 giữ nguyên. Manifest ghi build ID, hash từng tệp và schema riêng: SQLite 1, PostgreSQL 1. releaseReady:false và humanPilotStatus:UNVERIFIED được giữ tới khi người dùng nghiệm thu. Không ghi đè cùng phiên bản bằng nội dung khác. Dùng RC10 trở lên để khôi phục bản sao RC10, không hạ bản.
+Gói mới ở releases/bao-an-learning-3.8.0-rc.12.zip; gói RC10/RC11 giữ nguyên. Manifest ghi build ID, hash từng tệp và schema riêng: SQLite 1, PostgreSQL 1. releaseReady:false và humanPilotStatus:UNVERIFIED được giữ tới khi người dùng nghiệm thu. Không ghi đè cùng phiên bản bằng nội dung khác. Dùng RC10 trở lên để khôi phục bản sao RC10, không hạ bản.
 
 ## Tài liệu
 

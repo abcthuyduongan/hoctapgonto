@@ -13,6 +13,9 @@ export interface RenderStats {
   drawCalls?: number;
   triangles?: number;
   textureBytesEstimate?: number;
+  geometryBytesEstimate?: number;
+  activeAssetBytes?: number;
+  renderPending?: boolean;
   gpuGeometries?: number;
   gpuTextures?: number;
   gpuPrograms?: number;

@@ -3,6 +3,8 @@ import type { RendererInitOptions, WorldRenderer } from './types.ts';
 type Loader = (options: RendererInitOptions) => WorldRenderer | Promise<WorldRenderer>;
 interface FactoryOptions extends RendererInitOptions {
   premium3DEnabled: boolean;
+  /** Online lessons return to their lightweight DOM hub instead of a second renderer. */
+  fallbackToLegacy?:boolean;
   replaceCanvas: () => HTMLCanvasElement;
 }
 const defaults = {
@@ -24,6 +26,7 @@ export async function createWorldRenderer(opts: FactoryOptions,
     try { return await create(loaders.premium); }
     catch (error) {
       opts.signal.throwIfAborted();
+      if(opts.fallbackToLegacy===false)throw error;
       console.warn('Bảo An: dùng renderer dự phòng', error);
       // A canvas that acquired WebGL cannot later acquire a different context.
       // The premium loader owns cleanup on failure; the host owns replacement.

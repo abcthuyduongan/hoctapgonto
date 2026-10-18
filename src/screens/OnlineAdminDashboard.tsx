@@ -1,0 +1,232 @@
+import {useCallback,useEffect,useMemo,useRef,useState} from 'react';
+import type {OnlineAdminSummary,OnlineIdentity,OnlineMediaAsset,OnlineRedemption,OnlineWeek,OnlineWeekCheck} from '../core/online-contracts';
+import {onlineApi,OnlineError,getOnlineMediaMaxBytes} from '../core/online-client';
+import {onlineDocumentGameChoices as onlineGameChoices,onlineDocumentSourceId,inspectOnlineDocument,prepareOnlineDocument} from '../core/online-document-import';
+import {onlinePackQuestionKind} from '../core/online-import-identity';
+import {assertQuestionMediaSelectionBudget,validateQuestionMediaFile} from '../core/online-media-check';
+import OnlineQuestionReview,{OnlineQuestionDisclosure,onlinePackKindLabel} from './OnlineQuestionReview';
+import OnlineRecoveryPanel from './OnlineRecoveryPanel';
+import {rewardStatus} from '../core/reward-wallet';
+import {newId} from '../core/utils';
+import {DEFAULT_WEEKLY_SUBJECTS,summarizeWeeklySubjects,weeklySubjectId,weeklyPlanErrors} from '../core/weekly-plan';
+import {onlineMoney,onlineRewardStatus,onlineTime} from '../core/online-format';
+import '../styles/online.css';
+import '../styles/online-management.css';
+
+const messageOf=(error:unknown)=>error instanceof Error?error.message:'Chưa thực hiện được yêu cầu. Hãy thử lại.';
+type Preview=Omit<Awaited<ReturnType<typeof inspectOnlineDocument>>,'sets'>&{sets:(Awaited<ReturnType<typeof inspectOnlineDocument>>['sets'][number]&{subjectId?:string})[];classId:string;requestId:string;replaceWeekId?:string};
+type MediaIssue={name:string;message:string};
+type PreparedMedia={file:File;name:string;mime:string;sha256:string;size:number};
+const weekChoices=Array.from({length:52},(_,index)=>`Tuần ${String(index+1).padStart(2,'0')}`);
+const fileNameKey=(name:string)=>name.normalize('NFC').toLocaleLowerCase('vi');
+const mediaMime=(file:File)=>({'png':'image/png','jpg':'image/jpeg','jpeg':'image/jpeg','webp':'image/webp','mp3':'audio/mpeg','wav':'audio/wav','ogg':'audio/ogg'} as Record<string,string>)[file.name.split('.').at(-1)?.toLowerCase()??''];
+const yieldImport=()=>new Promise<void>(resolve=>window.setTimeout(resolve,0));
+
+export default function AdminDashboard({identity,onLogout,onRestored}:{identity:OnlineIdentity;onLogout:()=>Promise<void>;onRestored:()=>void}){
+  const [data,setData]=useState<OnlineAdminSummary|null>(null),[error,setError]=useState(''),[notice,setNotice]=useState(''),[busy,setBusy]=useState(false),[tab,changeTab]=useState<'students'|'weeks'|'wallet'|'recovery'>('students'),[classId,changeClassId]=useState('');
+  const [offset,setOffset]=useState(0),[loading,setLoading]=useState(false),[selectedWeek,setSelectedWeek]=useState<OnlineWeek|null>(null),[weekCheck,setWeekCheck]=useState<OnlineWeekCheck|null>(null),[targetSubjects,setTargetSubjects]=useState('3');
+  const [library,setLibrary]=useState<Awaited<ReturnType<typeof onlineApi.adminMedia>>|null>(null);
+  const [className,setClassName]=useState(''),[grade,setGrade]=useState('3'),[studentName,setStudentName]=useState(''),[username,setUsername]=useState(''),[password,setPassword]=useState(''),[credentials,setCredentials]=useState<{name:string;username:string;password:string}|null>(null),[query,changeQuery]=useState('');
+  const [weekTitle,setWeekTitle]=useState(weekChoices[0]),[subjectLabel,setSubjectLabel]=useState(''),[documentFile,setDocumentFile]=useState<File|null>(null),[preview,setPreview]=useState<Preview|null>(null);
+  const [pendingMedia,setPendingMedia]=useState<File[]>([]),[mediaIssues,setMediaIssues]=useState<MediaIssue[]>([]);
+  const [sourceId,setSourceId]=useState(''),[version,setVersion]=useState('1'),[replaceWeekId,setReplaceWeekId]=useState('');
+  const [walletEnabled,setWalletEnabled]=useState(false),[rate,setRate]=useState(''),[notes,setNotes]=useState<Record<string,string>>({});
+  const [uploadProgress,setUploadProgress]=useState('');
+  const [previewPage,setPreviewPage]=useState(0),[issuePage,setIssuePage]=useState(0);
+  const importController=useRef<AbortController|null>(null),checkedMedia=useRef(new WeakMap<File,PreparedMedia>());
+  const parsedDocument=useRef<{file:File;key:string;source:ReturnType<typeof prepareOnlineDocument>}|null>(null);
+  useEffect(()=>()=>{importController.current?.abort();parsedDocument.current=null;},[]);
+  useEffect(()=>{setPreviewPage(0);setIssuePage(0);},[preview?.requestId]);
+  const setTab=(value:typeof tab)=>{setOffset(0);changeTab(value);};
+  const setClassId=(value:string)=>{setOffset(0);setSelectedWeek(null);changeQuery('');changeClassId(value);};
+  const setQuery=(value:string)=>{setOffset(0);changeQuery(value);};
+  const operating=useRef(false),fileInput=useRef<HTMLInputElement>(null),generation=useRef(0),readController=useRef<AbortController|null>(null),readRequest=useRef<{key:string;work:Promise<void>}|null>(null);
+  const options=useRef({classId,section:tab,offset,query});options.current={classId,section:tab,offset,query};
+  const refresh=useCallback((force=false)=>{
+    const input={...options.current,...(!options.current.classId?{classId:undefined}:{})},key=JSON.stringify(input);
+    if(!force&&readRequest.current?.key===key)return readRequest.current.work;
+    readController.current?.abort();const controller=new AbortController();readController.current=controller;const current=++generation.current;setLoading(true);
+    const work=(async()=>{
+      try{const result=await onlineApi.adminSummary(input,controller.signal);if(current!==generation.current)return;setData(result);setLibrary(null);setPreview(null);setWeekCheck(null);}
+      catch(error){if(!controller.signal.aborted)throw error;}finally{if(current===generation.current)setLoading(false);}
+    })().finally(()=>{if(readRequest.current?.work===work)readRequest.current=null;});
+    readRequest.current={key,work};return work;
+  },[]);
+  useEffect(()=>{const timer=window.setTimeout(()=>void refresh().catch(error=>setError(messageOf(error))),query?250:0);return()=>window.clearTimeout(timer);},[classId,tab,offset,query,refresh]);
+  useEffect(()=>{let timer:number|undefined;const update=()=>{if(document.visibilityState!=='visible'||operating.current)return;window.clearTimeout(timer);timer=window.setTimeout(()=>{if(document.visibilityState==='visible'&&!operating.current)void refresh().catch(error=>setError(messageOf(error)));},100);};window.addEventListener('focus',update);document.addEventListener('visibilitychange',update);return()=>{window.clearTimeout(timer);++generation.current;readController.current?.abort();window.removeEventListener('focus',update);document.removeEventListener('visibilitychange',update);};},[refresh]);
+  useEffect(()=>{if(data){setWalletEnabled(data.wallet.enabled);setRate(String(data.wallet.rateVnd));}},[data?.wallet.enabled,data?.wallet.rateVnd]);
+  useEffect(()=>{if(error)document.querySelector('.online-admin [role="alert"]')?.scrollIntoView({block:'center'});},[error]);
+  async function run(action:()=>Promise<string>,reload=true){if(operating.current)return;operating.current=true;setBusy(true);setError('');setNotice('');try{const result=await action();setNotice(result);if(reload)await refresh(true);}catch(error){if(importController.current?.signal.aborted)setNotice('Đã dừng kiểm tra. Chưa giao câu hỏi cho lớp; tư liệu máy chủ đã nhận vẫn có thể còn trong thư viện và sẽ được đối chiếu khi thử lại.');else setError(messageOf(error));}finally{importController.current=null;operating.current=false;setBusy(false);setUploadProgress('');}}
+  function selectImportFiles(files:FileList|null){
+    const selected=Array.from(files??[]);if(!selected.length)return;
+    invalidate();setError('');setNotice('');setMediaIssues([]);
+    const documents=selected.filter(file=>/\.(docx|xlsx)$/i.test(file.name));
+    if(documents.length>1){setDocumentFile(null);setPendingMedia([]);setError('Mỗi lần chọn một tài liệu Word hoặc Excel cùng các hình và âm thanh đi kèm.');return;}
+    if(documents[0]?.size>1024*1024){setDocumentFile(null);setPendingMedia([]);setError('Tài liệu tối đa 1 MB. Hãy chia nhỏ theo tuần.');return;}
+    const media=selected.filter(file=>!documents.includes(file));
+    const combined=documents.length?media:[...pendingMedia.filter(file=>!media.some(next=>fileNameKey(next.name)===fileNameKey(file.name))),...media];
+    try{assertQuestionMediaSelectionBudget(combined);}catch(error){setError(messageOf(error));return;}
+    if(documents.length)setDocumentFile(documents[0]);
+    setPendingMedia(combined);
+  }
+  async function uploadSelectedMedia(existing:OnlineMediaAsset[],files:File[],signal:AbortSignal):Promise<OnlineMediaAsset[]>{
+    assertQuestionMediaSelectionBudget(pendingMedia);
+    const checked:PreparedMedia[]=[],issues:MediaIssue[]=pendingMedia.filter(file=>!files.includes(file)).map(file=>({name:file.name,message:'Không có câu hợp lệ sử dụng tệp này; đã bỏ qua đọc và tải lên.'})),added:OnlineMediaAsset[]=[];
+    let checkedCount=0;
+    // Decode a few files together so one slow decoder does not serialize the entire selection.
+    for(let offset=0;offset<files.length;offset+=3){
+      signal.throwIfAborted();
+      const results=await Promise.all(files.slice(offset,offset+3).map(async file=>{
+        try{
+          const previous=checkedMedia.current.get(file);if(previous)return previous;
+          if(!file.name.trim()||file.name.length>180||/[\\/\u0000-\u001f]/.test(file.name))throw new Error('Tên tệp cần 1–180 ký tự và không chứa đường dẫn hoặc ký tự điều khiển.');
+          if(file.size>getOnlineMediaMaxBytes())throw new Error(`Mỗi hình / âm thanh tối đa ${getOnlineMediaMaxBytes()/1024/1024} MB.`);
+          await validateQuestionMediaFile(file,signal);signal.throwIfAborted();
+          const bytes=new Uint8Array(await file.arrayBuffer()),sha256=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)),byte=>byte.toString(16).padStart(2,'0')).join('');
+          signal.throwIfAborted();const prepared={file,name:file.name,mime:mediaMime(file),sha256,size:bytes.length};checkedMedia.current.set(file,prepared);return prepared;
+        }catch(error){if(signal.aborted)throw error;issues.push({name:file.name,message:messageOf(error)});return null;}
+        finally{if(!signal.aborted)setUploadProgress(`Đang kiểm tra tư liệu ${++checkedCount}/${files.length}`);}
+      }));
+      checked.push(...results.filter((file):file is PreparedMedia=>file!==null));
+    }
+    // A conflicting name must never silently bind a question to the older file.
+    const conflicting=new Set(checked.filter(file=>[...existing,...checked].some(other=>fileNameKey(other.name)===fileNameKey(file.name)&&other.sha256!==file.sha256)).map(file=>fileNameKey(file.name)));
+    const prepared=checked.filter((file,index)=>{
+      if(conflicting.has(fileNameKey(file.name))){issues.push({name:file.name,message:'Tên này đã dùng cho tư liệu khác. Đổi tên tệp và cập nhật tên trong tài liệu.'});return false;}
+      return !existing.some(asset=>fileNameKey(asset.name)===fileNameKey(file.name)&&asset.sha256===file.sha256)
+        &&checked.findIndex(other=>fileNameKey(other.name)===fileNameKey(file.name))===index;
+    });
+    let completed=0;
+    for(let offset=0;offset<prepared.length;){
+      signal.throwIfAborted();const batch:PreparedMedia[]=[];let bytes=0;
+      while(offset<prepared.length&&(getOnlineMediaMaxBytes()>2*1024*1024?batch.length<1:batch.length<24&&bytes+prepared[offset].size<=2*1024*1024)){const file=prepared[offset++];batch.push(file);bytes+=file.size;}
+      setUploadProgress(`Đang tải tư liệu · đã xong ${completed}/${prepared.length}`);
+      // Retain encoded bytes only for this bounded request, including its retries.
+      const payload:Parameters<typeof onlineApi.uploadMediaBatch>[0]=[];
+      for(const {file,name,mime} of batch){
+        signal.throwIfAborted();
+        const data=new Uint8Array(await file.arrayBuffer()),parts:string[]=[];
+        for(let at=0;at<data.length;at+=32768)parts.push(String.fromCharCode(...data.subarray(at,at+32768)));
+        payload.push({name,mime,base64:btoa(parts.join(''))});
+      }
+      try{
+        if(getOnlineMediaMaxBytes()<=2*1024*1024)added.push(...await onlineApi.uploadMediaBatch(payload,signal));else added.push(await onlineApi.uploadMedia(payload[0],signal));
+      }catch(error){
+        // A rejected batch is atomic. Isolate validation errors without discarding
+        // its good files; network/auth/server failures must not trigger a fan-out.
+        if(!(error instanceof OnlineError)||![400,422].includes(error.status))throw error;
+        if(batch.length>1&&getOnlineMediaMaxBytes()<=2*1024*1024){
+          for(const {name,mime,base64} of payload){
+            signal.throwIfAborted();try{added.push(await onlineApi.uploadMedia({name,mime,base64},signal));}
+            catch(single){if(!(single instanceof OnlineError)||![400,422].includes(single.status))throw single;issues.push({name,message:messageOf(single)});}
+          }
+        }else batch.forEach(file=>issues.push({name:file.name,message:messageOf(error)}));
+      }
+      completed+=batch.length;
+    }
+    signal.throwIfAborted();const assets=[...new Map([...existing,...added].map(asset=>[asset.id,asset])).values()];setMediaIssues(issues);
+    const failedNames=new Set(issues.map(issue=>fileNameKey(issue.name)));
+    return assets.filter(asset=>!failedNames.has(fileNameKey(asset.name)));
+  }
+  const selectedClass=data?.classes.find(row=>row.id===classId)??data?.classes[0],selectedId=selectedClass?.id??'';
+  const existingPreviewWeek=weekCheck?.duplicateWeek,sourceConflictWeek=weekCheck?.conflictWeek,revisionError=weekCheck?.revisionError??'';
+  const subjectSummary=useMemo(()=>preview?summarizeWeeklySubjects(preview.sets):[],[preview]);
+  const planErrors=useMemo(()=>preview&&(!preview.replaceWeekId||selectedWeek?.plan)?[...weeklyPlanErrors(preview.sets),...(subjectSummary.length!==Number(targetSubjects)?[`Đã chọn ${targetSubjects} môn nhưng tài liệu có ${subjectSummary.length} môn.`]:[])]:[],[preview,subjectSummary,targetSubjects,selectedWeek]);
+  const subjectOptions=[...new Map([...DEFAULT_WEEKLY_SUBJECTS,...subjectSummary,...(selectedWeek?.plan?.subjects??[])].map(subject=>[subject.id,{id:subject.id,label:subject.label}])).values()];
+  async function mapSubject(from:string,to:string){if(!preview)return;const subject=subjectOptions.find(subject=>subject.id===to);if(!subject)return;const next={...preview,requestId:newId(),sets:preview.sets.map(set=>set.subjectId===from?{...set,subjectId:subject.id,subjectLabel:subject.label}:set)};await run(async()=>{setPreview(next);setWeekCheck(await onlineApi.adminWeekCheck({classId:next.classId,title:next.title,sets:next.sets}));return 'Đã cập nhật môn học cho phần xem trước.';},false);}
+  const previewGames=useMemo(()=>preview?.sets.map(set=>onlineGameChoices(set.pack))??[],[preview]);
+  const noCommonGame=previewGames.some(games=>games.length===0);
+  const students=data?.students.filter(student=>student.classId===selectedId&&`${student.name} ${student.username}`.toLocaleLowerCase('vi').includes(query.toLocaleLowerCase('vi')))??[];
+  function invalidate(){setPreview(null);setWeekCheck(null);}
+  function resetDocument(){parsedDocument.current=null;checkedMedia.current=new WeakMap();setPreview(null);setWeekCheck(null);setSelectedWeek(null);setTargetSubjects('3');setDocumentFile(null);setPendingMedia([]);setMediaIssues([]);setWeekTitle(weekChoices[0]);setSubjectLabel('');setSourceId('');setVersion('1');setReplaceWeekId('');if(fileInput.current)fileInput.current.value='';}
+  async function reviseWeek(id:string){const week=await onlineApi.adminWeek(id);
+    const versions=new Set(week.sets.map(set=>set.pack.version));if(versions.size!==1)throw new Error('Bộ tuần này có các phiên bản khác nhau. Hãy giữ bản đã giao và tạo học liệu tuần mới.');
+    resetDocument();setSelectedWeek(week);setTargetSubjects(String(week.plan?.subjects.length??3));setWeekTitle(week.title);setSourceId(onlineDocumentSourceId(week.sets[0].pack)??'');setVersion(String(week.sets[0].pack.version+1));setReplaceWeekId(week.id);window.scrollTo({top:0,behavior:'smooth'});
+    return week.closedStudents?`Có ${week.closedStudents} học sinh đã đóng tuần. Chỉ sửa lời giải/hiển thị; nội dung câu mới cần giao ở tuần chưa học.`:'Đang soạn bản cập nhật. Giữ nguyên nhãn môn và dạng câu của các nhóm; lịch sử và sao đã đạt được giữ lại.';
+  }
+  async function transition(request:OnlineRedemption,status:'approved'|'rejected'|'fulfilled'){
+    if(status==='fulfilled'&&!window.confirm(`Xác nhận đã trao ${onlineMoney(request.amountVnd)} tiền hoặc quà cho ${request.studentName}, yêu cầu “${request.title}”? ${request.stars} sao sẽ được ghi là đã đổi.`))return;
+    await run(async()=>{await onlineApi.transitionRedemption(request.requestId,{status,note:notes[request.requestId]?.trim()});return status==='fulfilled'?'Đã lưu xác nhận trao tiền / quà.':status==='rejected'?'Đã từ chối và trả lại sao khả dụng cho học sinh.':'Đã duyệt yêu cầu; chờ người lớn trao tiền / quà.';});
+  }
+  return <div className="online-app online-admin"><header className="online-header"><a href="?online=1" className="online-brand">✦ BẢO AN <span>LEARNING</span></a><div><strong>{identity.workspace.name}</strong><span>Quản trị viên · {identity.user.username}</span></div><button disabled={busy} onClick={()=>void onLogout().catch(error=>setError(messageOf(error)))}>Đăng xuất</button></header>
+    <main className="online-admin-main"><section className="online-intro"><div><p className="online-eyebrow">KHÔNG GIAN QUẢN TRỊ</p><h1>Lớp học & hành trình mỗi tuần</h1><p>Bạn quyết định môn học và nội dung. Ứng dụng kiểm tra cấu trúc câu hỏi, mở trò phù hợp và lưu tiến độ theo tài khoản.</p></div><button disabled={busy} onClick={()=>void run(async()=> 'Đã cập nhật dữ liệu từ máy chủ.')}>Làm mới dữ liệu</button></section>
+      {error&&<div className="online-notice online-error" role="alert">{error}<button disabled={busy} onClick={()=>void run(async()=> 'Đã kết nối lại máy chủ.')}>Thử lại</button></div>}{notice&&<p className="online-notice" role="status">{notice}</p>}
+      {credentials&&<section className="online-credentials" aria-label="Thông tin tài khoản mới" role="status"><div><h2>Tài khoản của {credentials.name}</h2><p>Chỉ hiển thị ở lần cấp này. Sao chép và gửi riêng cho học sinh.</p><dl><dt>Tên đăng nhập</dt><dd><code>{credentials.username}</code></dd><dt>Mật khẩu</dt><dd><code>{credentials.password}</code></dd></dl></div><button onClick={()=>setCredentials(null)}>Đã lưu · Đóng thông tin</button></section>}
+      {!data?<p className="online-loading" role="status">Đang tải lớp học…</p>:<>
+        <div className="online-stats"><div><strong>{data.stats.classes}</strong><span>Lớp học</span></div><div><strong>{data.stats.students}</strong><span>Học sinh</span></div><div><strong>{data.stats.questions}</strong><span>Câu hỏi lưu trữ</span></div><div><strong>{data.stats.pendingRequests}</strong><span>Ước muốn cần xử lý</span></div></div>
+        <section className="online-class-bar"><label>Lớp đang quản lý<select value={selectedId} disabled={busy||!data.classes.length} onChange={event=>{setClassId(event.target.value);resetDocument();}}>{!data.classes.length&&<option value="">Chưa có lớp học</option>}{data.classes.map(row=><option key={row.id} value={row.id}>{row.name} · Khối {row.grade}</option>)}</select></label><details><summary>+ Tạo lớp học</summary><form className="online-form online-inline-form" onSubmit={event=>{event.preventDefault();void run(async()=>{const row=await onlineApi.createClass({name:className.trim(),grade:Number(grade)});setClassId(row.id);setClassName('');invalidate();return `Đã tạo lớp ${row.name}.`;});}}><label>Tên lớp<input required maxLength={100} value={className} onChange={event=>setClassName(event.target.value)} disabled={busy}/></label><label>Khối<input type="number" required min="1" max="12" step="1" value={grade} onChange={event=>setGrade(event.target.value)} disabled={busy}/></label><button className="online-primary" disabled={busy||!className.trim()}>Tạo lớp</button></form></details></section>
+        <nav className="online-tabs" aria-label="Công việc quản trị"><button disabled={busy} aria-current={tab==='students'?'page':undefined} onClick={()=>setTab('students')}>Học sinh</button><button disabled={busy} aria-current={tab==='weeks'?'page':undefined} onClick={()=>setTab('weeks')}>Học liệu tuần</button><button disabled={busy} aria-current={tab==='wallet'?'page':undefined} onClick={()=>setTab('wallet')}>Đổi sao & lịch sử{data.stats.pendingRequests?` (${data.stats.pendingRequests})`:''}</button><button disabled={busy} aria-current={tab==='recovery'?'page':undefined} onClick={()=>setTab('recovery')}>Sao lưu & khôi phục</button></nav>
+        {tab!=='recovery'&&<div className="online-actions" role="group" aria-label="Phân trang quản trị"><span>{loading?'Đang tải…':`${data.page.total} mục · trang ${Math.floor(data.page.offset/20)+1}`}</span><button disabled={busy||loading||offset===0} onClick={()=>setOffset(Math.max(0,offset-20))}>Trang trước</button><button disabled={busy||loading||data.page.nextOffset===null} onClick={()=>setOffset(data.page.nextOffset!)}>Trang sau</button></div>}
+        {tab==='recovery'&&<OnlineRecoveryPanel onRestored={onRestored}/>}
+        {tab==='students'&&<div className="online-two-column"><section className="online-card"><h2>Thêm học sinh</h2><p>{selectedClass?`Cấp tài khoản riêng trong lớp ${selectedClass.name}.`:'Tạo lớp trước khi thêm học sinh.'}</p><form className="online-form" onSubmit={event=>{event.preventDefault();void run(async()=>{const result=await onlineApi.createStudent({name:studentName.trim(),classId:selectedId,username:username.trim(),...(password?{password}:{})});setCredentials({name:result.student.name,...result.credentials});setStudentName('');setUsername('');setPassword('');return `Đã tạo tài khoản cho ${result.student.name}.`;});}}><fieldset disabled={busy||!selectedId}><label>Họ tên học sinh<input required maxLength={100} autoComplete="off" value={studentName} onChange={event=>setStudentName(event.target.value)}/></label><label>Tên đăng nhập<input required maxLength={60} autoComplete="off" autoCapitalize="none" spellCheck={false} value={username} onChange={event=>setUsername(event.target.value)}/></label><label>Mật khẩu ban đầu (có thể để trống)<input type="password" minLength={10} maxLength={128} autoComplete="new-password" value={password} onChange={event=>setPassword(event.target.value)}/></label><p className="online-muted">Để trống để máy chủ tạo mật khẩu ngẫu nhiên. Tài khoản thuộc riêng học sinh và dùng được trên các thiết bị.</p><button className="online-primary" disabled={!studentName.trim()||!username.trim()}>Cấp tài khoản</button></fieldset></form></section>
+          <section className="online-card"><div className="online-section-head"><h2>Học sinh {selectedClass?.name}</h2><span>{students.length} tài khoản</span></div><label className="online-search">Tìm học sinh<input type="search" placeholder="Họ tên hoặc tên đăng nhập" value={query} onChange={event=>setQuery(event.target.value)}/></label>{students.length?<ul className="online-list">{students.map(student=><li key={student.id}><div className="online-section-head"><strong>{student.name}</strong><span className={`online-badge ${student.active?'':'is-muted'}`}>{student.active?'Đang hoạt động':'Đã tạm khóa'}</span></div><span>@{student.username} · {student.balance.available} sao khả dụng</span><small>{student.balance.earned} sao tích lũy · {student.balance.pending} sao đang chờ · {student.balance.redeemed} sao đã đổi</small><div className="online-actions"><button disabled={busy} onClick={()=>{if(!window.confirm(`Đặt lại mật khẩu cho ${student.name}? Mật khẩu cũ sẽ ngừng sử dụng.`))return;void run(async()=>{const next=await onlineApi.resetPassword(student.id);setCredentials({name:student.name,...next});return `Đã đặt lại mật khẩu cho ${student.name}.`;});}}>Đặt lại mật khẩu</button><button disabled={busy} onClick={()=>{if(student.active&&!window.confirm(`Tạm khóa tài khoản ${student.name}? Học sinh sẽ không thể đăng nhập cho đến khi bạn mở lại.`))return;void run(async()=>{await onlineApi.updateStudent(student.id,{active:!student.active});return student.active?'Đã tạm khóa tài khoản.':'Đã mở lại tài khoản.';});}}>{student.active?'Tạm khóa':'Mở lại tài khoản'}</button><label className="online-transfer">Chuyển lớp<select aria-label={`Chuyển lớp cho ${student.name}`} value={student.classId} disabled={busy} onChange={event=>{const next=event.target.value;void run(async()=>{await onlineApi.updateStudent(student.id,{classId:next});return `Đã chuyển lớp cho ${student.name}.`;});}}>{data.classes.map(row=><option key={row.id} value={row.id}>{row.name}</option>)}</select></label></div></li>)}</ul>:<p>{query?'Chưa tìm thấy học sinh phù hợp.':'Lớp chưa có học sinh. Cấp tài khoản ở biểu mẫu bên cạnh.'}</p>}</section></div>}
+        {tab==='weeks'&&<div className="online-two-column online-content-columns"><section className="online-card"><h2>{replaceWeekId?'Cập nhật học liệu đã giao':'Giao học liệu tuần mới'}</h2><p>Soạn câu hỏi bằng Excel. Bạn tự đặt môn học, chủ đề và nội dung; ứng dụng kiểm tra đáp án và mở trò phù hợp.</p>{replaceWeekId&&<p className="online-notice">Cập nhật tại vị trí tuần hiện có. Mỗi nhóm giữ mã nguồn và tăng một phiên bản; lượt chơi cũ và sao đã đạt được giữ lại. <button type="button" disabled={busy} onClick={resetDocument}>Hủy cập nhật</button></p>}
+          <div className="online-template-box"><strong>Mẫu soạn học liệu</strong><div className="online-actions"><a className="online-template-link" href="/question-templates/bo-mau-day-du.zip" download>Tải bộ mẫu đầy đủ (.zip)</a><a className="online-template-link" href="/question-templates/online-week.xlsx" download>Tải mẫu Excel trống (.xlsx)</a></div><p className="online-muted">Bộ đầy đủ có câu hỏi đã điền, đáp án, hình và âm thanh khớp nhau. Giải nén rồi chọn file Excel cùng các tư liệu bên trong. Mỗi nhóm cùng dạng cần ít nhất 2 câu; tuần mới tối đa 12 câu/môn. null được coi là thiếu dữ liệu; cột bắt buộc thiếu sẽ báo dòng và loại câu.</p></div>
+          <form className="online-form" onSubmit={event=>{event.preventDefault();void run(async()=>{
+            if(!selectedClass||!documentFile)throw new Error('Chọn lớp và tài liệu trước khi kiểm tra.');
+            invalidate();setMediaIssues([]);
+            const oldWeek=selectedWeek?.id===replaceWeekId?selectedWeek:undefined;
+            if(replaceWeekId&&(!oldWeek||oldWeek.classId!==selectedClass.id))throw new Error('Chọn lại tuần cần cập nhật trong lớp này.');
+            const controller=new AbortController();importController.current=controller;const {signal}=controller;
+            const context={idPrefix:'online',grade:selectedClass.grade,title:weekTitle.trim(),version:Number(version),...(sourceId.trim()?{sourceId:sourceId.trim()}:{}),...(subjectLabel.trim()?{subjectLabel:subjectLabel.trim()}:{}),...(oldWeek?{packIds:Object.fromEntries(oldWeek.sets.map(set=>[JSON.stringify([set.subjectLabel,onlinePackQuestionKind(set.pack)]),set.pack.id]))}:{})},key=JSON.stringify(context);
+            setUploadProgress('Đang đọc và kiểm tra cấu trúc tài liệu…');await yieldImport();signal.throwIfAborted();
+            let source=parsedDocument.current?.file===documentFile&&parsedDocument.current.key===key?parsedDocument.current.source:undefined;
+            if(!source){source=prepareOnlineDocument(new Uint8Array(await documentFile.arrayBuffer()),documentFile.name,context);parsedDocument.current={file:documentFile,key,source};}
+            signal.throwIfAborted();const names=source.mediaNames,referenced:OnlineMediaAsset[]=[];
+            for(let at=0;at<names.length;at+=100)referenced.push(...await onlineApi.mediaLookup(names.slice(at,at+100),signal));
+            // Temporary metadata only discovers which files valid rows need. It
+            // never authorizes publishing: real files and server assets follow.
+            const provisional=new Map<string,OnlineMediaAsset>();
+            pendingMedia.forEach((file,index)=>{const mime=mediaMime(file),nameKey=fileNameKey(file.name);if(mime&&!provisional.has(nameKey))provisional.set(nameKey,{id:`pending-import-${index}`,name:file.name,mime,kind:mime.startsWith('image/')?'image':'audio',size:file.size,sha256:index.toString(16).padStart(64,'0')});});
+            const preflight=await source.inspect([...referenced.filter(asset=>!provisional.has(fileNameKey(asset.name))),...provisional.values()],{weekTitle});
+            const usedIds=new Set(preflight.sets.flatMap(({pack})=>pack.items.flatMap(item=>[item.media?.imageId,item.media?.audioId,...('audioId' in item?[item.audioId]:[])]).filter((id):id is string=>!!id)));
+            const neededNames=new Set([...provisional.values()].filter(asset=>usedIds.has(asset.id)).map(asset=>fileNameKey(asset.name)));
+            const assets=await uploadSelectedMedia(referenced,pendingMedia.filter(file=>neededNames.has(fileNameKey(file.name))),signal);
+            setUploadProgress('Đang kiểm tra câu hỏi với tư liệu đã xác nhận…');await yieldImport();signal.throwIfAborted();
+            const result=await source.inspect(assets,{weekTitle});
+            const checked={...result,sets:result.sets.map(set=>({...set,subjectId:oldWeek?.plan?.assignments[set.pack.id]??weeklySubjectId(set.subjectLabel)})),classId:selectedClass.id,requestId:newId(),...(replaceWeekId?{replaceWeekId}:{})};
+            const check=await onlineApi.adminWeekCheck({classId:checked.classId,title:checked.title,sets:checked.sets,...(replaceWeekId?{replaceWeekId}:{})},signal);signal.throwIfAborted();setWeekCheck(check);setPreview(checked);
+            return `Đã kiểm tra ${result.totalQuestions} câu: ${result.acceptedQuestions} câu hợp lệ, ${result.issues.length} câu không được tải lên. Duyệt câu hỏi trước khi giao cho lớp.`;
+          },false);}}><fieldset disabled={busy||loading||!selectedClass}><h3>Chọn tuần và bộ học liệu</h3>
+            <label>Tuần học<select aria-label="Tuần học" value={weekTitle} disabled={!!replaceWeekId} onChange={event=>{setWeekTitle(event.target.value);invalidate();}}>{!weekChoices.includes(weekTitle)&&<option value={weekTitle}>{weekTitle}</option>}{weekChoices.map(title=><option key={title} value={title}>{title}</option>)}</select></label>
+            {(!replaceWeekId||selectedWeek?.plan)&&<label>Số môn trong tuần<select aria-label="Số môn trong tuần" value={targetSubjects} disabled={!!replaceWeekId} onChange={event=>setTargetSubjects(event.target.value)}><option value="3">3 môn · tối đa 36 câu</option><option value="4">4 môn · tối đa 48 câu</option></select></label>}
+            <p className="online-muted">Tuần mới gồm 3–4 môn, tối đa 12 câu mỗi môn tính chung mọi bộ. Gợi ý mỗi môn: 4 câu nền tảng, 5 vận dụng, 3 nâng cao. Tuần cũ giữ cấu hình đã giao.</p>
+            <p className="online-muted">Bộ câu hỏi sẽ được giao vào tuần đã chọn ở trên. Tên môn và nội dung lấy từ tài liệu.</p>
+            <label>Bộ câu hỏi, hình ảnh và âm thanh<input ref={fileInput} type="file" multiple accept=".docx,.xlsx,.png,.jpg,.jpeg,.webp,.mp3,.wav,.ogg" onChange={event=>{selectImportFiles(event.target.files);event.target.value='';}}/></label>
+            <p className="online-muted">Chọn cùng lúc một file Word / Excel và các hình, âm thanh đi kèm bằng Ctrl hoặc Shift. Tối đa 100 tệp tư liệu, tổng 32 MB cho toàn bộ lựa chọn kể cả tệp thêm sau. Nếu nằm ở thư mục khác, chọn file câu hỏi trước rồi chọn thêm tư liệu bằng cùng nút này.</p>
+            {documentFile&&<p className="online-import-filename">File câu hỏi: <strong>{documentFile.name}</strong></p>}
+            {!!pendingMedia.length&&<details open><summary>{pendingMedia.length} hình / âm thanh đã chọn</summary><ul className="online-list online-media-list">{pendingMedia.map((file,index)=><li key={file.name+index}><span>{file.name} · {(file.size/1024).toFixed(0)} KB</span><button type="button" onClick={()=>{setPendingMedia(previous=>previous.filter((_,i)=>i!==index));setMediaIssues([]);invalidate();}} aria-label={`Bỏ tệp ${file.name}`}>Bỏ</button></li>)}</ul></details>}
+            <p className="online-muted">Word / Excel tối đa 1 MB. Mỗi hình / âm thanh tối đa {getOnlineMediaMaxBytes()/1024/1024} MB. Trong tài liệu, điền đúng tên tệp, mô tả hình và bản chép lời âm thanh. Câu thuần văn bản không cần tư liệu.</p>
+            <details><summary>Tùy chọn bộ câu hỏi</summary>
+            <label>Mã bộ tuần (có thể để trống)<input pattern={'[a-z0-9](?:[a-z0-9]|-){2,47}'} maxLength={48} placeholder="Ví dụ: lop3-tuan01" value={sourceId} disabled={!!replaceWeekId} onChange={event=>{setSourceId(event.target.value);invalidate();}}/></label>
+            <p className="online-muted">Để trống để nhận mã từ thông tin tài liệu. Nhập lại cùng bộ không cấp thêm sao. Để sửa nội dung đã giao, chọn “Cập nhật tuần này” trong hành trình.</p>
+            <label>Phiên bản<input type="number" required min="1" max="1000000" step="1" value={version} readOnly={!!replaceWeekId} onChange={event=>{setVersion(event.target.value);invalidate();}}/></label>
+            <label>Nhãn môn khi tài liệu chưa có nhãn<input maxLength={100} placeholder="Để trống nếu mỗi nhóm đã có tên môn" value={subjectLabel} onChange={event=>{setSubjectLabel(event.target.value);invalidate();}}/></label>
+            </details><button className="online-primary" disabled={!documentFile||!weekTitle.trim()}>{busy?'Đang kiểm tra học liệu…':'Kiểm tra & xem trước'}</button></fieldset></form>
+          {uploadProgress&&<p role="status" aria-live="polite">{uploadProgress}</p>}
+          {busy&&importController.current&&<button type="button" onClick={()=>importController.current?.abort()}>Dừng kiểm tra</button>}
+          {!!mediaIssues.length&&<section className="online-notice online-error" aria-label="Tệp không được sử dụng"><h3>{mediaIssues.length} tệp không được sử dụng</h3><ul>{mediaIssues.map((issue,index)=><li key={index}><strong>{issue.name}</strong>: {issue.message}</li>)}</ul><p>Chỉ nạp tư liệu được câu hợp lệ sử dụng. Tệp lỗi loại các câu phụ thuộc; tệp không được tham chiếu sẽ được bỏ qua.</p></section>}
+          {preview&&<section className="online-preview" aria-label="Xem trước tuần học"><h3>{preview.title}</h3>
+            <p><strong>{preview.acceptedQuestions}/{preview.totalQuestions} câu hợp lệ</strong> · {preview.issues.length} câu bị loại · {previewGames.filter(games=>games.length>0).length} bộ đủ điều kiện chơi</p>
+            <div className="online-subject-summary" role="region" aria-label="Bảng môn học và số sao, có thể cuộn ngang" tabIndex={0}><h4>Môn học và số sao</h4><p>{subjectSummary.length} môn · {preview.acceptedQuestions} câu · tối đa {preview.acceptedQuestions*3} sao. Mọi câu đều có sao.</p><p className="online-subject-scroll-help">Vuốt ngang bảng để xem đủ cột.</p><table><thead><tr><th>Môn</th><th>Số câu</th><th>Nền tảng</th><th>Vận dụng</th><th>Nâng cao</th></tr></thead><tbody>{subjectSummary.map(subject=><tr key={subject.id}><td><label className="online-subject-label"><span>{subject.label}</span><select aria-label={`Xếp môn ${subject.label}`} disabled={busy||!!preview.replaceWeekId} value={subject.id} onChange={event=>void mapSubject(subject.id,event.target.value)}>{subjectOptions.map(option=><option key={option.id} value={option.id}>{option.label}</option>)}</select></label></td><td>{subject.questions}/12</td><td>{subject.easy}</td><td>{subject.medium}</td><td>{subject.hard}</td></tr>)}</tbody></table></div>
+            {planErrors.length>0&&<div className="online-notice online-error" role="alert">{planErrors.map(error=><p key={error}>{error}</p>)}</div>}
+            {!!preview.issues.length&&<section className="online-notice online-error online-import-issues" aria-label="Câu hỏi không được tải lên"><h4>Câu hỏi không được tải lên</h4><p>Các câu dưới đây đã được loại khỏi nội dung giao cho lớp. Sửa theo vị trí trong tài liệu rồi kiểm tra lại nếu muốn bổ sung.</p><ol start={issuePage*20+1}>{preview.issues.slice(issuePage*20,issuePage*20+20).map((issue,index)=><li key={index}><strong>{issue.location}</strong>{issue.itemId&&<small>Mã câu: {issue.itemId}</small>}{issue.prompt&&<span>{issue.prompt}</span>}<span>{issue.message}</span></li>)}</ol>{preview.issues.length>20&&<div className="online-actions"><span>Lỗi {issuePage*20+1}–{Math.min(issuePage*20+20,preview.issues.length)} / {preview.issues.length}</span><button type="button" disabled={issuePage===0} onClick={()=>setIssuePage(page=>page-1)}>Lỗi trước</button><button type="button" disabled={(issuePage+1)*20>=preview.issues.length} onClick={()=>setIssuePage(page=>page+1)}>Lỗi tiếp</button></div>}</section>}
+            {!preview.acceptedQuestions&&<p className="online-notice">Chưa có bộ hợp lệ để giao. Mỗi nhóm môn và dạng câu cần ít nhất 2 câu hợp lệ.</p>}
+            {existingPreviewWeek&&<p className="online-notice">Bộ này đã được giao trong “{existingPreviewWeek.title}”. Hãy dùng tuần hiện có; nhập lại không tạo tuần hoặc sao mới.</p>}
+            {sourceConflictWeek&&<p className="online-notice">Mã bộ đã được dùng trong “{sourceConflictWeek.title}”. Để thay nội dung, chọn “Cập nhật tuần này” tại tuần đã giao và kiểm tra phiên bản mới trước khi xác nhận.</p>}
+            {revisionError&&<p className="online-notice online-error">{revisionError} Kiểm tra mã câu, phiên bản và các nhóm còn đủ câu trước khi cập nhật.</p>}
+            {weekCheck?.revision&&<p className="online-notice">Bản cập nhật giữ {weekCheck.revision.retained} mã câu, thêm {weekCheck.revision.added} mã và bỏ {weekCheck.revision.removed} mã. Câu mới dùng mã riêng; lịch sử và ví sao đã kiếm vẫn được giữ. Các câu nguồn đã học trước đây tiếp tục dùng mức sao cao nhất của mình.</p>}
+            {noCommonGame&&<p className="online-notice online-error">Có bộ chưa có trò chung cho tất cả câu. Xem lý do ở từng câu, sửa giới hạn allowedGameIds hoặc tách bộ rồi kiểm tra lại trước khi giao.</p>}
+            <p>{preview.replaceWeekId?'Cập nhật cho':'Giao cho'} <strong>{data.classes.find(row=>row.id===preview.classId)?.name}</strong></p>
+            <ol start={previewPage*5+1}>{preview.sets.slice(previewPage*5,previewPage*5+5).map((set,index)=><li key={set.pack.id}><strong>{set.subjectLabel} · {set.pack.title}</strong><span>{onlinePackKindLabel(set.pack)} · {set.pack.items.length} câu · Phiên bản {set.pack.version}</span><small>Mã bộ: {onlineDocumentSourceId(set.pack)??set.pack.id}</small><span>Trò phù hợp: {previewGames[previewPage*5+index].map(game=>game.label).join(', ')||'Chưa có trò chung'}</span><OnlineQuestionReview pack={set.pack} pageSize={10}/>{preview.replaceWeekId&&selectedWeek?.sets.filter(old=>old.pack.id===set.pack.id).map(old=><OnlineQuestionDisclosure key={old.pack.id} pack={old.pack} label={`Đối chiếu bản đã giao v${old.pack.version} (${old.pack.items.length} câu) → bản mới v${set.pack.version} (${set.pack.items.length} câu)`}/>)}</li>)}</ol>
+            {preview.sets.length>5&&<div className="online-actions" role="group" aria-label="Trang bộ câu hỏi xem trước"><span>Bộ {previewPage*5+1}–{Math.min(previewPage*5+5,preview.sets.length)} / {preview.sets.length}</span><button type="button" disabled={previewPage===0} onClick={()=>setPreviewPage(page=>page-1)}>Bộ trước</button><button type="button" disabled={(previewPage+1)*5>=preview.sets.length} onClick={()=>setPreviewPage(page=>page+1)}>Bộ tiếp</button></div>}
+            <p>Chỉ {preview.acceptedQuestions} câu hợp lệ được giao sau khi xác nhận. Kiểm tra cấu trúc không thay thế việc người soạn duyệt nội dung và đáp án.</p>
+            <button className="online-primary" disabled={busy||loading||planErrors.length>0||!preview.acceptedQuestions||noCommonGame||!!existingPreviewWeek||!!sourceConflictWeek||!!revisionError||preview.classId!==selectedId} onClick={()=>void run(async()=>{const week=await onlineApi.publishWeek({requestId:preview.requestId,title:preview.title,classId:preview.classId,sets:preview.sets,...(preview.replaceWeekId?{replaceWeekId:preview.replaceWeekId}:{})});const revised=!!preview.replaceWeekId;resetDocument();return (revised?'Đã cập nhật “':'Đã giao “')+week.title+'” cho lớp.';})}>{busy?'Đang lưu…':existingPreviewWeek?'Bộ này đã được giao':sourceConflictWeek?'Chọn cập nhật tuần đã giao':preview.replaceWeekId?'Xác nhận cập nhật tuần học':`Giao ${preview.acceptedQuestions} câu hợp lệ cho lớp`}</button>
+          </section>}
+          <details className="online-media-manager"><summary>Thư viện hình ảnh và âm thanh</summary><p className="online-muted">Có thể dùng lại bằng tên tệp; kiểm tra tài liệu tra cứu đủ tệp được tham chiếu kể cả ngoài trang đang xem.</p><button disabled={busy} onClick={()=>void run(async()=>{setLibrary(await onlineApi.adminMedia());return 'Đã tải trang thư viện.';},false)}>Xem thư viện</button>{library&&<><ul className="online-list online-media-list">{library.assets.map(asset=><li key={asset.id}><strong>{asset.name}</strong><span>{asset.kind==='image'?'Hình ảnh':'Âm thanh'} · {(asset.size/1024).toFixed(0)} KB</span></li>)}</ul><div className="online-actions"><span>{library.page.total} tệp</span><button disabled={busy||library.page.offset===0} onClick={()=>void run(async()=>{setLibrary(await onlineApi.adminMedia(Math.max(0,library.page.offset-20)));return 'Đã chuyển trang thư viện.';},false)}>Tư liệu trước</button><button disabled={busy||library.page.nextOffset===null} onClick={()=>void run(async()=>{setLibrary(await onlineApi.adminMedia(library.page.nextOffset!));return 'Đã chuyển trang thư viện.';},false)}>Tư liệu sau</button></div></>}</details>
+          </section><section className="online-card"><h2>Hành trình đã giao</h2><p>{selectedClass?.name??'Chọn lớp để xem học liệu'}</p>{data.weeks.filter(week=>week.classId===selectedId).length?<ol className="online-list online-week-list">{data.weeks.filter(week=>week.classId===selectedId).sort((a,b)=>a.position-b.position).map(week=><li key={week.id}><strong>{week.title}</strong><small>Đã giao {onlineTime(week.createdAt)} · {week.plan?`${week.plan.subjects.length} môn · tối đa 12 câu/môn`:'Cấu hình cũ'}</small>{!!week.closedStudents&&<p className="online-notice">{week.closedStudents} học sinh đã đóng tuần. Nội dung câu hỏi đã học được bảo vệ.</p>}<ul>{week.sets.map(set=><li key={set.pack.id+'@'+set.pack.version}><strong>{set.subjectLabel}</strong><span>{set.pack.title} · {set.pack.itemCount} câu · v{set.pack.version}</span>{selectedWeek?.id===week.id&&selectedWeek.sets.filter(detail=>detail.pack.id===set.pack.id).map(detail=><OnlineQuestionDisclosure key={detail.pack.id} pack={detail.pack} label="Xem câu hỏi đã giao"/>)}</li>)}</ul><div className="online-actions"><button disabled={busy||loading} onClick={()=>void run(async()=>{setSelectedWeek(await onlineApi.adminWeek(week.id));return 'Đã tải chi tiết một tuần.';},false)}>Xem chi tiết tuần</button><button disabled={busy||loading} onClick={()=>void run(async()=>reviseWeek(week.id),false)}>Cập nhật tuần này</button></div></li>)}</ol>:<p>Chưa có tuần học nào. Tải mẫu Excel và soạn nội dung của bạn để bắt đầu.</p>}</section></div>}
+        {tab==='wallet'&&<div className="online-two-column"><section className="online-card"><h2>Cấu hình đổi sao</h2><p>Áp dụng cho toàn bộ lớp trong không gian này. Yêu cầu đã gửi giữ nguyên tỷ lệ lúc gửi.</p><form className="online-form" onSubmit={event=>{event.preventDefault();void run(async()=>{await onlineApi.configureWallet({enabled:walletEnabled,rateVnd:Number(rate)});return 'Đã lưu cấu hình đổi sao.';});}}><fieldset disabled={busy}><label className="online-checkbox"><input type="checkbox" checked={walletEnabled} onChange={event=>setWalletEnabled(event.target.checked)}/> Cho phép học sinh gửi ước muốn đổi sao</label><label>Giá trị 1 sao (đồng)<input type="number" required min="1" max="1000000" step="1" value={rate} onChange={event=>setRate(event.target.value)}/></label><button className="online-primary">Lưu tỷ lệ</button></fieldset></form><p className="online-muted">Sao được giữ khi gửi yêu cầu; trả lại khi hủy hoặc từ chối. Xác nhận “Đã trao” sau khi người lớn đã trao tiền / quà thực tế.</p></section><section className="online-card"><h2>Yêu cầu & lịch sử đổi sao</h2><p>Hiển thị mọi lớp để bạn xử lý yêu cầu tại một nơi.</p>{data.redemptions.length?<ul className="online-list">{[...data.redemptions].sort((a,b)=>b.requestedAt.localeCompare(a.requestedAt)).map(request=>{const status=rewardStatus(request);return <li key={request.requestId}><div className="online-section-head"><strong>{request.studentName} · {request.title}</strong><span className="online-badge">{onlineRewardStatus[status]}</span></div><span>{data.classes.find(row=>row.id===request.classId)?.name??'Lớp học'} · {request.stars} sao × {onlineMoney(request.rateVnd)} = {onlineMoney(request.amountVnd)}</span><small>Gửi {onlineTime(request.requestedAt)} · Mục tiêu {onlineMoney(request.goalVnd)}</small>{request.history.slice(1).map((entry,index)=><small key={index}>{onlineRewardStatus[entry.status]} · {onlineTime(entry.at)}{entry.note?` · ${entry.note}`:''}</small>)}{(status==='pending'||status==='approved')&&<><label>Ghi chú cho {request.studentName}<input maxLength={300} value={notes[request.requestId]??''} onChange={event=>setNotes(previous=>({...previous,[request.requestId]:event.target.value}))} disabled={busy}/></label><div className="online-actions">{status==='pending'?<><button className="online-primary" disabled={busy} onClick={()=>void transition(request,'approved')}>Duyệt yêu cầu</button><button disabled={busy} onClick={()=>void transition(request,'rejected')}>Từ chối & trả sao</button></>:<button className="online-primary" disabled={busy} onClick={()=>void transition(request,'fulfilled')}>Xác nhận đã trao tiền / quà</button>}</div></>}</li>;})}</ul>:<p>Chưa có yêu cầu đổi sao.</p>}</section></div>}
+      </>}
+    </main><footer className="online-footer">Bảo An Learning · Dữ liệu được lưu trên máy chủ của bạn</footer>
+  </div>;
+}

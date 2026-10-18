@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import {zipSync,unzipSync} from 'fflate';
-import {ONLINE_DOCUMENT_HEADERS,ONLINE_DOCUMENT_KINDS,parseOnlineDocument,inspectOnlineDocument,onlineDocumentGameChoices,onlineDocumentMediaNames} from '../src/core/online-document-import.ts';
+import {ONLINE_DOCUMENT_HEADERS,ONLINE_DOCUMENT_KINDS,parseOnlineDocument,inspectOnlineDocument,prepareOnlineDocument,onlineDocumentGameChoices,onlineDocumentMediaNames} from '../src/core/online-document-import.ts';
 import {parseQuestionWorkbookBytes} from '../src/core/excel-import.ts';
 import {validatePack} from '../src/core/validation.ts';
 import {onlinePresentation,onlineScoreResponse} from '../src/core/online-exercises.ts';
@@ -288,4 +288,14 @@ test('Excel null values mean missing data; only bad source rows and Excel error 
   const numeric=rows().filter(row=>row.kind==='numeric-answer');assert.equal((await inspectOnlineDocument(populatedXlsx(numeric),'zero.xlsx',context,[])).acceptedQuestions,2);
   const booleanBytes=populatedXlsx(rows().filter(row=>row.kind==='fill-blank'),(files,key)=>{files[key]=encode(decode(files[key]).replace(/<c r="U3"[^>]*>.*?<\/c>/,'<c r="U3" t="b"><v>0</v></c>'));});const booleans=await inspectOnlineDocument(booleanBytes,'false.xlsx',context,[]);assert.equal(booleans.acceptedQuestions,2);assert.equal(booleans.sets[0].pack.items[0].caseSensitive,false);
   const unicode=await inspectOnlineDocument(populatedXlsx(rows().filter(row=>row.kind==='quiz').map(row=>({...row,imageFile:row.imageFile.toLocaleUpperCase('vi').normalize('NFD')}))),'unicode.xlsx',context,media);assert.equal(unicode.acceptedQuestions,2);assert.equal(unicode.sets[0].pack.items[0].media.imageId,'image-asset');
+});
+
+test('prepared workbook reuses parsing but rechecks media and never retains a prior invalid catalogue result',async()=>{
+ const bytes=populatedXlsx(threeQuestions('quiz')),fixedContext={...context};
+ const prepared=prepareOnlineDocument(bytes,'prepared.xlsx',fixedContext),expected=await inspectOnlineDocument(bytes,'prepared.xlsx',context,media);
+ fixedContext.grade=1;
+ assert.deepEqual(await prepared.inspect(media),expected);
+ const missing=await prepared.inspect([]);assert.equal(missing.acceptedQuestions,0);assert.equal(missing.issues.length,3);
+ assert.deepEqual(await prepared.inspect(media),expected);
+ assert.deepEqual(prepared.mediaNames,onlineDocumentMediaNames(bytes,'prepared.xlsx'));
 });

@@ -35,14 +35,17 @@ function ReviewItem({pack,index,compatibility}:{pack:ContentPack;index:number;co
     </div></>}
   </details>;
 }
-const OnlineQuestionReview=memo(function OnlineQuestionReview({pack}:{pack:ContentPack}){
+const OnlineQuestionReview=memo(function OnlineQuestionReview({pack,pageSize}:{pack:ContentPack;pageSize?:number}){
   const compatibility=useMemo(()=>onlineGameCompatibility(pack),[pack]);
+  const [page,setPage]=useState(0),size=pageSize&&pageSize>0?Math.floor(pageSize):pack.items.length;
+  const current=Math.min(page,Math.max(0,Math.ceil(pack.items.length/size)-1)),offset=current*size;
   const common=compatibility.games.filter(game=>game.allowed);
   return <div className="online-question-review" aria-label={`Duyệt mọi câu trong ${pack.title}`}><p>{pack.items.length} câu · mở từng câu để xem đáp án, tư liệu, trò phù hợp và thử làm.</p>
     <p><strong>Trò chung cho toàn bộ {pack.items.length} câu:</strong> {common.map(game=>game.label).join(', ')||'Chưa có'}. Bộ chỉ mở trò dùng được với tất cả câu.</p>
     {!common.length&&<p className="online-notice online-error">Chưa có trò chung. Sửa các câu bị chặn hoặc tách bộ trước khi giao. Ứng dụng không tự bỏ câu để mở trò.</p>}
     <details><summary>Xem điều kiện của 5 trò cho cả bộ</summary><ul>{compatibility.games.map(game=><li key={game.id}><strong>{game.label}: {game.allowed?'Dùng cả bộ':'Chưa dùng cả bộ'}</strong>{game.reason&&<span> · {game.reason}</span>}</li>)}</ul></details>
-    {pack.items.map((item,index)=><ReviewItem key={item.id} pack={pack} index={index} compatibility={compatibility.items[index]}/>)}</div>;
+    {pack.items.slice(offset,offset+size).map((item,index)=><ReviewItem key={item.id} pack={pack} index={offset+index} compatibility={compatibility.items[offset+index]}/>)}
+    {pack.items.length>size&&<div className="online-actions" role="group" aria-label={`Trang câu hỏi trong ${pack.title}`}><span>Câu {offset+1}–{Math.min(offset+size,pack.items.length)} / {pack.items.length}</span><button type="button" disabled={current===0} onClick={()=>setPage(current-1)}>Câu trước</button><button type="button" disabled={offset+size>=pack.items.length} onClick={()=>setPage(current+1)}>Câu tiếp</button></div>}</div>;
 });
 export const OnlineQuestionDisclosure=memo(function OnlineQuestionDisclosure({pack,label}:{pack:ContentPack;label:string}){
   const[open,setOpen]=useState(false);
