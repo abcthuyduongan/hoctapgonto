@@ -2,6 +2,8 @@ import {createServer} from 'node:http';
 import {adminSummary,adminWeek,adminMedia,adminWeekCheck} from './admin-data.mjs';
 import {audioDurationMs,validateUploadedAudio} from './audio-duration.mjs';
 import {createFailureReporter,ONLINE_RUNTIME_VERSION} from './api-diagnostics.mjs';
+import {readBuildIdentity} from './build-identity.mjs';
+import {parseJsonBody} from './json-body.mjs';
 import {createReadStream} from 'node:fs';
 import {stat,realpath,readFile} from 'node:fs/promises';
 import {resolve,relative,extname,sep,isAbsolute} from 'node:path';
@@ -23,7 +25,7 @@ async function verifyPassword(value,stored){const[salt,expected]=(stored??dummyH
 async function body(req,maxBytes=MAX_BODY){if(!/^application\/json(?:\s*;|$)/i.test(req.headers['content-type']??''))fail(415,'Yêu cầu phải dùng dữ liệu JSON.');
   if(Number(req.headers['content-length']??0)>maxBytes)fail(413,'Gói dữ liệu vượt giới hạn kích thước.');const chunks=[];let size=0;
   for await(const chunk of req){size+=chunk.length;if(size>maxBytes)fail(413,'Gói dữ liệu vượt giới hạn kích thước.');chunks.push(chunk);}
-  let result;try{result=JSON.parse(Buffer.concat(chunks).toString('utf8'));}catch{fail(400,'Dữ liệu JSON không đọc được.');}if(!result||typeof result!=='object'||Array.isArray(result))fail(400,'Dữ liệu gửi lên cần là một đối tượng JSON.');return result;
+  return parseJsonBody(Buffer.concat(chunks),req.headers['content-encoding'],maxBytes);
 }
 const MIME={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json; charset=utf-8','.webmanifest':'application/manifest+json','.glb':'model/gltf-binary','.svg':'image/svg+xml','.png':'image/png','.webp':'image/webp','.jpg':'image/jpeg','.wav':'audio/wav','.mp3':'audio/mpeg','.wasm':'application/wasm','.zip':'application/zip','.docx':'application/vnd.openxmlformats-officedocument.wordprocessingml.document','.xlsx':'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet','.csv':'text/csv; charset=utf-8','.woff2':'font/woff2'};
 
@@ -64,7 +66,10 @@ export function createOnlineServer({databasePath,staticRoot=resolve('dist'),publ
   /** A request can stay open while its cookie is revoked or its account is locked. */
   async function authenticatedBody(req,expectedRole,maxBytes=MAX_BODY){const input=await body(req,maxBytes);return{input,auth:authenticatedActor(req,expectedRole)};}
   function rateLimit(req,name,passwordChange=false){const address=req.socket.remoteAddress??'local',keys=[hash(`${passwordChange?'password-ip':'ip'}:${address}`),hash(`${passwordChange?'password-user':'user'}:${name}`)],time=Date.now();
-    store.tx(()=>{for(const [index,key]of keys.entries()){const row=db.prepare('SELECT * FROM login_limits WHERE key=?').get(key),count=row&&row.reset_at>time?row.count:0;
+    store.tx(()=>{
+      // Bound cleanup work and leave the current counters to the existing reset logic.
+      db.prepare('DELETE FROM login_limits WHERE key IN (SELECT key FROM login_limits WHERE reset_at<=? AND key NOT IN (?,?) ORDER BY reset_at,key LIMIT 100)').run(time,...keys);
+      for(const [index,key]of keys.entries()){const row=db.prepare('SELECT * FROM login_limits WHERE key=?').get(key),count=row&&row.reset_at>time?row.count:0;
       if(count>=(index===0?100:12))fail(429,passwordChange?'Đã thử đổi mật khẩu quá nhiều lần. Hãy đợi 15 phút rồi thử lại.':'Đã thử đăng nhập quá nhiều lần. Hãy đợi 15 phút rồi thử lại.');
       db.prepare('INSERT INTO login_limits VALUES(?,?,?) ON CONFLICT(key) DO UPDATE SET count=excluded.count,reset_at=excluded.reset_at').run(key,count+1,row&&row.reset_at>time?row.reset_at:time+900000);
     }});
@@ -83,7 +88,7 @@ export function createOnlineServer({databasePath,staticRoot=resolve('dist'),publ
         if(mutable&&(req.headers.origin!==origin||req.headers['sec-fetch-site']==='cross-site'))fail(403,'Yêu cầu phải xuất phát từ chính website này.');
         if(method==='OPTIONS')fail(405,'API chỉ dùng cùng origin.');
         const route=path.slice('/api/online'.length);
-        if(method==='GET'&&route==='/status')return json(res,200,{available:true,configured:store.configured(),runtimeVersion:ONLINE_RUNTIME_VERSION,questionProtocolVersion:1});
+        if(method==='GET'&&route==='/status')return json(res,200,{available:true,configured:store.configured(),runtimeVersion:ONLINE_RUNTIME_VERSION,questionProtocolVersion:1,mediaUploadEncoding:'gzip',build:await readBuildIdentity(root)});
         if(method==='POST'&&route==='/setup'){
           const input=shape(await body(req),['token','name','username','password']);available();if(store.configured())fail(409,'Máy chủ đã được khởi tạo. Hãy đăng nhập.');
           rateLimit(req,'bootstrap');if(!setupToken||!sameSecret(input.token,setupToken))fail(403,'Mã khởi tạo không đúng. Lấy mã riêng từ quản trị máy chủ.');

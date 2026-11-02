@@ -1,6 +1,7 @@
+import '../styles/game-base.css';
 import {useQuestionSpeech} from './useQuestionSpeech';
 import {saveFailureMessage} from './save-failure-message';
-import QuestionMedia from '../components/QuestionMedia';
+import QuestionMedia,{useNextQuestionImage} from '../components/QuestionMedia';
 import GameMascot from './GameMascot';
 import { useEffect, useRef, useState } from 'react';
 import { playFeedbackTone } from '../core/experience';
@@ -30,6 +31,7 @@ export default function MathQuest({pack,onAttempt,onComplete,onExit,questionMode
   const [imageReadyQuestion,setImageReadyQuestion]=useState<string|null>(null);
   const imageReady=!sourceQuestion.media?.imageId||imageReadyQuestion===sourceQuestion.id;
   const correctSelected=selected!==null&&(serverScored?outcome?.correct===true:selected===legacyQuestion.correctIndex);
+  useNextQuestionImage(content.items[index+1]?.media,correctSelected);
   const clock=useQuestionClock({enabled:questionMode,itemId:sourceQuestion.id,canOpen:imageReady,finished:correctSelected||status==='done',onQuestionOpen,requireItem:serverScored});
   const question=clock.item?.kind==='multiple-choice'?clock.item:sourceQuestion;
   const correctIndex=serverScored?outcome?.feedback?.correctIndex:legacyQuestion.correctIndex;

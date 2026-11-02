@@ -1,6 +1,5 @@
 import { useEffect, useRef } from 'react';
 import { playCompletionFanfare } from '../core/experience';
-import { useGameScene } from '../world3d/GameSceneContext';
 
 type Props = {
   title: string;
@@ -12,8 +11,6 @@ type Props = {
 /** A celebratory layer over the existing game, never a page replacement. */
 export default function GameCompletion({title,summary,onExit,questionMode=false}:Props) {
   const exitButton = useRef<HTMLButtonElement>(null);
-  const { setMood } = useGameScene();
-  useEffect(() => { setMood('victory'); return () => setMood('idle'); }, [setMood]);
   useEffect(() => { exitButton.current?.focus({preventScroll:true}); playCompletionFanfare(); }, []);
   // Per-question stars have already been awarded by the host's saved receipts.
   if(questionMode)return <div className="reward-curtain question-completion"><div className="reward-panel question-completion-panel" role="dialog" aria-modal="true" aria-labelledby="question-completion-title"><h2 id="question-completion-title">{title}</h2><p>{summary}</p><button type="button" className="button primary" ref={exitButton} onClick={onExit}>Trở về hành trình</button></div></div>;

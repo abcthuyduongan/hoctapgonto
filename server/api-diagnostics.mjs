@@ -1,6 +1,7 @@
 import {randomUUID} from 'node:crypto';
 import {AsyncLocalStorage} from 'node:async_hooks';
-export const ONLINE_RUNTIME_VERSION='3.8.0-rc.12';
+import metadata from '../package.json' with {type:'json'};
+export const ONLINE_RUNTIME_VERSION=metadata.version;
 const timingContext=new AsyncLocalStorage();
 const timingFields=new Set(['sql','lockingSql','pool','password','storage','serialize']);
 const finiteMs=value=>Number.isFinite(value)?Math.max(0,Math.round(value*10)/10):0;
@@ -22,8 +23,9 @@ export function createPerformanceReporter({enabled=process.env.BAO_AN_PERFORMANC
   if(++seen%sample!==0||count>=budget)return action();count++;
   const group=String(path).split('?')[0].split('/')[3],routeGroup=['play','media','student','students','admin','account','setup','login','logout','me','wallet','redemptions','status'].includes(group)?group:'other';
   const trace={sqlMs:0,lockingSqlMs:0,poolMs:0,passwordMs:0,storageMs:0,serializeMs:0,sqlCount:0};
+  Object.defineProperty(trace,'requestId',{value:'BT-'+randomUUID().replaceAll('-','').slice(0,12)});
   return timingContext.run(trace,async()=>{const started=performance.now();let status=500;try{const response=await action();status=response.status;return response;}finally{
-   try{logger(JSON.stringify({event:'api.performance',version:ONLINE_RUNTIME_VERSION,requestId:'BT-'+randomUUID().replaceAll('-','').slice(0,12),at:new Date(at).toISOString(),routeGroup,method:['GET','POST','PATCH','HEAD'].includes(method)?method:'OTHER',status,elapsedMs:finiteMs(performance.now()-started),...Object.fromEntries(Object.entries(trace).map(([key,value])=>[key,finiteMs(value)]))}));}catch{/* Observability must not break a request. */}
+   try{logger(JSON.stringify({event:'api.performance',version:ONLINE_RUNTIME_VERSION,requestId:trace.requestId,at:new Date(at).toISOString(),routeGroup,method:['GET','POST','PATCH','HEAD'].includes(method)?method:'OTHER',status,elapsedMs:finiteMs(performance.now()-started),...Object.fromEntries(Object.entries(trace).map(([key,value])=>[key,finiteMs(value)]))}));}catch{/* Observability must not break a request. */}
   }});
  };
 }
@@ -31,12 +33,14 @@ export function createPerformanceReporter({enabled=process.env.BAO_AN_PERFORMANC
  * Never accept an error object, body, cookie, account ID or authored text. */
 export function createFailureReporter({logger=value=>console.error(value),now=Date.now,limit=30}={}){
  let windowStart=now(),count=0;
- return(path,method,status,elapsedMs)=>{
+ return(path,method,status,elapsedMs,error)=>{
   if(status<500)return;
   const at=now();if(at-windowStart>=60000){windowStart=at;count=0;}if(count>=limit)return;count++;
   const group=String(path).split('?')[0].split('/')[3],routeGroup=['play','media','student','students','admin','account','setup','login','restore','backup','wallet','redemptions','status'].includes(group)?group:'other';
   const supportId='BA-'+randomUUID().replaceAll('-','').slice(0,12);
-  try{logger(JSON.stringify({event:'api.failure',version:ONLINE_RUNTIME_VERSION,supportId,at:new Date(at).toISOString(),routeGroup,method:['GET','POST','PATCH','HEAD','OPTIONS'].includes(method)?method:'OTHER',status,elapsedMs:Math.max(0,Math.round(elapsedMs))}));}catch{return;}
+  const allowedCodes={'55P03':'lock-timeout','57014':'query-cancelled','53300':'connection-limit','40001':'serialization','40P01':'deadlock','ECONNREFUSED':'connection','ECONNRESET':'connection','ETIMEDOUT':'connection-timeout'};
+  const code=Object.hasOwn(allowedCodes,error?.code??'')?error.code:undefined,requestId=timingContext.getStore()?.requestId;
+  try{logger(JSON.stringify({event:'api.failure',version:ONLINE_RUNTIME_VERSION,supportId,...(requestId?{requestId}:{}),...(code?{failureKind:allowedCodes[code],databaseCode:code}:{}),at:new Date(at).toISOString(),routeGroup,method:['GET','POST','PATCH','HEAD','OPTIONS'].includes(method)?method:'OTHER',status,elapsedMs:Math.max(0,Math.round(elapsedMs))}));}catch{return;}
   return supportId;
  };
 }

@@ -1,3 +1,4 @@
+import {mediaRequestBody} from '../helpers/media-request.mjs';
 import {test,expect,type Page} from '@playwright/test';
 import {zipSync,strToU8,unzipSync} from 'fflate';
 import {cloudBrowserFixture} from '../helpers/cloud-browser-fixture.mjs';
@@ -59,7 +60,7 @@ test('a server-rejected audio batch isolates its bad file and preserves good med
   try{
     await setup(page,f);const singles:string[]=[];let batches=0;
     await page.route('**/api/online/media/batch',async route=>{batches++;await route.fulfill({status:422,contentType:'application/json',body:JSON.stringify({error:'Không xác minh được thời lượng âm thanh.'})});});
-    await page.route('**/api/online/media',async route=>{const data=route.request().postDataJSON();singles.push(data.name);if(data.name==='broken.wav')await route.fulfill({status:422,contentType:'application/json',body:JSON.stringify({error:'Không xác minh được thời lượng âm thanh.'})});else await route.continue();});
+    await page.route('**/api/online/media',async route=>{const data=mediaRequestBody(route.request());singles.push(data.name);if(data.name==='broken.wav')await route.fulfill({status:422,contentType:'application/json',body:JSON.stringify({error:'Không xác minh được thời lượng âm thanh.'})});else await route.continue();});
     await page.getByLabel('Bộ câu hỏi, hình ảnh và âm thanh',{exact:true}).setInputFiles([doc('server-audio-check.docx',document(false,true,true)),...['broken.wav','good.wav'].map(name=>({name,mimeType:'audio/wav',buffer:waveFixture()}))]);
     await page.getByRole('button',{name:'Kiểm tra & xem trước',exact:true}).click();const preview=page.getByRole('region',{name:'Xem trước tuần học',exact:true});await expect(preview).toBeVisible();
     const excluded=page.getByRole('region',{name:'Câu hỏi không được tải lên',exact:true});await expect(excluded).toContainText('broken.wav');await expect(excluded).not.toContainText('good.wav');await expect(preview.locator('.online-review-item')).toHaveCount(6);

@@ -451,6 +451,21 @@ test('online authenticated chunked mutations cannot outlive reset or suspension 
   });
 });
 
+test('online login cleanup is bounded and preserves active counters',async t=>{
+  const f=await fixture(t);await f.bootstrap();
+  const db=f.database(),expired=Date.now()-1000,activeUntil=Date.now()+900000;
+  for(let i=0;i<205;i++)db.prepare('INSERT INTO login_limits VALUES(?,?,?)').run(`expired-${i}`,1,expired);
+  const activeKey=createHash('sha256').update('user:limited-user').digest('hex');
+  db.prepare('INSERT INTO login_limits VALUES(?,?,?)').run(activeKey,12,activeUntil);
+  const client=f.client(),input={method:'POST',body:{username:'missing-user',password:'Invalid-test-password!'}};
+  await client.denied('/login',input,[401]);
+  assert.equal(db.prepare('SELECT count(*) AS n FROM login_limits WHERE reset_at<=?').get(expired).n,105);
+  assert.equal(db.prepare('SELECT count FROM login_limits WHERE key=?').get(activeKey).count,12);
+  await client.denied('/login',{method:'POST',body:{username:'limited-user',password:'Invalid-test-password!'}},[429]);
+  await client.denied('/login',input,[401]);await client.denied('/login',input,[401]);
+  assert.equal(db.prepare('SELECT count(*) AS n FROM login_limits WHERE reset_at<=?').get(expired).n,0);
+});
+
 test('online repeated failed logins are limited by normalized account and remain limited after restart',async t=>{
   const f=await fixture(t);await f.bootstrap();
   const client=f.client();

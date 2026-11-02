@@ -33,6 +33,7 @@ export class OnlineStore{
       CREATE TABLE IF NOT EXISTS users(id TEXT PRIMARY KEY,workspace_id TEXT NOT NULL REFERENCES workspaces(id),username TEXT NOT NULL UNIQUE,password_hash TEXT NOT NULL,role TEXT NOT NULL CHECK(role IN ('admin','student')),student_id TEXT,active INTEGER NOT NULL DEFAULT 1,created_at TEXT NOT NULL);
       CREATE TABLE IF NOT EXISTS auth_sessions(token_hash TEXT PRIMARY KEY,user_id TEXT NOT NULL REFERENCES users(id),csrf_token TEXT NOT NULL,expires_at INTEGER NOT NULL);
       CREATE TABLE IF NOT EXISTS login_limits(key TEXT PRIMARY KEY,count INTEGER NOT NULL,reset_at INTEGER NOT NULL);
+      CREATE INDEX IF NOT EXISTS login_limit_expiry ON login_limits(reset_at,key);
       CREATE TABLE IF NOT EXISTS classes(id TEXT NOT NULL,workspace_id TEXT NOT NULL REFERENCES workspaces(id),name TEXT NOT NULL,grade INTEGER NOT NULL,created_at TEXT NOT NULL,PRIMARY KEY(workspace_id,id));
       CREATE TABLE IF NOT EXISTS students(id TEXT NOT NULL,workspace_id TEXT NOT NULL,class_id TEXT NOT NULL,name TEXT NOT NULL,user_id TEXT NOT NULL REFERENCES users(id),active INTEGER NOT NULL DEFAULT 1,created_at TEXT NOT NULL,PRIMARY KEY(workspace_id,id),FOREIGN KEY(workspace_id,class_id) REFERENCES classes(workspace_id,id));
       CREATE TABLE IF NOT EXISTS packs(workspace_id TEXT NOT NULL REFERENCES workspaces(id),pack_id TEXT NOT NULL,version INTEGER NOT NULL,subject_label TEXT NOT NULL,json TEXT NOT NULL,content_hash TEXT NOT NULL,PRIMARY KEY(workspace_id,pack_id,version));

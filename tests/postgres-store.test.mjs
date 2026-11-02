@@ -8,6 +8,18 @@ import {PostgresStore} from '../server/postgres-store.mjs';
 import {createPostgresFixture as fixture,authFor,postgresMigration as migration} from './helpers/postgres-fixture.mjs';
 
 const hash=value=>createHash('sha256').update(value).digest('hex');
+test('login limit cleanup is bounded and preserves active counters',async t=>{
+  const f=await fixture(t),now=1700000000000;
+  await f.db.query("INSERT INTO bao_an.login_limits SELECT 'expired-'||i,1,$1 FROM generate_series(1,205) i",[now]);
+  await f.db.query("INSERT INTO bao_an.login_limits VALUES ('active',12,$1)",[now+900000]);
+  const limit={addressHash:'fresh-ip',userHash:'fresh-user',now};
+  await f.store.consumeLoginLimit(limit);
+  assert.equal((await f.db.query('SELECT count(*)::int AS n FROM bao_an.login_limits WHERE reset_at <= $1',[now])).rows[0].n,105);
+  assert.equal((await f.db.query("SELECT count FROM bao_an.login_limits WHERE key='active'")).rows[0].count,12);
+  await assert.rejects(f.store.consumeLoginLimit({...limit,userHash:'active'}),error=>error.status===429);
+  await f.store.consumeLoginLimit(limit);await f.store.consumeLoginLimit(limit);
+  assert.equal((await f.db.query('SELECT count(*)::int AS n FROM bao_an.login_limits WHERE reset_at <= $1',[now])).rows[0].n,0);
+});
 const verification=await readFile(new URL('../supabase/verify.sql',import.meta.url),'utf8');
 async function student(f,name='learner',classroom){
   const cls=classroom??await f.store.createClass(f.admin,{name:'Lớp tự nhiên',grade:3});

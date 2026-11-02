@@ -3,7 +3,7 @@ import type {AttemptInput,GameHostProps,ModuleId} from '../core/contracts';
 import type {OnlineIdentity,OnlineCompactPlay,OnlineStudentSummary,OnlinePackSummary,OnlineSummarySet,OnlineAttemptReceipt} from '../core/online-contracts';
 import OnlineQuestionStars from './OnlineQuestionStars';
 import {onlineMoney,onlineTime,onlineRewardStatus} from '../core/online-format';
-import '../styles/game-base.css';
+import '../styles/student-shell.css';
 import {onlineApi} from '../core/online-client';
 import {newId} from '../core/utils';
 import {stopSpeaking} from '../core/speech';
@@ -11,8 +11,8 @@ import {stopQuestionAudio} from '../core/question-audio';
 import {rewardStatus} from '../core/reward-wallet';
 import StudentScreen from './StudentScreen';
 import AsyncBoundary from '../components/AsyncBoundary';
+import {QuestionMediaScope,preloadQuestionImage} from '../components/QuestionMedia';
 import {GAME_COMPONENTS,preloadGameComponent} from '../games/loaders';
-import {getSceneForModule} from '../world3d/scenes/sceneCatalog';
 
 const importExercise=()=>import('./OnlineExerciseRunner');
 let exerciseModule:ReturnType<typeof importExercise>|undefined;
@@ -118,6 +118,7 @@ export default function OnlineStudentWorld({identity,onLogout,onPasswordChanged}
     try{
       const play=await onlineApi.playCompact({moduleId,packId:pack.id,contentVersion:pack.version,requestId:startRequest.current.id,...(reviewItemIds?{reviewItemIds}:{})},controller.signal);
       if(!mounted.current)return;
+      if(play.presentation.kind==='quiz'||play.presentation.kind==='learning')preloadQuestionImage(play.session.sessionId,play.presentation.items[0]?.media);
       complete.current=false;completionPromise.current=null;setReward(null);setQuestionNotice('');setGameAction(null);
       activeSession.current=play.session.sessionId;setActive(play);startRequest.current=null;
     }catch(error){if(mounted.current&&error instanceof Error&&error.name!=='AbortError')setError(messageOf(error));}
@@ -157,12 +158,12 @@ export default function OnlineStudentWorld({identity,onLogout,onPasswordChanged}
   }
   const GameComponent=active?(active.presentation.kind==='learning'?OnlineExerciseRunner:GAME_COMPONENTS[active.session.moduleId]):null;
   const gameProps:GameHostProps|null=active?{pack:active.presentation,onAttempt:recordAttempt,onComplete:completeGame,onExit:()=>void leaveGame(),questionMode:active.session.rewardPolicyVersion===2,serverScored:active.session.questionProtocolVersion===1,mediaPlayId:active.session.sessionId,onQuestionHint:(itemId)=>onlineApi.questionHint(active.session.sessionId,itemId),onQuestionOpen:(itemId)=>onlineApi.openQuestion(active.session.sessionId,itemId)}:null;
-  return <div className="app-shell focused-games-app ba-frame-shell online-app online-student">
+  return <div className="app-shell focused-games-app ba-frame-shell online-app online-student" data-motion={motionOn?'on':'off'}>
     <header className="online-header" inert={!!active||walletOpen||passwordOpen||advanceOpen}><a href="?online=1" className="online-brand">✦ BẢO AN <span>LEARNING</span></a><div><strong>{identity.workspace.name}</strong><span>{state?.student.name??identity.user.username}{state?` · ${state.className}`:''}</span></div><div className="online-header-actions"><button aria-pressed={soundOn} onClick={()=>setSoundOn(value=>!value)}>{soundOn?'🔊':'🔇'} Âm thanh</button><button aria-pressed={motionOn} onClick={()=>setMotionOn(value=>!value)}>Hiệu ứng {motionOn?'bật':'tắt'}</button><button disabled={starting} onClick={openPassword}>Đổi mật khẩu</button><button disabled={starting} onClick={()=>void onLogout().catch(error=>setError(messageOf(error)))}>Đăng xuất</button></div></header>
     <main ref={studentMain} tabIndex={-1} className="site-main site-main-gameworld" aria-busy={starting||refreshing||loadingMore} inert={!!active||walletOpen||passwordOpen||advanceOpen}>
       {error&&!active&&<div className="online-notice online-error" role="alert">{error}<button onClick={()=>void refresh().catch(error=>setError(messageOf(error)))}>Thử kết nối lại</button></div>}
       {loading?<p className="online-loading" role="status">Đang mở hành trình của con…</p>:state?<>
-        {state.weeks.length>0?<StudentScreen availableStars={state.balance.available} practiceContext={{title:state.current?.weekTitle??'Hành trình của con',detail:state.current?`${state.current.subjectLabel} · ${state.current.pack.title}`:state.weeks.length?'Con đã hoàn thành tất cả học liệu được giao.':'Quản trị viên đang chuẩn bị học liệu cho lớp.',pack:state.current?.pack??null,games:state.current?.games??[],complete:state.weeks.length>0&&!state.current}} onPlay={startGame} starting={starting||!!active} onOpenWallet={()=>setWalletOpen(true)} worldActive={!starting&&!walletOpen&&!passwordOpen&&!advanceOpen} motionOn={motionOn} gameWorld={active?getSceneForModule(active.session.moduleId):null} guideMood="idle" guideCue={0}/>:<section className="online-student-empty" aria-label="Chờ giáo viên giao học liệu"><span aria-hidden="true">✦</span><h1>Chờ bộ câu hỏi của thầy cô</h1><p>Khi giáo viên giao bộ câu hỏi tuần cho lớp, bài học và trò chơi phù hợp sẽ xuất hiện ở đây.</p><p>⭐ {state.balance.available} sao</p><button onClick={()=>setWalletOpen(true)}>Ví đổi sao</button></section>}
+        {state.weeks.length>0?<StudentScreen availableStars={state.balance.available} practiceContext={{title:state.current?.weekTitle??'Hành trình của con',detail:state.current?`${state.current.subjectLabel} · ${state.current.pack.title}`:state.weeks.length?'Con đã hoàn thành tất cả học liệu được giao.':'Quản trị viên đang chuẩn bị học liệu cho lớp.',pack:state.current?.pack??null,games:state.current?.games??[],complete:state.weeks.length>0&&!state.current}} onPlay={startGame} starting={starting||!!active} onOpenWallet={()=>setWalletOpen(true)}/>:<section className="online-student-empty" aria-label="Chờ giáo viên giao học liệu"><span aria-hidden="true">✦</span><h1>Chờ bộ câu hỏi của thầy cô</h1><p>Khi giáo viên giao bộ câu hỏi tuần cho lớp, bài học và trò chơi phù hợp sẽ xuất hiện ở đây.</p><p>⭐ {state.balance.available} sao</p><button onClick={()=>setWalletOpen(true)}>Ví đổi sao</button></section>}
         <section className="online-student-weeks" aria-label="Học liệu được giao">
           <div className="online-section-head"><h2>Hành trình theo tuần</h2><button disabled={starting||refreshing||loadingMore} onClick={()=>void refresh().catch(error=>{if(error?.name!=='AbortError')setError(messageOf(error));})}>{refreshing?'Đang làm mới…':'Làm mới tiến độ'}</button></div>
           <p>Mỗi câu cần ít nhất 2 sao để hoàn thành tuần. Con có thể ôn lên 3 sao trước khi xác nhận sang tuần mới; tuần đã qua sẽ khóa.</p>
@@ -175,13 +176,12 @@ export default function OnlineStudentWorld({identity,onLogout,onPasswordChanged}
     {starting&&<div className="online-student-status" role="status">{selectingPack?'Đang tải trò phù hợp…':'Đang mở trò chơi…'}</div>}
     {active&&GameComponent&&gameProps&&<div className="overlay immersive-overlay" role="presentation">
       <div className={`game-dialog adventure-dialog immersive-dialog premium-game dialog-${active.session.moduleId}`} data-scene-engine="html" data-scene-state="ready" ref={gameDialog} tabIndex={-1} role="dialog" aria-modal="true" aria-busy={gameAction!==null} aria-label={`Đang chơi ${active.pack.title}`}>
-        <div id="ba37-game-scene-slot" className="ba37-game-scene-slot" aria-hidden="true"/>
         <div className="game-dialog-head"><div><span className="eyebrow">{state?.weeks.flatMap(week=>week.sets).find(set=>set.pack.id===active.pack.id)?.subjectLabel??'HỌC LIỆU ĐƯỢC GIAO'}</span><h2>{active.pack.title}</h2></div><button className="button outline" disabled={gameAction!==null} onClick={()=>void leaveGame()}>{gameAction==='exit'?'Đang trở về…':'← Thoát trò chơi'}</button></div>
         {gameAction&&<div className={`online-game-request-status ${gameAction==='exit'?'is-leaving':''}`} role="status">{gameAction==='answer'?'Đang lưu câu trả lời…':gameAction==='complete'?'Đang lưu kết quả hoàn thành…':'Đang trở về hành trình…'}</div>}
         {error&&<p className="online-notice online-error" role="alert">{error} Con có thể thử lại thao tác vừa rồi.</p>}
         {questionNotice&&active.session.rewardPolicyVersion===2&&<div className="game-star-receipt question-star-receipt" role="status">{questionNotice}</div>}
         {reward&&<div className="game-star-receipt" role="status">{reward.gained?`⭐ +${reward.gained} sao mới`:'Đã giữ mức sao cao nhất'} · Bộ này đạt {reward.tier}/3 sao. Máy chủ đã lưu thành tích.</div>}
-        <AsyncBoundary key={active.session.sessionId} label="trò chơi" onExit={()=>void leaveGame()}><Suspense fallback={<p className="loading-state">Đang tải trò chơi…</p>}><GameComponent key={active.session.sessionId} {...gameProps}/></Suspense></AsyncBoundary>
+        <QuestionMediaScope key={active.session.sessionId} scope={active.session.sessionId}><AsyncBoundary label="trò chơi" onExit={()=>void leaveGame()}><Suspense fallback={<p className="loading-state">Đang tải trò chơi…</p>}><GameComponent key={active.session.sessionId} {...gameProps}/></Suspense></AsyncBoundary></QuestionMediaScope>
       </div>
     </div>}
     {advanceOpen&&state?.currentWeekSummary&&<AsyncBoundary label="xác nhận chuyển tuần" onExit={()=>setAdvanceOpen(false)}><Suspense fallback={<p className="online-loading" role="status">Đang mở xác nhận chuyển tuần…</p>}><OnlineWeekAdvanceDialog week={state.currentWeekSummary} onClose={()=>setAdvanceOpen(false)} onConfirm={advanceWeek}/></Suspense></AsyncBoundary>}

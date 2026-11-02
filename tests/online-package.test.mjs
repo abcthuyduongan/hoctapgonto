@@ -18,6 +18,7 @@ import {waveFixture} from './helpers/media-fixture.mjs';
 
 const workspace=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const results=join(workspace,'test-results');
+const packagedBuild={version:RELEASE_VERSION,sourceId:null,commit:null,displayMode:'2d',questionProtocolVersion:1};
 const managerPassword='Package-manager-test-2026!';
 const studentPassword='Package-student-test-2026!';
 const inside=(root,file)=>{const path=relative(root,file);return path===''||!isAbsolute(path)&&path!=='..'&&!path.startsWith(`..${sep}`);};
@@ -119,7 +120,7 @@ test('actual pilot ZIP runs a standalone local manager from an extracted Unicode
   for(const key of Object.keys(env))if(key.startsWith('BAO_AN_')||['NODE_PATH','NODE_OPTIONS'].includes(key))delete env[key];
   Object.assign(env,{BAO_AN_HOST:'127.0.0.1',BAO_AN_PORT:String(port),BAO_AN_STATIC_DIR:'app',BAO_AN_DATA_DIR:'data',NODE_PATH:''});
   async function start(){running=runNode(join(extract,'online-local.mjs'),{cwd:extract,env});return waitReady(running,origin);}
-  assert.deepEqual(await start(),{available:true,configured:false,runtimeVersion:RELEASE_VERSION,questionProtocolVersion:1});
+  assert.deepEqual(await start(),{available:true,configured:false,runtimeVersion:RELEASE_VERSION,questionProtocolVersion:1,mediaUploadEncoding:'gzip',build:packagedBuild});
   const token=(await readFile(join(extract,'data','bootstrap-token.txt'),'utf8')).trim();assert.ok(token.length>=24);
   assert.ok((await stat(join(extract,'data','bao-an.sqlite'))).isFile());
   const manager=new Client(origin),learner=new Client(origin);
@@ -172,7 +173,7 @@ test('actual pilot ZIP runs a standalone local manager from an extracted Unicode
     assert.ok(!running.output().includes(token));assert.ok(!running.output().includes(managerPassword));assert.ok(!running.output().includes(studentPassword));
   });
   await t.test('restarting the extracted executable retains accounts, assignments, earnings, wallet and redemption history',async()=>{
-    await stop(running);assert.deepEqual(await start(),{available:true,configured:true,runtimeVersion:RELEASE_VERSION,questionProtocolVersion:1});
+    await stop(running);assert.deepEqual(await start(),{available:true,configured:true,runtimeVersion:RELEASE_VERSION,questionProtocolVersion:1,mediaUploadEncoding:'gzip',build:packagedBuild});
     assert.equal((await readFile(join(extract,'data','bootstrap-token.txt'),'utf8')).trim(),token);
     const restoredManager=new Client(origin),restoredLearner=new Client(origin);
     await restoredManager.call('/login',{method:'POST',body:{username:'packaged-manager',password:managerPassword}});
@@ -191,7 +192,7 @@ test('actual pilot ZIP runs a standalone local manager from an extracted Unicode
     const restored=runNode(join(extract,'restore-online.mjs'),{cwd:extract,env,args:['--file',snapshot,'--data-dir',cleanData,'--confirm',checked.sha256]});await ended(restored);
     assert.equal(restored.child.exitCode,0,restored.output());assert.equal(JSON.parse(restored.stdout()).restored,true);
     const db=new DatabaseSync(join(cleanData,'bao-an.sqlite'),{readOnly:true});try{assert.equal(db.prepare('SELECT count(*) AS n FROM auth_sessions').get().n,0);assert.equal(db.prepare('PRAGMA integrity_check').get().integrity_check,'ok');}finally{db.close();}
-    env.BAO_AN_DATA_DIR=cleanData;assert.deepEqual(await start(),{available:true,configured:true,runtimeVersion:RELEASE_VERSION,questionProtocolVersion:1});
+    env.BAO_AN_DATA_DIR=cleanData;assert.deepEqual(await start(),{available:true,configured:true,runtimeVersion:RELEASE_VERSION,questionProtocolVersion:1,mediaUploadEncoding:'gzip',build:packagedBuild});
     const previousSession=await fetch(`${origin}/api/online/student`,{headers:{Cookie:learner.cookie},signal:AbortSignal.timeout(5000)});assert.equal(previousSession.status,401);
     const restoredManager=new Client(origin),restoredLearner=new Client(origin);await restoredManager.call('/login',{method:'POST',body:{username:'packaged-manager',password:managerPassword}});await restoredLearner.call('/login',{method:'POST',body:{username:'packaged-student',password:studentPassword}});
     const dashboard=await restoredManager.call('/dashboard'),state=await restoredLearner.call('/student');

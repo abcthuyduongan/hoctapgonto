@@ -4,6 +4,8 @@ import {OnlineError,fail,shape,text,integer} from './online-errors.mjs';
 import {adminSummary,adminWeek,adminMedia,adminWeekCheck} from './admin-data.mjs';
 import {audioDurationMs} from './audio-duration.mjs';
 import {createFailureReporter,createPerformanceReporter,measureApiSpan,measureApiSerialization,ONLINE_RUNTIME_VERSION} from './api-diagnostics.mjs';
+import {readBuildIdentity} from './build-identity.mjs';
+import {parseJsonBody} from './json-body.mjs';
 
 const scrypt=promisify(scryptCallback),options={N:32768,r:8,p:1,maxmem:64*1024*1024};
 const COOKIE='baoan_online_session',MAX_MEDIA=2*1024*1024;
@@ -21,8 +23,7 @@ async function body(request,max=2*1024*1024){
   if(Number(request.headers.get('content-length')??0)>max)fail(413,'Gói dữ liệu vượt giới hạn kích thước.');
   const reader=request.body?.getReader();if(!reader)fail(400,'Thiếu dữ liệu gửi lên.');const chunks=[];let size=0;
   try{for(;;){const{value,done}=await reader.read();if(done)break;size+=value.length;if(size>max){await reader.cancel();fail(413,'Gói dữ liệu vượt giới hạn kích thước.');}chunks.push(value);}}finally{reader.releaseLock();}
-  let value;try{value=JSON.parse(Buffer.concat(chunks).toString('utf8'));}catch{fail(400,'Dữ liệu JSON không đọc được.');}
-  if(!value||typeof value!=='object'||Array.isArray(value))fail(400,'Dữ liệu gửi lên cần là một đối tượng JSON.');return value;
+  return parseJsonBody(Buffer.concat(chunks),request.headers.get('content-encoding'),max);
 }
 export function validateCloudMedia(input){
   shape(input,['name','mime','base64']);const name=text(input.name,'Tên tệp',180);if(/[\\/]/.test(name))fail(400,'Tên tệp không được chứa đường dẫn.');
@@ -61,7 +62,7 @@ export function createCloudApi({store,storage,publicOrigin,setupToken,performanc
       if(!url.pathname.startsWith('/api/online/'))fail(404,'Không có API này.');
       if(method==='OPTIONS')fail(405,'API chỉ dùng cùng origin.');
       if(mutable&&(request.headers.get('origin')!==origin||request.headers.get('sec-fetch-site')==='cross-site'))fail(403,'Yêu cầu phải xuất phát từ chính website này.');
-      if(method==='GET'&&route==='/status')return cloudJson(200,{available:true,configured:await store.configured(),mediaMaxBytes:MAX_MEDIA,runtimeVersion:ONLINE_RUNTIME_VERSION,questionProtocolVersion:1});
+      if(method==='GET'&&route==='/status')return cloudJson(200,{available:true,configured:await store.configured(),mediaMaxBytes:MAX_MEDIA,runtimeVersion:ONLINE_RUNTIME_VERSION,questionProtocolVersion:1,mediaUploadEncoding:'gzip',build:await readBuildIdentity()});
       if(method==='POST'&&route==='/setup'){
         const input=shape(await body(request),['token','name','username','password']);if(await store.configured())fail(409,'Máy chủ đã được khởi tạo. Hãy đăng nhập.');await limit(context,'bootstrap');
         if(!setupToken||setupToken.length<24||!same(input.token,setupToken))fail(403,'Mã khởi tạo không đúng. Lấy mã riêng từ quản trị máy chủ.');
@@ -135,7 +136,7 @@ export function createCloudApi({store,storage,publicOrigin,setupToken,performanc
           if(!Number.isSafeInteger(start)||!Number.isSafeInteger(end)||start<0||start>end||start>=asset.size)return cloudJson(416,{error:'Khoảng dữ liệu không hợp lệ.'},{'Content-Range':`bytes */${asset.size}`});status=206;
         }
         const headers={...privateHeaders,'Content-Type':asset.mime,'Accept-Ranges':'bytes','Content-Length':String(end-start+1),'Content-Disposition':`inline; filename*=UTF-8''${encodeURIComponent(asset.name)}`,...(status===206?{'Content-Range':`bytes ${start}-${end}/${asset.size}`}:{})};
-        if(method==='HEAD')return new Response(null,{status,headers});const bytes=await measureApiSpan('storage',()=>storage.download(asset.object_path));
+        if(method==='HEAD')return new Response(null,{status,headers});const bytes=await measureApiSpan('storage',()=>storage.download(asset.object_path,asset.sha256));
         if(bytes.length!==asset.size||hash(bytes)!==asset.sha256)fail(502,'Tệp tư liệu không khớp dữ liệu đã duyệt.');if(auth.role==='student'&&asset.kind==='audio'&&url.searchParams.has('playId')&&start===0&&end===asset.size-1)await store.recordAudioDelivery(auth,url.searchParams.get('playId'),url.searchParams.get('itemId'),media[1],await audioDurationMs(bytes,asset.mime));return new Response(bytes.subarray(start,end+1),{status,headers});
       }
       if(method==='POST'&&route==='/classes'){role(auth,'admin');return cloudJson(201,await store.createClass(auth,await body(request)));}
@@ -151,7 +152,7 @@ export function createCloudApi({store,storage,publicOrigin,setupToken,performanc
       const redemption=route.match(/^\/redemptions\/([^/]+)\/(transition|cancel)$/);
       if(method==='POST'&&redemption){role(auth,redemption[2]==='cancel'?'student':'admin');return cloudJson(200,await store.transitionReward(auth,decodeURIComponent(redemption[1]),await body(request),redemption[2]==='cancel'));}
       fail(404,'Không có thao tác API này.');
-    }catch(error){const status=error instanceof OnlineError?error.status:error instanceof URIError?400:500,supportId=reportFailure(new URL(request.url).pathname,request.method,status,performance.now()-started);return cloudJson(status,{error:error instanceof OnlineError?error.message:error instanceof URIError?'Đường dẫn không hợp lệ.':'Máy chủ chưa xử lý được yêu cầu. Vui lòng thử lại.',...(supportId?{supportId}:{})});}
+    }catch(error){const status=error instanceof OnlineError?error.status:error instanceof URIError?400:500,supportId=reportFailure(new URL(request.url).pathname,request.method,status,performance.now()-started,error);return cloudJson(status,{error:error instanceof OnlineError?error.message:error instanceof URIError?'Đường dẫn không hợp lệ.':'Máy chủ chưa xử lý được yêu cầu. Vui lòng thử lại.',...(supportId?{supportId}:{})});}
   };
   return(request,context)=>performanceReporter(new URL(request.url).pathname,request.method,()=>handle(request,context));
 }

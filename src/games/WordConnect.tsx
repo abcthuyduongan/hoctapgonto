@@ -1,3 +1,4 @@
+import '../styles/game-base.css';
 import {useQuestionSpeech} from './useQuestionSpeech';
 import {saveFailureMessage} from './save-failure-message';
 import QuestionMedia,{QuestionImageRecovery} from '../components/QuestionMedia';

@@ -6,6 +6,8 @@ import './styles/base.css';
 
 const root=document.getElementById('root');
 if(!root)throw new Error('Không tìm thấy phần tử root');
+root.dataset.appVersion=__BAO_AN_BUILD_INFO__.version;
+root.dataset.sourceId=__BAO_AN_BUILD_INFO__.sourceId;
 const OnlineScreen=lazy(()=>import('./screens/OnlineScreen'));
 const address=new URL(window.location.href);
 if(address.searchParams.get('online')==='0'||address.searchParams.has('legacy')||address.pathname==='/legacy-archive'){address.pathname='/';address.searchParams.set('online','1');address.searchParams.delete('legacy');history.replaceState(null,'',address);}

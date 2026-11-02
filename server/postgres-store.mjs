@@ -106,9 +106,15 @@ export class PostgresStore{
     const entries=[{key:addressHash,max:100},{key:userHash,max:12}].sort((a,b)=>a.key.localeCompare(b.key));
     for(const entry of entries)text(entry.key,'Mã giới hạn đăng nhập',100);
     await this.transaction(async client=>{
+      // Skip counters being renewed by another request rather than waiting on them.
+      // Exclude our own keys; their expiry is handled atomically by the UPSERT below.
       // A single ordered UPSERT locks both counters. Throwing rolls back both,
       // including a previously absent address counter when the user is limited.
-      const rows=await this.rows(`INSERT INTO bao_an.login_limits(key,count,reset_at)
+      const rows=await this.rows(`WITH expired AS (
+        DELETE FROM bao_an.login_limits WHERE key IN (
+          SELECT key FROM bao_an.login_limits WHERE reset_at<=$2 AND NOT(key=ANY($1::text[]))
+          ORDER BY reset_at,key LIMIT 100 FOR UPDATE SKIP LOCKED) RETURNING key
+      ) INSERT INTO bao_an.login_limits(key,count,reset_at)
         SELECT key,1,$2::bigint+900000 FROM unnest($1::text[]) AS entry(key) ORDER BY key
         ON CONFLICT(key) DO UPDATE SET count=CASE WHEN bao_an.login_limits.reset_at>$2 THEN bao_an.login_limits.count+1 ELSE 1 END,
           reset_at=CASE WHEN bao_an.login_limits.reset_at>$2 THEN bao_an.login_limits.reset_at ELSE $2::bigint+900000 END

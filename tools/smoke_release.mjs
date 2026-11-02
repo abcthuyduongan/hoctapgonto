@@ -16,7 +16,7 @@ const zipPath=resolve(process.argv[2]??`releases/bao-an-learning-${version}.zip`
 const prefix=`bao-an-learning-${version}/`,files=unzipSync(archive),manifest=JSON.parse(Buffer.from(files[prefix+'release.json']).toString('utf8'));
 assert.equal(manifest.version,version);assert.equal(manifest.releaseReady,false);
 for(const file of manifest.files){const bytes=files[prefix+file.path];assert.equal(bytes?.length,file.bytes);assert.equal(sha(bytes),file.sha256);}
-const tempParent=resolve(tmpdir()),temporary=await mkdtemp(join(tempParent,'bao-an-rc12-smoke-')),root=join(temporary,'app-release'),setupToken=randomUUID();
+const tempParent=resolve(tmpdir()),temporary=await mkdtemp(join(tempParent,'bao-an-release-smoke-')),root=join(temporary,'app-release'),setupToken=randomUUID();
 let child;
 try{
  for(const [name,bytes] of Object.entries(files)){
@@ -35,5 +35,5 @@ try{
  console.log(JSON.stringify({version,zipSha256:sha(archive),verifiedFiles:manifest.files.length,standaloneOutsideWorkspace:true,configuredEmptyDatabase:true,questionCount:0,mediaDecoderVerified:true,logoutVerified:true,passed:true}));
 }finally{
  if(child?.exitCode===null){const stopped=once(child,'exit');child.kill();await Promise.race([stopped,delay(5000)]);}
- const rel=relative(tempParent,resolve(temporary));if(isAbsolute(rel)||rel==='..'||rel.startsWith(`..${sep}`)||!basename(temporary).startsWith('bao-an-rc12-smoke-'))throw new Error('Unsafe smoke cleanup');await rm(temporary,{recursive:true,force:true,maxRetries:3,retryDelay:100});
+ const rel=relative(tempParent,resolve(temporary));if(isAbsolute(rel)||rel==='..'||rel.startsWith(`..${sep}`)||!basename(temporary).startsWith('bao-an-release-smoke-'))throw new Error('Unsafe smoke cleanup');await rm(temporary,{recursive:true,force:true,maxRetries:3,retryDelay:100});
 }
