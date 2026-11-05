@@ -216,8 +216,10 @@ export function itemContentFingerprint(ref: PackItemRef, packs: ContentPack[]): 
   if (!item) return;
   if (item.kind === 'multiple-choice'||item.kind==='numeric-answer'||item.kind==='fill-blank') return JSON.stringify(['question', normalize(item.prompt)]);
   if (item.kind === 'pair') return JSON.stringify(['pair', ...[normalize(item.left), normalize(item.right)].sort()]);
-  if(item.kind==='sentence')return JSON.stringify(['sentence', normalize(item.words.join(' '))]);
-  return JSON.stringify(['context-question',richContextFingerprint(ref,packs),normalize(item.prompt)]);
+  if (item.kind === 'sentence') return JSON.stringify(['sentence', normalize(item.words.join(' '))]);
+  if (item.kind === 'compare') return JSON.stringify(['compare', normalize(item.left), normalize(item.right), item.operator]);
+  if (item.kind === 'categorize') return JSON.stringify(['categorize', normalize(item.prompt), ...item.categories.map(normalize).sort()]);
+  return JSON.stringify(['context-question',richContextFingerprint(ref,packs),normalize('prompt' in item && typeof item.prompt === 'string' ? item.prompt : '')]);
 }
 
 export function validateCurriculum(input: unknown, packs: ContentPack[]): string[] {

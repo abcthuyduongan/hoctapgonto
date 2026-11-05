@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Bảo An Learning · Hướng dẫn sử dụng 4.0.0</title>
+<style>:root{font:17px/1.65 system-ui,"Segoe UI",sans-serif;color:#173b40;background:#f1f7f5}*{box-sizing:border-box}main{max-width:980px;margin:auto;padding:32px 24px}header,section{background:white;border:1px solid #d3e5df;border-radius:16px;padding:24px;margin-bottom:20px}h1,h2,h3{line-height:1.25;color:#0f5146}a{color:#006d5b}code{background:#edf5f2;padding:2px 5px;border-radius:4px;overflow-wrap:anywhere}pre{padding:16px;background:#edf5f2;border-radius:8px;white-space:pre-wrap;overflow-wrap:anywhere}li{margin:8px 0}.notice{border-left:5px solid #1cb099;background:#e8f7f4;padding:12px 16px;border-radius:0 8px 8px 0}table{border-collapse:collapse;width:100%}th,td{text-align:left;padding:10px;border-bottom:1px solid #d3e5df;vertical-align:top}th{background:#f1f7f5;font-weight:700}@media(max-width:600px){main{padding:16px 12px}header,section{padding:18px}}@media print{body{background:white}main{padding:0}section{break-inside:avoid}}</style></head>
+<body><main><header><p><strong>Phiên bản 4.0.0 chính thức</strong> · Phát hành hoàn thiện</p><h1>Bảo An Learning — Bản đồ học tập & Trò chơi thông minh</h1><p>Ứng dụng giáo dục hiện đại dành cho học sinh Lớp 3, gia đình và nhà trường. Kết hợp giữa học tập bám sát chương trình GDPT 2018 và trải nghiệm phiêu lưu hấp dẫn với 10 minigame, bản đồ khám phá danh lam đất nước và xây dựng thị trấn tuổi thơ.</p><p class="notice">✨ <strong>Bản hoàn thiện 4.0.0</strong> bao gồm: Bản đồ thế giới 4 vùng môn học, 10 minigame, Kệ quà thật & ghim mục tiêu, Chuỗi ngày học tập (streak), Nhiệm vụ ngày & Đố vui, Thị trấn của con với hàng xóm động vật & cổ vũ bạn bè, Khu phụ huynh bảo vệ bằng PIN, Phòng luyện thi Violympic & IOE, cùng bộ học liệu chuẩn 8 tuần Học kỳ 2.</p></header>
+
+<section><h2>1. Hướng dẫn khởi động nhanh</h2>
+<ol>
+  <li><strong>Giải nén gói ứng dụng:</strong> Giải nén toàn bộ tệp <code>bao-an-learning-4.0.0.zip</code> vào một thư mục trên máy tính Windows.</li>
+  <li><strong>Yêu cầu môi trường:</strong> Cài đặt Node.js phiên bản <strong>22.22.2 trở lên</strong>. Gói ứng dụng độc lập đã tích hợp đầy đủ thư viện, không cần chạy lệnh <code>npm install</code>.</li>
+  <li><strong>Khởi chạy ứng dụng:</strong>
+    <ul>
+      <li>Nhấp đúp vào tệp <strong><code>MO_BAO_AN.cmd</code></strong> để mở giao diện học sinh trên trình duyệt.</li>
+      <li>Nhấp đúp vào tệp <strong><code>MO_QUAN_LY.cmd</code></strong> để mở trang quản trị giáo viên.</li>
+      <li>Hoặc truy cập trực tiếp tại: <a href="http://127.0.0.1:4180/?online=1"><code>http://127.0.0.1:4180/?online=1</code></a></li>
+    </ul>
+  </li>
+  <li><strong>Khởi tạo lần đầu:</strong> Lấy mã khởi tạo trong tệp <code>data/bootstrap-token.txt</code> để đặt tên trường/lớp và tài khoản quản trị ban đầu. Phạm vi: máy tính Windows, máy tính bảng và điện thoại di động; manifest thử nghiệm mang cờ <code>releaseReady: false</code> trước khi phê duyệt chính thức.</li>
+</ol>
+</section>
+
+<section><h2>2. Bản đồ học tập & Khám phá vùng đất tri thức</h2>
+<p>Bản đồ học tập được thiết kế trực quan với 4 vùng đất đại diện cho các môn học chính:</p>
+<ul>
+  <li>🗺️ <strong>Vùng Toán Học (Math Isle):</strong> Hành trình chinh phục các con số, hình học và bài toán tư duy với các chặng bám sát vị trí địa danh.</li>
+  <li>📖 <strong>Vùng Tiếng Việt (Vietnamese Realm):</strong> Luyện từ và câu, biện pháp nghệ thuật, đọc hiểu và xếp câu văn mượt mà.</li>
+  <li>🌍 <strong>Vùng Tiếng Anh (English Harbor):</strong> Rèn luyện từ vựng, giao tiếp hàng ngày và kỹ năng nghe hiểu âm thanh chuẩn.</li>
+  <li>💻 <strong>Vùng Tin Học (Computing Workshop):</strong> Làm quen với máy tính, an toàn thông tin và kỹ năng số.</li>
+</ul>
+<p>Mỗi chặng tuần đã hoàn thành có viền sáng ánh vàng; đạt trọn vẹn 3 sao tất cả các câu sẽ xuất hiện cờ vàng chiến thắng 🚩. Tuần chưa mở được phủ lớp sương mù kỳ bí.</p>
+</section>
+
+<section><h2>3. Kho Trò chơi giáo dục đa dạng</h2>
+<p>Hệ thống khởi đầu với năm game kinh điển (Đảo Câu Hỏi, Khu Rừng Trí Nhớ, Đảo Nối Từ, Xưởng Ghép Câu, Đường Mòn Số Học) và nay đã mở rộng thành kho 10 trò chơi giáo dục phong phú:</p>
+<table>
+  <thead><tr><th>Tên trò chơi</th><th>Mã trò chơi</th><th>Dạng câu hỏi tương thích</th><th>Mô tả trải nghiệm</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Đảo Câu Hỏi</strong></td><td><code>math-quest</code></td><td>Trắc nghiệm (Quiz), Đọc hiểu, Nghe</td><td>Trả lời câu hỏi trắc nghiệm vượt chướng ngại vật trên biển đảo.</td></tr>
+    <tr><td><strong>Khu Rừng Trí Nhớ</strong></td><td><code>memory-match</code></td><td>Nối cặp (Pairs)</td><td>Lật tìm các cặp thẻ từ vựng và phép tính tương ứng trong rừng thông.</td></tr>
+    <tr><td><strong>Đảo Nối Từ</strong></td><td><code>word-connect</code></td><td>Nối cặp (Pairs)</td><td>Nối các mảnh ghép từ vựng tạo thành cặp nghĩa chính xác.</td></tr>
+    <tr><td><strong>Xưởng Ghép Câu</strong></td><td><code>sentence-builder</code></td><td>Xếp câu (Sentences)</td><td>Sắp xếp các khối từ ngữ thành câu hoàn chỉnh đúng ngữ pháp.</td></tr>
+    <tr><td><strong>Đường Mòn Số Học</strong></td><td><code>sequence-trail</code></td><td>Xếp câu / Quy luật</td><td>Tìm quy luật và xếp các bước tư duy theo trình tự logic.</td></tr>
+    <tr><td><strong>Cân Thăng Bằng</strong></td><td><code>balance-scale</code></td><td>So sánh (Compare)</td><td>Đặt các đại lượng và biểu thức lên đĩa cân so sánh <code>&gt;</code>, <code>&lt;</code>, <code>=</code>.</td></tr>
+    <tr><td><strong>Phân Loại Vào Giỏ</strong></td><td><code>basket-sort</code></td><td>Phân loại (Categorize)</td><td>Kéo thả các thẻ từ và sự vật vào 2–4 nhóm phân loại tương ứng.</td></tr>
+    <tr><td><strong>Lật Thẻ Kho Báu</strong></td><td><code>treasure-flip</code></td><td>Nối cặp / Ghi nhớ</td><td>Khám phá rương kho báu ghi nhớ vị trí và ghép đôi từ vựng.</td></tr>
+    <tr><td><strong>Bếp Nhỏ Của Cáo</strong></td><td><code>fox-kitchen</code></td><td>Xếp câu / Trật tự</td><td>Cùng đầu bếp Cáo nhặt nguyên liệu nấu súp theo đúng thứ tự câu văn.</td></tr>
+    <tr><td><strong>Đua Thuyền Rồng</strong></td><td><code>boat-race</code></td><td>Trắc nghiệm bấm giờ</td><td>Tăng tốc thuyền rồng vượt sóng bằng các câu trả lời nhanh và chính xác.</td></tr>
+  </tbody>
+</table>
+</section>
+
+<section><h2>4. Thị trấn của con (My Little Town)</h2>
+<p>Thị trấn là phần thưởng ảo lâu dài khuyến khích học sinh học tập đều đặn tất cả các môn:</p>
+<ul>
+  <li><strong>Vật liệu tích lũy:</strong> Mỗi sao môn Toán cho <strong>Đá</strong>, Tiếng Việt cho <strong>Gỗ</strong>, Tiếng Anh cho <strong>Cá</strong>, Tin học cho <strong>Linh kiện</strong>. Xây dựng công trình chỉ tốn vật liệu môn học, <strong>hoàn toàn không trừ vào sao trong ví đổi quà thật</strong>!</li>
+  <li><strong>12 Công trình cổ tích:</strong> Nhà gỗ, giếng nước, cầu gỗ, vườn hoa, cối xay gió, thư viện nhỏ, tháp chuông... sắp đặt trên lưới thị trấn 10×10.</li>
+  <li><strong>Hàng xóm động vật:</strong> Cứ mỗi 4 tuần học hoàn thành, một bạn nhỏ đáng yêu (Thỏ Trắng, Cáo Cam, Gấu Nâu...) sẽ chuyển đến sinh sống. Học sinh được tự tay đặt tên cho bạn nhỏ (có bộ lọc từ ngữ phù hợp).</li>
+  <li><strong>Thăm thị trấn bạn &amp; Bảng tin lớp:</strong> Ghé thăm thị trấn của bạn cùng lớp ở chế độ chỉ xem và bấm nút <em>"🎉 Cổ vũ bạn ngay!"</em> (1 lượt/ngày). Bảng tin chỉ cập nhật thành tích văn minh (mở huy hiệu, xong tuần, xây nhà), không có ô chat hay tin nhắn tự do, ngăn ngừa bắt nạt học đường.</li>
+</ul>
+</section>
+
+<section><h2>5. Khu Phụ Huynh &amp; Thi Thử</h2>
+<h3>👨‍👩‍👧 Khu Phụ Huynh (Bảo vệ bằng PIN)</h3>
+<ul>
+  <li><strong>Đặt mã PIN an toàn:</strong> Phụ huynh tự đặt mã PIN 4–6 số từ tài khoản con. Giới hạn số lần nhập sai tránh con tò mò đoán mã.</li>
+  <li><strong>Quản lý Kệ quà:</strong> Thêm các món quà thật gần gũi (hộp bút màu, truyện tranh, vé xem phim...) kèm số sao yêu cầu (ví dụ mức quy đổi tham khảo: 1 sao = 1.000 đồng giá trị quà). Khi con đủ sao và yêu cầu đổi quà, phụ huynh trực tiếp bấm duyệt hoặc trao quà.</li>
+  <li><strong>Báo cáo tuần trực quan:</strong> Xem tổng số phút học mỗi ngày, tỉ lệ trả lời đúng theo môn, các câu sai cần lưu ý. Có thể in hoặc tải báo cáo PDF.</li>
+  <li><strong>Giới hạn thời gian học:</strong> Cài đặt số phút học tối đa mỗi ngày (ví dụ 25 phút/ngày) và khung giờ được phép sử dụng. Khi hết giờ, hệ thống tự động lưu bài đang làm an toàn và thông báo con nghỉ ngơi, không làm mất sao.</li>
+</ul>
+
+<h3>🏆 Phòng Luyện Thi Thử Violympic &amp; IOE</h3>
+<p>Đồng hồ đếm ngược cả đề tính theo thời gian máy chủ. Không hiển thị đáp án trước khi nộp bài. Sau khi nộp, học sinh được xem lại toàn bộ câu hỏi sai kèm lời giải chi tiết và bấm nút <em>"Ôn các câu sai"</em> để luyện tập lại ngay.</p>
+</section>
+
+<section><h2>6. Hướng dẫn dành cho Giáo viên</h2>
+<ul>
+  <li><strong>Nhập học liệu đa định dạng:</strong> Hỗ trợ nhập trực tiếp từ bảng tính Excel (<code>.xlsx</code>) hoặc tệp Word (<code>.docx</code>).</li>
+  <li><strong>Xuất đáp án &amp; Thống kê:</strong> Xuất toàn bộ bộ câu hỏi của tuần ra Excel đầy đủ sheet <em>Thông tin bộ</em>, <em>Câu hỏi</em>, <em>Dữ liệu nghe</em> và <em>Thống kê</em>.</li>
+  <li><strong>Gói học liệu 8 tuần Học kỳ 2:</strong> Hệ thống tích hợp sẵn 8 tuần học kỳ 2 (Tuần 19 đến Tuần 26) chuẩn chương trình GDPT 2018 tại <code>data/curriculum/hoc-ky-2-8-tuan.json</code>.</li>
+</ul>
+</section>
+
+<section><h2>7. Sao lưu, khôi phục và toàn vẹn dữ liệu</h2>
+<p>Bảo An Learning áp dụng nguyên tắc toàn vẹn dữ liệu tối cao: 0 sự cố mất sao, 0 sự cố lệch số dư. Toàn bộ cơ sở dữ liệu và tệp đa phương tiện được sao lưu tự động định kỳ qua công cụ <code>server/cloud-backup-restore.mjs</code> hoặc <code>SAO_LUU_QUAN_LY.cmd</code>.</p>
+</section>
+</main></body></html>

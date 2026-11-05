@@ -1,9 +1,11 @@
 import {randomBytes,randomUUID,createHash,scrypt as scryptCallback,scryptSync,timingSafeEqual} from 'node:crypto';
 import {promisify} from 'node:util';
 import {OnlineError,fail,shape,text,integer} from './online-errors.mjs';
-import {adminSummary,adminWeek,adminMedia,adminWeekCheck} from './admin-data.mjs';
+import {adminSummary,adminWeek,adminMedia,adminWeekCheck,adminExport} from './admin-data.mjs';
 import {audioDurationMs} from './audio-duration.mjs';
 import {createFailureReporter,createPerformanceReporter,measureApiSpan,measureApiSerialization,ONLINE_RUNTIME_VERSION} from './api-diagnostics.mjs';
+import {readBuildIdentity} from './build-identity.mjs';
+import {parseJsonBody} from './json-body.mjs';
 
 const scrypt=promisify(scryptCallback),options={N:32768,r:8,p:1,maxmem:64*1024*1024};
 const COOKIE='baoan_online_session',MAX_MEDIA=2*1024*1024;
@@ -21,8 +23,7 @@ async function body(request,max=2*1024*1024){
   if(Number(request.headers.get('content-length')??0)>max)fail(413,'Gói dữ liệu vượt giới hạn kích thước.');
   const reader=request.body?.getReader();if(!reader)fail(400,'Thiếu dữ liệu gửi lên.');const chunks=[];let size=0;
   try{for(;;){const{value,done}=await reader.read();if(done)break;size+=value.length;if(size>max){await reader.cancel();fail(413,'Gói dữ liệu vượt giới hạn kích thước.');}chunks.push(value);}}finally{reader.releaseLock();}
-  let value;try{value=JSON.parse(Buffer.concat(chunks).toString('utf8'));}catch{fail(400,'Dữ liệu JSON không đọc được.');}
-  if(!value||typeof value!=='object'||Array.isArray(value))fail(400,'Dữ liệu gửi lên cần là một đối tượng JSON.');return value;
+  return parseJsonBody(Buffer.concat(chunks),request.headers.get('content-encoding'),max);
 }
 export function validateCloudMedia(input){
   shape(input,['name','mime','base64']);const name=text(input.name,'Tên tệp',180);if(/[\\/]/.test(name))fail(400,'Tên tệp không được chứa đường dẫn.');
@@ -44,7 +45,10 @@ export function createCloudApi({store,storage,publicOrigin,setupToken,performanc
   const canonical=new URL(publicOrigin);
   if(canonical.origin!==publicOrigin.replace(/\/$/,'')||canonical.username||canonical.password||!['http:','https:'].includes(canonical.protocol)||canonical.protocol!=='https:'&&!['127.0.0.1','localhost'].includes(canonical.hostname))throw new Error('BAO_AN_PUBLIC_ORIGIN cần origin HTTPS chính xác.');
   const origin=canonical.origin;
-  function role(auth,expected){if(auth.role!==expected)fail(403,expected==='admin'?'Chỉ quản lý được thực hiện thao tác này.':'Hãy dùng tài khoản học sinh để vào luyện tập.');}
+  function role(auth,expected){
+    const allowed=Array.isArray(expected)?expected:[expected];
+    if(!allowed.includes(auth.role))fail(403,allowed.includes('admin')?'Chỉ quản lý hoặc phụ huynh được thực hiện thao tác này.':'Hãy dùng tài khoản học sinh để vào luyện tập.');
+  }
   async function identity(auth,currentWorkspace){const workspace=currentWorkspace??await store.workspace(auth.workspaceId),{csrfToken,tokenHash,...user}=auth;void tokenHash;return{user,workspace:{id:workspace.id,name:workspace.name},csrfToken};}
   const userAuth=(row,csrfToken,tokenHash)=>({id:row.id,workspaceId:row.workspace_id,username:row.username,role:row.role,...(row.student_id?{studentId:row.student_id}:{}),csrfToken,...(tokenHash?{tokenHash}:{})});
   async function actor(request){const raw=(request.headers.get('cookie')??'').split(';').map(part=>part.trim()).find(part=>part.startsWith(`${COOKIE}=`))?.slice(COOKIE.length+1);if(!raw||raw.length>200)fail(401,'Hãy đăng nhập để tiếp tục.');const row=await store.findSession(hash(raw),Date.now());if(!row)fail(401,'Phiên đăng nhập đã hết hạn hoặc tài khoản đã được khóa.');return userAuth(row,row.csrf_token,row.token_hash);}
@@ -61,7 +65,8 @@ export function createCloudApi({store,storage,publicOrigin,setupToken,performanc
       if(!url.pathname.startsWith('/api/online/'))fail(404,'Không có API này.');
       if(method==='OPTIONS')fail(405,'API chỉ dùng cùng origin.');
       if(mutable&&(request.headers.get('origin')!==origin||request.headers.get('sec-fetch-site')==='cross-site'))fail(403,'Yêu cầu phải xuất phát từ chính website này.');
-      if(method==='GET'&&route==='/status')return cloudJson(200,{available:true,configured:await store.configured(),mediaMaxBytes:MAX_MEDIA,runtimeVersion:ONLINE_RUNTIME_VERSION,questionProtocolVersion:1});
+      if(method==='GET'&&route==='/status')return cloudJson(200,{available:true,configured:await store.configured(),mediaMaxBytes:MAX_MEDIA,runtimeVersion:ONLINE_RUNTIME_VERSION,questionProtocolVersion:1,mediaUploadEncoding:'gzip',build:await readBuildIdentity()});
+      if(method==='GET'&&route==='/contest/presets')return cloudJson(200,await store.contestPresets());
       if(method==='POST'&&route==='/setup'){
         const input=shape(await body(request),['token','name','username','password']);if(await store.configured())fail(409,'Máy chủ đã được khởi tạo. Hãy đăng nhập.');await limit(context,'bootstrap');
         if(!setupToken||setupToken.length<24||!same(input.token,setupToken))fail(403,'Mã khởi tạo không đúng. Lấy mã riêng từ quản trị máy chủ.');
@@ -87,14 +92,18 @@ export function createCloudApi({store,storage,publicOrigin,setupToken,performanc
       const adminWeekMatch=route.match(/^\/admin\/weeks\/([^/]+)$/);
       if(method==='GET'&&adminWeekMatch)return cloudJson(200,await adminWeek(store,auth,decodeURIComponent(adminWeekMatch[1])));
       if(method==='GET'&&route==='/admin/media')return cloudJson(200,await adminMedia(store,auth,Object.fromEntries(url.searchParams)));
+      const exportMatch=route.match(/^\/admin\/export\/weeks\/([^/]+)$/);
+      if(method==='GET'&&exportMatch)return cloudJson(200,await adminExport(store,auth,decodeURIComponent(exportMatch[1])));
       if(method==='POST'&&route==='/admin/media/lookup')return cloudJson(200,await adminMedia(store,auth,await body(request)));
       if(method==='POST'&&route==='/admin/week-check')return cloudJson(200,await adminWeekCheck(store,auth,await body(request)));
       if(method==='GET'&&route==='/dashboard'){role(auth,'admin');return cloudJson(200,await store.dashboard(auth));}
       if(method==='GET'&&route==='/recovery'){role(auth,'admin');return cloudJson(200,{supported:false,reason:'Bản cloud dùng công cụ sao lưu và phục hồi PostgreSQL cùng Storage trong Supabase. Không khôi phục tệp SQLite trực tiếp vào môi trường này.'});}
       if(method==='GET'&&route==='/student'){role(auth,'student');if(request.headers.get('x-bao-an-question-protocol')!=='1')fail(409,'Ứng dụng đã được cập nhật. Hãy tải lại trang; sao đã lưu vẫn được giữ.');return cloudJson(200,await store.studentSummary(auth));}
+      if(method==='GET'&&route==='/student/map'){role(auth,'student');const query=Object.fromEntries(url.searchParams.entries());return cloudJson(200,await store.studentMap(auth,query));}
       if(method==='GET'&&route==='/student/summary'){role(auth,'student');return cloudJson(200,await store.studentSummary(auth,url.searchParams.get('cursor')??'0'));}
       if(method==='POST'&&route==='/student/journey'){role(auth,'student');return cloudJson(200,await store.ensureJourney(auth,await body(request)));}
       if(method==='POST'&&route==='/student/advance-week'){role(auth,'student');return cloudJson(200,await store.advanceWeek(auth,await body(request)));}
+      if(method==='POST'&&route==='/student/discovery/view'){role(auth,'student');const b=await body(request);return cloudJson(200,await store.viewDiscovery(auth,b.packId));}
       const gamesMatch=route.match(/^\/student\/pack\/([^/]+)\/(\d+)\/games$/);
       if(method==='GET'&&gamesMatch){role(auth,'student');return cloudJson(200,await store.packGames(auth,text(decodeURIComponent(gamesMatch[1]),'Mã bộ',80),integer(Number(gamesMatch[2]),'Phiên bản')));}
       if(method==='GET'&&route==='/media'){role(auth,'admin');return cloudJson(200,await store.listMedia(auth));}
@@ -134,8 +143,14 @@ export function createCloudApi({store,storage,publicOrigin,setupToken,performanc
           start=matched[1]?Number(matched[1]):Math.max(0,asset.size-Number(matched[2]));if(matched[1]&&matched[2])end=Math.min(end,Number(matched[2]));
           if(!Number.isSafeInteger(start)||!Number.isSafeInteger(end)||start<0||start>end||start>=asset.size)return cloudJson(416,{error:'Khoảng dữ liệu không hợp lệ.'},{'Content-Range':`bytes */${asset.size}`});status=206;
         }
-        const headers={...privateHeaders,'Content-Type':asset.mime,'Accept-Ranges':'bytes','Content-Length':String(end-start+1),'Content-Disposition':`inline; filename*=UTF-8''${encodeURIComponent(asset.name)}`,...(status===206?{'Content-Range':`bytes ${start}-${end}/${asset.size}`}:{})};
-        if(method==='HEAD')return new Response(null,{status,headers});const bytes=await measureApiSpan('storage',()=>storage.download(asset.object_path));
+        // Images are immutable (random id, write-once object): the viewer's own browser may keep them.
+        // Audio stays no-store because every listening question needs its own delivery receipt.
+        const etag=`"${asset.sha256}"`,image=asset.kind==='image';
+        const cache=image?{'Cache-Control':'private, max-age=31536000, immutable','ETag':etag,'Pragma':''}:{};
+        if(image&&method==='GET'&&!range&&(request.headers.get('if-none-match')??'').split(',').map(value=>value.trim().replace(/^W\//,'')).includes(etag)){const notModified={...privateHeaders,...cache};delete notModified.Pragma;return new Response(null,{status:304,headers:notModified});}
+        const headers={...privateHeaders,...cache,'Content-Type':asset.mime,'Accept-Ranges':'bytes','Content-Length':String(end-start+1),'Content-Disposition':`inline; filename*=UTF-8''${encodeURIComponent(asset.name)}`,...(status===206?{'Content-Range':`bytes ${start}-${end}/${asset.size}`}:{})};
+        if(image)delete headers.Pragma;
+        if(method==='HEAD')return new Response(null,{status,headers});const bytes=await measureApiSpan('storage',()=>storage.download(asset.object_path,asset.sha256));
         if(bytes.length!==asset.size||hash(bytes)!==asset.sha256)fail(502,'Tệp tư liệu không khớp dữ liệu đã duyệt.');if(auth.role==='student'&&asset.kind==='audio'&&url.searchParams.has('playId')&&start===0&&end===asset.size-1)await store.recordAudioDelivery(auth,url.searchParams.get('playId'),url.searchParams.get('itemId'),media[1],await audioDurationMs(bytes,asset.mime));return new Response(bytes.subarray(start,end+1),{status,headers});
       }
       if(method==='POST'&&route==='/classes'){role(auth,'admin');return cloudJson(201,await store.createClass(auth,await body(request)));}
@@ -149,9 +164,148 @@ export function createCloudApi({store,storage,publicOrigin,setupToken,performanc
       if(method==='POST'&&play){role(auth,'student');const input=await body(request),id=decodeURIComponent(play[1]);if(play[2]==='attempt')return cloudJson(200,await store.attempt(auth,id,input,true));if(play[2]==='question-hint')return cloudJson(200,await store.questionHint(auth,id,input));if(play[2]==='question-open')return cloudJson(200,await store.openQuestion(auth,id,input,true));shape(input,[]);return cloudJson(200,await store.finishPlay(auth,id,play[2]==='abandon',true,true));}
       if(method==='POST'&&route==='/redemptions'){role(auth,'student');return cloudJson(201,await store.requestReward(auth,await body(request)));}
       const redemption=route.match(/^\/redemptions\/([^/]+)\/(transition|cancel)$/);
-      if(method==='POST'&&redemption){role(auth,redemption[2]==='cancel'?'student':'admin');return cloudJson(200,await store.transitionReward(auth,decodeURIComponent(redemption[1]),await body(request),redemption[2]==='cancel'));}
+      if(method==='POST'&&redemption){role(auth,redemption[2]==='cancel'?'student':['admin','parent']);return cloudJson(200,await store.transitionReward(auth,decodeURIComponent(redemption[1]),await body(request),redemption[2]==='cancel'));}
+      if(method==='GET'&&route==='/gifts'){return cloudJson(200,await store.gifts(auth,url.searchParams.get('classId')));}
+      if(method==='POST'&&route==='/gifts'){role(auth,'admin');return cloudJson(201,await store.createGift(auth,await body(request)));}
+      const giftMatch=route.match(/^\/gifts\/([^/]+)$/);
+      if(giftMatch&&(method==='PATCH'||method==='PUT'||method==='POST')){role(auth,'admin');return cloudJson(200,await store.updateGift(auth,decodeURIComponent(giftMatch[1]),await body(request)));}
+      if(method==='GET'&&route==='/student/goal'){role(auth,'student');return cloudJson(200,await store.studentGoal(auth));}
+      if(method==='POST'&&route==='/student/goal'){role(auth,'student');const input=await body(request);return cloudJson(200,await store.setStudentGoal(auth,input.giftId));}
+      if(method==='POST'&&route==='/student/redeem-gift'){role(auth,'student');return cloudJson(201,await store.redeemGift(auth,await body(request)));}
+      const confirmMatch=route.match(/^\/student\/redemptions\/([^/]+)\/confirm-received$/);
+      if(method==='POST'&&confirmMatch){role(auth,'student');return cloudJson(200,await store.confirmReceived(auth,decodeURIComponent(confirmMatch[1]))); }
+      if(method==='GET'&&route==='/student/badges'){role(auth,'student');return cloudJson(200,await store.studentBadges(auth));}
+      if(method==='GET'&&route==='/student/streak'){role(auth,'student');return cloudJson(200,await store.studentStreak(auth));}
+      if(method==='GET'&&route==='/student/daily-missions'){role(auth,'student');return cloudJson(200,await store.studentDailyMissions(auth));}
+      if(method==='POST'&&route==='/student/daily-riddle/answer'){role(auth,'student');return cloudJson(200,await store.answerDailyRiddle(auth,await body(request)));}
+      if(method==='POST'&&route==='/parent/setup-pin'){
+        role(auth,['student','admin']);
+        const input=await body(request);
+        const studentId=auth.role==='student'?auth.studentId:input.studentId;
+        return cloudJson(200,await store.setupParentPin(auth,studentId,input));
+      }
+      if(method==='POST'&&route==='/parent/verify-pin'){
+        role(auth,'student');
+        const input=await body(request);
+        return cloudJson(200,await store.verifyParentPin(auth,auth.studentId,input.pin));
+      }
+      if(method==='GET'&&route==='/parent/dashboard'){
+        role(auth,['student','admin','parent']);
+        const studentId=auth.role==='student'?auth.studentId:(url.searchParams.get('studentId')||auth.studentId);
+        const weekId=url.searchParams.get('weekId')||undefined;
+        return cloudJson(200,await store.parentDashboard(auth,studentId,weekId));
+      }
+      if(method==='POST'&&route==='/parent/settings'){
+        role(auth,['student','admin','parent']);
+        const input=await body(request);
+        const studentId=auth.role==='student'?auth.studentId:input.studentId;
+        return cloudJson(200,await store.updateParentSettings(auth,studentId,input));
+      }
+      if(method==='GET'&&route==='/parent/students'){
+        role(auth,'parent');
+        return cloudJson(200,await store.parentStudents(auth));
+      }
+      if(method==='POST'&&route==='/parents'){
+        role(auth,'admin');
+        const input=await body(request);
+        const uname=username(input.username);
+        const password=input.password||randomBytes(12).toString('base64url');
+        const hash=await passwordHash(password);
+        const created=await store.createParent(auth,input,hash,uname);
+        return cloudJson(201,{parent:created,credentials:{username:uname,password}});
+      }
+      if(method==='GET'&&route==='/contest/presets'){
+        role(auth,['student','admin','parent']);
+        return cloudJson(200,await store.contestPresets(auth));
+      }
+      if(method==='POST'&&route==='/contest/start'){
+        role(auth,'student');
+        const input=await body(request);
+        return cloudJson(200,await store.startContest(auth,input));
+      }
+      if(method==='GET'&&route==='/contest/active'){
+        role(auth,'student');
+        return cloudJson(200,await store.activeContest(auth));
+      }
+      if(method==='POST'&&/^\/contest\/([^/]+)\/save$/.test(route)){
+        role(auth,'student');
+        const sessionId=decodeURIComponent(route.match(/^\/contest\/([^/]+)\/save$/)[1]);
+        const input=await body(request);
+        return cloudJson(200,await store.saveContestProgress(auth,sessionId,input));
+      }
+      if(method==='POST'&&/^\/contest\/([^/]+)\/submit$/.test(route)){
+        role(auth,'student');
+        const sessionId=decodeURIComponent(route.match(/^\/contest\/([^/]+)\/submit$/)[1]);
+        const input=await body(request);
+        return cloudJson(200,await store.submitContest(auth,sessionId,input));
+      }
+      if(method==='GET'&&route==='/contest/history'){
+        role(auth,['student','admin','parent']);
+        const studentId=auth.role==='student'?auth.studentId:(url.searchParams.get('studentId')||auth.studentId);
+        const presetId=url.searchParams.get('presetId')||undefined;
+        return cloudJson(200,await store.contestHistory(auth,studentId,presetId));
+      }
+      if(method==='POST'&&/^\/contest\/([^/]+)\/review-pack$/.test(route)){
+        role(auth,'student');
+        const sessionId=decodeURIComponent(route.match(/^\/contest\/([^/]+)\/review-pack$/)[1]);
+        return cloudJson(200,await store.contestReviewPack(auth,sessionId));
+      }
+      if(method==='GET'&&route==='/town'){
+        const studentId=auth.role==='student'?auth.studentId:url.searchParams.get('studentId');
+        if(!studentId)fail(400,'Thiếu mã học sinh.');
+        return cloudJson(200,await store.townSummary(auth,studentId));
+      }
+      if(method==='POST'&&route==='/town/build'){
+        role(auth,'student');
+        const input=await body(request);
+        return cloudJson(200,await store.placeBuilding(auth,auth.studentId,input));
+      }
+      if(method==='POST'&&route==='/town/recalculate'){
+        const input=await body(request);
+        const studentId=auth.role==='student'?auth.studentId:(input.studentId||url.searchParams.get('studentId'));
+        if(!studentId)fail(400,'Thiếu mã học sinh.');
+        return cloudJson(200,await store.recalculateMaterials(auth,studentId));
+      }
+      if(method==='GET'&&route==='/town/animals'){
+        const studentId=auth.role==='student'?auth.studentId:url.searchParams.get('studentId');
+        if(!studentId)fail(400,'Thiếu mã học sinh.');
+        return cloudJson(200,await store.townAnimals(auth,studentId));
+      }
+      if(method==='POST'&&route==='/town/animals/name'){
+        role(auth,'student');
+        const input=await body(request);
+        return cloudJson(200,await store.nameTownAnimal(auth,auth.studentId,input));
+      }
+      if(method==='GET'&&route==='/town/classmates'){
+        role(auth,'student');
+        return cloudJson(200,await store.classmatesTowns(auth,auth.studentId));
+      }
+      if(method==='GET'&&route==='/town/visit'){
+        role(auth,'student');
+        const targetStudentId=url.searchParams.get('studentId');
+        if(!targetStudentId)fail(400,'Thiếu mã học sinh cần ghé thăm.');
+        return cloudJson(200,await store.visitTown(auth,auth.studentId,targetStudentId));
+      }
+      if(method==='POST'&&route==='/town/cheer'){
+        role(auth,'student');
+        const input=await body(request);
+        if(!input.targetStudentId)fail(400,'Thiếu mã học sinh được cổ vũ.');
+        return cloudJson(200,await store.cheerClassmate(auth,auth.studentId,input.targetStudentId));
+      }
+      if(method==='GET'&&route==='/class-feed'){
+        const student=auth.role==='student'?await store.student(auth,auth.studentId):null;
+        const classId=student?student.class_id:url.searchParams.get('classId');
+        if(!classId)fail(400,'Thiếu mã lớp học.');
+        return cloudJson(200,await store.classFeed(auth,classId));
+      }
+      if(method==='POST'&&/^\/classes\/[^/]+\/feed-toggle$/.test(route)){
+        role(auth,'admin');
+        const classId=decodeURIComponent(route.match(/^\/classes\/([^/]+)\/feed-toggle$/)[1]);
+        const input=await body(request);
+        return cloudJson(200,await store.updateClassSettings(auth,classId,input));
+      }
       fail(404,'Không có thao tác API này.');
-    }catch(error){const status=error instanceof OnlineError?error.status:error instanceof URIError?400:500,supportId=reportFailure(new URL(request.url).pathname,request.method,status,performance.now()-started);return cloudJson(status,{error:error instanceof OnlineError?error.message:error instanceof URIError?'Đường dẫn không hợp lệ.':'Máy chủ chưa xử lý được yêu cầu. Vui lòng thử lại.',...(supportId?{supportId}:{})});}
+    }catch(error){const status=error instanceof OnlineError?error.status:error instanceof URIError?400:500,supportId=reportFailure(new URL(request.url).pathname,request.method,status,performance.now()-started,error);return cloudJson(status,{error:error instanceof OnlineError?error.message:error instanceof URIError?'Đường dẫn không hợp lệ.':'Máy chủ chưa xử lý được yêu cầu. Vui lòng thử lại.',...(supportId?{supportId}:{})});}
   };
   return(request,context)=>performanceReporter(new URL(request.url).pathname,request.method,()=>handle(request,context));
 }

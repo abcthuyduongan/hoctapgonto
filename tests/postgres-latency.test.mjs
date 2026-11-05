@@ -40,18 +40,26 @@ test('cloud login, week summary and secure game actions keep bounded database ro
   const login=await request('login','/login',{username:'latency-child',password},13);assert.equal(login.user.role,'student');assert.ok(traces.at(-1).passwordMs>0);
   const summary=await request('summary','/student/summary',undefined,4);assert.equal(summary.currentWeekSummary.total,4);assert.equal(summary.balance.earned,0);assert.equal(JSON.stringify(summary).includes('"items"'),false);
   pool.queries.length=0;const imageStarted=performance.now(),imageResponse=await api(new Request(origin+'/api/online/media/'+imageId,{headers:{Cookie:cookie}}));
-  assert.equal(imageResponse.status,200);assert.match(imageResponse.headers.get('cache-control'),/no-store/);assert.deepEqual(Buffer.from(await imageResponse.arrayBuffer()),imageBytes);
-  assert.equal(pool.queries.length,2);assert.equal(traces.at(-1).sqlCount,2);assert.ok(traces.at(-1).storageMs>=0);
+  assert.equal(imageResponse.status,200);assert.equal(imageResponse.headers.get('cache-control'),'private, max-age=31536000, immutable');assert.equal(imageResponse.headers.get('netlify-cdn-cache-control'),'no-store');assert.deepEqual(Buffer.from(await imageResponse.arrayBuffer()),imageBytes);
+  assert.equal(pool.queries.length,2);assert.equal(traces.at(-1).sqlCount,2);assert.ok(traces.at(-1).storageMs>=0);assert.match(imageResponse.headers.get('server-timing')??'',/sql;dur=[\d.]+;desc="n=2".*total;dur=/);
+  // A revalidation still checks the session and assignment, but never downloads from Storage.
+  const etag=imageResponse.headers.get('etag');assert.match(etag,/^"[a-f0-9]{64}"$/);pool.queries.length=0;
+  const revalidated=await api(new Request(origin+'/api/online/media/'+imageId,{headers:{Cookie:cookie,'If-None-Match':etag}}));
+  assert.equal(revalidated.status,304);assert.equal(pool.queries.length,2);assert.equal(traces.at(-1).storageMs??0,0);
   measurements.privateImage={queries:pool.queries.length,injectedRttMs:rttMs,injectedWaitMs:pool.queries.length*rttMs,elapsedMs:Math.round(performance.now()-imageStarted)};
   const input={requestId:'latency-play',moduleId:'math-quest',packId:source.id,contentVersion:1};
   const play=await request('firstGame','/play/compact',input,13);assert.equal(play.session.questionProtocolVersion,1);assert.equal(play.pack.items,undefined);
   const opened=await request('openQuestion',`/play/${play.session.sessionId}/question-open`,{itemId:'q1'},9);assert.equal(opened.item.id,'q1');assert.equal(opened.item.correctIndex,undefined);
   const answer={attemptKey:'latency-answer',itemId:'q1',response:{kind:'choice',choiceIndex:0},hintsUsed:0,elapsedMs:0};
   const receipt=await request('answer',`/play/${play.session.sessionId}/attempt`,answer,12);assert.equal(receipt.event.correct,true);assert.equal(receipt.questionRewards.gained,3);
+  // Students share the workspace lock so classmates do not queue behind each other.
+  const workspaceLocks=pool.queries.filter(sql=>/FROM bao_an\.workspaces WHERE id=\$1 FOR /.test(sql));assert.deepEqual(workspaceLocks.map(sql=>sql.match(/FOR (UPDATE|SHARE)/)[0]),['FOR SHARE']);
   const duplicate=await request('duplicate',`/play/${play.session.sessionId}/attempt`,answer,10);assert.equal(duplicate.duplicate,true);assert.equal(duplicate.questionRewards.gained,0);
   const replay=await request('retryGame','/play/compact',input,9);assert.equal(replay.session.sessionId,play.session.sessionId);
   const next=await request('nextGame','/play/compact',{...input,requestId:'latency-second-game'},10);assert.notEqual(next.session.sessionId,play.session.sessionId);
   assert.equal((await store.studentSummary({...login.user,csrfToken:csrf,tokenHash:hash(cookie.split('=')[1])})).balance.earned,3);
+  pool.queries.length=0;await store.createClass(f.admin,{name:'Lớp quản trị khóa riêng',grade:3});
+  assert.deepEqual(pool.queries.filter(sql=>/FROM bao_an\.workspaces WHERE id=\$1 FOR /.test(sql)).map(sql=>sql.match(/FOR (UPDATE|SHARE)/)[0]),['FOR UPDATE'],'admin changes keep the exclusive workspace lock');
   t.diagnostic(JSON.stringify(measurements));
   assert.doesNotMatch(JSON.stringify(traces),/latency-child|latency-private-image|latency-answer|latency-questions|SELECT |csrfToken|token_hash/);
 });

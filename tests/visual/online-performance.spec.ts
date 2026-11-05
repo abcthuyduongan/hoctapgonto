@@ -24,12 +24,14 @@ test('login has a bounded role-free bundle and the default lesson creates no 3D 
   const authAssets=await Promise.all(bodies),js=authAssets.filter(row=>row.name.endsWith('.js')).reduce((n,row)=>n+row.gzip,0),css=authAssets.filter(row=>row.name.endsWith('.css')).reduce((n,row)=>n+row.gzip,0);
   expect(requests.some(url=>/OnlineAdminDashboard|OnlineStudentWorld|WorldCanvas|three-vendor|\.glb/.test(url))).toBe(false);expect(js).toBeLessThanOrEqual(100*1024);expect(css).toBeLessThanOrEqual(20*1024);
   await page.getByLabel('Tên đăng nhập',{exact:true}).fill('perf.child');await page.getByLabel('Mật khẩu',{exact:true}).fill(f.password);await page.getByRole('button',{name:'Đăng nhập',exact:true}).click();await expect(page.locator('[data-hub-mode="light"]')).toBeVisible();
+  const studentAssets=await Promise.all(bodies),studentCss=studentAssets.filter(row=>row.name.endsWith('.css')).reduce((n,row)=>n+row.gzip,0);expect(studentCss).toBeLessThanOrEqual(20*1024);
+  const status=await(await page.request.get(f.origin+'/api/online/status')).json();expect(status.build.sourceId).toMatch(/^[a-f0-9]{64}$/);expect(await page.locator('#root').getAttribute('data-source-id')).toBe(status.build.sourceId);expect(await page.locator('#root').getAttribute('data-app-version')).toBe(status.runtimeVersion);
   await page.screenshot({path:testInfo.outputPath('lite-hub.png'),fullPage:true});
   await page.getByRole('button',{name:'Chơi Đảo Câu Hỏi bằng bộ được giao',exact:true}).click();await expect(page.locator('.quiz-question')).toHaveText('Câu hỏi 1');await expect(page.locator('.answer-option').first()).toBeEnabled();
   expect(requests.some(url=>/WorldCanvas|three-vendor|\.glb/.test(url))).toBe(false);expect(await page.evaluate(()=>(window as any).__perfWebgl)).toBe(0);await expect(page.locator('canvas')).toHaveCount(0);
   await page.locator('.immersive-dialog').screenshot({path:testInfo.outputPath('lite-quiz.png')});
   await page.getByRole('button',{name:'← Thoát trò chơi',exact:true}).click();await expect(page.locator('[data-hub-mode="light"]')).toBeVisible();
-  await testInfo.attach('role-bundle-and-lite',{body:JSON.stringify({authAssets,jsGzip:js,cssGzip:css,glbRequests:requests.filter(url=>url.endsWith('.glb')).length,webglContexts:await page.evaluate(()=>(window as any).__perfWebgl)},null,2),contentType:'application/json'});
+  await testInfo.attach('role-bundle-and-lite',{body:JSON.stringify({authAssets,jsGzip:js,cssGzip:css,studentCssGzip:studentCss,sourceId:status.build.sourceId,glbRequests:requests.filter(url=>url.endsWith('.glb')).length,webglContexts:await page.evaluate(()=>(window as any).__perfWebgl)},null,2),contentType:'application/json'});
  }finally{await f.close();}
 });
 
@@ -49,24 +51,21 @@ for(const game of ['memory','connect'])test(`${game} overlaps mismatch reveal wi
  }finally{release();await page.unrouteAll({behavior:'ignoreErrors'});await f.close();}
 });
 
-test('optional 3D is lazy, bounded, settles without RAF and releases when a lesson starts',async({page},testInfo)=>{
- const f=await fixture(page),models:string[]=[];page.on('request',r=>{if(r.url().endsWith('.glb'))models.push(r.url());});
+test('the 2D release ignores saved 3D preferences and frees resources over fifty lesson visits',async({page},testInfo)=>{
+ const f=await fixture(page),models:string[]=[],scripts:string[]=[],errors:string[]=[];
+ page.on('request',r=>{if(r.url().endsWith('.glb'))models.push(r.url());if(r.url().endsWith('.js'))scripts.push(r.url());});page.on('pageerror',e=>errors.push(e.message));
+ await page.addInitScript(()=>{localStorage.setItem('bao-an-display-mode-v1','3d');(window as any).__webgl=0;const original=HTMLCanvasElement.prototype.getContext;HTMLCanvasElement.prototype.getContext=function(this:HTMLCanvasElement,...args:any[]){if(String(args[0]).includes('webgl'))(window as any).__webgl++;return(original as any).apply(this,args);} as any;});
  try{
-  await f.api('/login',{username:'perf.child',password:f.password});await page.goto(f.origin+'/?online=1&controls=1');await expect(page.locator('[data-hub-mode="light"]')).toBeVisible();expect(models).toHaveLength(0);
-  await page.getByRole('button',{name:'Khám phá 3D',exact:true}).click();const host=page.locator('.ba3d-render-host');await expect(host).toHaveAttribute('data-state','ready',{timeout:60000});await expect(host).toHaveAttribute('data-engine','three-webgl');
-  const stats=async()=>JSON.parse(await host.getAttribute('data-diagnostics')??'{}');await expect.poll(async()=>(await stats()).readyAssets?.length).toBe(2);expect(models.every(url=>url.includes('/models/optimized/'))).toBe(true);
-  await page.getByRole('button',{name:'Chọn Khu Rừng Trí Nhớ',exact:true}).click();await expect.poll(async()=>(await stats()).readyAssets?.includes('memory-world')).toBe(true);
-  await expect.poll(async()=>(await stats()).renderPending,{timeout:12000}).toBe(false);const measured=await stats();expect(measured.activeAssetBytes).toBeLessThanOrEqual(2*1024*1024);expect(measured.textureBytesEstimate+measured.geometryBytesEstimate).toBeLessThanOrEqual(32*1024*1024);await expect(page.locator('canvas')).toHaveCount(1);
-  await page.locator('.game-hub').screenshot({path:testInfo.outputPath('optional-3d.png')});
-  await page.getByRole('button',{name:'Bắt đầu',exact:true}).click();await expect(page.locator('.memory-grid')).toBeVisible();await expect(page.locator('.ba3d-render-host')).toHaveCount(0);await expect(page.locator('canvas')).toHaveCount(0);await expect(page.locator('.immersive-dialog')).toHaveAttribute('data-scene-engine','html');
-  await page.getByRole('button',{name:'← Thoát trò chơi',exact:true}).click();await expect(host).toHaveAttribute('data-state','ready',{timeout:60000});
-  const cdp=await page.context().newCDPSession(page),samples:{cycle:number;heap:number;canvases:number}[]=[];
-  try{for(let cycle=0;cycle<10;cycle++){
-   await page.getByRole('button',{name:'Chế độ nhẹ',exact:true}).click();await expect(page.locator('canvas')).toHaveCount(0);
-   await cdp.send('HeapProfiler.collectGarbage');const heap=await cdp.send('Runtime.getHeapUsage');samples.push({cycle,heap:heap.usedSize,canvases:await page.locator('canvas').count()});
-   await page.getByRole('button',{name:'Khám phá 3D',exact:true}).click();await expect(host).toHaveAttribute('data-state','ready',{timeout:60000});await expect(page.locator('canvas')).toHaveCount(1);
+  await f.api('/login',{username:'perf.child',password:f.password});await page.goto(f.origin+'/');await expect(page.locator('[data-hub-mode="light"]')).toBeVisible();await expect(page.getByRole('button',{name:'Khám phá 3D',exact:true})).toHaveCount(0);
+  const cdp=await page.context().newCDPSession(page),samples:{cycle:number;heap:number;nodes:number}[]=[];
+  try{for(let cycle=1;cycle<=50;cycle++){
+   await page.getByRole('button',{name:'Chơi Đảo Câu Hỏi bằng bộ được giao',exact:true}).click();await expect(page.locator('.answer-option').first()).toBeEnabled();
+   await page.getByRole('button',{name:'← Thoát trò chơi',exact:true}).click();await expect(page.locator('.immersive-dialog')).toHaveCount(0);await expect(page.getByRole('button',{name:'Chơi Đảo Câu Hỏi bằng bộ được giao',exact:true})).toBeEnabled();
+   if(cycle%10===0){await cdp.send('HeapProfiler.collectGarbage');const heap=await cdp.send('Runtime.getHeapUsage');samples.push({cycle,heap:heap.usedSize,nodes:await page.locator('*').count()});}
   }}finally{await cdp.detach();}
-  expect(samples.at(-1)!.heap-samples[4].heap).toBeLessThanOrEqual(10*1024*1024);
-  await testInfo.attach('optional-3d-resource-budget',{body:JSON.stringify({models,measured,modeChanges:20,samples},null,2),contentType:'application/json'});
+  expect(models).toEqual([]);expect(scripts.some(url=>/WorldCanvas|three-vendor|PremiumWorldRenderer/.test(url))).toBe(false);expect(await page.evaluate(()=>(window as any).__webgl)).toBe(0);expect(errors).toEqual([]);
+  expect(samples.at(-1)!.heap-samples[0].heap).toBeLessThanOrEqual(10*1024*1024);expect(Math.max(...samples.map(s=>s.nodes))-Math.min(...samples.map(s=>s.nodes))).toBeLessThan(30);
+  expect((await f.pool.query("SELECT count(*)::int AS n FROM bao_an.plays WHERE json->>'status'='active'")).rows[0].n).toBe(0);
+  await testInfo.attach('fifty-2d-lesson-visits',{body:JSON.stringify({samples,modelRequests:models.length,webglContexts:0}),contentType:'application/json'});
  }finally{await f.close();}
 });

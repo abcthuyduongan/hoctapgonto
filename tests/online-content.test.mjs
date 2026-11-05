@@ -146,13 +146,13 @@ test('Existing single-pack envelopes preserve validated source data and mark loc
 
 test('Available games follow concrete shape and matching-answer ambiguity, without subject routing',()=>{
   const quiz=parse('quiz',quizItems());
-  assert.deepEqual(ids(quiz),['math-quest','memory-match','word-connect']);
-  quiz.subject='vietnamese';assert.deepEqual(ids(quiz),['math-quest','memory-match','word-connect']);
-  quiz.items[1].options[1]='Nắng';assert.deepEqual(ids(quiz),['math-quest']);
-  assert.deepEqual(ids(parse('pairs',pairItems())),['memory-match','word-connect']);
+  assert.deepEqual(ids(quiz),['math-quest','memory-match','word-connect','treasure-flip','boat-race']);
+  quiz.subject='vietnamese';assert.deepEqual(ids(quiz),['math-quest','memory-match','word-connect','treasure-flip','boat-race']);
+  quiz.items[1].options[1]='Nắng';assert.deepEqual(ids(quiz),['math-quest','boat-race']);
+  assert.deepEqual(ids(parse('pairs',pairItems())),['memory-match','word-connect','treasure-flip']);
   const four=Array.from({length:4},(_,i)=>({left:`Q${i}`,right:`A${i}`}));
-  assert.deepEqual(ids(parse('pairs',four)),['math-quest','memory-match','word-connect']);
-  assert.deepEqual(ids(parse('sentences',sentenceItems())),['sentence-builder','sequence-trail']);
+  assert.deepEqual(ids(parse('pairs',four)),['math-quest','memory-match','word-connect','treasure-flip','boat-race']);
+  assert.deepEqual(ids(parse('sentences',sentenceItems())),['sentence-builder','sequence-trail','fox-kitchen']);
   quiz.items[0].correctIndex=99;assert.deepEqual(onlineGameChoices(quiz),[]);
 });
 

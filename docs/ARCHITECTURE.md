@@ -1,65 +1,13 @@
-# KIẾN TRÚC V3.0 — BẢN THỰC THI ĐẦU TIÊN
+# Kiến trúc hiện hành — Bảo An Learning 3.9
 
-## Vấn đề cần giải quyết
+Frontend React/TypeScript dùng một giao diện 2D. Màn đăng nhập, quản trị, học sinh và game tải theo nhu cầu. `src/games/loaders.ts` mở đúng game từ registry; không có engine/model 3D.
 
-V2 tổ chức quanh màn hình luyện đề. V3 coi trò chơi là **module** có thể thay thế và nội dung học tập là **dữ liệu** có quản lý phiên bản. Dự án không sao chép mã V2.
+Trình duyệt gọi API cùng origin `/api/online/*`. Hai adapter sử dụng cùng hợp đồng và nghiệp vụ: `server/online-server.mjs` + SQLite cho local; `server/cloud-api.mjs` + PostgreSQL và Storage riêng cho Netlify. Hai kho không tự đồng bộ.
 
-## Luồng tối thiểu đã có
+Máy chủ kiểm tra phiên, CSRF, vai trò, workspace/lớp và tuần được giao. Lượt chơi, câu mở, trả lời, sao và đổi quà được xác nhận ở server. Tối ưu media không thay bytes học liệu, hash nguồn, ID câu hay quy tắc sao.
 
-```text
-Creator Studio
-  -> ContentPack (kind=quiz | pairs)
-  -> validatePack()
-  -> IndexedDB packs (key=id@version, add-only)
-  -> Góc học sinh
-  -> Module registry kiểm tra compatible()
-  -> App/Host tạo PlaySession
-  -> Math Quest hoặc Memory Match
-  -> onAttempt({itemId, objectiveId, correct, hintsUsed, elapsedMs})
-  -> Host gắn sessionId, packId, contentVersion, moduleVersion, eventId
-  -> IndexedDB events
-  -> reports.ts
-  -> Góc phụ huynh
-```
+Ảnh dùng cache RAM có phạm vi lượt chơi và giới hạn tài nguyên. Ảnh câu kế tiếp chỉ chuẩn bị sau câu đúng; không mở sớm đồng hồ. Upload JSON media lớn có thể dùng gzip theo khả năng server; giải nén bất đồng bộ có ngân sách output. Storage cache chỉ giữ bytes đã xác minh hash, sau kiểm tra quyền của API. Audio không được dùng cache để bỏ qua biên nhận từng câu nghe.
 
-Mô hình dành cho **dùng thử trên một thiết bị**. **Chưa có server đáng tin cậy** và không được sử dụng như công cụ quản lý kết quả chính thức.
+Build sinh `build-info.json`, hash nguồn bao gồm thay đổi local và commit nền khi có. Frontend root và status API công bố cùng source ID để đối chiếu. Worker tương thích tự gỡ, không precache dữ liệu riêng. Manifest phát hành giữ hash từng tệp và schema SQLite/PostgreSQL 1.
 
-## Runtime
-
-- Vỏ React/Vite điều phối màn hình và tương tác có thể truy cập bằng bàn phím.
-- Ở Alpha 2.6, Math Quest được chạy bằng React/CSS và không tải Phaser chỉ để vẽ nền trang trí. Game SDK vẫn hỗ trợ viết các module Phaser thực sự khi có gameplay đủ phức tạp.
-- Game Memory Match không cần Phaser: dùng HTML button để giữ hỗ trợ bàn phím và thao tác cảm ứng.
-- `GameHostProps` là giao diện ổn định để thêm game. Trong giai đoạn tiếp theo, module registration có thể chuyển sang loader phân tách theo package.
-
-## Mô hình dữ liệu
-
-```text
-ContentPack {
-  id, version, kind, title, grade, subject, publishedAt,
-  items: Array<QuizItem | PairItem>
-}
-PlaySession {
-  sessionId, packId, contentVersion, moduleId, moduleVersion,
-  startedAt, endedAt?, status
-}
-LearningEvent {
-  eventId, sessionId, packId, contentVersion, moduleId, moduleVersion,
-  itemId, objectiveId, correct, hintsUsed, elapsedMs, occurredAt
-}
-```
-
-`IndexedDB.add` ngăn ghi đè với cùng khóa. Khi có cloud, server cần UNIQUE constraint, foreign keys, Row Level Security, kiểm tra integrity và idempotency; bản local hiện chưa thay được chúng.
-
-## Ranh giới an toàn
-
-- Hiện tại Parent/Creator chỉ là nhãn giao diện, không phải phân quyền. Cần auth backend trước khi triển khai thực tế.
-- Không lưu tên, tuổi, điện thoại, địa chỉ hay giọng nói trẻ em trong bản Alpha.
-- Không cho nhập HTML/JavaScript để thực thi trong game; nội dung hiển thị bằng React text.
-- Không có thu thập analytics hoặc gọi dịch vụ bên ngoài.
-- Chưa có đồng bộ đa thiết bị, chưa có bảo đảm backup khi xóa dữ liệu trình duyệt.
-
-## Phân ranh các giai đoạn
-
-- Alpha 1: một ứng dụng nhỏ, code được chia `core`, `games`, `screens` thay vì mở monorepo quá sớm.
-- Alpha 2: ổn định API module, có thể tách `core` thành `packages/contracts`, `learning-engine`, `storage` theo tài liệu V3 ban đầu. Không tách package chỉ để phô trương kiến trúc.
-- Alpha 3: thêm `game-instance` + `assignment`, hệ thống hồ sơ, parent auth, cloud RLS và sync queue.
+Hướng dẫn vận hành: `QUAN_LY_CUC_BO.md`; cấu hình cloud/SQL: `NETLIFY_SUPABASE.md`; các việc triển khai: `KE_HOACH_TOI_UU_VA_PHAT_HANH_2026-11-02.md`.

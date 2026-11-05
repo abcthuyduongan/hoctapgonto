@@ -2,8 +2,18 @@
 import type { LearnerSettings,LearningMedia } from './learning-contracts';
 export const GAME_SDK_VERSION = 1 as const;
 export type Subject = 'math' | 'vietnamese' | 'english' | 'thinking';
-export type ModuleId = 'math-quest' | 'memory-match' | 'sentence-builder' | 'word-connect' | 'sequence-trail';
-export type ItemKind = 'multiple-choice' | 'pair' | 'sentence' | 'numeric-answer' | 'fill-blank' | 'reading-choice' | 'listening-choice' | 'listening-gap';
+export type ModuleId =
+  | 'math-quest'
+  | 'memory-match'
+  | 'sentence-builder'
+  | 'word-connect'
+  | 'sequence-trail'
+  | 'balance-scale'
+  | 'basket-sort'
+  | 'treasure-flip'
+  | 'fox-kitchen'
+  | 'boat-race';
+export type ItemKind = 'multiple-choice' | 'pair' | 'sentence' | 'numeric-answer' | 'fill-blank' | 'reading-choice' | 'listening-choice' | 'listening-gap' | 'compare' | 'categorize';
 
 export type QuestionMetadata={knowledgeId:string;difficulty:'easy'|'medium'|'hard';contentRole:'unassigned'|'practice'|'assessment'|'review';source:string;rights:string;reviewStatus:'draft'|'reviewed';formId?:string;topicId?:string;level?:string;allowedGameIds?:ModuleId[]};
 export type QuestionTemplateInfo={schema:'baoan-question-template';templateVersion:1;contentFormatVersion:2;topicId:string;source:string;rights:string;reviewStatus:'draft'|'reviewed'};
@@ -17,14 +27,45 @@ export type PairItem = BaseItem & {kind: 'pair'; left: string; right: string};
 /** words appear in the target sentence order; game shuffles indices, not strings. */
 export type SentenceItem = BaseItem & {kind:'sentence'; prompt:string; words:string[]; hint:string};
 
+export type CompareOperator = '>' | '<' | '=';
+export type CompareItem = BaseItem & {
+  kind: 'compare';
+  prompt?: string;
+  left: string;
+  right: string;
+  operator: CompareOperator;
+  explanation: string;
+  hint?: string;
+};
+
+export type CategorizeElement = { id: string; text: string; category: string };
+export type CategorizeItem = BaseItem & {
+  kind: 'categorize';
+  prompt: string;
+  categories: string[];
+  elements: CategorizeElement[];
+  explanation: string;
+  hint?: string;
+};
+
+export type PackDiscoveryCard = {
+  title: string;
+  text: string;
+  imageFile?: string;
+  imageId?: string;
+};
+
 type PackBase = {
   id: string; version: number; title: string; subject: Subject; grade: number;
   source: 'builtin' | 'local'; publishedAt: string;
   templateInfo?:QuestionTemplateInfo;
+  discovery?: PackDiscoveryCard;
 };
 export type QuizPack = PackBase & {kind: 'quiz'; items: QuizItem[]};
 export type PairsPack = PackBase & {kind: 'pairs'; items: PairItem[]};
 export type SentencePack = PackBase & {kind:'sentences'; items:SentenceItem[]};
+export type ComparePack = PackBase & {kind:'compare'; items:CompareItem[]};
+export type CategorizePack = PackBase & {kind:'categorize'; items:CategorizeItem[]};
 export type NumericItem=BaseItem&{kind:'numeric-answer';prompt:string;answer:string;unit?:string;explanation:string;hint:string};
 export type FillBlankItem=BaseItem&{kind:'fill-blank';prompt:string;acceptedAnswers:string[];caseSensitive:boolean;explanation:string;hint:string};
 export type ReadingChoiceItem=Omit<QuizItem,'kind'>&{kind:'reading-choice';passageId:string;hint:string};
@@ -33,12 +74,17 @@ export type ListeningGapItem=Omit<FillBlankItem,'kind'>&{kind:'listening-gap';au
 export type RichLearningItem=NumericItem|FillBlankItem|ReadingChoiceItem|ListeningChoiceItem|ListeningGapItem;
 export type ReadingPassage={passageId:string;title:string;body:string;source:string;rights:string;approvedAt:string};
 export type LearningPack=PackBase&{kind:'learning';contentFormatVersion:2;items:RichLearningItem[];passages:ReadingPassage[];media:LearningMedia[]};
-export type ContentPack = QuizPack | PairsPack | SentencePack | LearningPack;
-type QuestionView<T>=T extends {options:unknown}?Omit<T,'correctIndex'|'explanation'|'hint'|'options'>&{options:string[]}:Omit<T,'answer'|'acceptedAnswers'|'caseSensitive'|'explanation'|'hint'>;
+export type ContentPack = QuizPack | PairsPack | SentencePack | LearningPack | ComparePack | CategorizePack;
+type QuestionView<T>=T extends {options:unknown}?Omit<T,'correctIndex'|'explanation'|'hint'|'options'>&{options:string[]}
+  :T extends {operator:unknown}?Omit<T,'operator'|'explanation'|'hint'>
+  :T extends {elements:unknown}?Omit<T,'elements'|'explanation'|'hint'>&{elements:{id:string;text:string}[]}
+  :Omit<T,'answer'|'acceptedAnswers'|'caseSensitive'|'explanation'|'hint'>;
 export type TimedQuestionView=QuestionView<QuizItem|RichLearningItem>;
 export type StudentQuizPack=Omit<QuizPack,'items'>&{items:QuestionView<QuizItem>[]};
+export type StudentComparePack=Omit<ComparePack,'items'>&{items:QuestionView<CompareItem>[]};
+export type StudentCategorizePack=Omit<CategorizePack,'items'>&{items:QuestionView<CategorizeItem>[]};
 export type StudentLearningPack=Omit<LearningPack,'items'|'passages'>&{items:QuestionView<RichLearningItem>[];passages:Pick<ReadingPassage,'passageId'|'title'|'body'>[]};
-export type StudentQuestionPack=StudentQuizPack|StudentLearningPack;
+export type StudentQuestionPack=StudentQuizPack|StudentLearningPack|StudentComparePack|StudentCategorizePack;
 export type QuestionOpenReceipt={openedAt:string;serverNow:string;threeStarMs:number;twoStarMs:number;item?:TimedQuestionView;passage?:Pick<ReadingPassage,'passageId'|'title'|'body'>};
 export type AttemptFeedback={explanation:string;answer?:string;correctIndex?:number;audioTranscript?:string};
 export type AttemptOutcome={correct:boolean;feedback?:AttemptFeedback};
@@ -83,7 +129,9 @@ export type PlaySession = {
 export type GameResponse = {kind:'choice';choiceIndex:number}
   | {kind:'text';value:string}
   | {kind:'order';indices:number[]}
-  | {kind:'pair';first:{itemId:string;side:'left'|'right'};second:{itemId:string;side:'left'|'right'}};
+  | {kind:'pair';first:{itemId:string;side:'left'|'right'};second:{itemId:string;side:'left'|'right'}}
+  | {kind:'compare';operator:CompareOperator}
+  | {kind:'categorize';elementId:string;category:string};
 export type LearningEvent = {
   eventId: string; sessionId: string; packId: string; contentVersion: number;
   moduleId: ModuleId; moduleVersion: string; itemId: string; objectiveId: string;

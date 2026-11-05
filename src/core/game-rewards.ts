@@ -31,6 +31,14 @@ export function scoreGameResponse(source:ContentPack,moduleId:PlaySession['modul
       return {correct:first.itemId===second.itemId&&first.side!==second.side,touchedItemIds:[...new Set([first.itemId,second.itemId])]};
     }
   }
+  if(pack.kind==='compare'&&item.kind==='compare'&&object(input,['kind','operator'])&&input.kind==='compare'&&['>','<','='].includes(input.operator as string)){
+    return {correct:input.operator===item.operator,touchedItemIds:[itemId]};
+  }
+  if(pack.kind==='categorize'&&item.kind==='categorize'&&object(input,['kind','elementId','category'])&&input.kind==='categorize'){
+    const elem=item.elements.find(e=>e.id===input.elementId);
+    if(!elem)throw new Error('Thẻ không thuộc câu hỏi phân loại này.');
+    return {correct:elem.category===input.category,touchedItemIds:[itemId]};
+  }
   throw new Error('Thiếu câu trả lời gốc hoặc câu trả lời không hợp lệ cho game.');
 }
 

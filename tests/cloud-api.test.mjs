@@ -16,7 +16,10 @@ class Client{
     const mutable=!['GET','HEAD'].includes(method),h={'X-Bao-An-Question-Protocol':'1',...headers};if(this.cookie)h.Cookie=this.cookie;
     if(mutable){h['Content-Type']='application/json';if(requestOrigin!==null)h.Origin=requestOrigin;if(csrf)h['X-CSRF-Token']=csrf;}
     const response=await this.api(new Request(`${origin}/api/online${route}`,{method,headers:h,...(mutable?{body:JSON.stringify(body??{})}:{})}),{ip:'192.0.2.100'});
-    assert.match(response.headers.get('cache-control')??'',/no-store/);assert.equal(response.headers.get('netlify-cdn-cache-control'),'no-store');
+    // Only immutable images may live in the viewer's private browser cache; everything else stays no-store.
+    if(/^image\//.test(response.headers.get('content-type')??''))assert.equal(response.headers.get('cache-control'),'private, max-age=31536000, immutable');
+    else assert.match(response.headers.get('cache-control')??'',/no-store/);
+    assert.equal(response.headers.get('netlify-cdn-cache-control'),'no-store');
     const cookies=response.headers.getSetCookie();if(cookies.length)this.cookie=cookies.map(value=>value.split(';',1)[0]).join('; ');
     const data=binary?Buffer.from(await response.arrayBuffer()):await response.json();
     if(response.ok&&typeof data.csrfToken==='string')this.csrf=data.csrfToken;

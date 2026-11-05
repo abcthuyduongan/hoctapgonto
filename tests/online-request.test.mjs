@@ -2,6 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {OnlineRequestTimeoutError,withOnlineDeadline} from '../src/core/online-request.ts';
 import {build} from 'esbuild';
+import {gunzipSync} from 'node:zlib';
+import {randomBytes} from 'node:crypto';
 
 const bundle=await build({entryPoints:['src/core/online-client.ts'],bundle:true,platform:'node',format:'esm',write:false,logLevel:'silent'});
 const {onlineApi,OnlineError,subscribeOnlineSessionExpired}=await import('data:text/javascript;base64,'+Buffer.from(bundle.outputFiles[0].contents).toString('base64'));
@@ -49,4 +51,27 @@ test('game APIs reject a mixed old Function response and send the supported prot
  t.mock.method(globalThis,'fetch',async(_path,options)=>{calls++;headers=options.headers;return Response.json({session:{rewardPolicyVersion:2}});});
  await assert.rejects(onlineApi.playCompact(input),error=>error instanceof OnlineError&&error.status===409&&/cùng phiên bản/.test(error.message));assert.equal(calls,1);assert.equal(headers['X-Bao-An-Question-Protocol'],'1');
  const current={session:{questionProtocolVersion:1}};t.mock.method(globalThis,'fetch',async()=>Response.json(current,{headers:{'X-Bao-An-Question-Protocol':'1'}}));assert.deepEqual(await onlineApi.playCompact(input),current);
+});
+
+test('concurrent opens share one request but failed or finished opens can be requested again',async t=>{
+ let calls=0,release;const held=new Promise(resolve=>{release=resolve;});
+ t.mock.method(globalThis,'fetch',async()=>{calls++;await held;return Response.json({openedAt:'2026-11-02T00:00:00.000Z'},{headers:{'X-Bao-An-Question-Protocol':'1'}});});
+ const first=onlineApi.openQuestion('dedup-play','question-1'),second=onlineApi.openQuestion('dedup-play','question-1');assert.equal(first,second);assert.equal(calls,1);release();await Promise.all([first,second]);
+ await onlineApi.openQuestion('dedup-play','question-1');assert.equal(calls,2);
+ t.mock.method(globalThis,'fetch',async()=>{calls++;return Response.json({error:'Temporarily unavailable'},{status:503});});
+ await assert.rejects(onlineApi.openQuestion('dedup-play','question-1'),/Temporarily/);
+ t.mock.method(globalThis,'fetch',async()=>{calls++;return Response.json({openedAt:'2026-11-02T00:00:00.000Z'},{headers:{'X-Bao-An-Question-Protocol':'1'}});});
+ await onlineApi.openQuestion('dedup-play','question-1');assert.equal(calls,4);
+});
+
+test('media uploads negotiate lossless gzip and fall back to plain JSON for older servers',async t=>{
+ let supported=true,encoded=0,plain=0;const file={name:'noise.png',mime:'image/png',base64:randomBytes(256*1024).toString('base64')};
+ t.mock.method(globalThis,'fetch',async(path,options)=>{
+  if(path.endsWith('/status'))return Response.json({available:true,configured:true,mediaMaxBytes:2097152,...(supported?{mediaUploadEncoding:'gzip'}:{})});
+  if(options.headers['Content-Encoding']==='gzip'){
+   encoded++;assert.ok(options.body instanceof Blob);const bytes=Buffer.from(await options.body.arrayBuffer());assert.ok(bytes.length<Buffer.byteLength(JSON.stringify(file))*.8);assert.deepEqual(JSON.parse(gunzipSync(bytes).toString('utf8')),file);
+  }else{plain++;assert.equal(typeof options.body,'string');assert.deepEqual(JSON.parse(options.body),file);}
+  return Response.json({id:'stored-image'});
+ });
+ await onlineApi.status();await onlineApi.uploadMedia(file);assert.equal(encoded,1);supported=false;await onlineApi.status();await onlineApi.uploadMedia(file);assert.equal(plain,1);
 });

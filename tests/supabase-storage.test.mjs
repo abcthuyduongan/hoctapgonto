@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createPrivateStorage} from '../server/supabase-storage.mjs';
+import {createHash} from 'node:crypto';
 
 const endpoint='https://fixture-project.supabase.co',key='fixture-server-secret-not-a-real-key',bucket='bao-an-media';
 const bucketPath=`/storage/v1/bucket/${bucket}`,objectPath=`/storage/v1/object/${bucket}`;
@@ -69,4 +70,24 @@ test('Supabase failed private-bucket verification can retry without uploading be
   const files=storage();await sanitized(files.upload(object,bytes,'image/png'));assert.equal(uploads,0);
   await files.upload(object,bytes,'image/png');assert.equal(checks,2);assert.equal(uploads,1);
   await files.upload(object,bytes,'image/png');assert.equal(checks,2);assert.equal(uploads,2);
+});
+
+test('verified storage downloads coalesce and reuse immutable bytes without returning mutable cache buffers',async t=>{
+ const hash=createHash('sha256').update(bytes).digest('hex');
+ const calls=mockStorageFetch(t,call=>call.url.pathname===bucketPath?json({id:bucket,name:bucket,public:false}):call.method==='DELETE'?json([]):new Response(bytes));
+ const files=storage(),[a,b]=await Promise.all([files.download(object,hash),files.download(object,hash)]);assert.deepEqual(a,bytes);assert.deepEqual(b,bytes);a[0]^=255;assert.deepEqual(b,bytes);
+ assert.deepEqual(await files.download(object,hash),bytes);assert.equal(calls.filter(call=>call.url.pathname.startsWith(objectPath+'/')).length,1);
+ await sanitized(files.download(object,'0'.repeat(64)));await sanitized(files.download(object,'0'.repeat(64)));
+ assert.equal(calls.filter(call=>call.url.pathname.startsWith(objectPath+'/')).length,3);
+ await files.remove(object);assert.deepEqual(await files.download(object,hash),bytes);assert.equal(calls.filter(call=>call.url.pathname.startsWith(objectPath+'/')).length,4);
+});
+
+test('verified storage cache obeys TTL and byte budget and never caches legacy unverified downloads',async t=>{
+ let time=0;const hash=createHash('sha256').update(bytes).digest('hex');
+ const calls=mockStorageFetch(t,call=>call.url.pathname===bucketPath?json({id:bucket,name:bucket,public:false}):new Response(bytes));
+ const files=createPrivateStorage({url:endpoint,key,bucket,cacheMaxBytes:bytes.length,cacheTtlMs:10,now:()=>time});
+ await files.download(object,hash);await files.download('workspace-id/other-media',hash);await files.download(object,hash);
+ assert.equal(calls.filter(call=>call.url.pathname.startsWith(objectPath+'/')).length,3);
+ time=10;await files.download(object,hash);assert.equal(calls.filter(call=>call.url.pathname.startsWith(objectPath+'/')).length,4);
+ await files.download(object);await files.download(object);assert.equal(calls.filter(call=>call.url.pathname.startsWith(objectPath+'/')).length,6);
 });

@@ -14,9 +14,11 @@ import {gameRestrictionError} from './game-policy.ts';
 export {onlineDocumentSourceId} from './online-import-identity.ts';
 
 export const ONLINE_DOCUMENT_KINDS=['quiz','pairs','sentences','numeric-answer','fill-blank','reading-choice','listening-choice','listening-gap'] as const;
-export type OnlineDocumentKind=typeof ONLINE_DOCUMENT_KINDS[number];
+export const ALL_ONLINE_DOCUMENT_KINDS=['quiz','pairs','sentences','numeric-answer','fill-blank','reading-choice','listening-choice','listening-gap','compare','categorize'] as const;
+export type OnlineDocumentKind=typeof ALL_ONLINE_DOCUMENT_KINDS[number];
 export const ONLINE_DOCUMENT_HEADERS=['subjectLabel','kind','title','topic','week','competition','level','prompt','A','B','C','D','answer','left','right','words','hint','explanation','unit','acceptedAnswers','caseSensitive','passageTitle','passage','imageFile','imageAlt','audioFile','audioTranscript','source','rights','itemId','objectiveId','allowedGameIds','difficulty'] as const;
-type Fields=Partial<Record<typeof ONLINE_DOCUMENT_HEADERS[number],string>>;
+export const ALL_DOCUMENT_HEADERS=[...ONLINE_DOCUMENT_HEADERS,'operator','categories','elements'] as const;
+type Fields=Partial<Record<typeof ALL_DOCUMENT_HEADERS[number],string>>;
 type SourceLocation={row?:number;table?:number};
 const sourceLocations=new WeakMap<Fields,SourceLocation>();
 const sourceProblems=new WeakMap<Fields,string>();
@@ -40,7 +42,7 @@ function atSource<T>(row:Fields,action:()=>T):T {try{return action();}catch(erro
 const UNDATED='1970-01-01T00:00:00.000Z';
 const DEFAULT_SOURCE='Nội dung do người soạn cung cấp';
 const DEFAULT_RIGHTS='Người soạn chịu trách nhiệm';
-const nativeKinds=new Set(['quiz','pairs','sentences']);
+const nativeKinds=new Set(['quiz','pairs','sentences','compare','categorize']);
 function fail(message:string):never {throw new Error(message);}
 function required(value:string|undefined,field:string,max=320):string {
   if(typeof value!=='string'||!value.trim()||/^null$/i.test(value.trim()))fail(`${field}: thiếu dữ liệu (ô trống hoặc null); cần điền nội dung.`);
@@ -138,13 +140,13 @@ function wordRows(bytes:Uint8Array,inspect=false):{rows:Fields[];title?:string} 
       if(cells.some(row=>['kind','subjectLabel','prompt','left','acceptedAnswers'].includes(row[0]))){
         const message='tiêu đề bảng câu hỏi phải là field và value; không bỏ qua bảng đã điền.';
         if(!inspect)atSource(row,()=>fail(message));
-        for(const [name,value] of cells)if(ONLINE_DOCUMENT_HEADERS.includes(name as keyof Fields)&&value)row[name as keyof Fields]=value;
+        for(const [name,value] of cells)if(ALL_DOCUMENT_HEADERS.includes(name as any)&&value)row[name as keyof Fields]=value;
         sourceProblems.set(row,message);rows.push(row);
       }
       continue;
     }
     for(const cellsRow of cells.slice(1)){
-      const [name,value]=cellsRow;try{atSource(row,()=>{if(cellsRow.length!==2||!ONLINE_DOCUMENT_HEADERS.includes(name as typeof ONLINE_DOCUMENT_HEADERS[number])||names.has(name))fail(`Trường ${name??'?'} không hợp lệ hoặc trùng tên.`);
+      const [name,value]=cellsRow;try{atSource(row,()=>{if(cellsRow.length!==2||!ALL_DOCUMENT_HEADERS.includes(name as any)||names.has(name))fail(`Trường ${name??'?'} không hợp lệ hoặc trùng tên.`);
       names.add(name);if(value)row[name as keyof Fields]=required(value,name,name==='passage'||name==='audioTranscript'?8000:4000);});}
       catch(error){if(!inspect||!(error instanceof SourceRowError))throw error;if(!sourceProblems.has(row))sourceProblems.set(row,error.detail);}
     }normalizeMissing(row);rows.push(row);
@@ -187,6 +189,8 @@ function groupPack(rows:Fields[],packKind:OnlineDocumentKind,id:string,version:n
   if(rows.length<(diagnoseSingleton?1:2)||rows.length>30)fail(`${rows[0].subjectLabel}: mỗi môn và dạng câu cần 2–30 câu hỏi.`);
   const shared=['subjectLabel','kind','title','topic','week','competition','level','imageFile','imageAlt','audioFile','audioTranscript','source','rights','itemId','objectiveId','allowedGameIds','difficulty'];
   const specifics=packKind==='pairs'?['left','right']:packKind==='sentences'?['prompt','words','answer']
+    :packKind==='compare'?['prompt','left','right','operator','answer']
+    :packKind==='categorize'?['prompt','categories','elements','words','acceptedAnswers','passageTitle']
     :packKind==='numeric-answer'?['prompt','answer','unit']:['fill-blank','listening-gap'].includes(packKind)?['prompt','answer','acceptedAnswers','caseSensitive']
     :['prompt','A','B','C','D','answer',...(packKind==='reading-choice'?['passage','passageTitle']:[])];
   const feedback=packKind==='pairs'?[]:packKind==='quiz'?['explanation']:packKind==='sentences'?['hint']:['hint','explanation'];
@@ -196,18 +200,27 @@ function groupPack(rows:Fields[],packKind:OnlineDocumentKind,id:string,version:n
       if(words.length<3||words.length>15||words.some(word=>word.length>45||/\s/.test(word)))fail('Trường words/answer cần 3–15 từ, mỗi từ tối đa 45 ký tự và không chứa khoảng trắng.');}
     if(packKind==='sentences'&&row.words&&row.answer&&JSON.stringify(split(row.words,'words'))!==JSON.stringify(row.answer.trim().split(/\s+/)))fail('words và answer có thứ tự mâu thuẫn.');
     if(['fill-blank','listening-gap'].includes(packKind)&&row.acceptedAnswers&&row.answer&&JSON.stringify(split(row.acceptedAnswers,'acceptedAnswers'))!==JSON.stringify(split(row.answer,'answer')))fail('acceptedAnswers và answer mâu thuẫn.');
+    if(packKind==='compare'){
+      const op = (row.operator ?? row.answer ?? '').trim();
+      if(!['>','<','='].includes(op)) fail('Câu so sánh cần dấu >, < hoặc = trong cột operator hoặc answer.');
+    }
   });
   const extras=rows.map(row=>atSource(row,()=>attachments(row,catalog)));
   if(nativeKinds.has(packKind)){
     const nativeRows=rows.map(row=>atSource(row,()=>({...(row.itemId?{id:row.itemId}:{}),objectiveId:row.objectiveId??'CUSTOM.QUESTION',metadata:rowMetadata(row),
       ...(packKind==='quiz'?{prompt:required(row.prompt,'prompt'),...choice(row),explanation:required(row.explanation??`Đáp án: ${row.answer}`,'explanation',500)}
-        :packKind==='pairs'?{left:required(row.left,'left',120),right:required(row.right,'right',120)}:{prompt:required(row.prompt,'prompt'),...(row.words?{words:split(row.words,'words')}:{answer:required(row.answer,'answer',689)}),...(row.hint?{hint:required(row.hint,'hint',160)}:{})}),
+        :packKind==='pairs'?{left:required(row.left,'left',120),right:required(row.right,'right',120)}
+        :packKind==='compare'?{left:required(row.left,'left',120),right:required(row.right,'right',120),operator:required(row.operator??row.answer,'operator',5),explanation:required(row.explanation??`${row.left} ${row.operator??row.answer} ${row.right}`,'explanation',500),...(row.prompt?{prompt:row.prompt}:{})}
+        :packKind==='categorize'?{prompt:required(row.prompt,'prompt'),passageTitle:row.passageTitle??row.categories,words:row.words??row.elements??row.acceptedAnswers,explanation:required(row.explanation??'Phân loại các thẻ.','explanation',500),...(row.hint?{hint:row.hint}:{})}
+        :{prompt:required(row.prompt,'prompt'),...(row.words?{words:split(row.words,'words')}:{answer:required(row.answer,'answer',689)}),...(row.hint?{hint:required(row.hint,'hint',160)}:{})}),
       })));
     // A singleton can never be published. Build its actual item only to expose
     // its field errors before reporting that the group also lacks a partner.
     if(diagnoseSingleton&&rows.length===1){const row=rows[0],base={id:row.itemId??'',objectiveId:row.objectiveId??'CUSTOM.QUESTION',metadata:rowMetadata(row)};
       const item:ContentPack['items'][number]=packKind==='quiz'?{...base,kind:'multiple-choice',prompt:required(row.prompt,'prompt'),...choice(row),explanation:row.explanation??`Đáp án: ${row.answer}`}
         :packKind==='pairs'?{...base,kind:'pair',left:required(row.left,'left',120),right:required(row.right,'right',120)}
+        :packKind==='compare'?{...base,kind:'compare',left:required(row.left,'left',120),right:required(row.right,'right',120),operator:(row.operator??row.answer) as import('./contracts.ts').CompareOperator,explanation:row.explanation??`${row.left} ${row.operator??row.answer} ${row.right}`}
+        :packKind==='categorize'?{...base,kind:'categorize',prompt:required(row.prompt,'prompt'),categories:(row.passageTitle??row.categories??'Nhóm 1|Nhóm 2').split('|'),elements:(row.words??row.elements??'thẻ 1:Nhóm 1|thẻ 2:Nhóm 2').split('|').map((p: string, i: number)=>({id:`elem-${i+1}`,text:p.split(':')[0],category:p.split(':')[1]||'Nhóm 1'})),explanation:row.explanation??'Phân loại thẻ.'}
         :{...base,kind:'sentence',prompt:required(row.prompt,'prompt'),words:row.words?split(row.words,'words'):required(row.answer,'answer',689).split(/\s+/),hint:row.hint??'Sắp xếp các thẻ theo đúng thứ tự đáp án.'};
       if(extras[0].question)item.media=extras[0].question;if(!item.id)item.id=onlineGeneratedItemId(item);
       const pack={id,version,title,grade,subject:'thinking',source:'local',publishedAt:UNDATED,kind:packKind,items:[item]} as ContentPack;
@@ -258,14 +271,77 @@ function assertMediaCatalog(media:OnlineMediaAsset[]):void {
   // enforced by the host; references below still require a unique, valid asset.
   if(!Array.isArray(media)||media.some(asset=>!asset||typeof asset.name!=='string'||typeof asset.id!=='string'||typeof asset.sha256!=='string'||typeof asset.mime!=='string'||!['image','audio'].includes(asset.kind)))fail('Catalog đa phương tiện không hợp lệ.');
 }
+export interface ParsedDiscoveryEntry {
+  subjectLabel?: string;
+  title?: string;
+  discoveryTitle: string;
+  discoveryText: string;
+  discoveryImageFile?: string;
+}
+
+export function parseDiscoveryInfo(info: string[][] | undefined): ParsedDiscoveryEntry[] {
+  if (!info || !Array.isArray(info)) return [];
+  const entries: ParsedDiscoveryEntry[] = [];
+  let headerIndex = -1;
+  const colMap: Record<string, number> = {};
+
+  for (let r = 0; r < info.length; r++) {
+    const row = info[r];
+    if (row && row.some(cell => typeof cell === 'string' && cell.trim() === 'discoveryTitle')) {
+      headerIndex = r;
+      row.forEach((cell, idx) => {
+        if (typeof cell === 'string') colMap[cell.trim()] = idx;
+      });
+      break;
+    }
+  }
+
+  if (headerIndex !== -1) {
+    for (let r = headerIndex + 1; r < info.length; r++) {
+      const row = info[r];
+      if (!row || !row.length) continue;
+      const discoveryTitle = (row[colMap['discoveryTitle']] ?? '').trim();
+      const discoveryText = (row[colMap['discoveryText']] ?? '').trim();
+      const discoveryImageFile = (row[colMap['discoveryImageFile']] ?? '').trim();
+      const subjectLabel = colMap['subjectLabel'] !== undefined ? (row[colMap['subjectLabel']] ?? '').trim() : undefined;
+      const title = colMap['title'] !== undefined ? (row[colMap['title']] ?? '').trim() : undefined;
+      if (discoveryTitle || discoveryText || discoveryImageFile) {
+        entries.push({
+          ...(subjectLabel ? { subjectLabel } : {}),
+          ...(title ? { title } : {}),
+          discoveryTitle,
+          discoveryText,
+          ...(discoveryImageFile ? { discoveryImageFile } : {}),
+        });
+      }
+    }
+    if (entries.length) return entries;
+  }
+
+  const titleRow = info.find(r => r[0] === 'discoveryTitle')?.[1]?.trim();
+  const textRow = info.find(r => r[0] === 'discoveryText')?.[1]?.trim();
+  const imageRow = info.find(r => r[0] === 'discoveryImageFile')?.[1]?.trim();
+  if (titleRow || textRow || imageRow) {
+    entries.push({
+      discoveryTitle: titleRow || '',
+      discoveryText: textRow || '',
+      ...(imageRow ? { discoveryImageFile: imageRow } : {}),
+    });
+  }
+
+  return entries;
+}
+
 function documentSource(bytes:Uint8Array,fileName:string,context:OnlineWeekContext,media:OnlineMediaAsset[],inspect=false) {
   if(!(bytes instanceof Uint8Array)||bytes.byteLength<22||bytes.byteLength>1024*1024)fail('Word hoặc Excel cần dung lượng dưới 1 MB; tải ảnh và âm thanh riêng.');
   assertMediaCatalog(media);
   const extension=fileName.toLowerCase().split('.').pop();let rows:Fields[];let sourceTitle:string|undefined;
+  let discoveryEntries: ParsedDiscoveryEntry[] = [];
   if(extension==='xlsx'){
     const workbook=parseQuestionWorkbookBytes(bytes);rows=sourceRows(workbook.sheets['Câu hỏi'],workbook.rowNumbers['Câu hỏi'],inspect,workbook.cellErrors['Câu hỏi']);
     const info=workbook.sheets['Thông tin bộ'];if(info[0]?.[0]!=='schema'||info[0]?.[1]!=='baoan-online-week'||info.find(row=>row[0]==='formatVersion')?.[1]!=='1')fail('Thông tin bộ thiếu schema hoặc phiên bản mẫu.');
     sourceTitle=info.find(row=>row[0]==='title')?.[1];
+    discoveryEntries=parseDiscoveryInfo(info);
   }else if(extension==='docx'){const parsed=wordRows(bytes,inspect);rows=parsed.rows;sourceTitle=parsed.title;}else fail('Chỉ nhận mẫu Word .docx hoặc Excel .xlsx.');
   if(!/^[a-z0-9-]{3,77}$/.test(context.idPrefix)||!Number.isInteger(context.grade)||context.grade<1||context.grade>12)fail('Thông tin lớp hoặc mã tuần không hợp lệ.');
   const filled=rows.filter(row=>sourceProblems.has(row)||sourceNulls.has(row)||Object.keys(row).some(key=>!['kind','title','subjectLabel','week','topic','competition','level','source','rights','difficulty'].includes(key)));
@@ -274,20 +350,22 @@ function documentSource(bytes:Uint8Array,fileName:string,context:OnlineWeekConte
   const title=required([...weeks][0]??(sourceTitle||context.title),'Tên tuần',90);
   const sourceCode=onlineSourceCode(title,context.sourceId),version=context.version??1;
   if(!Number.isSafeInteger(version)||version<1)fail('version: phiên bản phải là số nguyên dương.');
-  return {filled,title,sourceCode,version};
+  return {filled,title,sourceCode,version,discoveryEntries};
 }
 
 /** Only text tables and supplied media catalog references are interpreted. */
 export function onlineDocumentMediaNames(bytes:Uint8Array,fileName:string):string[]{
-  const {filled}=documentSource(bytes,fileName,{idPrefix:'online',grade:3,title:'Tuần học'},[],true);
-  return [...new Set(filled.flatMap(row=>[row.imageFile,row.audioFile]).filter((name):name is string=>!!name))];
+  const {filled,discoveryEntries}=documentSource(bytes,fileName,{idPrefix:'online',grade:3,title:'Tuần học'},[],true);
+  const fromQuestions = filled.flatMap(row=>[row.imageFile,row.audioFile]);
+  const fromDiscovery = (discoveryEntries || []).map(d => d.discoveryImageFile).filter((name):name is string => !!name);
+  return [...new Set([...fromQuestions, ...fromDiscovery].filter((name):name is string=>!!name))];
 }
 
 /** Keep one parsed source for the current preview; catalogs are checked afresh on every inspection. */
 export function prepareOnlineDocument(bytes:Uint8Array,fileName:string,context:OnlineWeekContext){
   const fixedContext={...context,...(context.packIds?{packIds:{...context.packIds}}:{})};
   const source=documentSource(bytes,fileName,fixedContext,[],true);
-  const mediaNames=[...new Set(source.filled.flatMap(row=>[row.imageFile,row.audioFile]).filter((name):name is string=>!!name))];
+  const mediaNames=[...new Set([...source.filled.flatMap(row=>[row.imageFile,row.audioFile]), ...(source.discoveryEntries || []).map(d => d.discoveryImageFile)].filter((name):name is string=>!!name))];
   return {mediaNames,async inspect(media:OnlineMediaAsset[],options:{weekTitle?:string}={}){
     assertMediaCatalog(media);
     return inspectDocumentSource(source,fixedContext,media,options);
@@ -295,18 +373,35 @@ export function prepareOnlineDocument(bytes:Uint8Array,fileName:string,context:O
 }
 
 export async function parseOnlineDocument(bytes:Uint8Array,fileName:string,context:OnlineWeekContext,media:OnlineMediaAsset[]):Promise<OnlineWeek> {
-  const {filled,title,sourceCode,version}=documentSource(bytes,fileName,context,media);
+  const {filled,title,sourceCode,version,discoveryEntries}=documentSource(bytes,fileName,context,media);
   const groups=new Map<string,{label:string;kind:OnlineDocumentKind;title:string;rows:Fields[]}>();
   for(const row of filled)atSource(row,()=>{
     const label=required(row.subjectLabel??context.subjectLabel,'subjectLabel',120);
-    if(!ONLINE_DOCUMENT_KINDS.includes(row.kind as OnlineDocumentKind))fail('kind: chọn một trong 8 dạng được liệt kê trong mẫu.');
+    if(!ALL_ONLINE_DOCUMENT_KINDS.includes(row.kind as any))fail('kind: chọn một trong 8 dạng được liệt kê trong mẫu.');
     const packKind=row.kind as OnlineDocumentKind,key=JSON.stringify([label,packKind]),packTitle=required(row.title??title,'title',90);
     let group=groups.get(key);if(!group){group={label,kind:packKind,title:packTitle,rows:[]};groups.set(key,group);}else if(group.title!==packTitle)fail('Các câu cùng môn và dạng cần cùng title.');
     group.rows.push(row);
   });
   if(groups.size>30)fail('Mỗi tuần tối đa 30 bộ môn và dạng câu.');
-  return {title,sets:[...groups.values()].map(group=>({subjectLabel:group.label,pack:groupPack(group.rows,group.kind,
-    context.packIds?.[JSON.stringify([group.label,group.kind])]??onlineGeneratedPackId(sourceCode,group.label,group.kind),version,group.title,context.grade,media)}))};
+  return {title,sets:[...groups.values()].map(group=>{
+    const pack = groupPack(group.rows,group.kind,
+      context.packIds?.[JSON.stringify([group.label,group.kind])]??onlineGeneratedPackId(sourceCode,group.label,group.kind),version,group.title,context.grade,media);
+    const dMatch = (discoveryEntries || []).find(d => 
+      (d.subjectLabel && d.title && d.subjectLabel === group.label && d.title === group.title) ||
+      (d.subjectLabel && !d.title && d.subjectLabel === group.label) ||
+      (!d.subjectLabel && d.title && d.title === group.title)
+    ) ?? (discoveryEntries && discoveryEntries.length === 1 && !discoveryEntries[0].subjectLabel && !discoveryEntries[0].title ? discoveryEntries[0] : undefined);
+    if (dMatch) {
+      const asset = dMatch.discoveryImageFile ? media.find(m => m.name === dMatch.discoveryImageFile) : undefined;
+      pack.discovery = {
+        title: dMatch.discoveryTitle,
+        text: dMatch.discoveryText,
+        ...(dMatch.discoveryImageFile ? { imageFile: dMatch.discoveryImageFile } : {}),
+        ...(asset ? { imageId: asset.id } : {}),
+      };
+    }
+    return {subjectLabel:group.label,pack};
+  })};
 }
 
 /** Preview valid, playable groups and keep every excluded source question visible. */
@@ -324,7 +419,7 @@ function inspectDocumentSource(source:ReturnType<typeof documentSource>,context:
     const problem=sourceProblems.get(row);if(problem){exclude(row,problem);continue;}
     try{atSource(row,()=>{
       const label=required(row.subjectLabel??context.subjectLabel,'subjectLabel',120);
-      if(!ONLINE_DOCUMENT_KINDS.includes(row.kind as OnlineDocumentKind))fail('kind: chọn một trong 8 dạng được liệt kê trong mẫu.');
+      if(!ALL_ONLINE_DOCUMENT_KINDS.includes(row.kind as any))fail('kind: chọn một trong 8 dạng được liệt kê trong mẫu.');
       required(row.title??documentTitle,'title',90);
       const kind=row.kind as OnlineDocumentKind,key=JSON.stringify([label,kind]);let group=groups.get(key);
       if(!group){group={label,kind,rows:[]};groups.set(key,group);}group.rows.push(row);

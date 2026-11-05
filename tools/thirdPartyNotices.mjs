@@ -3,7 +3,7 @@ import {dirname,isAbsolute,join,relative,resolve,sep} from 'node:path';
 import {fileURLToPath} from 'node:url';
 
 const PROJECT_ROOT=resolve(dirname(fileURLToPath(import.meta.url)),'..');
-export const BROWSER_NOTICE_PACKAGES=Object.freeze(['react','react-dom','scheduler','three','fflate']);
+export const BROWSER_NOTICE_PACKAGES=Object.freeze(['react','react-dom','scheduler','fflate']);
 const within=(root,path)=>{const rel=relative(root,path);return rel===''||(!isAbsolute(rel)&&rel!=='..'&&!rel.startsWith(`..${sep}`));};
 
 /** Read installed package notices at build time; the distributed artifact needs no node_modules. */

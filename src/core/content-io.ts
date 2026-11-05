@@ -33,6 +33,8 @@ export function parseContentImport(raw: string): ContentPack[] {
       if (checked.kind === 'quiz' && (!text(item.prompt) || !text(item.explanation) || !Array.isArray(item.options) || item.options.some((o:unknown) => !text(o)))) throw new Error(`Bộ ${i + 1}: câu trắc nghiệm thiếu dữ liệu.`);
       if (checked.kind === 'pairs' && (!text(item.left) || !text(item.right))) throw new Error(`Bộ ${i + 1}: cặp từ thiếu dữ liệu.`);
       if (checked.kind === 'sentences' && (!text(item.prompt) || !text(item.hint) || !Array.isArray(item.words) || item.words.some((w:unknown) => !text(w)))) throw new Error(`Bộ ${i + 1}: ghép câu thiếu dữ liệu.`);
+      if (checked.kind === 'compare' && (!text(item.left) || !text(item.right) || !text(item.operator))) throw new Error(`Bộ ${i + 1}: câu so sánh thiếu dữ liệu.`);
+      if (checked.kind === 'categorize' && (!text(item.prompt) || !Array.isArray(item.categories) || !Array.isArray(item.elements))) throw new Error(`Bộ ${i + 1}: câu phân loại thiếu dữ liệu.`);
     }
     const problems = validatePack(checked);
     if (problems.length) throw new Error(`Bộ ${i + 1}: ${problems[0]}`);

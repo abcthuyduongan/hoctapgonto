@@ -1,8 +1,9 @@
 import {seedLegacyApiWeek} from '../helpers/legacy-weeks.mjs';
 import {test,expect,type Page} from '@playwright/test';
 import {cloudBrowserFixture} from '../helpers/cloud-browser-fixture.mjs';
+import {readFile} from 'node:fs/promises';
 
-async function studentFixture(page:Page){
+async function studentFixture(page:Page,withImage=false){
   const f=await cloudBrowserFixture();
   async function api(route:string,body:unknown,csrf=''){
     if(route==='/weeks')await seedLegacyApiWeek(f.store,await(await page.request.get(f.origin+'/api/online/me')).json(),body);const response=await page.request.post(f.origin+'/api/online'+route,{headers:{Origin:f.origin,...(csrf?{'X-CSRF-Token':csrf}:{})},data:body});
@@ -11,15 +12,16 @@ async function studentFixture(page:Page){
   try{
     const admin=await api('/setup',{token:f.token,name:'Loading test',username:'loading.admin',password:f.password});
     const cls=await api('/classes',{name:'Loading class',grade:3},admin.csrfToken);
+    if(withImage){const id='11111111-1111-4111-8111-111111111111',bytes=await readFile('public/icons/bao-an-192.png'),objectPath=admin.user.workspaceId+'/'+id;await f.store.addMedia(admin.user,{id,name:'first-image.png',mime:'image/png',bytes,objectPath});f.objects.set(objectPath,bytes);}
     await api('/students',{name:'Loading student',classId:cls.id,username:'loading.child',password:f.password},admin.csrfToken);
-    const pack={id:'loading-quiz',title:'Bài học mở ngay',version:1,grade:3,kind:'quiz',subject:'thinking',source:'local',publishedAt:'2026-10-17T00:00:00.000Z',items:[1,2].map(i=>({id:'loading-'+i,kind:'multiple-choice',objectiveId:'LOADING.TEST',prompt:'Chọn câu trả lời '+i,options:['Đúng '+i,'Sai A','Sai B','Sai C'],correctIndex:0,explanation:'Đáp án do tác giả xác định.'}))};
+    const pack={id:'loading-quiz',title:'Bài học mở ngay',version:1,grade:3,kind:'quiz',subject:'thinking',source:'local',publishedAt:'2026-10-17T00:00:00.000Z',items:[1,2].map(i=>({id:'loading-'+i,kind:'multiple-choice',objectiveId:'LOADING.TEST',prompt:'Chọn câu trả lời '+i,options:['Đúng '+i,'Sai A','Sai B','Sai C'],correctIndex:0,explanation:'Đáp án do tác giả xác định.',...(withImage?{media:{imageId:'11111111-1111-4111-8111-111111111111',imageAlt:'Ảnh đầu bài'}}:{})}))};
     await api('/weeks',{requestId:'loading-week',title:'Tuần 01',classId:cls.id,sets:[{subjectLabel:'Kiểm tra tải trò chơi',pack}]},admin.csrfToken);
     await page.context().clearCookies();await api('/login',{username:'loading.child',password:f.password});
     return f;
   }catch(error){await f.close();throw error;}
 }
 
-test('a student starts before slow 3D assets finish, warms the game during session creation and retries a failed answer safely',async({page},testInfo)=>{
+test('a student with an old 3D preference starts directly in 2D, warms the game and safely retries a failed answer',async({page},testInfo)=>{
   const f=await studentFixture(page);
   let releaseModels!:()=>void,releasePlay!:()=>void,releaseStudent=()=>{};
   const modelsHeld=new Promise<void>(resolve=>{releaseModels=resolve;}),playHeld=new Promise<void>(resolve=>{releasePlay=resolve;});
@@ -28,10 +30,10 @@ test('a student starts before slow 3D assets finish, warms the game during sessi
   await page.route('**/*.glb',async route=>{modelRequests++;await modelsHeld;await route.continue();modelFinished++;});
   await page.route('**/api/online/play/compact',async route=>{playRequested=true;await playHeld;await route.continue();});
   try{
-    await page.goto(f.origin+'/');await page.getByRole('button',{name:'Khám phá 3D',exact:true}).click();
+    await page.addInitScript(()=>localStorage.setItem('bao-an-display-mode-v1','3d'));await page.goto(f.origin+'/');
     const host=page.locator('.ba3d-render-host'),start=page.getByRole('button',{name:'Chơi Đảo Câu Hỏi bằng bộ được giao',exact:true});
-    await expect(host).toHaveAttribute('data-state','loading');await expect(start).toBeVisible();
-    await expect.poll(()=>modelRequests).toBeGreaterThan(0);
+    await expect(host).toHaveCount(0);await expect(start).toBeVisible();
+    expect(modelRequests).toBe(0);
     const started=Date.now();await start.click();await expect.poll(()=>playRequested).toBe(true);
     await expect.poll(()=>gameChunkRequested).toBe(true);expect(modelFinished).toBe(0);
     releasePlay();await expect(page.locator('.quiz-question')).toHaveText('Chọn câu trả lời 1');
@@ -54,11 +56,11 @@ test('a student starts before slow 3D assets finish, warms the game during sessi
   }finally{releaseModels();releasePlay();releaseStudent();await page.unrouteAll({behavior:'ignoreErrors'});await f.close();}
 });
 
-test('failed scene downloads retain a working direct start and the fallback scene',async({page})=>{
+test('unavailable legacy models never block the 2D lesson',async({page})=>{
   const f=await studentFixture(page);
   await page.route('**/*.glb',route=>route.fulfill({status:404,contentType:'text/plain',body:'Fixture scene unavailable'}));
   try{
-    await page.goto(f.origin+'/');await page.getByRole('button',{name:'Khám phá 3D',exact:true}).click();await expect(page.locator('[data-hub-mode="light"]')).toBeVisible();await expect(page.locator('.ba3d-render-host')).toHaveCount(0);
+    await page.goto(f.origin+'/');await expect(page.locator('[data-hub-mode="light"]')).toBeVisible();await expect(page.locator('.ba3d-render-host')).toHaveCount(0);
     await page.getByRole('button',{name:'Chơi Đảo Câu Hỏi bằng bộ được giao',exact:true}).click();
     await expect(page.locator('.quiz-question')).toHaveText('Chọn câu trả lời 1');await page.locator('.answer-option').first().click();await expect(page.locator('.feedback-win')).toBeVisible();
     await page.getByRole('button',{name:'← Thoát trò chơi',exact:true}).click();await expect(page.getByRole('button',{name:'Chơi Đảo Câu Hỏi bằng bộ được giao',exact:true})).toBeEnabled();
@@ -77,4 +79,16 @@ test('an interrupted game chunk displays recovery controls and reload can start 
     await page.getByRole('button',{name:'Chơi Đảo Câu Hỏi bằng bộ được giao',exact:true}).click();await expect(page.locator('.quiz-question')).toHaveText('Chọn câu trả lời 1');
     await page.getByRole('button',{name:'← Thoát trò chơi',exact:true}).click();
   }finally{await f.close();}
+});
+
+test('the first image downloads while the game chunk is held and does not start its clock early',async({page})=>{
+ const f=await studentFixture(page,true);let release=()=>{},images=0,opens=0;
+ const held=new Promise<void>(resolve=>{release=resolve;});
+ await page.route('**/assets/MathQuest-*.js',async route=>{await held;await route.continue();});
+ page.on('request',request=>{if(request.url().includes('/media/11111111'))images++;if(request.url().endsWith('/question-open'))opens++;});
+ try{
+  await page.goto(f.origin+'/');await page.getByRole('button',{name:'Chơi Đảo Câu Hỏi bằng bộ được giao',exact:true}).click();await expect.poll(()=>images).toBe(1);expect(opens).toBe(0);
+  release();await expect(page.locator('.answer-option').first()).toBeEnabled();expect(images).toBe(1);expect(opens).toBe(1);
+  await page.getByRole('button',{name:'← Thoát trò chơi',exact:true}).click();
+ }finally{release();await page.unrouteAll({behavior:'ignoreErrors'});await f.close();}
 });

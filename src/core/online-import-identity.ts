@@ -70,7 +70,9 @@ export function onlineSemanticPackIdentity(pack:ContentPack,hashes:MediaHashes={
   const media=pack.kind==='learning'?new Map(pack.media.map(row=>[row.mediaId,row])):new Map();
   const items=pack.items.map(item=>{
     const row:Record<string,unknown>={kind:item.kind};
-    if('prompt'in item)row.prompt=text(item.prompt);
+    if('prompt'in item && typeof item.prompt === 'string')row.prompt=text(item.prompt);
+    if(item.kind==='compare'){row.left=text(item.left);row.right=text(item.right);row.operator=item.operator;}
+    if(item.kind==='categorize'){row.categories=item.categories.map(text).sort();row.elements=item.elements.map(e=>`${text(e.text)}:${text(e.category)}`).sort();}
     if(item.kind==='pair'){row.left=text(item.left);row.right=text(item.right);}
     if(item.kind==='sentence')row.words=item.words.map(text);
     if('options'in item){row.options=item.options.map(text).sort();row.answer=text(item.options[item.correctIndex]);}

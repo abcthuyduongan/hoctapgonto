@@ -1,9 +1,9 @@
 import {useCallback,useEffect,useMemo,useRef,useState} from 'react';
-import type {OnlineAdminSummary,OnlineIdentity,OnlineMediaAsset,OnlineRedemption,OnlineWeek,OnlineWeekCheck} from '../core/online-contracts';
+import type {OnlineAdminSummary,OnlineIdentity,OnlineMediaAsset,OnlineRedemption,OnlineWeek,OnlineWeekCheck,GiftItem,GiftKind} from '../core/online-contracts';
 import {onlineApi,OnlineError,getOnlineMediaMaxBytes} from '../core/online-client';
 import {onlineDocumentGameChoices as onlineGameChoices,onlineDocumentSourceId,inspectOnlineDocument,prepareOnlineDocument} from '../core/online-document-import';
 import {onlinePackQuestionKind} from '../core/online-import-identity';
-import {assertQuestionMediaSelectionBudget,validateQuestionMediaFile} from '../core/online-media-check';
+import {assertQuestionMediaSelectionBudget,optimizeQuestionImage,validateQuestionMediaFile} from '../core/online-media-check';
 import OnlineQuestionReview,{OnlineQuestionDisclosure,onlinePackKindLabel} from './OnlineQuestionReview';
 import OnlineRecoveryPanel from './OnlineRecoveryPanel';
 import {rewardStatus} from '../core/reward-wallet';
@@ -16,16 +16,21 @@ import '../styles/online-management.css';
 const messageOf=(error:unknown)=>error instanceof Error?error.message:'Chưa thực hiện được yêu cầu. Hãy thử lại.';
 type Preview=Omit<Awaited<ReturnType<typeof inspectOnlineDocument>>,'sets'>&{sets:(Awaited<ReturnType<typeof inspectOnlineDocument>>['sets'][number]&{subjectId?:string})[];classId:string;requestId:string;replaceWeekId?:string};
 type MediaIssue={name:string;message:string};
-type PreparedMedia={file:File;name:string;mime:string;sha256:string;size:number};
+type PreparedMedia={file:File;blob:Blob;name:string;mime:string;sha256:string;size:number;optimizedFrom?:number};
 const weekChoices=Array.from({length:52},(_,index)=>`Tuần ${String(index+1).padStart(2,'0')}`);
 const fileNameKey=(name:string)=>name.normalize('NFC').toLocaleLowerCase('vi');
 const mediaMime=(file:File)=>({'png':'image/png','jpg':'image/jpeg','jpeg':'image/jpeg','webp':'image/webp','mp3':'audio/mpeg','wav':'audio/wav','ogg':'audio/ogg'} as Record<string,string>)[file.name.split('.').at(-1)?.toLowerCase()??''];
 const yieldImport=()=>new Promise<void>(resolve=>window.setTimeout(resolve,0));
 
 export default function AdminDashboard({identity,onLogout,onRestored}:{identity:OnlineIdentity;onLogout:()=>Promise<void>;onRestored:()=>void}){
-  const [data,setData]=useState<OnlineAdminSummary|null>(null),[error,setError]=useState(''),[notice,setNotice]=useState(''),[busy,setBusy]=useState(false),[tab,changeTab]=useState<'students'|'weeks'|'wallet'|'recovery'>('students'),[classId,changeClassId]=useState('');
+  const [data,setData]=useState<OnlineAdminSummary|null>(null),[error,setError]=useState(''),[notice,setNotice]=useState(''),[busy,setBusy]=useState(false),[tab,changeTab]=useState<'students'|'weeks'|'wallet'|'recovery'|'gifts'>('students'),[classId,changeClassId]=useState('');
   const [offset,setOffset]=useState(0),[loading,setLoading]=useState(false),[selectedWeek,setSelectedWeek]=useState<OnlineWeek|null>(null),[weekCheck,setWeekCheck]=useState<OnlineWeekCheck|null>(null),[targetSubjects,setTargetSubjects]=useState('3');
   const [library,setLibrary]=useState<Awaited<ReturnType<typeof onlineApi.adminMedia>>|null>(null);
+  const [gifts,setGifts]=useState<GiftItem[]>([]);
+  const [giftTitle,setGiftTitle]=useState(''),[giftPrice,setGiftPrice]=useState('10'),[giftKind,setGiftKind]=useState<GiftKind>('item');
+  const [giftStock,setGiftStock]=useState(''),[giftWeeklyLimit,setGiftWeeklyLimit]=useState(''),[giftUnlockAfterWeek,setGiftUnlockAfterWeek]=useState('0');
+  const [giftClassId,setGiftClassId]=useState(''),[giftImageMediaId,setGiftImageMediaId]=useState(''),[giftActive,setGiftActive]=useState(true);
+  const [editingGiftId,setEditingGiftId]=useState<string|null>(null),[giftUploading,setGiftUploading]=useState(false);
   const [className,setClassName]=useState(''),[grade,setGrade]=useState('3'),[studentName,setStudentName]=useState(''),[username,setUsername]=useState(''),[password,setPassword]=useState(''),[credentials,setCredentials]=useState<{name:string;username:string;password:string}|null>(null),[query,changeQuery]=useState('');
   const [weekTitle,setWeekTitle]=useState(weekChoices[0]),[subjectLabel,setSubjectLabel]=useState(''),[documentFile,setDocumentFile]=useState<File|null>(null),[preview,setPreview]=useState<Preview|null>(null);
   const [pendingMedia,setPendingMedia]=useState<File[]>([]),[mediaIssues,setMediaIssues]=useState<MediaIssue[]>([]);
@@ -33,7 +38,8 @@ export default function AdminDashboard({identity,onLogout,onRestored}:{identity:
   const [walletEnabled,setWalletEnabled]=useState(false),[rate,setRate]=useState(''),[notes,setNotes]=useState<Record<string,string>>({});
   const [uploadProgress,setUploadProgress]=useState('');
   const [previewPage,setPreviewPage]=useState(0),[issuePage,setIssuePage]=useState(0);
-  const importController=useRef<AbortController|null>(null),checkedMedia=useRef(new WeakMap<File,PreparedMedia>());
+  const importController=useRef<AbortController|null>(null),checkedMedia=useRef(new WeakMap<File,PreparedMedia>()),optimizationNote=useRef('');
+  const [optimizeImages,setOptimizeImages]=useState(true);
   const parsedDocument=useRef<{file:File;key:string;source:ReturnType<typeof prepareOnlineDocument>}|null>(null);
   useEffect(()=>()=>{importController.current?.abort();parsedDocument.current=null;},[]);
   useEffect(()=>{setPreviewPage(0);setIssuePage(0);},[preview?.requestId]);
@@ -57,6 +63,11 @@ export default function AdminDashboard({identity,onLogout,onRestored}:{identity:
   useEffect(()=>{if(data){setWalletEnabled(data.wallet.enabled);setRate(String(data.wallet.rateVnd));}},[data?.wallet.enabled,data?.wallet.rateVnd]);
   useEffect(()=>{if(error)document.querySelector('.online-admin [role="alert"]')?.scrollIntoView({block:'center'});},[error]);
   async function run(action:()=>Promise<string>,reload=true){if(operating.current)return;operating.current=true;setBusy(true);setError('');setNotice('');try{const result=await action();setNotice(result);if(reload)await refresh(true);}catch(error){if(importController.current?.signal.aborted)setNotice('Đã dừng kiểm tra. Chưa giao câu hỏi cho lớp; tư liệu máy chủ đã nhận vẫn có thể còn trong thư viện và sẽ được đối chiếu khi thử lại.');else setError(messageOf(error));}finally{importController.current=null;operating.current=false;setBusy(false);setUploadProgress('');}}
+  const loadGifts=useCallback(async()=>{try{const list=await onlineApi.gifts(classId||undefined);setGifts(list);}catch(err){setError(messageOf(err));}},[classId]);
+  useEffect(()=>{if(tab==='gifts')void loadGifts();},[tab,classId,loadGifts]);
+  function resetGiftForm(){setGiftTitle('');setGiftPrice('10');setGiftKind('item');setGiftStock('');setGiftWeeklyLimit('');setGiftUnlockAfterWeek('0');setGiftClassId('');setGiftImageMediaId('');setGiftActive(true);setEditingGiftId(null);}
+  function editGift(gift:GiftItem){setGiftTitle(gift.title);setGiftPrice(String(gift.priceStars));setGiftKind(gift.kind);setGiftStock(gift.stock!==null?String(gift.stock):'');setGiftWeeklyLimit(gift.weeklyLimit!==null?String(gift.weeklyLimit):'');setGiftUnlockAfterWeek(String(gift.unlockAfterWeek));setGiftClassId(gift.classId??'');setGiftImageMediaId(gift.imageMediaId??'');setGiftActive(gift.active);setEditingGiftId(gift.id);window.scrollTo({top:0,behavior:'smooth'});}
+  async function handleUploadGiftImage(files:FileList|null){const file=files?.[0];if(!file)return;if(!file.type.startsWith('image/')){setError('Chỉ hỗ trợ tệp hình ảnh (.png, .jpg, .webp).');return;}setGiftUploading(true);try{const bytes=new Uint8Array(await file.arrayBuffer());let binary='';for(let i=0;i<bytes.length;i+=32768)binary+=String.fromCharCode(...bytes.subarray(i,i+32768));const uploaded=await onlineApi.uploadMedia({name:file.name,mime:file.type,base64:btoa(binary)});setGiftImageMediaId(uploaded.id);setNotice(`Đã tải ảnh "${file.name}".`);}catch(err){setError(messageOf(err));}finally{setGiftUploading(false);}}
   function selectImportFiles(files:FileList|null){
     const selected=Array.from(files??[]);if(!selected.length)return;
     invalidate();setError('');setNotice('');setMediaIssues([]);
@@ -82,8 +93,10 @@ export default function AdminDashboard({identity,onLogout,onRestored}:{identity:
           if(!file.name.trim()||file.name.length>180||/[\\/\u0000-\u001f]/.test(file.name))throw new Error('Tên tệp cần 1–180 ký tự và không chứa đường dẫn hoặc ký tự điều khiển.');
           if(file.size>getOnlineMediaMaxBytes())throw new Error(`Mỗi hình / âm thanh tối đa ${getOnlineMediaMaxBytes()/1024/1024} MB.`);
           await validateQuestionMediaFile(file,signal);signal.throwIfAborted();
-          const bytes=new Uint8Array(await file.arrayBuffer()),sha256=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)),byte=>byte.toString(16).padStart(2,'0')).join('');
-          signal.throwIfAborted();const prepared={file,name:file.name,mime:mediaMime(file),sha256,size:bytes.length};checkedMedia.current.set(file,prepared);return prepared;
+          // A name already in the library keeps its original bytes, so re-importing an old week never conflicts.
+          const known=existing.some(asset=>fileNameKey(asset.name)===fileNameKey(file.name)),optimized=optimizeImages&&!known?await optimizeQuestionImage(file):null;signal.throwIfAborted();
+          const blob:Blob=optimized??file,bytes=new Uint8Array(await blob.arrayBuffer()),sha256=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)),byte=>byte.toString(16).padStart(2,'0')).join('');
+          signal.throwIfAborted();const prepared:PreparedMedia={file,blob,name:file.name,mime:optimized?optimized.type:mediaMime(file),sha256,size:bytes.length,...(optimized?{optimizedFrom:file.size}:{})};checkedMedia.current.set(file,prepared);return prepared;
         }catch(error){if(signal.aborted)throw error;issues.push({name:file.name,message:messageOf(error)});return null;}
         finally{if(!signal.aborted)setUploadProgress(`Đang kiểm tra tư liệu ${++checkedCount}/${files.length}`);}
       }));
@@ -103,9 +116,9 @@ export default function AdminDashboard({identity,onLogout,onRestored}:{identity:
       setUploadProgress(`Đang tải tư liệu · đã xong ${completed}/${prepared.length}`);
       // Retain encoded bytes only for this bounded request, including its retries.
       const payload:Parameters<typeof onlineApi.uploadMediaBatch>[0]=[];
-      for(const {file,name,mime} of batch){
+      for(const {blob,name,mime} of batch){
         signal.throwIfAborted();
-        const data=new Uint8Array(await file.arrayBuffer()),parts:string[]=[];
+        const data=new Uint8Array(await blob.arrayBuffer()),parts:string[]=[];
         for(let at=0;at<data.length;at+=32768)parts.push(String.fromCharCode(...data.subarray(at,at+32768)));
         payload.push({name,mime,base64:btoa(parts.join(''))});
       }
@@ -124,6 +137,8 @@ export default function AdminDashboard({identity,onLogout,onRestored}:{identity:
       }
       completed+=batch.length;
     }
+    const shrunk=checked.filter(file=>file.optimizedFrom!==undefined),before=shrunk.reduce((sum,file)=>sum+(file.optimizedFrom??0),0),after=shrunk.reduce((sum,file)=>sum+file.size,0);
+    optimizationNote.current=shrunk.length?` Đã tối ưu ${shrunk.length} ảnh lớn: ${(before/1048576).toFixed(1)} MB → ${(after/1048576).toFixed(1)} MB.`:'';
     signal.throwIfAborted();const assets=[...new Map([...existing,...added].map(asset=>[asset.id,asset])).values()];setMediaIssues(issues);
     const failedNames=new Set(issues.map(issue=>fileNameKey(issue.name)));
     return assets.filter(asset=>!failedNames.has(fileNameKey(asset.name)));
@@ -138,6 +153,8 @@ export default function AdminDashboard({identity,onLogout,onRestored}:{identity:
   const noCommonGame=previewGames.some(games=>games.length===0);
   const students=data?.students.filter(student=>student.classId===selectedId&&`${student.name} ${student.username}`.toLocaleLowerCase('vi').includes(query.toLocaleLowerCase('vi')))??[];
   function invalidate(){setPreview(null);setWeekCheck(null);}
+  /** The weeks list is paged; an export of the whole class reads every page in order. */
+  async function allClassWeekIds(id:string):Promise<string[]>{const ids:string[]=[];for(let offset:number|null=0;offset!==null;){const page=await onlineApi.adminSummary({classId:id,section:'weeks',offset});ids.push(...page.weeks.filter(week=>week.classId===id).sort((a,b)=>a.position-b.position).map(week=>week.id));offset=page.page.nextOffset;}return ids;}
   function resetDocument(){parsedDocument.current=null;checkedMedia.current=new WeakMap();setPreview(null);setWeekCheck(null);setSelectedWeek(null);setTargetSubjects('3');setDocumentFile(null);setPendingMedia([]);setMediaIssues([]);setWeekTitle(weekChoices[0]);setSubjectLabel('');setSourceId('');setVersion('1');setReplaceWeekId('');if(fileInput.current)fileInput.current.value='';}
   async function reviseWeek(id:string){const week=await onlineApi.adminWeek(id);
     const versions=new Set(week.sets.map(set=>set.pack.version));if(versions.size!==1)throw new Error('Bộ tuần này có các phiên bản khác nhau. Hãy giữ bản đã giao và tạo học liệu tuần mới.');
@@ -155,7 +172,7 @@ export default function AdminDashboard({identity,onLogout,onRestored}:{identity:
       {!data?<p className="online-loading" role="status">Đang tải lớp học…</p>:<>
         <div className="online-stats"><div><strong>{data.stats.classes}</strong><span>Lớp học</span></div><div><strong>{data.stats.students}</strong><span>Học sinh</span></div><div><strong>{data.stats.questions}</strong><span>Câu hỏi lưu trữ</span></div><div><strong>{data.stats.pendingRequests}</strong><span>Ước muốn cần xử lý</span></div></div>
         <section className="online-class-bar"><label>Lớp đang quản lý<select value={selectedId} disabled={busy||!data.classes.length} onChange={event=>{setClassId(event.target.value);resetDocument();}}>{!data.classes.length&&<option value="">Chưa có lớp học</option>}{data.classes.map(row=><option key={row.id} value={row.id}>{row.name} · Khối {row.grade}</option>)}</select></label><details><summary>+ Tạo lớp học</summary><form className="online-form online-inline-form" onSubmit={event=>{event.preventDefault();void run(async()=>{const row=await onlineApi.createClass({name:className.trim(),grade:Number(grade)});setClassId(row.id);setClassName('');invalidate();return `Đã tạo lớp ${row.name}.`;});}}><label>Tên lớp<input required maxLength={100} value={className} onChange={event=>setClassName(event.target.value)} disabled={busy}/></label><label>Khối<input type="number" required min="1" max="12" step="1" value={grade} onChange={event=>setGrade(event.target.value)} disabled={busy}/></label><button className="online-primary" disabled={busy||!className.trim()}>Tạo lớp</button></form></details></section>
-        <nav className="online-tabs" aria-label="Công việc quản trị"><button disabled={busy} aria-current={tab==='students'?'page':undefined} onClick={()=>setTab('students')}>Học sinh</button><button disabled={busy} aria-current={tab==='weeks'?'page':undefined} onClick={()=>setTab('weeks')}>Học liệu tuần</button><button disabled={busy} aria-current={tab==='wallet'?'page':undefined} onClick={()=>setTab('wallet')}>Đổi sao & lịch sử{data.stats.pendingRequests?` (${data.stats.pendingRequests})`:''}</button><button disabled={busy} aria-current={tab==='recovery'?'page':undefined} onClick={()=>setTab('recovery')}>Sao lưu & khôi phục</button></nav>
+        <nav className="online-tabs" aria-label="Công việc quản trị"><button disabled={busy} aria-current={tab==='students'?'page':undefined} onClick={()=>setTab('students')}>Học sinh</button><button disabled={busy} aria-current={tab==='weeks'?'page':undefined} onClick={()=>setTab('weeks')}>Học liệu tuần</button><button disabled={busy} aria-current={tab==='gifts'?'page':undefined} onClick={()=>setTab('gifts')}>Kệ quà</button><button disabled={busy} aria-current={tab==='wallet'?'page':undefined} onClick={()=>setTab('wallet')}>Đổi sao & lịch sử{data.stats.pendingRequests?` (${data.stats.pendingRequests})`:''}</button><button disabled={busy} aria-current={tab==='recovery'?'page':undefined} onClick={()=>setTab('recovery')}>Sao lưu & khôi phục</button></nav>
         {tab!=='recovery'&&<div className="online-actions" role="group" aria-label="Phân trang quản trị"><span>{loading?'Đang tải…':`${data.page.total} mục · trang ${Math.floor(data.page.offset/20)+1}`}</span><button disabled={busy||loading||offset===0} onClick={()=>setOffset(Math.max(0,offset-20))}>Trang trước</button><button disabled={busy||loading||data.page.nextOffset===null} onClick={()=>setOffset(data.page.nextOffset!)}>Trang sau</button></div>}
         {tab==='recovery'&&<OnlineRecoveryPanel onRestored={onRestored}/>}
         {tab==='students'&&<div className="online-two-column"><section className="online-card"><h2>Thêm học sinh</h2><p>{selectedClass?`Cấp tài khoản riêng trong lớp ${selectedClass.name}.`:'Tạo lớp trước khi thêm học sinh.'}</p><form className="online-form" onSubmit={event=>{event.preventDefault();void run(async()=>{const result=await onlineApi.createStudent({name:studentName.trim(),classId:selectedId,username:username.trim(),...(password?{password}:{})});setCredentials({name:result.student.name,...result.credentials});setStudentName('');setUsername('');setPassword('');return `Đã tạo tài khoản cho ${result.student.name}.`;});}}><fieldset disabled={busy||!selectedId}><label>Họ tên học sinh<input required maxLength={100} autoComplete="off" value={studentName} onChange={event=>setStudentName(event.target.value)}/></label><label>Tên đăng nhập<input required maxLength={60} autoComplete="off" autoCapitalize="none" spellCheck={false} value={username} onChange={event=>setUsername(event.target.value)}/></label><label>Mật khẩu ban đầu (có thể để trống)<input type="password" minLength={10} maxLength={128} autoComplete="new-password" value={password} onChange={event=>setPassword(event.target.value)}/></label><p className="online-muted">Để trống để máy chủ tạo mật khẩu ngẫu nhiên. Tài khoản thuộc riêng học sinh và dùng được trên các thiết bị.</p><button className="online-primary" disabled={!studentName.trim()||!username.trim()}>Cấp tài khoản</button></fieldset></form></section>
@@ -186,7 +203,7 @@ export default function AdminDashboard({identity,onLogout,onRestored}:{identity:
             const result=await source.inspect(assets,{weekTitle});
             const checked={...result,sets:result.sets.map(set=>({...set,subjectId:oldWeek?.plan?.assignments[set.pack.id]??weeklySubjectId(set.subjectLabel)})),classId:selectedClass.id,requestId:newId(),...(replaceWeekId?{replaceWeekId}:{})};
             const check=await onlineApi.adminWeekCheck({classId:checked.classId,title:checked.title,sets:checked.sets,...(replaceWeekId?{replaceWeekId}:{})},signal);signal.throwIfAborted();setWeekCheck(check);setPreview(checked);
-            return `Đã kiểm tra ${result.totalQuestions} câu: ${result.acceptedQuestions} câu hợp lệ, ${result.issues.length} câu không được tải lên. Duyệt câu hỏi trước khi giao cho lớp.`;
+            return `Đã kiểm tra ${result.totalQuestions} câu: ${result.acceptedQuestions} câu hợp lệ, ${result.issues.length} câu không được tải lên. Duyệt câu hỏi trước khi giao cho lớp.${optimizationNote.current}`;
           },false);}}><fieldset disabled={busy||loading||!selectedClass}><h3>Chọn tuần và bộ học liệu</h3>
             <label>Tuần học<select aria-label="Tuần học" value={weekTitle} disabled={!!replaceWeekId} onChange={event=>{setWeekTitle(event.target.value);invalidate();}}>{!weekChoices.includes(weekTitle)&&<option value={weekTitle}>{weekTitle}</option>}{weekChoices.map(title=><option key={title} value={title}>{title}</option>)}</select></label>
             {(!replaceWeekId||selectedWeek?.plan)&&<label>Số môn trong tuần<select aria-label="Số môn trong tuần" value={targetSubjects} disabled={!!replaceWeekId} onChange={event=>setTargetSubjects(event.target.value)}><option value="3">3 môn · tối đa 36 câu</option><option value="4">4 môn · tối đa 48 câu</option></select></label>}
@@ -194,6 +211,7 @@ export default function AdminDashboard({identity,onLogout,onRestored}:{identity:
             <p className="online-muted">Bộ câu hỏi sẽ được giao vào tuần đã chọn ở trên. Tên môn và nội dung lấy từ tài liệu.</p>
             <label>Bộ câu hỏi, hình ảnh và âm thanh<input ref={fileInput} type="file" multiple accept=".docx,.xlsx,.png,.jpg,.jpeg,.webp,.mp3,.wav,.ogg" onChange={event=>{selectImportFiles(event.target.files);event.target.value='';}}/></label>
             <p className="online-muted">Chọn cùng lúc một file Word / Excel và các hình, âm thanh đi kèm bằng Ctrl hoặc Shift. Tối đa 100 tệp tư liệu, tổng 32 MB cho toàn bộ lựa chọn kể cả tệp thêm sau. Nếu nằm ở thư mục khác, chọn file câu hỏi trước rồi chọn thêm tư liệu bằng cùng nút này.</p>
+            <label className="online-checkbox"><input type="checkbox" checked={optimizeImages} onChange={event=>{setOptimizeImages(event.target.checked);checkedMedia.current=new WeakMap();invalidate();}}/> Tự thu nhỏ ảnh lớn trước khi tải lên (cạnh dài tối đa 1024 điểm ảnh, định dạng WebP) để học sinh mở câu nhanh hơn. Ảnh đã có tên trong thư viện được giữ nguyên.</label>
             {documentFile&&<p className="online-import-filename">File câu hỏi: <strong>{documentFile.name}</strong></p>}
             {!!pendingMedia.length&&<details open><summary>{pendingMedia.length} hình / âm thanh đã chọn</summary><ul className="online-list online-media-list">{pendingMedia.map((file,index)=><li key={file.name+index}><span>{file.name} · {(file.size/1024).toFixed(0)} KB</span><button type="button" onClick={()=>{setPendingMedia(previous=>previous.filter((_,i)=>i!==index));setMediaIssues([]);invalidate();}} aria-label={`Bỏ tệp ${file.name}`}>Bỏ</button></li>)}</ul></details>}
             <p className="online-muted">Word / Excel tối đa 1 MB. Mỗi hình / âm thanh tối đa {getOnlineMediaMaxBytes()/1024/1024} MB. Trong tài liệu, điền đúng tên tệp, mô tả hình và bản chép lời âm thanh. Câu thuần văn bản không cần tư liệu.</p>
@@ -224,8 +242,97 @@ export default function AdminDashboard({identity,onLogout,onRestored}:{identity:
             <button className="online-primary" disabled={busy||loading||planErrors.length>0||!preview.acceptedQuestions||noCommonGame||!!existingPreviewWeek||!!sourceConflictWeek||!!revisionError||preview.classId!==selectedId} onClick={()=>void run(async()=>{const week=await onlineApi.publishWeek({requestId:preview.requestId,title:preview.title,classId:preview.classId,sets:preview.sets,...(preview.replaceWeekId?{replaceWeekId:preview.replaceWeekId}:{})});const revised=!!preview.replaceWeekId;resetDocument();return (revised?'Đã cập nhật “':'Đã giao “')+week.title+'” cho lớp.';})}>{busy?'Đang lưu…':existingPreviewWeek?'Bộ này đã được giao':sourceConflictWeek?'Chọn cập nhật tuần đã giao':preview.replaceWeekId?'Xác nhận cập nhật tuần học':`Giao ${preview.acceptedQuestions} câu hợp lệ cho lớp`}</button>
           </section>}
           <details className="online-media-manager"><summary>Thư viện hình ảnh và âm thanh</summary><p className="online-muted">Có thể dùng lại bằng tên tệp; kiểm tra tài liệu tra cứu đủ tệp được tham chiếu kể cả ngoài trang đang xem.</p><button disabled={busy} onClick={()=>void run(async()=>{setLibrary(await onlineApi.adminMedia());return 'Đã tải trang thư viện.';},false)}>Xem thư viện</button>{library&&<><ul className="online-list online-media-list">{library.assets.map(asset=><li key={asset.id}><strong>{asset.name}</strong><span>{asset.kind==='image'?'Hình ảnh':'Âm thanh'} · {(asset.size/1024).toFixed(0)} KB</span></li>)}</ul><div className="online-actions"><span>{library.page.total} tệp</span><button disabled={busy||library.page.offset===0} onClick={()=>void run(async()=>{setLibrary(await onlineApi.adminMedia(Math.max(0,library.page.offset-20)));return 'Đã chuyển trang thư viện.';},false)}>Tư liệu trước</button><button disabled={busy||library.page.nextOffset===null} onClick={()=>void run(async()=>{setLibrary(await onlineApi.adminMedia(library.page.nextOffset!));return 'Đã chuyển trang thư viện.';},false)}>Tư liệu sau</button></div></>}</details>
-          </section><section className="online-card"><h2>Hành trình đã giao</h2><p>{selectedClass?.name??'Chọn lớp để xem học liệu'}</p>{data.weeks.filter(week=>week.classId===selectedId).length?<ol className="online-list online-week-list">{data.weeks.filter(week=>week.classId===selectedId).sort((a,b)=>a.position-b.position).map(week=><li key={week.id}><strong>{week.title}</strong><small>Đã giao {onlineTime(week.createdAt)} · {week.plan?`${week.plan.subjects.length} môn · tối đa 12 câu/môn`:'Cấu hình cũ'}</small>{!!week.closedStudents&&<p className="online-notice">{week.closedStudents} học sinh đã đóng tuần. Nội dung câu hỏi đã học được bảo vệ.</p>}<ul>{week.sets.map(set=><li key={set.pack.id+'@'+set.pack.version}><strong>{set.subjectLabel}</strong><span>{set.pack.title} · {set.pack.itemCount} câu · v{set.pack.version}</span>{selectedWeek?.id===week.id&&selectedWeek.sets.filter(detail=>detail.pack.id===set.pack.id).map(detail=><OnlineQuestionDisclosure key={detail.pack.id} pack={detail.pack} label="Xem câu hỏi đã giao"/>)}</li>)}</ul><div className="online-actions"><button disabled={busy||loading} onClick={()=>void run(async()=>{setSelectedWeek(await onlineApi.adminWeek(week.id));return 'Đã tải chi tiết một tuần.';},false)}>Xem chi tiết tuần</button><button disabled={busy||loading} onClick={()=>void run(async()=>reviseWeek(week.id),false)}>Cập nhật tuần này</button></div></li>)}</ol>:<p>Chưa có tuần học nào. Tải mẫu Excel và soạn nội dung của bạn để bắt đầu.</p>}</section></div>}
+          </section><section className="online-card"><h2>Hành trình đã giao</h2><p>{selectedClass?.name??'Chọn lớp để xem học liệu'}</p>{selectedClass&&data.weeks.some(week=>week.classId===selectedId)&&<div className="online-actions online-export-actions"><button disabled={busy||loading} onClick={()=>void run(async()=>{const ids=(await allClassWeekIds(selectedId));return (await import('../core/question-export-download')).downloadClassExport(selectedClass.name,ids,{onProgress:setUploadProgress});},false)}>Xuất mọi tuần của lớp (.zip)</button><button disabled={busy||loading} onClick={()=>void run(async()=>{const ids=(await allClassWeekIds(selectedId));return (await import('../core/question-export-download')).downloadClassExport(selectedClass.name,ids,{withMedia:true,onProgress:setUploadProgress});},false)}>Xuất mọi tuần kèm hình, âm thanh</button></div>}{uploadProgress&&busy&&<p className="online-muted" role="status">{uploadProgress}</p>}{data.weeks.filter(week=>week.classId===selectedId).length?<ol className="online-list online-week-list">{data.weeks.filter(week=>week.classId===selectedId).sort((a,b)=>a.position-b.position).map(week=><li key={week.id}><strong>{week.title}</strong><small>Đã giao {onlineTime(week.createdAt)} · {week.plan?`${week.plan.subjects.length} môn · tối đa 12 câu/môn`:'Cấu hình cũ'}</small>{!!week.closedStudents&&<p className="online-notice">{week.closedStudents} học sinh đã đóng tuần. Nội dung câu hỏi đã học được bảo vệ.</p>}<ul>{week.sets.map(set=><li key={set.pack.id+'@'+set.pack.version}><strong>{set.subjectLabel}</strong><span>{set.pack.title} · {set.pack.itemCount} câu · v{set.pack.version}</span>{selectedWeek?.id===week.id&&selectedWeek.sets.filter(detail=>detail.pack.id===set.pack.id).map(detail=><OnlineQuestionDisclosure key={detail.pack.id} pack={detail.pack} label="Xem câu hỏi đã giao"/>)}</li>)}</ul><div className="online-actions"><button disabled={busy||loading} onClick={()=>void run(async()=>{setSelectedWeek(await onlineApi.adminWeek(week.id));return 'Đã tải chi tiết một tuần.';},false)}>Xem chi tiết tuần</button><button disabled={busy||loading} onClick={()=>void run(async()=>reviseWeek(week.id),false)}>Cập nhật tuần này</button><button disabled={busy||loading} onClick={()=>void run(async()=>(await import('../core/question-export-download')).downloadWeekExport(week.id,{onProgress:setUploadProgress}),false)}>Xuất câu hỏi & đáp án (.xlsx)</button><button disabled={busy||loading} onClick={()=>void run(async()=>(await import('../core/question-export-download')).downloadWeekExport(week.id,{withMedia:true,onProgress:setUploadProgress}),false)}>Xuất kèm hình, âm thanh (.zip)</button></div></li>)}</ol>:<p>Chưa có tuần học nào. Tải mẫu Excel và soạn nội dung của bạn để bắt đầu.</p>}</section></div>}
         {tab==='wallet'&&<div className="online-two-column"><section className="online-card"><h2>Cấu hình đổi sao</h2><p>Áp dụng cho toàn bộ lớp trong không gian này. Yêu cầu đã gửi giữ nguyên tỷ lệ lúc gửi.</p><form className="online-form" onSubmit={event=>{event.preventDefault();void run(async()=>{await onlineApi.configureWallet({enabled:walletEnabled,rateVnd:Number(rate)});return 'Đã lưu cấu hình đổi sao.';});}}><fieldset disabled={busy}><label className="online-checkbox"><input type="checkbox" checked={walletEnabled} onChange={event=>setWalletEnabled(event.target.checked)}/> Cho phép học sinh gửi ước muốn đổi sao</label><label>Giá trị 1 sao (đồng)<input type="number" required min="1" max="1000000" step="1" value={rate} onChange={event=>setRate(event.target.value)}/></label><button className="online-primary">Lưu tỷ lệ</button></fieldset></form><p className="online-muted">Sao được giữ khi gửi yêu cầu; trả lại khi hủy hoặc từ chối. Xác nhận “Đã trao” sau khi người lớn đã trao tiền / quà thực tế.</p></section><section className="online-card"><h2>Yêu cầu & lịch sử đổi sao</h2><p>Hiển thị mọi lớp để bạn xử lý yêu cầu tại một nơi.</p>{data.redemptions.length?<ul className="online-list">{[...data.redemptions].sort((a,b)=>b.requestedAt.localeCompare(a.requestedAt)).map(request=>{const status=rewardStatus(request);return <li key={request.requestId}><div className="online-section-head"><strong>{request.studentName} · {request.title}</strong><span className="online-badge">{onlineRewardStatus[status]}</span></div><span>{data.classes.find(row=>row.id===request.classId)?.name??'Lớp học'} · {request.stars} sao × {onlineMoney(request.rateVnd)} = {onlineMoney(request.amountVnd)}</span><small>Gửi {onlineTime(request.requestedAt)} · Mục tiêu {onlineMoney(request.goalVnd)}</small>{request.history.slice(1).map((entry,index)=><small key={index}>{onlineRewardStatus[entry.status]} · {onlineTime(entry.at)}{entry.note?` · ${entry.note}`:''}</small>)}{(status==='pending'||status==='approved')&&<><label>Ghi chú cho {request.studentName}<input maxLength={300} value={notes[request.requestId]??''} onChange={event=>setNotes(previous=>({...previous,[request.requestId]:event.target.value}))} disabled={busy}/></label><div className="online-actions">{status==='pending'?<><button className="online-primary" disabled={busy} onClick={()=>void transition(request,'approved')}>Duyệt yêu cầu</button><button disabled={busy} onClick={()=>void transition(request,'rejected')}>Từ chối & trả sao</button></>:<button className="online-primary" disabled={busy} onClick={()=>void transition(request,'fulfilled')}>Xác nhận đã trao tiền / quà</button>}</div></>}</li>;})}</ul>:<p>Chưa có yêu cầu đổi sao.</p>}</section></div>}
+        {tab==='gifts'&&<div className="online-two-column">
+          <section className="online-card">
+            <h2>{editingGiftId?'Sửa món quà':'Thêm món quà lên Kệ'}</h2>
+            <p>Học sinh dùng sao đạt được từ các bài học để ghim mục tiêu và đổi quà.</p>
+            <form className="online-form" onSubmit={event=>{event.preventDefault();void run(async()=>{
+              const payload: Partial<GiftItem> = {
+                title: giftTitle.trim(),
+                priceStars: Number(giftPrice),
+                kind: giftKind,
+                stock: giftStock.trim() ? Number(giftStock) : null,
+                weeklyLimit: giftWeeklyLimit.trim() ? Number(giftWeeklyLimit) : null,
+                unlockAfterWeek: Number(giftUnlockAfterWeek) || 0,
+                classId: giftClassId || null,
+                imageMediaId: giftImageMediaId || null,
+                active: giftActive,
+              };
+              if (editingGiftId) {
+                await onlineApi.updateGift(editingGiftId, payload);
+                resetGiftForm();
+                await loadGifts();
+                return 'Đã cập nhật món quà.';
+              } else {
+                await onlineApi.createGift(payload);
+                resetGiftForm();
+                await loadGifts();
+                return 'Đã thêm món quà mới lên Kệ.';
+              }
+            });}}>
+              <fieldset disabled={busy}>
+                <label>Tên món quà<input required maxLength={120} value={giftTitle} onChange={e=>setGiftTitle(e.target.value)}/></label>
+                <label>Giá đổi (sao)<input type="number" required min="1" max="100000" step="1" value={giftPrice} onChange={e=>setGiftPrice(e.target.value)}/></label>
+                <label>Phân loại quà
+                  <select value={giftKind} onChange={e=>setGiftKind(e.target.value as GiftKind)}>
+                    <option value="item">Vật phẩm (đồ chơi, dụng cụ học tập…)</option>
+                    <option value="experience">Trải nghiệm (đi chơi, xem phim…)</option>
+                    <option value="privilege">Đặc quyền (chọn món ăn, thêm giờ chơi…)</option>
+                    <option value="saving">Heo đất tiết kiệm (quy đổi tiền)</option>
+                  </select>
+                </label>
+                <label>Số lượng trong kho (bỏ trống nếu không giới hạn)<input type="number" min="0" max="100000" step="1" placeholder="Không giới hạn" value={giftStock} onChange={e=>setGiftStock(e.target.value)}/></label>
+                <label>Giới hạn đổi mỗi tuần (bỏ trống nếu không giới hạn)<input type="number" min="1" max="1000" step="1" placeholder="Không giới hạn" value={giftWeeklyLimit} onChange={e=>setGiftWeeklyLimit(e.target.value)}/></label>
+                <label>Mở khóa sau tuần thứ<input type="number" min="0" max="100" step="1" value={giftUnlockAfterWeek} onChange={e=>setGiftUnlockAfterWeek(e.target.value)}/></label>
+                <label>Dành riêng cho lớp
+                  <select value={giftClassId} onChange={e=>setGiftClassId(e.target.value)}>
+                    <option value="">Tất cả các lớp trong trường</option>
+                    {data.classes.map(row=><option key={row.id} value={row.id}>{row.name}</option>)}
+                  </select>
+                </label>
+                <label>Hình ảnh món quà
+                  <input type="file" accept="image/*" disabled={giftUploading} onChange={e=>void handleUploadGiftImage(e.target.files)}/>
+                </label>
+                {giftImageMediaId&&<p className="online-notice">Ảnh đã chọn: <code>{giftImageMediaId}</code></p>}
+                <label className="online-checkbox">
+                  <input type="checkbox" checked={giftActive} onChange={e=>setGiftActive(e.target.checked)}/> Hiển thị trên Kệ quà của học sinh
+                </label>
+                <div className="online-actions">
+                  <button className="online-primary" disabled={busy||!giftTitle.trim()||Number(giftPrice)<1}>
+                    {editingGiftId?'Cập nhật món quà':'Thêm món quà'}
+                  </button>
+                  {editingGiftId&&<button type="button" onClick={resetGiftForm}>Hủy sửa</button>}
+                </div>
+              </fieldset>
+            </form>
+          </section>
+          <section className="online-card">
+            <div className="online-section-head">
+              <h2>Kệ quà tặng ({gifts.length})</h2>
+              <button disabled={busy} onClick={()=>void loadGifts()}>Làm mới</button>
+            </div>
+            {gifts.length?<ul className="online-list">
+              {gifts.map(gift=><li key={gift.id}>
+                <div className="online-section-head">
+                  <strong>{gift.title}</strong>
+                  <span className={`online-badge ${gift.active?'':'is-muted'}`}>{gift.active?'Đang hiển thị':'Đã ẩn'}</span>
+                </div>
+                <span>⭐ {gift.priceStars} sao · {gift.kind==='item'?'Vật phẩm':gift.kind==='experience'?'Trải nghiệm':gift.kind==='privilege'?'Đặc quyền':'Tiết kiệm'} · {gift.stock!==null?`Kho: ${gift.stock}`:'Kho: ∞'}</span>
+                <small>{gift.weeklyLimit?`Tối đa ${gift.weeklyLimit} lần/tuần`:''} {gift.unlockAfterWeek?`· Sau tuần ${gift.unlockAfterWeek}`:''} {gift.classId?`· Lớp: ${data.classes.find(c=>c.id===gift.classId)?.name??gift.classId}`:'· Mọi lớp'}</small>
+                <div className="online-actions">
+                  <button disabled={busy} onClick={()=>editGift(gift)}>Sửa quà</button>
+                  <button disabled={busy} onClick={()=>void run(async()=>{
+                    await onlineApi.updateGift(gift.id,{active:!gift.active});
+                    await loadGifts();
+                    return gift.active?'Đã ẩn món quà.':'Đã kích hoạt món quà.';
+                  })}>{gift.active?'Ẩn khỏi kệ':'Hiện trên kệ'}</button>
+                </div>
+              </li>)}
+            </ul>:<p>Chưa có món quà nào trên kệ. Hãy tạo món quà đầu tiên!</p>}
+          </section>
+        </div>}
       </>}
     </main><footer className="online-footer">Bảo An Learning · Dữ liệu được lưu trên máy chủ của bạn</footer>
   </div>;

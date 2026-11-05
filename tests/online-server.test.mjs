@@ -131,7 +131,9 @@ async function provisionManager(f,username='second-manager'){
 }
 async function mediaBytes(client,id,{range,method='GET'}={}){
   const response=await fetch(`${client.origin}${apiPrefix}/media/${id}`,{method,headers:{...(client.cookie?{Cookie:client.cookie}:{}),...(range?{Range:range}:{})}});
-  assert.match(response.headers.get('cache-control')??'',/no-store/i);
+  // Images are write-once and may live in the viewer's private cache; audio and errors never are.
+  if(response.ok&&/^image\//.test(response.headers.get('content-type')??''))assert.equal(response.headers.get('cache-control'),'private, max-age=31536000, immutable');
+  else assert.match(response.headers.get('cache-control')??'',/no-store/i);
   return{status:response.status,headers:response.headers,bytes:Buffer.from(await response.arrayBuffer())};
 }
 function slowPost(f,client,route,body){
@@ -451,6 +453,21 @@ test('online authenticated chunked mutations cannot outlive reset or suspension 
   });
 });
 
+test('online login cleanup is bounded and preserves active counters',async t=>{
+  const f=await fixture(t);await f.bootstrap();
+  const db=f.database(),expired=Date.now()-1000,activeUntil=Date.now()+900000;
+  for(let i=0;i<205;i++)db.prepare('INSERT INTO login_limits VALUES(?,?,?)').run(`expired-${i}`,1,expired);
+  const activeKey=createHash('sha256').update('user:limited-user').digest('hex');
+  db.prepare('INSERT INTO login_limits VALUES(?,?,?)').run(activeKey,12,activeUntil);
+  const client=f.client(),input={method:'POST',body:{username:'missing-user',password:'Invalid-test-password!'}};
+  await client.denied('/login',input,[401]);
+  assert.equal(db.prepare('SELECT count(*) AS n FROM login_limits WHERE reset_at<=?').get(expired).n,105);
+  assert.equal(db.prepare('SELECT count FROM login_limits WHERE key=?').get(activeKey).count,12);
+  await client.denied('/login',{method:'POST',body:{username:'limited-user',password:'Invalid-test-password!'}},[429]);
+  await client.denied('/login',input,[401]);await client.denied('/login',input,[401]);
+  assert.equal(db.prepare('SELECT count(*) AS n FROM login_limits WHERE reset_at<=?').get(expired).n,0);
+});
+
 test('online repeated failed logins are limited by normalized account and remain limited after restart',async t=>{
   const f=await fixture(t);await f.bootstrap();
   const client=f.client();
@@ -493,6 +510,8 @@ test('online image and audio uploads verify type, enforce assignment ownership a
   await publish(manager,classroom.id,{sets:[{subjectLabel:'Tự nhiên có minh họa',pack}]});
   const whole=await mediaBytes(learner,image.id);
   assert.equal(whole.status,200);assert.equal(whole.headers.get('content-type'),'image/png');assert.deepEqual(whole.bytes,imageBytes);
+  const etag=whole.headers.get('etag');assert.equal(etag,`"${image.sha256}"`);
+  const revalidated=await fetch(`${learner.origin}${apiPrefix}/media/${image.id}`,{headers:{Cookie:learner.cookie,'If-None-Match':etag}});assert.equal(revalidated.status,304);assert.equal((await revalidated.arrayBuffer()).byteLength,0);
   const range=await mediaBytes(learner,audio.id,{range:'bytes=0-15'});
   assert.equal(range.status,206);assert.equal(range.headers.get('content-range'),`bytes 0-15/${audioBytes.length}`);
   assert.equal(range.headers.get('accept-ranges'),'bytes');assert.deepEqual(range.bytes,audioBytes.subarray(0,16));

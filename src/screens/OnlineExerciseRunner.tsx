@@ -1,7 +1,8 @@
+import '../styles/game-base.css';
 import {useRef,useState} from 'react';
 import type {AttemptInput,AttemptFeedback,GameHostProps,GameResponse,StudentLearningPack,RichLearningItem} from '../core/contracts';
 import {normalizedNumber,normalizedWord} from '../core/rich-content';
-import QuestionMedia from '../components/QuestionMedia';
+import QuestionMedia,{useNextQuestionImage} from '../components/QuestionMedia';
 import GameCompletion from '../games/GameCompletion';
 import {useQuestionLayout} from '../games/useQuestionLayout';
 import {questionClockText,useQuestionClock} from '../games/useQuestionClock';
@@ -23,6 +24,7 @@ export default function OnlineExerciseRunner({pack,onAttempt,onComplete,onExit,q
   const sourceItem=content.items[index],listening=sourceItem.kind==='listening-choice'||sourceItem.kind==='listening-gap';
   const [imageReadyQuestion,setImageReadyQuestion]=useState<string|null>(null);
   const imageReady=!sourceItem.media?.imageId||imageReadyQuestion===sourceItem.id;
+  useNextQuestionImage(content.items[index+1]?.media,feedback===true);
   const clock=useQuestionClock({enabled:questionMode,itemId:sourceItem.id,canOpen:imageReady&&(!listening||played),finished:feedback===true||done,onQuestionOpen,requireItem:serverScored});
   const item=clock.item&&clock.item.kind!=='multiple-choice'?clock.item:sourceItem;
   const correctIndex=serverScored?feedbackDetail?.correctIndex:'correctIndex'in item?item.correctIndex:undefined;

@@ -1,138 +1,126 @@
-import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
-import type { ModuleId } from '../core/contracts';
-import type {OnlinePackSummary} from '../core/online-contracts';
-import { GAME_REGISTRY } from '../core/registry';
-import type { SceneInfo } from '../world3d/WorldCanvas';
-import AsyncBoundary from '../components/AsyncBoundary';
-import type { WorldId } from '../world3d/engine';
-import { getSceneForModule } from '../world3d/scenes/sceneCatalog';
-import type { GuideMood, QualityChoice } from '../world3d/renderer/types';
-import { playClickSound, playIslandSelectSound } from '../core/sound';
+import {useEffect,useState} from 'react';
+import type {ModuleId} from '../core/contracts';
+import type {OnlinePackSummary,OnlineStudentSummary,OnlineSummarySet} from '../core/online-contracts';
 import '../styles/student-assigned-games.css';
 
-const WorldCanvas=lazy(()=>import('../world3d/WorldCanvas'));
-const displayKey='bao-an-display-mode-v1';
-type DisplayMode='light'|'3d';
-function initialDisplayMode():DisplayMode {
-  try{return localStorage.getItem(displayKey)==='3d'?'3d':'light';}catch{return 'light';}
+interface Props {
+  studentName:string;
+  availableStars:number;
+  earnedStars:number;
+  sets:OnlineSummarySet[];
+  week:OnlineStudentSummary['currentWeekSummary'];
+  practiceContext:{title:string;detail:string;pack:OnlinePackSummary|null;games:{id:ModuleId;label:string}[];complete:boolean};
+  onPlay:(id:ModuleId,pack:OnlinePackSummary)=>Promise<void>;
+  onChooseGames:(pack:OnlinePackSummary)=>Promise<void>;
+  starting:boolean;
+  onOpenWallet:()=>void;
+  showCardBlock?:boolean;
 }
 
-interface Props {
-  availableStars: number;
-  /** An online host supplies author-labelled content without a fixed subject curriculum. */
-  practiceContext:{title:string;detail:string;pack:OnlinePackSummary|null;games:{id:ModuleId;label:string}[];complete:boolean};
-  onPlay: (id:ModuleId,pack:OnlinePackSummary)=>Promise<void>;
-  starting: boolean;
-  onOpenWallet: () => void;
-  worldActive: boolean;
-  motionOn: boolean;
-  gameWorld: WorldId | null;
-  guideMood: GuideMood;
-  guideCue: number;
-  onSceneChange?: (info: SceneInfo) => void;
-}
-const themes:Record<string,{world:string,symbol:string,short:string,intro:string}>= {
-  'math-quest': {world:'Đảo Toán Học',symbol:'∑',short:'Chọn đáp án',intro:'Vượt từng câu hỏi bằng cách chọn đáp án đúng.'},
-  'memory-match': {world:'Khu Rừng Trí Nhớ',symbol:'◇',short:'Trí nhớ',intro:'Lật thẻ, nhớ vị trí và tìm hai nội dung đi cùng nhau.'},
-  'sentence-builder': {world:'Xưởng Ghép Câu',symbol:'Aa',short:'Ghép câu',intro:'Xếp những từ bị đảo vị trí thành câu hoàn chỉnh.'},
-  'word-connect': {world:'Đảo Nối Từ',symbol:'🔗',short:'Nối từ',intro:'Quan sát hai cột rồi nối câu hỏi với câu trả lời phù hợp.'},
-  'sequence-trail': {world:'Bậc Thang Quy Luật',symbol:'▥',short:'Xếp thứ tự',intro:'Đặt các thẻ theo đúng thứ tự của câu hoặc dãy số.'}
+export const GAME_CARD_IMAGES: Record<string, string> = {
+  'math-quest': '/art/game-cards/game-card-question-island.webp',
+  'memory-match': '/art/game-cards/game-card-memory-grove.webp',
+  'sentence-builder': '/art/game-cards/game-card-sentence-house.webp',
+  'word-connect': '/art/game-cards/game-card-word-bridge.webp',
+  'sequence-trail': '/art/game-cards/game-card-sequence-trail.webp',
+  'balance-scale': '/art/game-cards/game-card-question-island.webp',
+  'basket-sort': '/art/game-cards/game-card-memory-grove.webp',
+  'treasure-flip': '/art/game-cards/game-card-memory-grove.webp',
+  'fox-kitchen': '/art/game-cards/game-card-sequence-trail.webp',
+  'boat-race': '/art/game-cards/game-card-question-island.webp',
 };
-export default function StudentScreen({availableStars,practiceContext,onPlay,starting,onOpenWallet,worldActive,motionOn,gameWorld,guideMood,guideCue,onSceneChange}:Props){
-  const [focused,setFocused]=useState<WorldId|null>(null);
-  const [displayMode,setDisplayMode]=useState<DisplayMode>(initialDisplayMode);
-  const [simpleControls,setSimpleControls]=useState(()=>new URLSearchParams(window.location.search).get('controls')==='1');
-  const [sceneState,setSceneState]=useState<SceneInfo['state']>('loading');
-  const overview = useRef<HTMLDivElement>(null);
-  useEffect(() => { if (gameWorld) setFocused(gameWorld); }, [gameWorld]);
-  const [quality,setQuality]=useState<QualityChoice>('low');
-  const assignedMode=true;
-  const currentPack=practiceContext.pack;
-  const worldName=(worldId:string)=>worldId==='math-quest'?'Đảo Câu Hỏi':themes[worldId].world;
-  const playable=practiceContext.games;
-  const assignedFallback=sceneState!=='ready';
-  const selectIsland = (id: WorldId | null) => {
-    if (id && id !== focused) playIslandSelectSound();
-    setFocused(id);
-  };
-  function changeDisplayMode(mode:DisplayMode){
-    setDisplayMode(mode);setSceneState('loading');
-    try{localStorage.setItem(displayKey,mode);}catch{/* Display preferences are optional. */}
-  }
-  const sceneChanged=useCallback((info:SceneInfo)=>{
-    setSceneState(info.state);onSceneChange?.(info);
-    if(info.state==='fallback'||info.state==='unavailable'){
-      setDisplayMode('light');
-      try{localStorage.setItem(displayKey,'light');}catch{/* A failed scene must still fall back. */}
-    }
-  },[onSceneChange]);
-  function packFor(gameId:ModuleId){return currentPack&&playable.some(game=>game.id===gameId)?currentPack:undefined;}
-  const enterWorld=(id:WorldId)=>{const game=GAME_REGISTRY.find(row=>getSceneForModule(row.id)===id);if(!game||starting)return;const pack=packFor(game.id);if(pack)void onPlay(game.id,pack);};
-  if(displayMode==='light')return <section id="home" className="game-hub student-light-hub" data-hub-mode="light" aria-label="Chọn trò chơi phù hợp">
-    <div className="student-light-heading"><img className="student-light-guide" src="/art/fox-guide-common.webp" alt="Cáo nhỏ đồng hành" width="88" height="112" decoding="async"/><div><p className="online-eyebrow">HÀNH TRÌNH CỦA CON</p><h1>{practiceContext.title}</h1><p>{practiceContext.detail}</p></div><button type="button" className="game-wallet-button" aria-label="Ví đổi sao" onClick={onOpenWallet} disabled={starting}>⭐ {availableStars} sao · Đổi thưởng →</button></div>
-    <section className="assigned-game-fallback student-light-games" aria-label="Trò chơi phù hợp bộ được giao"><strong>{currentPack?'Chọn trò để vào bộ được giao':practiceContext.complete?'Con đã hoàn thành học liệu được giao':'Đang chờ học liệu từ lớp'}</strong>{currentPack&&<p>{currentPack.title} · {currentPack.itemCount} câu</p>}<div>{playable.map(game=><button key={game.id} type="button" disabled={starting} aria-label={`Chơi ${game.label} bằng bộ được giao`} onClick={()=>currentPack&&void onPlay(game.id,currentPack)}><span aria-hidden="true">{themes[game.id].symbol}</span><span><strong>{game.label}</strong><small>{themes[game.id].intro}</small></span><span aria-hidden="true">→</span></button>)}</div>{!currentPack&&<p>{practiceContext.detail}</p>}</section>
-    <div className="student-display-choice"><span>Chế độ nhẹ</span><button type="button" disabled={starting} onClick={()=>changeDisplayMode('3d')}>Khám phá 3D</button></div>
+const themes:Record<ModuleId,{symbol:string;intro:string;action:string}>={
+  'math-quest':{symbol:'?',intro:'Chọn đáp án, vượt từng câu hỏi và góp thêm sao.',action:'Vào đảo câu hỏi'},
+  'memory-match':{symbol:'◇',intro:'Lật thẻ và tìm những cặp nội dung đi cùng nhau.',action:'Khám phá trí nhớ'},
+  'sentence-builder':{symbol:'Aa',intro:'Ghép từng từ để tạo thành một câu hoàn chỉnh.',action:'Bắt đầu ghép câu'},
+  'word-connect':{symbol:'↔',intro:'Tìm hai nội dung phù hợp rồi nối chúng với nhau.',action:'Nối đôi khám phá'},
+  'sequence-trail':{symbol:'123',intro:'Tìm quy luật và đưa các thẻ về đúng thứ tự.',action:'Chinh phục thứ tự'},
+  'balance-scale':{symbol:'⚖',intro:'So sánh hai vế toán học bằng chiếc cân đĩa kỳ diệu.',action:'Cân thăng bằng'},
+  'basket-sort':{symbol:'🧺',intro:'Phân loại và gom các thẻ kiến thức vào đúng từng giỏ.',action:'Xếp vào giỏ'},
+  'treasure-flip':{symbol:'💎',intro:'Mở rương kho báu vàng óng để ghép đúng cặp thẻ.',action:'Lật kho báu'},
+  'fox-kitchen':{symbol:'🍲',intro:'Cùng Cáo xếp nguyên liệu vào nồi súp theo đúng quy luật.',action:'Vào bếp nấu súp'},
+  'boat-race':{symbol:'⛵',intro:'Trả lời nhanh và chính xác để đưa thuyền rồng về đích.',action:'Đua thuyền lướt sóng'},
+};
+function regionTheme(label:string){
+  const name=label.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+  if(/toan|math/.test(name))return {name:'Đảo Số',symbol:'＋',tone:'mint'};
+  if(/tieng viet|vietnamese|ngu van/.test(name))return {name:'Rừng Chữ',symbol:'Aa',tone:'peach'};
+  if(/tieng anh|english/.test(name))return {name:'Cảng English',symbol:'abc',tone:'blue'};
+  if(/tin hoc|computer|informatics/.test(name))return {name:'Phố Robot',symbol:'⌘',tone:'lilac'};
+  return {name:label,symbol:'✦',tone:'sand'};
+}
+const packKey=(pack:OnlinePackSummary)=>`${pack.id}@${pack.version}`;
+/** Lightweight HTML map. Progress and compatible games always come from the server. */
+export default function StudentScreen({studentName,availableStars,earnedStars,sets,week,practiceContext,onPlay,onChooseGames,starting,onOpenWallet,showCardBlock=true}:Props){
+  const [selectedKey,setSelectedKey]=useState<string|null>(null);
+  const [knownGames,setKnownGames]=useState<Record<string,Props['practiceContext']['games']>>({});
+  useEffect(()=>setSelectedKey(null),[week?.weekId]);
+  useEffect(()=>{
+    setKnownGames(previous=>{
+      const next={...previous};let changed=false;
+      const remember=(pack:OnlinePackSummary,games:Props['practiceContext']['games'])=>{
+        if(!games.length)return;
+        const key=packKey(pack),old=previous[key];
+        if(old?.length===games.length&&old.every((game,index)=>game.id===games[index].id&&game.label===games[index].label))return;
+        next[key]=games;changed=true;
+      };
+      sets.forEach(set=>remember(set.pack,set.games));
+      if(practiceContext.pack)remember(practiceContext.pack,practiceContext.games);
+      return changed?next:previous;
+    });
+  },[sets,practiceContext.pack,practiceContext.games]);
+  const selected=sets.find(set=>packKey(set.pack)===selectedKey)
+    ??sets.find(set=>practiceContext.pack&&packKey(set.pack)===packKey(practiceContext.pack))??sets[0];
+  const currentPack=selected?.pack??practiceContext.pack;
+  const latestGames=selected?.games.length?selected.games:currentPack&&practiceContext.pack&&packKey(currentPack)===packKey(practiceContext.pack)?practiceContext.games:[];
+  const games=latestGames.length?latestGames:currentPack?knownGames[packKey(currentPack)]??[]:[];
+  const regions=new Map<string,OnlineSummarySet[]>();
+  sets.forEach(set=>regions.set(set.subjectLabel,[...(regions.get(set.subjectLabel)??[]),set]));
+  const completed=week?week.two+week.three:0;
+  return <section id="home" className={`game-hub student-light-hub ${!showCardBlock?'hub-compact':''}`} data-hub-mode="light" aria-label="Chọn trò chơi phù hợp">
+    <div className="student-welcome">
+      <div><p className="online-eyebrow">MỖI NGÀY MỘT CHUYẾN KHÁM PHÁ</p><h1>Chào {studentName} <span aria-hidden="true">✦</span></h1><p>Cùng đi một chút, học một điều hay!</p></div>
+      <nav className="student-quick-nav" aria-label="Góc học tập của con"><a href="#explore-map" aria-current="location">⌖ Khám phá</a><a href="#online-week-journey">Hành trình tuần ↓</a></nav>
+    </div>
+    <div className="student-explorer-layout">
+      <div className="student-explorer-main">
+        {showCardBlock && (
+          <section id="explore-map" className="student-map" aria-labelledby="student-map-title">
+            <div className="student-map-heading"><div><span className="student-kicker">BẢN ĐỒ CỦA CON</span><h2 id="student-map-title">{week?.title??practiceContext.title}</h2></div><span className="student-map-stamp">{regions.size} vùng khám phá</span></div>
+            <p className="student-map-guide">Chạm một địa điểm, chọn trò con thích và bắt đầu nhé.</p>
+            <div className="student-region-grid">{[...regions].map(([label,regionSets])=>{
+              const theme=regionTheme(label),active=regionSets.some(set=>currentPack&&packKey(set.pack)===packKey(currentPack));
+              return <section key={label} className={`student-region region-${theme.tone}${active?' is-selected':''}`} aria-label={`Vùng ${label}`}>
+                <div className="student-region-heading"><span className="student-region-symbol" aria-hidden="true">{theme.symbol}</span><div><span>{label}</span><h3>{theme.name}</h3></div></div>
+                <ol className="student-map-stops">{regionSets.map((set,index)=>{
+                  const chosen=!!currentPack&&packKey(set.pack)===packKey(currentPack),done=set.questionProgress.two+set.questionProgress.three;
+                  return <li key={packKey(set.pack)}><button type="button" className="student-map-stop" aria-pressed={chosen} disabled={starting} aria-label={`Khám phá ${label} · ${set.pack.title}`} onClick={()=>{setSelectedKey(packKey(set.pack));if(!set.games.length&&!knownGames[packKey(set.pack)]?.length)void onChooseGames(set.pack);}}>
+                    <span className={`student-stop-marker${set.done?' is-done':''}`} aria-hidden="true">{set.done?'✓':index+1}</span><span className="student-stop-copy"><strong>{set.pack.title}</strong><small>{done}/{set.questionProgress.total} câu đạt 2 sao</small></span><span aria-hidden="true">{chosen?'●':'→'}</span>
+                  </button></li>;
+                })}</ol>
+              </section>;
+            })}</div>
+            {!regions.size&&<p className="student-map-empty">{practiceContext.detail}</p>}
+            <p className="student-map-note"><span aria-hidden="true">✧</span> Mỗi địa điểm là một bộ câu hỏi thầy cô đã giao cho con.</p>
+          </section>
+        )}
+        <section className="student-light-games" aria-label="Trò chơi phù hợp bộ được giao" aria-busy={starting}>
+          <div className="student-games-heading"><div><span className="student-kicker">CHỌN CÁCH CON MUỐN CHƠI</span><h2 id="student-games-title">{currentPack?currentPack.title:practiceContext.complete?'Thật tuyệt, con đã hoàn thành!':'Chuyến khám phá đang được chuẩn bị'}</h2></div>{currentPack&&<span className="student-question-count">{currentPack.itemCount} câu hỏi</span>}</div>
+          {currentPack&&<p className="student-games-guide">Cùng một bộ câu hỏi, con có thể thử những cách chơi này.</p>}
+          <div className="student-game-grid">{games.map(game=><button key={game.id} type="button" className={`student-game-card game-card-${game.id}`} disabled={starting} aria-label={`Chơi ${game.label} bằng bộ được giao`} onClick={()=>currentPack&&void onPlay(game.id,currentPack)}>
+            {GAME_CARD_IMAGES[game.id]&&<img src={GAME_CARD_IMAGES[game.id]} alt="" className="student-game-thumbnail" aria-hidden="true" loading="lazy"/>}
+            <span className="student-game-symbol" aria-hidden="true">{themes[game.id].symbol}</span><span className="student-game-copy"><strong>{game.label}</strong><span>{themes[game.id].intro}</span><small>{themes[game.id].action} <span aria-hidden="true">→</span></small></span>
+          </button>)}</div>
+          {currentPack&&!games.length&&<button type="button" disabled={starting} onClick={()=>void onChooseGames(currentPack)}>{starting?'Đang tìm trò phù hợp…':'Xem trò chơi của địa điểm này'}</button>}
+          {!currentPack&&<p>{practiceContext.detail}</p>}
+        </section>
+      </div>
+      <aside className="student-travel-bag" aria-label="Hành trang khám phá">
+        <div className="student-buddy"><span className="student-buddy-icon" aria-hidden="true">🦊</span><div><strong>Cáo nhỏ đồng hành</strong><p>Cứ bình tĩnh, mình cùng thử nhé!</p></div></div>
+        <section className="student-week-card" aria-labelledby="student-week-card-title"><span className="student-kicker">TỪNG BƯỚC TIẾN BỘ</span><h2 id="student-week-card-title">Chuyến đi tuần này</h2>{week?<><div className="student-progress-count"><strong>{completed}<span> / {week.total}</span></strong><span>câu đạt yêu cầu</span></div><progress className="student-week-meter" value={completed} max={Math.max(1,week.total)} aria-label="Số câu đạt yêu cầu tuần này"/><p>{week.ready?'Con đã sẵn sàng hoàn thành tuần!':`Thêm ${week.zero+week.one} câu đạt 2 sao nữa nhé.`}</p><a className="student-text-link" href="#online-week-journey">Xem tiến độ từng câu <span aria-hidden="true">→</span></a></>:<p>{practiceContext.detail}</p>}</section>
+        <section className="student-star-card" aria-labelledby="student-star-card-title"><span className="student-star-symbol" aria-hidden="true">★</span><span className="student-kicker">HŨ SAO CỦA CON</span><h2 id="student-star-card-title">{availableStars} <span>sao khả dụng</span></h2><p>{earnedStars} sao đã tích lũy qua các chuyến đi.</p><button type="button" className="game-wallet-button" aria-label="Ví đổi sao" onClick={onOpenWallet} disabled={starting}>Mở ví · {availableStars} sao <span aria-hidden="true">→</span></button></section>
+        <p className="student-gentle-note">Mỗi câu tối đa 3 sao.<br/>Thử lại để tiến bộ từng chút một.</p>
+      </aside>
+    </div>
   </section>;
-  return <div data-hub-mode="3d" className={`ba3d-home premium-world game-hub ${simpleControls?'':'immersive-world'} ${focused ? 'has-focused-island' : 'overview-mode'}`} id="home">
-    <div className="student-display-choice student-display-choice-3d"><span>Khám phá 3D</span><button type="button" disabled={starting} onClick={()=>changeDisplayMode('light')}>Chế độ nhẹ</button></div>
-    <section className="ba3d-world" aria-label="Bảo An Learning: thế giới game 3D tương tác">
-      <div className="game-hub-top">
-        <div className="game-journey-brief"><strong>{practiceContext.title}</strong><span>{practiceContext.detail}</span></div>
-        <button type="button" className="game-wallet-button" aria-label="Ví đổi sao" onClick={onOpenWallet} disabled={starting}><span aria-hidden="true">⭐</span><strong>{availableStars} sao</strong><span>Đổi thưởng →</span></button>
-      </div>
-      {simpleControls&&<nav className="ba3d-island-picker" aria-label="Chọn đảo học tập">
-        {GAME_REGISTRY.map(game => {
-          const theme = themes[game.id];
-          const sceneId = getSceneForModule(game.id);
-          return <button type="button" key={game.id} className="ba3d-island-choice"
-            aria-label={`Chọn ${worldName(game.id)}`} aria-pressed={focused === sceneId} disabled={starting}
-            onClick={() => selectIsland(sceneId)}>
-            <span aria-hidden="true">{theme.symbol}</span><span>{theme.short}</span>
-          </button>;
-        })}
-      </nav>}
-      <div className="game-hub-stage">
-        {!gameWorld&&worldActive&&<AsyncBoundary label="cảnh 3D" onExit={()=>changeDisplayMode('light')}><Suspense fallback={<p className="online-loading" role="status">Đang mở cảnh 3D… Con vẫn có thể chọn trò bên dưới.</p>}><WorldCanvas selected={focused} onSelect={selectIsland} active={worldActive} motionOn={motionOn}
-          quality={quality} gameWorld={gameWorld} guideMood={guideMood} guideCue={guideCue} onSceneChange={sceneChanged}
-          onEnterWorld={enterWorld} onOverview={()=>selectIsland(null)}/></Suspense></AsyncBoundary>}
-        <div ref={overview} tabIndex={-1} role="group" aria-label="Tổng quan các đảo" className="ba3d-island-overview">
-          <span className="ba3d-sr-only" role="status">{focused?`Đã chọn ${worldName(focused)}`:'Chọn một trò ở phía trên hoặc chạm vào một đảo.'}</span>
-          {focused&&<button type="button" className="ba3d-overview-reset" aria-label="Xem tất cả các đảo" onClick={()=>{playClickSound();setFocused(null);overview.current?.focus();}}><span aria-hidden="true">↻</span> Tổng quan</button>}
-        </div>
-        {!simpleControls&&<div className="game-character-hint" role="status" aria-live="polite">
-          {focused&&<><strong>{worldName(focused)}</strong><span>{practiceContext&&focused==='math-quest'?'Đọc đề, xem hình hoặc nghe âm thanh rồi hoàn thành câu hỏi.':themes[focused].intro}</span></>}
-          <span>{assignedMode&&!currentPack?(practiceContext.complete?'Con đã hoàn thành học liệu được giao. Con xem lại hành trình hoặc chờ lớp giao bộ tiếp theo nhé.':'Chưa có bộ ôn được giao. Nhờ người lớn kiểm tra dữ liệu lớp nhé.'):
-            focused&&assignedMode&&!packFor(GAME_REGISTRY.find(game=>getSceneForModule(game.id)===focused)!.id)?`Bộ này chơi được ở: ${playable.map(game=>themes[game.id].short).join(', ')}. Hãy chọn đảo phù hợp nhé.`:
-            focused?'Khi Cáo tới đảo, bấm lại đảo hoặc nhấn Enter để vào chơi.':'Bấm vào một đảo để Cáo dẫn đường.'}</span>
-        </div>}
-        {assignedFallback&&<section className="assigned-game-fallback" aria-label="Trò chơi phù hợp bộ được giao"><strong>{currentPack?'Chọn trò để vào bộ được giao':practiceContext?.complete?'Con đã hoàn thành học liệu được giao':'Đang chờ học liệu từ lớp'}</strong>{currentPack&&<p>{currentPack.title}</p>}{sceneState==='loading'&&<p>Cảnh đang tải. Con có thể vào bài ngay bằng các nút dưới đây.</p>}<div>{playable.map(game=><button key={game.id} type="button" disabled={starting} aria-label={`Chơi ${game.label} bằng bộ được giao`} onClick={()=>currentPack&&void onPlay(game.id,currentPack)}>{themes[game.id].symbol} {game.label} →</button>)}</div>{!currentPack&&<p>{practiceContext?.detail}</p>}</section>}
-      </div>
-      {simpleControls&&<div className="game-hub-bottom">
-        {focused ? <div className="ba3d-anchors" aria-label="Chọn trò chơi 3D">
-          {GAME_REGISTRY.map(game=>{
-            if (focused !== getSceneForModule(game.id)) return null;
-            const options=packFor(game.id)?[packFor(game.id)!]:[];
-            const pack=packFor(game.id);
-            return <article className={`ba3d-island-control ba3d-${game.id} ba3d-selected`} key={game.id} aria-label={`Học liệu ${worldName(game.id)}`}>
-              <label htmlFor={`ba3d-pack-${game.id}`}>Bộ câu hỏi</label>
-              <select id={`ba3d-pack-${game.id}`} aria-label={`Chọn bộ học liệu cho ${game.label}`} value={pack?`${pack.id}@${pack.version}`:''} disabled={!pack||starting}
-                >
-                {!pack&&<option value="">{assignedMode?'Bộ ôn chưa phù hợp đảo này':'Chưa có học liệu'}</option>}
-                {options.map(p=><option key={`${p.id}@${p.version}`} value={`${p.id}@${p.version}`}>{p.title} · {p.itemCount} câu</option>)}
-              </select>
-              <button type="button" className="ba3d-play" disabled={!pack||starting} onClick={()=>pack&&void onPlay(game.id,pack)}>{starting?'Đang mở…':'Bắt đầu'} <span aria-hidden="true">▶</span></button>
-            </article>;
-          })}
-        </div> : <p className="game-hub-prompt">Chọn một trò để bắt đầu nhé!</p>}
-        <div className="game-hub-tools">
-          <label>Hình ảnh <select aria-label="Chất lượng cảnh 3D" value={quality} onChange={event=>setQuality(event.target.value as QualityChoice)}><option value="auto">Tự động</option><option value="low">Nhẹ</option><option value="balanced">Cân bằng</option><option value="high">Cao</option></select></label>
-        </div>
-        <button type="button" className="game-return-character" onClick={()=>setSimpleControls(false)}>← Điều khiển bằng Cáo</button>
-      </div>}
-      {!simpleControls&&<div className="game-character-tools">
-        <details className="game-world-help"><summary>ⓘ Cách chơi</summary><p>Bấm vào đảo muốn khám phá. Khi Cáo đã tới, bấm lại đảo hoặc bấm Cáo để vào trò.</p><p>Bàn phím: bấm vào cảnh, dùng ← → để chọn đảo, Enter để chơi, Esc để về tổng quan. Bộ câu hỏi do giáo viên giao cho lớp.</p><button type="button" onClick={()=>setSimpleControls(true)}>Chọn trò bằng nút</button><label>Hình ảnh <select aria-label="Chất lượng cảnh 3D" value={quality} onChange={event=>setQuality(event.target.value as QualityChoice)}><option value="auto">Tự động</option><option value="low">Nhẹ</option><option value="balanced">Cân bằng</option><option value="high">Cao</option></select></label></details>
-        {(sceneState==='fallback'||sceneState==='unavailable')&&<button className="game-fallback-button" onClick={()=>setSimpleControls(true)}>Mở trò chơi bằng nút</button>}
-      </div>}
-    </section>
-  </div>;
 }

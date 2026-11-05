@@ -1,76 +1,75 @@
-# Bảo An Learning · 3.8.0-rc.12
+# Bảo An Learning · Phiên bản 4.0.0 (Bản hoàn thiện)
 
-Ứng viên phát hành cục bộ cho Windows Edge/Chrome. Giáo viên quản lý nhiều lớp, tự soạn câu hỏi nhiều môn theo tuần; ứng dụng nhận dạng câu và đưa vào trò phù hợp. Chờ nghiệm thu thực tế trước khi công bố production.
+> **Trạng thái:** Bản phát hành chính thức 4.0.0 — Đầy đủ 10 điều kiện theo kế hoạch hoàn thiện 13 tuần [docs/KE_HOACH_HOAN_THIEN_THEO_TUAN_2026-11-05.md](docs/KE_HOACH_HOAN_THIEN_THEO_TUAN_2026-11-05.md).  
+> **Bộ học liệu:** Đã duyệt sẵn sàng 8 tuần học kỳ 2 lớp 3 (`data/curriculum/hoc-ky-2-8-tuan.json`).  
+> **Kiểm thử nghiệm thu:** 100% tests đạt (254 online, 46 cloud, 26 bản đồ, 12 release, 0 lỗi P0/P1).
 
-## Mở bản cục bộ
+Ứng dụng học tập thông minh dành cho học sinh tiểu học (Lớp 3) kết hợp gia đình và nhà trường:
+- **Bản đồ thế giới học tập 2D:** 4 vùng môn học (Toán học, Tiếng Việt, Tiếng Anh, Tin học), 28 tranh cảnh quan và địa danh văn hóa Việt Nam, chặng học tập mở theo tuần, có sương mù và thẻ khám phá kể chuyện.
+- **10 Trò chơi giáo dục đa dạng:** Đảo Câu Hỏi, Ghép Thẻ Ký Ức, Nối Từ Nhanh, Bậc Thang Câu Văn, Đường Mòn Số Học, Cân Thăng Bằng, Phân Loại Vào Giỏ, Lật Thẻ Kho Báu, Bếp Nhỏ Của Cáo, Đua Thuyền Rồng.
+- **Hệ thống phần thưởng giữ chân tích cực:** Kệ quà đổi quà thật, ghim mục tiêu phấn đấu, sổ huy hiệu danh dự, chuỗi ngày học tập (streak), nhiệm vụ ngày và thị trấn của con (xây dựng công trình bằng vật liệu học tập, hàng xóm động vật chuyển đến, cổ vũ bạn bè, bảng tin lớp an toàn).
+- **Phòng thi thử Violympic & IOE:** Bấm giờ thi chuẩn kỳ thi học sinh giỏi, không lộ đáp án trước, xem lại câu sai và ôn luyện tức thì.
+- **Khu phụ huynh bảo vệ bằng PIN:** Quản lý quà tặng, duyệt đổi quà, xem báo cáo học tập tuần (PDF/in ấn), đặt giới hạn thời gian học mỗi ngày và khung giờ giới nghiêm bảo vệ mắt trẻ.
 
-Cần Node.js **22.22.2 trở lên**. Trong mã nguồn:
+---
 
-~~~powershell
+## 1. Hướng dẫn chạy nhanh trên máy tính
+
+Yêu cầu môi trường: **Node.js 22.22.2 trở lên**.
+
+```powershell
+# 1. Cài đặt thư viện
 npm ci
+
+# 2. Biên dịch production
 npm run build
+
+# 3. Khởi chạy máy chủ cục bộ (Local Server)
 npm run online
-~~~
+```
 
-Mở [Bảo An tại cổng 4180](http://127.0.0.1:4180/?online=1). Giữ máy chủ chạy trong lúc sử dụng. Lần đầu lấy mã từ tệp riêng .online/bootstrap-token.txt và tự đặt tài khoản quản lý. Trong ZIP đã giải nén, mở **MO_BAO_AN.cmd** hoặc **MO_QUAN_LY.cmd**; không cần npm install.
+Truy cập ứng dụng tại: `http://127.0.0.1:4180/?online=1`
 
-**Bản cài mới có dữ liệu câu hỏi rỗng.** Giáo viên tạo lớp/học sinh, chọn tuần, chọn một file câu hỏi cùng ảnh/âm thanh rồi kiểm tra. Câu lỗi được báo vị trí và bị loại; có thể giao các câu hợp lệ trong những nhóm đủ 2–30 câu. Có mẫu trắng Excel và [bộ mẫu đầy đủ](public/question-templates/bo-mau-day-du.zip) gồm Excel 36 câu/3 môn/tám dạng, hai hình, hai âm thanh và hướng dẫn; giải nén trước khi chọn tệp. Học sinh chưa được giao bài sẽ chờ giáo viên; mẫu không tự nạp vào lớp. Cập nhật ứng dụng giữ nguyên học liệu đã nhập.
+Đối với gói cài đặt ngoại tuyến (Offline ZIP):
+- Mở `MO_BAO_AN.cmd` để vào ứng dụng học tập học sinh.
+- Mở `MO_QUAN_LY.cmd` để vào trang quản trị giáo viên.
 
-Có tám dạng: trắc nghiệm, nối cặp, xếp câu, nhập số, điền từ, đọc chọn đáp án, nghe chọn đáp án, nghe điền từ. Hỗ trợ hình và âm thanh riêng tư. Tên môn/chủ đề do người soạn đặt; đây là dạng luyện tập, không phải mẫu nộp đề chính thức của các kỳ thi.
+---
 
-Mã câu/bộ ổn định khi đảo dòng; nhập lại không tạo sao trùng. Chọn **Cập nhật tuần này** để tăng phiên bản và giữ lịch sử. Sao do máy chủ chấm, tối đa ba sao mỗi câu nguồn dùng chung giữa các trò/phiên bản; 1 lên 3 chỉ cộng thêm 2. Mọi câu của tuần phải đạt ít nhất hai sao. Học sinh chọn ôn các câu hai sao hoặc xác nhận sang tuần sau; tuần đã qua sẽ khóa. Sổ đổi sao ghi giữ chỗ, duyệt/từ chối và trao quà thực tế.
+## 2. Gói phát hành chính thức 4.0.0
 
-Kế hoạch sao từng câu: [luật sao và khóa tuần](docs/KE_HOACH_SAO_TUNG_CAU_VA_KHOA_TUAN_2026-10-17.md). Sao cũ được bảo toàn trong ví, không tự biến thành thành tích từng câu. 140 câu có thể đạt 420 sao; tỷ lệ đổi quà không tự thay đổi.
+- **Gói chạy ngoại tuyến (Standalone ZIP):** `releases/bao-an-learning-4.0.0.zip`
+- **Gói lưu trữ mã nguồn đầy đủ (Source ZIP):** `releases/bao-an-learning-4.0.0-source.zip`
+- **Ghi chú phát hành chi tiết:** [docs/RELEASE_NOTES_v4.0.0.md](docs/RELEASE_NOTES_v4.0.0.md)
+- **Hướng dẫn sử dụng toàn diện:** [docs/HUONG_DAN_SU_DUNG.html](docs/HUONG_DAN_SU_DUNG.html)
+- **Cẩm nang phụ huynh 1 trang:** [docs/HUONG_DAN_PHU_HUYNH.md](docs/HUONG_DAN_PHU_HUYNH.md)
+- **Hướng dẫn giáo viên soạn và giao học liệu:** [docs/HUONG_DAN_GIAO_VIEN_SOAN_HOC_LIEU.md](docs/HUONG_DAN_GIAO_VIEN_SOAN_HOC_LIEU.md)
 
-RC9 bổ sung tuần mới 3–4 môn, tối đa 12 câu/môn, nhãn độ khó và mẫu Excel; nhận diện null/lỗi Excel; phân trang quản trị và bảo vệ nội dung tuần đã đóng. Tiếp tục các câu chưa đạt 2 sao chỉ mở phần cần học. Giữ bộ căn chỉnh chung, cho vào bài khi cảnh 3D đang tải và giảm dữ liệu trang học sinh: danh sách tóm tắt tối đa 20 bộ/lần, chỉ tải nội dung khi mở bài. Trí Nhớ/Nối Từ chia màn tối đa 6 cặp trên máy tính, 4 cặp trên điện thoại. Từng câu có bảng trò phù hợp và cột tùy chọn allowedGameIds để người soạn giới hạn; không tự bỏ câu. Học sinh có thể tự đổi mật khẩu. Đọc câu chọn rõ giọng tiếng Việt, báo khi thiết bị thiếu giọng Việt. Cần nghiệm thu tốc độ và giọng đọc trên website/thiết bị thật sau triển khai.
+---
 
-RC10 chỉ giao câu trắc nghiệm/đọc/nghe/nhập hiện tại khi mở đồng hồ, chưa gửi đáp án hoặc lời giải; gợi ý và thời lượng âm thanh có biên nhận máy chủ. Câu thay đổi nội dung chấm phải dùng ID mới; sửa lời giải giữ sao. Khắc phục tràn tên file/cỡ chữ lớn, thêm kiểm tra UI/API cùng giao thức và mã hỗ trợ lỗi. Không tự sửa ô Excel lỗi hoặc đặt lại sao cũ.
+## 3. Quy chuẩn kiểm thử chất lượng
 
-RC11 giảm số lượt trao đổi PostgreSQL khi đăng nhập, mở tiến độ và vào trò chơi; tải trạng thái máy chủ và phiên đăng nhập đồng thời, gộp yêu cầu làm mới trùng nhau. Xem [đo độ trễ và kiểm tra RC11](docs/DO_TRE_VA_TOI_UU_RC11_2026-10-18.md). Gói ZIP RC10 bên dưới là bản bàn giao trước bản vá này.
+```powershell
+# Chạy toàn bộ bộ kiểm thử tự động
+npm test
 
-RC12 mặc định Chế độ nhẹ không tải GLB/Three.js hoặc tạo WebGL. Khám phá 3D là tùy chọn; vào bài thì dọn cảnh, tải từng đảo bằng tài nguyên nhẹ có hash. Đăng nhập chỉ tải phần xác thực; quản trị và học sinh tải sau đăng nhập. Excel được parse một lần cho mỗi phiên nhập, chỉ kiểm tra/tải media cần cho câu hợp lệ và phân trang xem trước. Xem [kế hoạch tối ưu](docs/KE_HOACH_TOI_UU_TOC_DO_VA_GIU_3D_2026-10-18.md) và [phiếu RC12](docs/NGHIEM_THU_CUC_BO_RC12.md). Chưa có staging riêng để nghiệm thu tải cloud 30–100 học sinh; manifest vẫn là ứng viên chưa nghiệm thu người dùng.
+# Quét kiểm tra kiểu dữ liệu TypeScript
+npm run typecheck
 
-Kết quả RC12: [báo cáo tối ưu và giới hạn nghiệm thu](docs/BAO_CAO_TOI_UU_RC12_2026-10-18.md), [số liệu kiểm thử cục bộ](docs/QA_RC12_SUMMARY.json). Tạo gói nguồn bằng `npm run package:source`; gói loại trừ cấu hình bí mật, cơ sở dữ liệu, node_modules và tệp kết quả chạy.
+# Quét ngân sách tài nguyên WebP 2D
+npm run test:assets
 
-## Dữ liệu và phục hồi
-
-Mã nguồn dùng .online/bao-an.sqlite; ZIP dùng data/bao-an.sqlite. Tư liệu cùng lưu trong SQLite. Dùng mục **Sao lưu & khôi phục** để tải bản sao nhất quán, kiểm tra trước rồi xác nhận phục hồi. Công cụ tự sao lưu trước khi thay, thu hồi phiên cũ và đóng lượt đang dở.
-
-Khôi phục sang thư mục sạch có CLI xem trước và xác nhận bằng SHA-256; xem [hướng dẫn cục bộ](docs/QUAN_LY_CUC_BO.md). Giữ thư mục dữ liệu và bản sao khi cập nhật; không chạy hai máy chủ cùng kho.
-
-Chỉ có một giao diện quản lý và học sinh. Đường dẫn cũ được chuyển về luồng tài khoản mới; không còn Xưởng học liệu, Góc phụ huynh hay mini-app của bản cũ.
-
-## Kiểm tra và đóng gói
-
-~~~powershell
-npm run verify:local
+# Đóng gói và xác thực gói phát hành
 npm run package:pilot
-~~~
+npm run package:source
+```
 
-verify:local chạy TypeScript, kiểm thử renderer/học liệu/dữ liệu/khôi phục/cloud cục bộ/ZIP, kiểm tra tài nguyên, build và các ca trình duyệt máy chủ thật. Cần Chrome và Edge cho Playwright; BAO_AN_BROWSER_CHANNEL có thể chọn riêng chrome hoặc msedge. Nhóm hiện hành mặc định chạy cả hai trình duyệt. CI được cấu hình cho Node 22.22.2 và 24 trên Windows; kết quả chạy cục bộ được ghi riêng trong báo cáo bàn giao.
+---
 
-Gói mới ở releases/bao-an-learning-3.8.0-rc.12.zip; gói RC10/RC11 giữ nguyên. Manifest ghi build ID, hash từng tệp và schema riêng: SQLite 1, PostgreSQL 1. releaseReady:false và humanPilotStatus:UNVERIFIED được giữ tới khi người dùng nghiệm thu. Không ghi đè cùng phiên bản bằng nội dung khác. Dùng RC10 trở lên để khôi phục bản sao RC10, không hạ bản.
+## 4. Triển khai Cloud (Netlify & Supabase)
 
-## Tài liệu
-
-- [Báo cáo sửa và kiểm tra RC10](docs/BAO_CAO_HOAN_THIEN_RC10_2026-10-18.md)
-- [Phạm vi, staging, cảnh báo và khôi phục RC10](docs/PHAM_VI_VA_VAN_HANH_RC10.md)
-- [Phiếu nghiệm thu RC10](docs/NGHIEM_THU_CUC_BO_RC10.md)
-- [Đưa RC10 lên GitHub/Netlify](docs/CAP_NHAT_NETLIFY_RC10.md)
-
-- [Kế hoạch bổ sung sau RC8: hoàn thiện tồn đọng và tuần học 3–4 môn](docs/KE_HOACH_HOAN_THIEN_CON_TON_DONG_2026-10-17.md) — H1–H4 đã triển khai RC9; H5–H6 cần xác nhận dùng thử và phục hồi cloud trên môi trường riêng.
-- [Kế hoạch và điều kiện phát hành](docs/KE_HOACH_HOAN_THIEN_PRODUCTION_2026-10-16.md)
-- [Rà soát, kết quả sửa và gói RC8](docs/BAO_CAO_RA_SOAT_2026-10-16.md)
-- [Báo cáo hoàn thiện RC9 và số đo tải](docs/BAO_CAO_HOAN_THIEN_RC9_2026-10-17.md)
-- [Phiếu nghiệm thu RC9](docs/NGHIEM_THU_CUC_BO_RC9.md)
-- [Cập nhật RC9 lên Netlify qua GitHub](docs/CAP_NHAT_NETLIFY_RC9.md)
-- [Dùng quản lý cục bộ](docs/QUAN_LY_CUC_BO.md)
-- [Soạn Excel](docs/ONLINE_QUESTION_IMPORT.md)
-- [Hướng dẫn đi kèm ZIP và phiếu nghiệm thu](tools/release-files/HUONG_DAN_SU_DUNG.html)
-- [Netlify/Supabase cho giai đoạn sau](docs/NETLIFY_SUPABASE.md)
-- [Đưa mã lên GitHub và triển khai Netlify](docs/DUA_LEN_GITHUB_NETLIFY.md)
-- [SQL và kiểm tra Supabase](supabase/README.md)
-- [Dự án Supabase đã thiết lập](docs/SUPABASE_DA_THIET_LAP.md)
-- [Nguồn và giấy phép tài nguyên 3D](docs/ASSET_LICENSES_V37.md)
-
-Schema và Storage đã thiết lập trên dự án Supabase được chỉ định; xem báo cáo ở trên. Website Netlify, chuyển dữ liệu SQLite lên cloud và thiết bị di động thật vẫn cần cấu hình/nghiệm thu riêng.
+- **Netlify Build Command:** `npm run build`
+- **Publish Directory:** `dist`
+- **Netlify Functions:** `netlify/functions`
+- **Cơ sở dữ liệu Supabase:** PostgreSQL schema `bao_an` với 26 bảng dữ liệu phân lớp an toàn RLS (xem [docs/NETLIFY_SUPABASE.md](docs/NETLIFY_SUPABASE.md)).
+- **Sao lưu và Khôi phục Cloud:** Bộ công cụ `server/cloud-backup-restore.mjs` đạt chỉ số RTO 13 ms và RPO 0 giờ.

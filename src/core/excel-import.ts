@@ -7,7 +7,7 @@ import { Unzip, UnzipInflate, unzipSync } from 'fflate';
 
 export const EXCEL_IMPORT_LIMITS = {
   fileBytes: 1024 * 1024, expandedBytes: 8 * 1024 * 1024, xmlBytes: 2 * 1024 * 1024,
-  entries: 128, rows: 1000, columns: 32, cellCharacters: 4000,
+  entries: 128, rows: 1000, columns: 48, cellCharacters: 4000,
 } as const;
 
 export type Kind = 'quiz' | 'pairs' | 'sentences';
@@ -66,7 +66,7 @@ export function parseDelimitedTextWithRows(text: string): {rows:string[][];rowNu
   const pushCell = () => {
     if (currentCell.length > EXCEL_IMPORT_LIMITS.cellCharacters) throw new Error('Mỗi ô tối đa 4000 ký tự.');
     currentRow.push(currentCell.trim());
-    if (currentRow.length > EXCEL_IMPORT_LIMITS.columns) throw new Error('Bảng tính vượt giới hạn 32 cột.');
+    if (currentRow.length > EXCEL_IMPORT_LIMITS.columns) throw new Error(`Bảng tính vượt giới hạn ${EXCEL_IMPORT_LIMITS.columns} cột.`);
     currentCell = '';
   };
   const pushRow = () => {

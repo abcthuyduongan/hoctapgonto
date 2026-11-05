@@ -1,6 +1,6 @@
 # Sao từng câu và chuyển tuần có xác nhận
 
-**Bổ sung sau RC8:** người dùng xác nhận mỗi tuần chỉ giao 3–4 môn và mọi câu đều có sao. Xem [kế hoạch hoàn thiện tiếp theo](KE_HOACH_HOAN_THIEN_CON_TON_DONG_2026-10-17.md); giới hạn môn/số câu chưa được triển khai, dữ liệu và gói RC8 giữ nguyên.
+**Bổ sung sau RC8:** người dùng xác nhận mỗi tuần chỉ giao 3–4 môn và mọi câu đều có sao. Xem [kế hoạch hoàn thiện tiếp theo](KE_HOACH_TOI_UU_VA_PHAT_HANH_2026-11-02.md); giới hạn môn/số câu chưa được triển khai, dữ liệu và gói RC8 giữ nguyên.
 
 Ngày 17/10/2026. Yêu cầu đã được người dùng chốt: tốc độ là tiêu chí chính của trắc nghiệm; mỗi câu nguồn tối đa 3 sao dùng chung mọi game; mọi câu trong tuần đạt ít nhất 2 sao mới được chuyển; báo số câu 2 sao để chọn ôn thêm; sang tuần mới không quay lại tuần cũ. Trạng thái: đã triển khai và qua kiểm thử cục bộ (292 Node, 90 Chrome/Edge); chưa đưa lên website. Kết quả và số đo ở mục 17 báo cáo rà soát; các bước đề xuất chưa triển khai ở mục 6–7 dưới đây.
 

@@ -150,6 +150,9 @@ export type RewardRequestStatus='pending'|'approved'|'fulfilled'|'cancelled'|'re
 export interface RewardRequest {
   requestId:string;title:string;goalVnd:number;stars:number;rateVnd:number;amountVnd:number;requestedAt:string;
   history:{status:RewardRequestStatus;at:string;note?:string}[];
+  giftId?:string;
+  receivedAt?:string;
+  kind?:'item'|'experience'|'privilege'|'saving';
 }
 /** Local family reward ledger. Achievement stars remain immutable. */
 export interface RewardWallet {schemaVersion:1;enabled:boolean;rateVnd:number;updatedAt:string;requests:RewardRequest[]}

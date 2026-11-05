@@ -1,0 +1,59 @@
+/* Shared interface styling, kept separate from the existing game styles. */
+.online-app{--online-ink:#334d42;--online-muted:#697666;--online-primary:#4e7250;--online-line:#dce2d3;background:#f8f7ef}
+.online-app .online-brand{color:#446847!important;letter-spacing:.025em}
+.online-app .online-brand span{color:#7c866f}
+.online-app .online-eyebrow{color:#63805d!important;letter-spacing:.12em}
+.online-app .online-header{background:#fffdf7;border-bottom:1px solid #dce2d3;gap:24px;min-height:83px}
+.online-app .online-header>div>strong{font-size:13px}
+.online-app .online-header>div>span{font-size:11px;color:#7b836f}
+.online-app .online-header-actions button{font-size:11px;padding:9px 12px;background:#fafbf4;border-color:#d9e0d0;border-radius:10px}
+.online-app button.online-primary,.online-dialog button.online-primary{background:#4e7250;border-color:#4e7250;box-shadow:0 3px 0 #355739;color:#fff}
+.online-app button.online-primary:hover:not(:disabled),.online-dialog button.online-primary:hover:not(:disabled){background:#3b5d3e}
+.online-app input:not([type=checkbox]),.online-app select,.online-app textarea{border-color:#cbd6c5;border-radius:11px;color:#334d42}
+.online-app input::placeholder{color:#8a9383}
+.online-app button:focus-visible,.online-app a:focus-visible,.online-app input:focus-visible,.online-app select:focus-visible,.online-app summary:focus-visible{outline-color:#ad7629}
+.online-app .online-card{border-color:#dce2d3;box-shadow:0 4px 0 #e7eadf}
+.online-app .online-tabs{gap:8px;padding:6px;border:1px solid #dce2d3;border-radius:15px;background:#eeefe5}
+.online-app .online-tabs button{border-radius:10px;font-size:13px;min-width:130px}
+.online-app .online-tabs button[aria-current=page]{background:#4e7250;border-color:#4e7250;box-shadow:0 2px 0 #355739}
+.online-admin .online-intro{padding:26px 28px;border:1px solid #d5dfcb;border-radius:22px;background:#eef2e5}
+.online-admin .online-intro h1{font-size:clamp(25px,3vw,34px)}
+.online-admin .online-intro p:last-child{margin-bottom:0;font-size:13px}
+.online-admin .online-stats{gap:16px}
+.online-admin .online-stats>div{position:relative;padding:20px 24px;border:1px solid #dce2d3;border-radius:18px;background:#fffdf7;box-shadow:0 3px 0 #e7eadf}
+.online-admin .online-stats>div:nth-child(2){background:#edf3e7}
+.online-admin .online-stats>div:nth-child(3){background:#edf3f3}
+.online-admin .online-stats>div:nth-child(4){background:#fff1d2}
+.online-admin .online-stats strong{color:#4c714b;font-size:30px}
+.online-admin .online-stats span{font-size:12px}
+.online-admin .online-class-bar{background:#f0f2e7;border-color:#d7dfcd}
+.online-admin .online-admin-main{width:100%;max-width:1300px}
+.online-admin .online-admin-main>.online-actions[aria-label="Phân trang quản trị"]{margin-bottom:22px;font-size:12px;color:#6d7968}
+.online-admin .online-template-box{background:#f4f6eb;border-color:#b9c9ae}
+.online-admin .online-template-link{color:#4e7250;border-color:#c4d2ba}
+.online-admin .online-list>li{background:#fafbf6;border-color:#dce2d3}
+.online-app.online-auth{padding:48px 24px;background:#f6f5eb}
+.online-auth-layout{display:grid;grid-template-columns:1fr 1fr;width:min(100%,1040px);overflow:hidden;border:2px solid #9aab8b;border-radius:30px;background:#fffdf7;box-shadow:0 7px 0 #dfe4d2,0 20px 60px #41533a0c}
+.online-auth-layout .online-auth-card{width:100%;padding:48px 44px;border:0;border-radius:0;box-shadow:none;background:#fffdf7;min-width:0}
+.online-auth-layout .online-auth-card>.online-brand{margin-bottom:36px}
+.online-auth-layout .online-auth-card h1{font-size:27px}
+.online-auth-layout .online-auth-card>p:not(.online-eyebrow){font-size:13px}
+.online-auth-layout .online-auth-card .online-form{margin:28px 0}
+.online-auth-layout .online-auth-card .online-form label{font-size:12px;gap:8px}
+.online-auth-layout .online-auth-card .online-form input{min-height:49px;background:#fffefb}
+.online-auth-layout .online-auth-card .online-form button{min-height:49px;font-size:14px;margin-top:5px}
+.online-auth-layout .online-auth-card .online-muted{font-size:11px!important}
+.online-auth-welcome{display:flex;flex-direction:column;justify-content:center;padding:48px 42px;background:#e8edda;border-right:1px solid #d2ddc2;min-width:0}
+.online-auth-banner-img{width:100%;max-width:280px;height:auto;border-radius:14px;margin-bottom:16px;box-shadow:0 4px 12px rgba(64,87,71,0.12);object-fit:cover;display:block}
+.online-auth-mascot{display:grid;place-items:center;width:72px;height:72px;margin-bottom:26px;border:1px solid #cabd96;border-radius:23px;background:#fff4d8;font-size:43px;box-shadow:0 4px 0 #d8d6b5}
+.online-auth-welcome>.online-eyebrow{font-size:10px;margin-bottom:14px!important}
+.online-auth-welcome h2{font-size:clamp(28px,3.3vw,39px);line-height:1.25;letter-spacing:-.04em;margin-bottom:20px}
+.online-auth-welcome>p:not(.online-eyebrow){font-size:14px;line-height:1.8;color:#6a775c}
+.online-auth-route{list-style:none;padding:0;margin:19px 0 32px;display:grid;gap:15px}
+.online-auth-route>li{display:flex;gap:13px;align-items:center;font-size:13px;font-weight:650;color:#596f4e}
+.online-auth-route span{display:grid;place-items:center;width:28px;height:28px;border:1px solid #b4c6a1;border-radius:50%;background:#f6f8ec;font-size:11px;font-weight:750}
+.online-auth-caption{font-size:11px;font-style:italic;color:#798669;border-top:1px solid #cbd7b9;padding-top:20px}
+@media(max-width:1000px){.online-app .online-header{gap:16px;flex-wrap:wrap}.online-auth-layout .online-auth-card{padding:38px 30px}.online-auth-welcome{padding:38px 30px}.online-app .online-tabs button{min-width:115px}}
+@media(max-width:700px){.online-app.online-auth{padding:24px 14px}.online-auth-layout{grid-template-columns:1fr;max-width:480px;border-radius:24px}.online-auth-welcome{padding:25px;border-right:0;border-bottom:1px solid #d2ddc2;position:relative}.online-auth-mascot{position:absolute;right:22px;top:25px;width:47px;height:47px;border-radius:16px;font-size:29px;margin:0}.online-auth-welcome>.online-eyebrow{font-size:9px;max-width:calc(100% - 56px)}.online-auth-welcome h2{font-size:25px;max-width:calc(100% - 40px);margin:0}.online-auth-welcome>p:not(.online-eyebrow),.online-auth-route,.online-auth-caption,.online-auth-banner-img{display:none}.online-auth-layout .online-auth-card{padding:28px 25px}.online-auth-layout .online-auth-card>.online-brand{margin-bottom:24px}.online-auth-layout .online-auth-card h1{font-size:24px}.online-admin .online-intro{padding:22px 18px}.online-admin .online-intro>button{margin-top:18px}.online-admin .online-stats{gap:12px}.online-admin .online-stats>div{padding:17px}.online-app .online-header{padding:16px}.online-app .online-header>div:not(.online-header-actions){width:auto;min-width:0;flex:1}.online-app .online-header>div>strong,.online-app .online-header>div>span{overflow-wrap:anywhere}.online-app .online-header-actions{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}.online-app .online-header-actions button{font-size:10px;white-space:normal;min-width:0;padding:8px 5px}.online-app .online-tabs button{font-size:12px;min-width:108px}}
+@media(max-width:380px){.online-app .online-header{gap:12px}.online-app .online-brand{font-size:15px;gap:5px}.online-app .online-brand span{font-size:8px}.online-auth-layout .online-auth-card{padding:26px 20px}.online-auth-welcome{padding:24px 20px}.online-auth-welcome h2{font-size:23px}}
+@media(max-width:700px){.online-admin .online-header{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px 16px}.online-admin .online-header>.online-brand{grid-column:1;grid-row:1}.online-admin .online-header>button{grid-column:2;grid-row:1;margin:0}.online-admin .online-header>div:not(.online-header-actions){grid-column:1/-1;grid-row:2;width:100%;max-width:100%;margin:0;order:0}.online-admin .online-header>div>strong{font-size:12px}}

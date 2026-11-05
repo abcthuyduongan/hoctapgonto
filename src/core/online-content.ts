@@ -1,4 +1,4 @@
-import type { ContentPack, ModuleId, PairItem, QuizItem, QuestionMetadata, QuestionTemplateInfo, SentenceItem } from './contracts.ts';
+import type { CategorizeElement, CategorizeItem, CompareItem, CompareOperator, ContentPack, ModuleId, PairItem, QuizItem, QuestionMetadata, QuestionTemplateInfo, SentenceItem } from './contracts.ts';
 import { CONTENT_FORMAT_VERSION, CONTENT_SCHEMA, MAX_IMPORT_BYTES } from './content-io.ts';
 import { gamePresentation } from './game-presentation.ts';
 import { GAME_REGISTRY } from './registry.ts';
@@ -6,7 +6,7 @@ import { validatePack } from './validation.ts';
 import {onlineGeneratedItemId} from './online-import-identity.ts';
 import {gameRestrictionError} from './game-policy.ts';
 
-export type OnlineQuestionKind = 'quiz' | 'pairs' | 'sentences';
+export type OnlineQuestionKind = 'quiz' | 'pairs' | 'sentences' | 'compare' | 'categorize';
 export type OnlineQuestionContext = {id:string;version:number;title:string;grade:number};
 export type OnlineWeekContext = {idPrefix:string;grade:number;title:string;subjectLabel?:string;sourceId?:string;version?:number;packIds?:Record<string,string>};
 export type OnlineWeek = {title:string;sets:{subjectLabel:string;pack:ContentPack}[]};
@@ -36,7 +36,9 @@ function kind(value:unknown):OnlineQuestionKind {
   if(value==='quiz'||value==='multiple-choice')return 'quiz';
   if(value==='pairs'||value==='pair')return 'pairs';
   if(value==='sentences'||value==='sentence'||value==='order')return 'sentences';
-  return fail('Loại câu hỏi chưa được hỗ trợ. Chọn quiz, pairs hoặc sentences.');
+  if(value==='compare')return 'compare';
+  if(value==='categorize'||value==='basket-sort')return 'categorize';
+  return fail('Loại câu hỏi chưa được hỗ trợ. Chọn quiz, pairs, sentences, compare hoặc categorize.');
 }
 function checked(pack:ContentPack):ContentPack {
   const errors=validatePack(pack);
@@ -64,14 +66,14 @@ function stringArray(value:unknown,where:string,min:number,max:number,characters
   if(!Array.isArray(value)||value.length<min||value.length>max)fail(`${where}: cần từ ${min} đến ${max} phần tử.`);
   return value.map((entry,index)=>text(entry,`${where} ${index+1}`,characters));
 }
-function item(value:unknown,packKind:OnlineQuestionKind,index:number):QuizItem|PairItem|SentenceItem {
+function item(value:unknown,packKind:OnlineQuestionKind,index:number):QuizItem|PairItem|SentenceItem|CompareItem|CategorizeItem {
   const row=object(value,`Mục ${index+1}`),baseFields=['id','itemId','objectiveId','kind','metadata'];
   if(own(row,'kind')&&kind(row.kind)!==packKind)fail(`Mục ${index+1}: tệp chứa nhiều loại câu hỏi.`);
   if(own(row,'id')&&own(row,'itemId')&&row.id!==row.itemId)fail(`Mục ${index+1}: hai mã câu hỏi khác nhau.`);
   const idValue=own(row,'id')?row.id:row.itemId;
   const base={id:idValue===undefined?'':text(idValue,'id',80),objectiveId:optional(row,'objectiveId',120,'CUSTOM.QUESTION'),
     ...(own(row,'metadata')?{metadata:metadata(row.metadata)}:{})};
-  let result:QuizItem|PairItem|SentenceItem;
+  let result:QuizItem|PairItem|SentenceItem|CompareItem|CategorizeItem;
   if(packKind==='quiz') {
     keys(row,[...baseFields,'prompt','options','A','B','C','D','optionA','optionB','optionC','optionD','correctIndex','answer','explanation'],'Câu trắc nghiệm');
     const fromColumns=['A','B','C','D'].map(letter=>{
@@ -94,6 +96,53 @@ function item(value:unknown,packKind:OnlineQuestionKind,index:number):QuizItem|P
     keys(row,[...baseFields,'left','right','question','answer'],'Cặp câu hỏi');
     if(own(row,'left')&&own(row,'question')&&row.left!==row.question||own(row,'right')&&own(row,'answer')&&row.right!==row.answer)fail('Cặp câu hỏi có hai đáp án hoặc yêu cầu mâu thuẫn.');
     result={...base,kind:'pair',left:text(own(row,'left')?row.left:row.question,'left/question',120),right:text(own(row,'right')?row.right:row.answer,'right/answer',120)};
+  } else if(packKind==='compare') {
+    keys(row,[...baseFields,'left','right','operator','answer','explanation','hint','prompt'],'Câu so sánh');
+    const operator = own(row,'operator') ? text(row.operator,'operator',5) : own(row,'answer') ? text(row.answer,'answer',5) : undefined;
+    if(!operator || !['>','<','='].includes(operator)) fail('Câu so sánh cần dấu >, < hoặc = (operator hoặc answer).');
+    result = {
+      ...base,
+      kind: 'compare',
+      prompt: optional(row, 'prompt', 320, 'So sánh hai biểu thức'),
+      left: text(row.left, 'left', 120),
+      right: text(row.right, 'right', 120),
+      operator: operator as CompareOperator,
+      explanation: optional(row, 'explanation', 500, `${row.left} ${operator} ${row.right}`),
+      ...(own(row, 'hint') ? { hint: text(row.hint, 'hint', 160) } : {})
+    };
+  } else if(packKind==='categorize') {
+    keys(row,[...baseFields,'prompt','categories','elements','words','acceptedAnswers','passageTitle','explanation','hint'],'Câu phân loại');
+    let categories: string[] = [];
+    if(own(row, 'categories')){
+      categories = Array.isArray(row.categories) ? row.categories.map(c=>String(c).trim()) : String(row.categories).split('|').map(s=>s.trim()).filter(Boolean);
+    } else if(own(row, 'passageTitle')){
+      categories = String(row.passageTitle).split('|').map(s=>s.trim()).filter(Boolean);
+    }
+    let elements: CategorizeElement[] = [];
+    if(own(row, 'elements') && Array.isArray(row.elements)){
+      elements = row.elements as CategorizeElement[];
+    } else {
+      const rawElements = own(row, 'elements') ? String(row.elements) : own(row, 'words') ? String(row.words) : own(row, 'acceptedAnswers') ? String(row.acceptedAnswers) : '';
+      const pairs = rawElements.split('|').map(s=>s.trim()).filter(Boolean);
+      elements = pairs.map((p, idx)=>{
+        const parts = p.split(':').map(s=>s.trim());
+        const elText = parts[0];
+        const elCat = parts[1] || (categories[0] ?? '');
+        return { id: `elem-${idx+1}`, text: elText, category: elCat };
+      });
+    }
+    if(!categories.length){
+      categories = [...new Set(elements.map(e=>e.category))];
+    }
+    result = {
+      ...base,
+      kind: 'categorize',
+      prompt: text(row.prompt, 'prompt', 320),
+      categories,
+      elements,
+      explanation: optional(row, 'explanation', 500, 'Phân loại các thẻ vào đúng nhóm.'),
+      ...(own(row, 'hint') ? { hint: text(row.hint, 'hint', 160) } : {})
+    };
   } else {
     keys(row,[...baseFields,'prompt','words','correctOrder','answer','hint'],'Câu sắp xếp');
     const arrays=['words','correctOrder'].filter(key=>own(row,key)).map(key=>stringArray(row[key],key,3,15,45));
@@ -194,7 +243,8 @@ function csvRows(raw:string,extension:string):string[][] {
 }
 const columns:Record<string,string>={kind:'kind',type:'kind',id:'id',itemid:'id',objectiveid:'objectiveId',prompt:'prompt',options:'options',
   a:'A',b:'B',c:'C',d:'D',optiona:'A',optionb:'B',optionc:'C',optiond:'D',correctindex:'correctIndex',answer:'answer',explanation:'explanation',
-  left:'left',right:'right',question:'question',words:'words',correctorder:'correctOrder',hint:'hint',subject:'subjectLabel',subjectlabel:'subjectLabel'};
+  left:'left',right:'right',question:'question',words:'words',correctorder:'correctOrder',hint:'hint',subject:'subjectLabel',subjectlabel:'subjectLabel',
+  operator:'operator',categories:'categories',elements:'elements',passagetitle:'passageTitle',acceptedanswers:'acceptedAnswers'};
 function table(raw:string,extension:string):{kind:OnlineQuestionKind;subjectLabel?:string;row:Row}[] {
   const rows=csvRows(raw,extension);if(rows.length<2)fail('Tệp cần hàng tiêu đề và ít nhất 2 câu hỏi.');
   const headers=rows[0].map(header=>columns[header.trim().toLowerCase()]);
@@ -207,6 +257,8 @@ function table(raw:string,extension:string):{kind:OnlineQuestionKind;subjectLabe
     for(const key of ['options','words','correctOrder'])if(own(row,key)){try{row[key]=JSON.parse(row[key] as string);}catch{fail(`Hàng ${index+2}: ${key} cần mảng JSON.`);}}
     if(own(row,'correctIndex')){if(!/^[0-3]$/.test(row.correctIndex as string))fail(`Hàng ${index+2}: correctIndex phải từ 0–3.`);row.correctIndex=Number(row.correctIndex);}
     const inferred=own(row,'options')||['A','B','C','D'].some(key=>own(row,key))||own(row,'correctIndex')?'quiz'
+      :own(row,'operator')||(own(row,'left')&&own(row,'right')&&['>','<','='].includes(String(row.answer??'').trim()))?'compare'
+      :own(row,'categories')||(own(row,'words')&&String(row.words).includes(':'))?'categorize'
       :['left','right','question'].some(key=>own(row,key))?'pairs':'sentences';
     return {kind:own(row,'kind')?kind(row.kind):inferred,subjectLabel:label,row};
   });

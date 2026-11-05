@@ -1,0 +1,246 @@
+{
+  "schemaVersion": 1,
+  "plannedDate": "2026-11-05",
+  "timezone": "Asia/Saigon",
+  "capturedAtUtc": "2026-11-05T00:41:06.8419179+00:00",
+  "packageVersion": "3.9.0-rc.1",
+  "branch": "feature/v37-premium-world",
+  "headCommit": "a6d0af19a784608ab9505c0f2d6974497410b80e",
+  "runtimeSourceId": "abcc95f7a725ac92df41c1544a7b1d973d8e0fef0a969f385fba87def5759ac5",
+  "displayMode": "2d",
+  "questionProtocolVersion": 1,
+  "workingTreeDirty": true,
+  "statusEntryCounts": [
+    {
+      "status": " D",
+      "entries": 661
+    },
+    {
+      "status": " M",
+      "entries": 61
+    },
+    {
+      "status": "??",
+      "entries": 29
+    }
+  ],
+  "scope": "Selected source file hashes and complete runtime fingerprint. Not a source archive, clean commit, or database backup.",
+  "applicationTestsRerunForThisHandoff": false,
+  "historicalEvidence": {
+    "interfaceAccount": "6 passed previously, Chrome/Edge",
+    "newMapCases": "80 specifications, all initially CHUA_CHAY",
+    "interfaceFinal": "16 passed previously, Chrome/Edge"
+  },
+  "files": [
+    {
+      "path": "package.json",
+      "bytes": 3056,
+      "sha256": "6a37c118724cb92a53d71e09b5fc79efe173cc9ee796b510d200ff11ee624ae4"
+    },
+    {
+      "path": "package-lock.json",
+      "bytes": 79062,
+      "sha256": "a236d070901466bd73b4ed42b2b8c63837f55e924cd715d72a08495364e4fe3f"
+    },
+    {
+      "path": "tsconfig.json",
+      "bytes": 609,
+      "sha256": "5397013a893bd5dd495b6b0ecf98c1ef1481d9fc9270c9a1f80e7c64ca316bb2"
+    },
+    {
+      "path": "vite.config.ts",
+      "bytes": 645,
+      "sha256": "bef260ac45f0b1132f9ee2fccb43eabd1c0eff1cf561f36307e376c0c473df5d"
+    },
+    {
+      "path": "netlify.toml",
+      "bytes": 1129,
+      "sha256": "24225e1900df6fee6b7bdd77b47f67cbdf119991a7e5149a0ea7784dacba66d0"
+    },
+    {
+      "path": "playwright.online.config.ts",
+      "bytes": 869,
+      "sha256": "fbe83f56f4b0ef9662135757d5067bc6f0b72365cabf11b47a554e172a7e217c"
+    },
+    {
+      "path": "src/core/online-client.ts",
+      "bytes": 11845,
+      "sha256": "778c2207266d257e5d938de851770c21c592c6d61aada4af8a45eeb6bd2f4486"
+    },
+    {
+      "path": "src/core/online-contracts.ts",
+      "bytes": 4467,
+      "sha256": "412a997c1564bf86f69a9efe3a7b259498383666af9304e012a605dae7134798"
+    },
+    {
+      "path": "src/core/weekly-plan.ts",
+      "bytes": 4617,
+      "sha256": "088f63f06142af6626039f1ed08216e620d103375b2f04db093992663966c3eb"
+    },
+    {
+      "path": "src/core/question-rewards.ts",
+      "bytes": 11011,
+      "sha256": "1ddf68c7eee013268d5051c3283d695c9f667cc04729afc84d1278fb0af5390d"
+    },
+    {
+      "path": "src/core/reward-wallet.ts",
+      "bytes": 9138,
+      "sha256": "7964f7f2ce9ad424a7cc14dbe017043c27758643a3244275546d2606e25f9099"
+    },
+    {
+      "path": "src/core/registry.ts",
+      "bytes": 1652,
+      "sha256": "9c5043ce72e67cb9bc33bac30963649932df549774d45a1cdd003e06a75cf2ef"
+    },
+    {
+      "path": "src/screens/StudentScreen.tsx",
+      "bytes": 10335,
+      "sha256": "9ea5418cd3ebaa2ac57f7aad4f26b77b1365e8f5f4b7dd3fff28bc10c11a327d"
+    },
+    {
+      "path": "src/screens/OnlineStudentWorld.tsx",
+      "bytes": 30164,
+      "sha256": "d7e5ac56581a32045927e493e6ca844ef85fb85270c0ac1e5804b33a84d0e135"
+    },
+    {
+      "path": "src/screens/OnlineScreen.tsx",
+      "bytes": 7485,
+      "sha256": "e216c65aba9281c25093383c9b11b90165bd8ea3f580ca28cb75240559f2b1a5"
+    },
+    {
+      "path": "src/screens/OnlineQuestionStars.tsx",
+      "bytes": 2687,
+      "sha256": "8a3374642d4cb4c4d9bb0fe1eaaa023353be6fde8aebea9753fca68c20657e14"
+    },
+    {
+      "path": "src/screens/OnlineAdminDashboard.tsx",
+      "bytes": 51602,
+      "sha256": "599f66a5d2aeb78060eb51d3f9682f78e070a766d97ac92fa5e0f7fe09af2a9f"
+    },
+    {
+      "path": "src/screens/OnlineExerciseRunner.tsx",
+      "bytes": 11509,
+      "sha256": "bee90a157e782cb9cea5585a9c9a9c6c2f51e63c252ef1febb07d96fecf43c04"
+    },
+    {
+      "path": "src/games/loaders.ts",
+      "bytes": 1204,
+      "sha256": "1c448f400f7b37790411aa9c1548262eed627b96f963dec06b44999638a34c1e"
+    },
+    {
+      "path": "src/games/GameMascot.tsx",
+      "bytes": 457,
+      "sha256": "53fdc28778a59cf2ce4ef9c082dd4ea4d350fd008bbaabb39758cceffce3d65b"
+    },
+    {
+      "path": "src/styles/student-assigned-games.css",
+      "bytes": 12362,
+      "sha256": "62ed93463672a717b015b64e120d328e71ab10b72b54e5f8d6ca221cf0dd7d49"
+    },
+    {
+      "path": "src/styles/student-shell.css",
+      "bytes": 4917,
+      "sha256": "4609a1e1a322920d3ac2fd266952eace0b470212cec56f2033102fefba1a9693"
+    },
+    {
+      "path": "src/styles/learning-interface.css",
+      "bytes": 7643,
+      "sha256": "afc9d679f0ef9b78a56f85fd8c3de91df747fca672d60155017bbd624b15e2b1"
+    },
+    {
+      "path": "src/styles/online.css",
+      "bytes": 21743,
+      "sha256": "a2790a73444e6000f6097bc923c7aad0427dc877599bad04f6c845c65044a8d7"
+    },
+    {
+      "path": "src/styles/game-base.css",
+      "bytes": 294399,
+      "sha256": "ebb91c8c9b79fb7085ab95fa428cc4e2f86a94d50fea2b1338398171a252ffaa"
+    },
+    {
+      "path": "server/online-store.mjs",
+      "bytes": 55564,
+      "sha256": "46cc52d73901a5a6906321df097b7eb4d1dd7155346a7870e2f64151b4036d11"
+    },
+    {
+      "path": "server/postgres-store.mjs",
+      "bytes": 70944,
+      "sha256": "90ba7effb3623cddef5d075ee6a18e836d5127f52cf954883d190aa5f6d197ff"
+    },
+    {
+      "path": "server/online-server.mjs",
+      "bytes": 29956,
+      "sha256": "8b1961dca8f92ad6266554e6ca535d8ec404c3f2eed17b389a84e6e9748bf9e0"
+    },
+    {
+      "path": "server/cloud-api.mjs",
+      "bytes": 22188,
+      "sha256": "1c6f2a7dd360654ff2669dffec0ce69ab4108da3ca113bbac658c51ed6bb78cf"
+    },
+    {
+      "path": "server/student-summary.mjs",
+      "bytes": 2658,
+      "sha256": "2b11e1914b8ddf04429d473f266bf15e70a5527a3ab65e02f7e8f5c2b6d10997"
+    },
+    {
+      "path": "server/question-journey.mjs",
+      "bytes": 3524,
+      "sha256": "1422cd6869a4303d03f60efe1a93817f3073bb661f7d7bf65d6176d2f5360019"
+    },
+    {
+      "path": "server/api-diagnostics.mjs",
+      "bytes": 5122,
+      "sha256": "f39017ed5bb43c3f2c3df93b6966ca3455d05e92b71c3ebdc9c6243228973276"
+    },
+    {
+      "path": "server/build-identity.mjs",
+      "bytes": 1059,
+      "sha256": "b70fbb96da074bca8c11fea503fe26ab60af4aab562369eead4c683927a7b7fe"
+    },
+    {
+      "path": "tools/buildIdentity.mjs",
+      "bytes": 1848,
+      "sha256": "592264c66e15e0cd1175815d8ee56254930fcb28929c31bcb4c221a48c81ff31"
+    },
+    {
+      "path": "tools/onlineBuild.mjs",
+      "bytes": 1861,
+      "sha256": "64995f69c9138101072706912e18cbff232a6c820ba323d660b7de5277e38caa"
+    },
+    {
+      "path": "tools/package_release.mjs",
+      "bytes": 13089,
+      "sha256": "3fa784dca9ef361af6c800b439fff23f1bbdcf74955510b39c064becf4216ee2"
+    },
+    {
+      "path": "tools/package_source.mjs",
+      "bytes": 2748,
+      "sha256": "3f95195a004af8c6acbf807d09ef1284641454be30374483c1cba12ed3218045"
+    },
+    {
+      "path": "tests/visual/online-studentflow.spec.ts",
+      "bytes": 13533,
+      "sha256": "90e6f6d3ef86b0b6080333e471ae88f97ed783f7ecde6f0362be7d7c114073e3"
+    },
+    {
+      "path": "tests/visual/online-performance.spec.ts",
+      "bytes": 9489,
+      "sha256": "e19819bc68e774bc548455a57fb81ebf47355cd19156e8bd07d33de1bcfd7742"
+    },
+    {
+      "path": "tests/online-summary.test.mjs",
+      "bytes": 9092,
+      "sha256": "af75f70b4a06832d06d06ad25b30c704305376d2e3409fe772451534b313b98f"
+    },
+    {
+      "path": "tests/release-online-assets.mjs",
+      "bytes": 1593,
+      "sha256": "2b7af4200d19d57d3e43dd7bcdf63b18fcdd2a9a6daa2485065849f5ea6d35e6"
+    },
+    {
+      "path": "tests/helpers/postgres-fixture.mjs",
+      "bytes": 1608,
+      "sha256": "11c0efeec88973ff46660d50054e4c17b75689cbfe77f986578ae60bd7d03610"
+    }
+  ]
+}

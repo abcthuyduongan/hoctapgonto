@@ -2,12 +2,17 @@ import { lazy } from 'react';
 import type { ComponentType } from 'react';
 import type { GameHostProps, ModuleId } from '../core/contracts';
 
-const importers = {
+const importers: Record<ModuleId, () => Promise<{ default: ComponentType<GameHostProps> }>> = {
   'math-quest': () => import('./MathQuest'),
   'memory-match': () => import('./MemoryMatch'),
   'sentence-builder': () => import('./SentenceBuilder'),
   'word-connect': () => import('./WordConnect'),
-  'sequence-trail': () => import('./SequenceTrail')
+  'sequence-trail': () => import('./SequenceTrail'),
+  'balance-scale': () => import('./BalanceScale'),
+  'basket-sort': () => import('./BasketSort'),
+  'treasure-flip': () => import('./TreasureFlip'),
+  'fox-kitchen': () => import('./FoxKitchen'),
+  'boat-race': () => import('./BoatRace')
 };
 type GameModule = {default:ComponentType<GameHostProps>};
 const pending = new Map<ModuleId,Promise<GameModule>>();

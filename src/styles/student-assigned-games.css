@@ -1,11 +1,93 @@
-.assigned-game-fallback{position:absolute;z-index:7;bottom:78px;left:50%;transform:translateX(-50%);width:min(640px,calc(100% - 28px));max-height:65%;overflow:auto;padding:18px 20px;border:1px solid #a8c8cd;border-radius:17px;background:#fffdf5f2;color:#244e5d;box-shadow:0 12px 35px #20425224;text-align:center}.assigned-game-fallback>strong{font-size:1rem;display:block}.assigned-game-fallback>p{font-size:.85rem;margin:7px 0 12px}.assigned-game-fallback>div{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}.assigned-game-fallback button{min-height:44px;padding:11px 16px;border:1px solid #a6c5ca;border-radius:11px;background:#edf6f5;color:#235d67;font:650 .9rem/1.4 system-ui,sans-serif;cursor:pointer}.assigned-game-fallback button:focus-visible{outline:3px solid #bc7e24;outline-offset:3px}.assigned-game-fallback button:disabled{opacity:.5;cursor:wait}@media(max-width:620px){.assigned-game-fallback{bottom:92px;padding:15px;max-height:60%}.assigned-game-fallback>div{display:grid;grid-template-columns:1fr}.assigned-game-fallback button{width:100%;font-size:.85rem}}
-.student-light-hub{position:relative;width:min(1120px,calc(100% - 32px));margin:24px auto;padding:clamp(20px,3vw,36px);border:1px solid #c9ddd6;border-radius:22px;background:#f5faf6;color:#244e5d}
-.student-light-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:24px}.student-light-heading h1{margin:0 0 10px;font-size:clamp(24px,3vw,34px)}.student-light-heading p{margin:0 0 12px}.student-light-heading .game-wallet-button{position:static;flex-shrink:0}
-.student-light-hub .student-light-games.assigned-game-fallback{position:static;transform:none;width:100%;max-height:none;margin-top:24px;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none;text-align:left;overflow:visible}
-.student-light-hub .student-light-games>div{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,270px),1fr));gap:14px;justify-content:stretch}.student-light-games>div>button{display:flex;align-items:center;gap:14px;text-align:left;width:100%;padding:20px;background:#fff;border:1px solid #b9d4c8}.student-light-games button>span:first-child{font-size:28px;color:#1c7472}.student-light-games button>span:nth-child(2){display:grid;gap:6px;flex:1;min-width:0}.student-light-games small{font-weight:400;font-size:14px;color:#526b7d}.student-light-games strong{font-size:17px}
-.student-display-choice{display:flex;gap:14px;align-items:center;justify-content:flex-end;margin-top:22px;font-size:14px;color:#526b7d}.student-display-choice-3d{position:absolute;right:18px;bottom:14px;z-index:12;margin:0;padding:8px;border-radius:12px;background:#fffdf5f2}.student-starting{margin:14px 0 0;color:#126f74}
-@media(max-width:620px){.student-light-hub{width:calc(100% - 24px);margin:16px 12px;padding:20px 16px}.student-light-heading{flex-wrap:wrap;gap:12px}.student-light-hub .student-light-games>div{grid-template-columns:1fr}.student-light-games>div>button{padding:16px}.student-display-choice{justify-content:space-between}.student-display-choice-3d{bottom:8px;right:8px}}
-
-.student-light-guide{width:88px;height:112px;object-fit:contain;flex:0 0 auto}.student-light-heading>div{flex:1;min-width:0}@media(max-width:620px){.student-light-guide{display:none}}
-.student-light-heading>div{overflow-wrap:anywhere}
-@media(max-width:620px){.student-light-heading>div{flex-basis:100%}.student-light-heading .game-wallet-button{width:100%;justify-content:center}}
+/* A lightweight HTML map: no scene renderer, character animation or image downloads. */
+.online-student .student-light-hub{position:relative;width:min(1180px,calc(100% - 64px));height:auto;min-height:0;margin:34px auto 0;color:#334d42;overflow:visible}
+.student-welcome{display:flex;align-items:center;justify-content:space-between;gap:24px;margin-bottom:26px}
+.student-welcome h1{font-size:clamp(25px,3vw,36px);letter-spacing:-.04em;margin-bottom:8px}
+.student-welcome h1>span{font-size:.75em;color:#c27b25}
+.student-welcome p:last-child{margin:0;color:#647267}
+.student-quick-nav{display:flex;align-items:center;gap:8px;flex-shrink:0;padding:5px;border:1px solid #d6ddce;border-radius:16px;background:#fffdf8}
+.student-quick-nav a{padding:10px 14px;min-height:44px;display:flex;align-items:center;border-radius:11px;text-decoration:none;font-size:13px;font-weight:700;color:#596a5e}
+.student-quick-nav a[aria-current]{background:#e2edde;color:#355d40}
+.student-explorer-layout{display:grid;grid-template-columns:minmax(0,1fr) 274px;gap:24px;align-items:start}
+.student-explorer-main{min-width:0;display:grid;gap:28px}
+.student-map{position:relative;padding:28px;border:2px solid #93a88a;border-radius:26px;background:#f6f7e9;box-shadow:0 5px 0 #dce2d0;scroll-margin-top:24px}
+.student-map-heading,.student-games-heading{display:flex;align-items:center;justify-content:space-between;gap:14px}
+.student-kicker{display:block;font-size:10px;font-weight:800;letter-spacing:.13em;color:#61745d;margin-bottom:8px}
+.student-map-heading h2{font-size:25px;margin:0;color:#334d42;overflow-wrap:anywhere}
+.student-map-stamp{font-size:11px;font-weight:700;white-space:nowrap;padding:7px 10px;border:1px solid #b5c2a5;border-radius:9px;background:#fffdf3;color:#556b4a;transform:rotate(2deg)}
+.student-map-guide{font-size:13px;color:#62715d;margin:12px 0 22px!important}
+.student-region-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.student-region-grid:has(>.student-region:only-child){grid-template-columns:1fr}
+.student-region{--region-color:#526e53;--region-line:#bdd0b4;--region-bg:#e5efdf;position:relative;padding:19px 16px 15px;border:1px solid var(--region-line);border-radius:20px;background:var(--region-bg);min-width:0}
+.student-region.region-peach{--region-color:#905b43;--region-line:#e1bfa9;--region-bg:#f7e8d9}
+.student-region.region-blue{--region-color:#3c6e89;--region-line:#b1cfdb;--region-bg:#e2eff3}
+.student-region.region-lilac{--region-color:#706084;--region-line:#cbbddc;--region-bg:#eee7f5}
+.student-region.region-sand{--region-color:#856b37;--region-line:#d8c79c;--region-bg:#f3edd9}
+.student-region.is-selected{outline:2px solid var(--region-color);outline-offset:2px}
+.student-region-heading{display:flex;align-items:center;gap:11px;margin-bottom:15px;color:var(--region-color)}
+.student-region-symbol{display:grid;place-items:center;width:40px;height:40px;flex:0 0 40px;border:1px solid var(--region-line);border-radius:13px;background:#fff9;font-size:22px;font-weight:800;letter-spacing:-.06em}
+.student-region-heading>div{min-width:0}
+.student-region-heading>div>span{display:block;font-size:10px;font-weight:650;overflow-wrap:anywhere}
+.student-region-heading h3{font-size:17px;color:var(--region-color);margin:2px 0 0;overflow-wrap:anywhere}
+.student-map-stops{display:grid;gap:10px;list-style:none;padding:0;margin:0}
+.student-map-stops>li{min-width:0;position:relative}
+.online-student button.student-map-stop{display:flex;align-items:center;gap:9px;width:100%;min-height:68px;padding:12px 10px;border:1px solid var(--region-line);border-radius:13px;background:#fffdf6;color:#374d40;text-align:left;box-shadow:0 2px 0 #00000008}
+.online-student button.student-map-stop:hover:not(:disabled){background:#fff;border-color:var(--region-color)}
+.online-student button.student-map-stop[aria-pressed=true]{border-color:var(--region-color);background:#fff}
+.student-stop-marker{display:grid;place-items:center;width:26px;height:26px;flex:0 0 26px;border:1px dashed var(--region-color);border-radius:50%;font-size:12px;color:var(--region-color)}
+.student-stop-marker.is-done{background:#e5eddf;border-style:solid}
+.student-stop-copy{display:grid;gap:4px;flex:1;min-width:0;overflow-wrap:anywhere}
+.student-stop-copy strong{font-size:13px;line-height:1.4}
+.student-stop-copy small{font-size:10px;font-weight:500;color:#6c786a}
+.student-map-stop>span:last-child{font-size:12px;color:var(--region-color)}
+.student-map-note{margin:20px 0 0!important;font-size:11px;color:#697760;text-align:center}
+.student-map-note>span{margin-right:6px;color:#977727}
+.student-map-empty{padding:20px;background:#fff9;border-radius:15px;font-size:14px}
+.student-light-games{padding:2px 0 0;min-width:0}
+.student-games-heading h2{font-size:21px;margin:0;overflow-wrap:anywhere}
+.student-question-count{font-size:11px;color:#616f60;white-space:nowrap;padding:6px 10px;border-radius:8px;border:1px solid #dfe3d4;background:#fffdf7}
+.student-games-guide{font-size:13px;color:#718070;margin:10px 0 18px!important}
+.student-game-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.online-student button.student-game-card{display:flex;align-items:flex-start;gap:14px;width:100%;padding:20px 17px;border:1px solid #d3deca;border-radius:19px;background:#fffdf8;text-align:left;box-shadow:0 3px 0 #e6e8dc;transition:border-color .15s,transform .15s}
+.online-student button.student-game-card:hover:not(:disabled){border-color:#799277;background:#fff;transform:translateY(-2px)}
+.student-game-symbol{display:grid;place-items:center;width:42px;height:46px;flex:0 0 42px;border:1px solid #b8ccac;border-radius:13px;background:#e5efdc;color:#4a6b43;font-size:23px;font-weight:800}
+.game-card-memory-match .student-game-symbol{background:#f9e8c9;border-color:#e3c493;color:#a47335}
+.game-card-sentence-builder .student-game-symbol{background:#f3e4dc;border-color:#dbbcaa;color:#965d46}
+.game-card-word-connect .student-game-symbol{background:#e1edf3;border-color:#b2ceda;color:#4a7890}
+.game-card-sequence-trail .student-game-symbol{background:#eee6f5;border-color:#cfbddc;color:#7c5e96;font-size:18px}
+.student-game-copy{display:grid;gap:8px;min-width:0;flex:1}
+.student-game-copy>strong{font-size:15px;line-height:1.4;overflow-wrap:anywhere}
+.student-game-copy>span{font-size:12px;font-weight:400;line-height:1.65;color:#6a766a}
+.student-game-copy>small{display:flex;justify-content:space-between;gap:8px;font-size:11px;color:#477144;font-weight:750;margin-top:4px}
+.student-travel-bag{display:grid;gap:19px;min-width:0}
+.student-buddy{display:flex;align-items:center;gap:11px;padding:5px 4px}
+.student-buddy-icon{font-size:30px;display:grid;place-items:center;width:48px;height:48px;flex:0 0 48px;border-radius:50%;border:1px solid #dfd6be;background:#fff6dd}
+.student-buddy strong{font-size:13px}
+.student-buddy p{font-size:11px;color:#7b7e6c;margin:3px 0 0;line-height:1.5}
+.student-week-card{padding:22px;border:1px solid #d0dcc9;border-radius:21px;background:#fffdf8;box-shadow:0 3px 0 #e7eadd}
+.student-week-card h2{font-size:17px;margin-bottom:20px}
+.student-progress-count{display:grid;gap:3px;margin-bottom:15px}
+.student-progress-count>strong{font-size:33px;line-height:1.1;color:#496e41}
+.student-progress-count>strong>span{font-size:19px;font-weight:500;color:#839078}
+.student-progress-count>span{font-size:11px;color:#6d7964}
+.student-week-meter{display:block;width:100%;height:10px;border:none;border-radius:6px;overflow:hidden;accent-color:#739460;background:#e8eddf}
+.student-week-meter::-webkit-progress-bar{background:#e8eddf;border-radius:6px}
+.student-week-meter::-webkit-progress-value{background:#739460;border-radius:6px}
+.student-week-meter::-moz-progress-bar{background:#739460;border-radius:6px}
+.student-week-card>p{font-size:12px;color:#6d7964;margin:12px 0 16px}
+.student-text-link{display:flex;justify-content:space-between;align-items:center;gap:10px;min-height:44px;font-size:11px;text-decoration:none;font-weight:750;color:#496e41!important;border-top:1px solid #e3e9da;padding-top:8px}
+.student-star-card{position:relative;padding:24px 22px 20px;border:1px solid #dfc593;border-radius:21px;background:#fff0cc;box-shadow:0 3px 0 #eddfbd}
+.student-star-card .student-kicker{color:#8c6b32;margin-top:25px}
+.student-star-symbol{position:absolute;top:13px;right:20px;color:#bc8a32;font-size:31px;transform:rotate(12deg)}
+.student-star-card h2{font-size:30px;color:#795623;margin-bottom:8px}
+.student-star-card h2>span{display:block;margin-top:4px;font-size:12px;letter-spacing:0;font-weight:550}
+.student-star-card p{font-size:11px;color:#897346;margin-bottom:18px}
+.online-student .student-star-card .game-wallet-button{display:flex;justify-content:space-between;align-items:center;width:100%;min-height:44px;padding:11px 13px;border:1px solid #ae8143;border-radius:11px;background:#fff9e9;color:#795623;font-size:12px}
+.student-gentle-note{text-align:center;font-size:11px;line-height:1.8;color:#7a816d;padding:0 12px}
+@media(min-width:1080px){.student-game-grid:has(>.student-game-card:only-child){grid-template-columns:1fr}.student-game-grid>.student-game-card:only-child .student-game-copy{grid-template-columns:1fr auto}.student-game-grid>.student-game-card:only-child .student-game-copy>span{grid-column:1}.student-game-grid>.student-game-card:only-child .student-game-copy>small{grid-column:2;grid-row:1/3;align-items:center;align-self:center;gap:18px}}
+@media(max-width:1000px){.online-student .student-light-hub{width:calc(100% - 40px);margin-top:26px}.student-explorer-layout{grid-template-columns:minmax(0,1fr) 230px;gap:18px}.student-map{padding:22px}.student-region-grid{grid-template-columns:1fr;gap:14px}.student-region{padding:16px}.student-game-grid{grid-template-columns:1fr}.student-week-card,.student-star-card{padding:20px 17px}.student-quick-nav a{padding:9px 10px;font-size:11px}}
+@media(max-width:700px){.student-welcome{align-items:flex-start;flex-direction:column;gap:18px}.student-welcome p:last-child{font-size:13px}.student-quick-nav{width:100%}.student-quick-nav a{flex:1;justify-content:center;font-size:12px}.student-explorer-layout{grid-template-columns:1fr}.student-travel-bag{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;grid-row:1}.student-buddy,.student-gentle-note{display:none}.student-week-card,.student-star-card{padding:17px 14px;border-radius:18px}.student-week-card h2{font-size:14px;margin-bottom:16px}.student-week-card .student-kicker,.student-star-card .student-kicker{font-size:9px;letter-spacing:.06em}.student-star-card .student-kicker{margin-top:0}.student-star-symbol{font-size:19px;right:11px;top:28px}.student-star-card h2{font-size:28px}.student-star-card h2>span{font-size:10px}.student-star-card p{font-size:10px;margin-bottom:12px}.online-student .student-star-card .game-wallet-button{padding:9px;font-size:11px}.student-progress-count>strong{font-size:28px}.student-progress-count>span,.student-week-card>p,.student-text-link{font-size:10px}.student-week-card>p{margin-bottom:7px}.student-text-link{line-height:1.5}.student-map{padding:22px 17px;border-radius:21px}.student-region-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.student-region{padding:14px 12px}.student-region-heading{gap:8px}.student-region-symbol{width:31px;height:34px;flex-basis:31px;font-size:18px}.student-region-heading h3{font-size:15px}.student-map-stamp{font-size:10px}.student-map-note{font-size:10px}.student-map-guide{font-size:12px}.student-stop-copy strong{font-size:12px}.student-stop-copy small{font-size:10px}.student-stop-marker{width:23px;height:23px;flex-basis:23px}.student-map-heading h2{font-size:23px}.student-games-heading h2{font-size:20px}.student-game-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:480px){.online-student .student-light-hub{width:calc(100% - 28px);margin-top:23px}.student-region-grid,.student-game-grid{grid-template-columns:1fr}.student-map-stamp{white-space:normal;max-width:93px;text-align:center}.student-question-count{font-size:10px}.student-region-heading h3{font-size:17px}.student-stop-copy strong{font-size:13px}.student-stop-copy small{font-size:11px}.student-map-guide{margin-bottom:18px!important}}
+@media(prefers-reduced-motion:reduce){.online-student button.student-game-card{transition:none}.online-student button.student-game-card:hover:not(:disabled){transform:none}}
+.student-game-thumbnail{width:52px;height:40px;object-fit:cover;border-radius:8px;flex:0 0 52px;border:1px solid #d3deca}
+.student-light-hub.hub-compact .student-explorer-layout{grid-template-columns:1fr;max-width:620px;margin:0 auto}
+.student-light-hub.hub-compact .student-travel-bag{grid-template-columns:repeat(2,minmax(0,1fr))}

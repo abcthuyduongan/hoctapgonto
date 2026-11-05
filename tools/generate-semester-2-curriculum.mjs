@@ -1,0 +1,1127 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import { validatePack } from '../src/core/validation.ts';
+
+const weeks = [
+  {
+    weekNumber: 19,
+    title: 'Tuần 19: Nhà bác học sáng tạo',
+    discovery: {
+      title: 'Nhà bác học Thomas Edison',
+      text: 'Thomas Edison (1847–1931) là nhà phát minh vĩ đại đã chế tạo ra bóng đèn điện sợi đốt thực tế đầu tiên và máy ghi âm, với hơn 1.000 bằng sáng chế ghi dấu ấn cho nhân loại.',
+      imageFile: 'discovery-week-19.webp'
+    },
+    packs: [
+      {
+        id: 'hk2-tuan-19-toan-nhan',
+        version: 1,
+        title: 'Phép nhân số có bốn chữ số với số có một chữ số',
+        subject: 'math',
+        grade: 3,
+        source: 'local',
+        publishedAt: '2027-01-18T01:00:00.000Z',
+        kind: 'quiz',
+        discovery: {
+          title: 'Nhà bác học Thomas Edison',
+          text: 'Thomas Edison đã tiến hành hàng ngàn thí nghiệm kiên trì trước khi hoàn thiện bóng đèn sợi đốt.',
+          imageFile: 'discovery-week-19.webp'
+        },
+        items: [
+          {
+            id: 't19.m.01',
+            kind: 'multiple-choice',
+            objectiveId: 'TOAN3.HK2.NHAN',
+            prompt: 'Kết quả của phép tính 1213 × 3 là bao nhiêu?',
+            options: ['3639', '3629', '3649', '3636'],
+            correctIndex: 0,
+            explanation: 'Đặt tính rồi tính: 3 × 3 = 9; 3 × 1 = 3; 3 × 2 = 6; 3 × 1 = 3. Vậy 1213 × 3 = 3639.'
+          },
+          {
+            id: 't19.m.02',
+            kind: 'multiple-choice',
+            objectiveId: 'TOAN3.HK2.NHAN',
+            prompt: 'Một cửa hàng có 3 thùng dầu, mỗi thùng chứa 1250 lít dầu. Hỏi cửa hàng có tất cả bao nhiêu lít dầu?',
+            options: ['3750 lít', '3650 lít', '3550 lít', '3850 lít'],
+            correctIndex: 0,
+            explanation: 'Số lít dầu cửa hàng có là: 1250 × 3 = 3750 (lít).'
+          },
+          {
+            id: 't19.m.03',
+            kind: 'multiple-choice',
+            objectiveId: 'TOAN3.HK2.NHAN',
+            prompt: 'Tìm x biết: x : 4 = 1120',
+            options: ['4480', '4460', '4440', '4520'],
+            correctIndex: 0,
+            explanation: 'Muốn tìm số bị chia ta lấy thương nhân với số chia: x = 1120 × 4 = 4480.'
+          },
+          {
+            id: 't19.m.04',
+            kind: 'multiple-choice',
+            objectiveId: 'TOAN3.HK2.NHAN',
+            prompt: 'Tính nhẩm: 2000 × 4 = ?',
+            options: ['8000', '6000', '800', '80000'],
+            correctIndex: 0,
+            explanation: '2 nghìn × 4 = 8 nghìn = 8000.'
+          }
+        ]
+      },
+      {
+        id: 'hk2-tuan-19-viet-sangtao',
+        version: 1,
+        title: 'Mở rộng vốn từ Sáng tạo',
+        subject: 'vietnamese',
+        grade: 3,
+        source: 'local',
+        publishedAt: '2027-01-18T01:00:00.000Z',
+        kind: 'sentences',
+        items: [
+          {
+            id: 't19.v.01',
+            kind: 'sentence',
+            objectiveId: 'TV3.HK2.SANGTAO',
+            prompt: 'Sắp xếp các từ thành câu ca ngợi tinh thần làm việc của nhà khoa học:',
+            words: ['Nhà', 'khoa', 'học', 'miệt', 'mài', 'nghiên', 'cứu.'],
+            hint: 'Bắt đầu bằng cụm từ chỉ người nghiên cứu.'
+          },
+          {
+            id: 't19.v.02',
+            kind: 'sentence',
+            objectiveId: 'TV3.HK2.SANGTAO',
+            prompt: 'Sắp xếp các từ thành câu mô tả phát minh:',
+            words: ['Bóng', 'đèn', 'điện', 'thắp', 'sáng', 'muôn', 'nơi.'],
+            hint: 'Bắt đầu bằng từ chỉ đồ vật phát minh.'
+          },
+          {
+            id: 't19.v.03',
+            kind: 'sentence',
+            objectiveId: 'TV3.HK2.SANGTAO',
+            prompt: 'Sắp xếp các từ thành câu khuyên học sinh:',
+            words: ['Em', 'luôn', 'chăm', 'chỉ', 'và', 'sáng', 'tạo.'],
+            hint: 'Bắt đầu bằng từ Em.'
+          }
+        ]
+      },
+      {
+        id: 'hk2-tuan-19-anh-family',
+        version: 1,
+        title: 'Unit 11: My family and home',
+        subject: 'english',
+        grade: 3,
+        source: 'local',
+        publishedAt: '2027-01-18T01:00:00.000Z',
+        kind: 'pairs',
+        items: [
+          {
+            id: 't19.e.01',
+            kind: 'pair',
+            objectiveId: 'ENG3.HK2.FAMILY',
+            left: 'grandfather',
+            right: 'ông nội hoặc ông ngoại'
+          },
+          {
+            id: 't19.e.02',
+            kind: 'pair',
+            objectiveId: 'ENG3.HK2.FAMILY',
+            left: 'grandmother',
+            right: 'bà nội hoặc bà ngoại'
+          },
+          {
+            id: 't19.e.03',
+            kind: 'pair',
+            objectiveId: 'ENG3.HK2.FAMILY',
+            left: 'living room',
+            right: 'phòng khách ấm cúng'
+          },
+          {
+            id: 't19.e.04',
+            kind: 'pair',
+            objectiveId: 'ENG3.HK2.FAMILY',
+            left: 'kitchen',
+            right: 'phòng bếp nấu ăn'
+          }
+        ]
+      }
+    ]
+  },
+  {
+    weekNumber: 20,
+    title: 'Tuần 20: Kỳ quan thiên nhiên',
+    discovery: {
+      title: 'Vịnh Hạ Long xinh đẹp',
+      text: 'Vịnh Hạ Long thuộc tỉnh Quảng Ninh là di sản thiên nhiên thế giới được UNESCO công nhận, nổi tiếng với hàng ngàn hòn đảo đá vôi kỳ vĩ soi bóng xuống làn nước xanh ngọc bích.',
+      imageFile: 'discovery-week-20.webp'
+    },
+    packs: [
+      {
+        id: 'hk2-tuan-20-toan-chia',
+        version: 1,
+        title: 'Phép chia số có bốn chữ số cho số có một chữ số',
+        subject: 'math',
+        grade: 3,
+        source: 'local',
+        publishedAt: '2027-01-25T01:00:00.000Z',
+        kind: 'quiz',
+        items: [
+          {
+            id: 't20.m.01',
+            kind: 'multiple-choice',
+            objectiveId: 'TOAN3.HK2.CHIA',
+            prompt: 'Kết quả của phép tính 4848 : 4 là bao nhiêu?',
+            options: ['1212', '1202', '1221', '1242'],
+            correctIndex: 0,
+            explanation: '4848 : 4 = 1212.'
+          },
+          {
+            id: 't20.m.02',
+            kind: 'multiple-choice',
+            objectiveId: 'TOAN3.HK2.CHIA',
+            prompt: 'Có 1530 quyển vở chia đều cho 5 lớp học. Hỏi mỗi lớp nhận được bao nhiêu quyển vở?',
+            options: ['306 quyển', '360 quyển', '316 quyển', '305 quyển'],
+            correctIndex: 0,
+            explanation: 'Số quyển vở mỗi lớp nhận được là: 1530 : 5 = 306 (quyển).'
+          },
+          {
+            id: 't20.m.03',
+            kind: 'multiple-choice',
+            objectiveId: 'TOAN3.HK2.CHIA',
+            prompt: 'Thương và số dư của phép chia 2465 : 3 lần lượt là:',
+            options: ['821 dư 2', '821 dư 1', '820 dư 2', '822 dư 1'],
+            correctIndex: 0,
+            explanation: '2465 = 3 × 821 + 2. Vậy thương là 821 và số dư là 2.'
+          },
+          {
+            id: 't20.m.04',
+            kind: 'multiple-choice',
+            objectiveId: 'TOAN3.HK2.CHIA',
+            prompt: 'Tính nhẩm: 6000 : 3 = ?',
+            options: ['2000', '3000', '200', '1500'],
+            correctIndex: 0,
+            explanation: '6 nghìn : 3 = 2 nghìn = 2000.'
+          }
+        ]
+      },
+      {
+        id: 'hk2-tuan-20-viet-caukhien',
+        version: 1,
+        title: 'Câu khiến và câu cảm trong giao tiếp',
+        subject: 'vietnamese',
+        grade: 3,
+        source: 'local',
+        publishedAt: '2027-01-25T01:00:00.000Z',
+        kind: 'sentences',
+        items: [
+          {
+            id: 't20.v.01',
+            kind: 'sentence',
+            objectiveId: 'TV3.HK2.CAUKHIEN',
+            prompt: 'Sắp xếp các từ thành câu khiến lễ phép:',
+            words: ['Xin', 'mời', 'bạn', 'vào', 'lớp', 'học.'],
+            hint: 'Bắt đầu bằng từ biểu thị sự lịch sự Xin.'
+          },
+          {
+            id: 't20.v.02',
+            kind: 'sentence',
+            objectiveId: 'TV3.HK2.CAUKHIEN',
+            prompt: 'Sắp xếp các từ thành câu cảm xúc khen ngợi cảnh đẹp:',
+            words: ['Vịnh', 'Hạ', 'Long', 'đẹp', 'tuyệt', 'vời', 'quá!'],
+            hint: 'Kết thúc bằng từ cảm thán và dấu chấm than.'
+          },
+          {
+            id: 't20.v.03',
+            kind: 'sentence',
+            objectiveId: 'TV3.HK2.CAUKHIEN',
+            prompt: 'Sắp xếp các từ thành lời nhắc nhở giữ vệ sinh:',
+            words: ['Chúng', 'mình', 'cùng', 'nhau', 'giữ', 'vệ', 'sinh.'],
+            hint: 'Bắt đầu bằng Chúng mình.'
+          }
+        ]
+      },
+      {
+        id: 'hk2-tuan-20-anh-clothes',
+        version: 1,
+        title: 'Unit 12: Clothes and Colors',
+        subject: 'english',
+        grade: 3,
+        source: 'local',
+        publishedAt: '2027-01-25T01:00:00.000Z',
+        kind: 'pairs',
+        items: [
+          {
+            id: 't20.e.01',
+            kind: 'pair',
+            objectiveId: 'ENG3.HK2.CLOTHES',
+            left: 'yellow shirt',
+            right: 'áo sơ mi màu vàng'
+          },
+          {
+            id: 't20.e.02',
+            kind: 'pair',
+            objectiveId: 'ENG3.HK2.CLOTHES',
+            left: 'blue trousers',
+            right: 'quần dài màu xanh lam'
+          },
+          {
+            id: 't20.e.03',
+            kind: 'pair',
+            objectiveId: 'ENG3.HK2.CLOTHES',
+            left: 'warm jacket',
+            right: 'áo khoác giữ ấm'
+          },
+          {
+            id: 't20.e.04',
+            kind: 'pair',
+            objectiveId: 'ENG3.HK2.CLOTHES',
+            left: 'brown shoes',
+            right: 'đôi giày màu nâu'
+          }
+        ]
+      }
+    ]
+  },
+  {
+    weekNumber: 21,
+    title: 'Tuần 21: Nghệ thuật và Hình học',
+    discovery: {
+      title: 'Tranh dân gian Đông Hồ',
+      text: 'Tranh Đông Hồ xuất xứ từ Bắc Ninh, được in từ ván gỗ khắc thủ công trên nền giấy điệp óng ánh vỏ sò, gắn liền với các bức tranh nổi tiếng như Đám cưới chuột, Gà đàn, Hứng dừa.',
+      imageFile: 'discovery-week-21.webp'
+    },
+    packs: [
+      {
+        id: 'hk2-tuan-21-toan-chuvi',
+        version: 1,
+        title: 'Độ dài và Chu vi hình chữ nhật, hình vuông',
+        subject: 'math',
+        grade: 3,
+        source: 'local',
+        publishedAt: '2027-02-01T01:00:00.000Z',
+        kind: 'compare',
+        items: [
+          {
+            id: 't21.m.01',
+            kind: 'compare',
+            objectiveId: 'TOAN3.HK2.CHUVI',
+            left: 'Chu vi hình vuông cạnh 5 cm',
+            operator: '=',
+            right: 'Chu vi hình chữ nhật dài 6 cm rộng 4 cm',
+            explanation: 'Chu vi hình vuông = 5 × 4 = 20 cm. Chu vi hình chữ nhật = (6 + 4) × 2 = 20 cm. Hai chu vi bằng nhau.'
+          },
+          {
+            id: 't21.m.02',
+            kind: 'compare',
+            objectiveId: 'TOAN3.HK2.CHUVI',
+            left: '1 m 50 cm',
+            operator: '>',
+            right: '135 cm',
+            explanation: '1 m 50 cm = 150 cm. Vì 150 cm > 135 cm nên 1 m 50 cm > 135 cm.'
+          },
+          {
+            id: 't21.m.03',
+            kind: 'compare',
+            objectiveId: 'TOAN3.HK2.CHUVI',
+            left: 'Chu vi tam giác có 3 cạnh đều bằng 7 cm',
+            operator: '<',
+            right: 'Chu vi hình vuông cạnh 6 cm',
+            explanation: 'Chu vi tam giác = 7 × 3 = 21 cm. Chu vi hình vuông = 6 × 4 = 24 cm. Vì 21 < 24 nên vế trái nhỏ hơn.'
+          }
+        ]
+      },
+      {
+        id: 'hk2-tuan-21-viet-nghethuat',
+        version: 1,
+        title: 'Mở rộng vốn từ Nghệ thuật',
+        subject: 'vietnamese',
+        grade: 3,
+        source: 'local',
+        publishedAt: '2027-02-01T01:00:00.000Z',
+        kind: 'categorize',
+        items: [
+          {
+            id: 't21.v.01',
+            kind: 'categorize',
+            objectiveId: 'TV3.HK2.NGHETHUAT',
+            prompt: 'Phân loại các từ ngữ vào hai nhóm Người làm nghệ thuật và Hoạt động nghệ thuật:',
+            categories: ['Người làm nghệ thuật', 'Hoạt động nghệ thuật'],
+            elements: [
+              { id: 'el1', text: 'Nhạc sĩ', category: 'Người làm nghệ thuật' },
+              { id: 'el2', text: 'Họa sĩ', category: 'Người làm nghệ thuật' },
+              { id: 'el3', text: 'Diễn viên', category: 'Người làm nghệ thuật' },
+              { id: 'el4', text: 'Ca hát', category: 'Hoạt động nghệ thuật' },
+              { id: 'el5', text: 'Vẽ tranh', category: 'Hoạt động nghệ thuật' },
+              { id: 'el6', text: 'Biểu diễn múa', category: 'Hoạt động nghệ thuật' }
+            ],
+            explanation: 'Nhạc sĩ, họa sĩ, diễn viên là người làm nghệ thuật; ca hát, vẽ tranh, biểu diễn múa là hoạt động nghệ thuật.'
+          },
+          {
+            id: 't21.v.02',
+            kind: 'categorize',
+            objectiveId: 'TV3.HK2.NGHETHUAT',
+            prompt: 'Phân loại các từ ngữ vào hai nhóm Nhạc cụ truyền thống và Tác phẩm nghệ thuật:',
+            categories: ['Nhạc cụ truyền thống', 'Tác phẩm nghệ thuật'],
+            elements: [
+              { id: 'el7', text: 'Đàn bầu', category: 'Nhạc cụ truyền thống' },
+              { id: 'el8', text: 'Đàn tranh', category: 'Nhạc cụ truyền thống' },
+              { id: 'el9', text: 'Sáo trúc', category: 'Nhạc cụ truyền thống' },
+              { id: 'el10', text: 'Bức tranh', category: 'Tác phẩm nghệ thuật' },
+              { id: 'el11', text: 'Bài hát', category: 'Tác phẩm nghệ thuật' },
+              { id: 'el12', text: 'Vở kịch', category: 'Tác phẩm nghệ thuật' }
+            ],
+            explanation: 'Đàn bầu, đàn tranh, sáo trúc là nhạc cụ; bức tranh, bài hát, vở kịch là tác phẩm nghệ thuật.'
+          }
+        ]
+      },
+      {
+        id: 'hk2-tuan-21-anh-activities',
+        version: 1,
+        title: 'Unit 13: Break time activities',
+        subject: 'english',
+        grade: 3,
+        source: 'local',
+        publishedAt: '2027-02-01T01:00:00.000Z',
+        kind: 'sentences',
+        items: [
+          {
+            id: 't21.e.01',
+            kind: 'sentence',
+            objectiveId: 'ENG3.HK2.BREAKTIME',
+            prompt: 'Sắp xếp thành câu nói về hoạt động giờ ra chơi:',
+            words: ['They', 'play', 'football', 'in', 'the', 'playground.'],
+            hint: 'Bắt đầu bằng chủ ngữ They.'
+          },
+          {
+            id: 't21.e.02',
+            kind: 'sentence',
+            objectiveId: 'ENG3.HK2.BREAKTIME',
+            prompt: 'Sắp xếp thành câu diễn tả sở thích:',
+            words: ['I', 'like', 'playing', 'badminton', 'with', 'friends.'],
+            hint: 'Bắt đầu bằng I like.'
+          },
+          {
+            id: 't21.e.03',
+            kind: 'sentence',
+            objectiveId: 'ENG3.HK2.BREAKTIME',
+            prompt: 'Sắp xếp thành câu hỏi rủ bạn cùng chơi:',
+            words: ['Do', 'you', 'want', 'to', 'skip', 'rope?'],
+            hint: 'Bắt đầu bằng trợ động từ Do.'
+          }
+        ]
+      }
+    ]
+  },
+  {
+    weekNumber: 22,
+    title: 'Tuần 22: Thời gian và Biện pháp Nhân hóa',
+    discovery: {
+      title: 'Đồng hồ nước cổ xưa',
+      text: 'Trước khi có đồng hồ cơ khí, người xưa dùng đồng hồ nước (Clepsydra) đo thời gian bằng tốc độ dòng nước chảy đều qua một bình chứa chia vạch.',
+      imageFile: 'discovery-week-22.webp'
+    },
+    packs: [
+      {
+        id: 'hk2-tuan-22-toan-thoigian',
+        version: 1,
+        title: 'Tháng trong năm và ngày trong tháng',
+        subject: 'math',
+        grade: 3,
+        source: 'local',
+        publishedAt: '2027-02-08T01:00:00.000Z',
+        kind: 'quiz',
+        items: [
+          {
+            id: 't22.m.01',
+            kind: 'multiple-choice',
+            objectiveId: 'TOAN3.HK2.THOIGIAN',
+            prompt: 'Những tháng nào dưới đây trong năm có đúng 31 ngày?',
+            options: ['Tháng 1, tháng 3, tháng 5, tháng 7', 'Tháng 4, tháng 6, tháng 9, tháng 11', 'Tháng 2, tháng 4, tháng 6, tháng 8', 'Tháng 1, tháng 2, tháng 3, tháng 4'],
+            correctIndex: 0,
+            explanation: 'Các tháng có 31 ngày gồm: tháng 1, 3, 5, 7, 8, 10, 12.'
+          },
+          {
+            id: 't22.m.02',
+            kind: 'multiple-choice',
+            objectiveId: 'TOAN3.HK2.THOIGIAN',
+            prompt: 'Năm nhuận thì tháng 2 có bao nhiêu ngày?',
+            options: ['29 ngày', '28 ngày', '30 ngày', '31 ngày'],
+            correctIndex: 0,
+            explanation: 'Năm thường tháng 2 có 28 ngày, năm nhuận tháng 2 có 29 ngày.'
+          },
+          {
+            id: 't22.m.03',
+            kind: 'multiple-choice',
+            objectiveId: 'TOAN3.HK2.THOIGIAN',
+            prompt: 'Nếu ngày 20 tháng 11 là thứ Sáu thì ngày 22 tháng 11 cùng năm là thứ mấy?',
+            options: ['Chủ nhật', 'Thứ Bảy', 'Thứ Hai', 'Thứ Năm'],
+            correctIndex: 0,
+            explanation: 'Ngày 20 là thứ Sáu, ngày 21 là thứ Bảy, ngày 22 là Chủ nhật.'
+          },
+          {
+            id: 't22.m.04',
+            kind: 'multiple-choice',
+            objectiveId: 'TOAN3.HK2.THOIGIAN',
+            prompt: 'Một năm có tất cả bao nhiêu tháng?',
+            options: ['12 tháng', '10 tháng', '14 tháng', '11 tháng'],
+            correctIndex: 0,
+            explanation: 'Một năm có 12 tháng từ tháng 1 đến tháng 12.'
+          }
+        ]
+      },
+      {
+        id: 'hk2-tuan-22-viet-nhanhoa',
+        version: 1,
+        title: 'Biện pháp nhân hóa trong văn học',
+        subject: 'vietnamese',
+        grade: 3,
+        source: 'local',
+        publishedAt: '2027-02-08T01:00:00.000Z',
+        kind: 'sentences',
+        items: [
+          {
+            id: 't22.v.01',
+            kind: 'sentence',
+            objectiveId: 'TV3.HK2.NHANHOA',
+            prompt: 'Sắp xếp thành câu nhân hóa gọi sự vật như con người:',
+            words: ['Bác', 'mặt', 'trời', 'tỏa', 'ánh', 'nắng', 'ấm.'],
+            hint: 'Dùng từ xưng hô Bác với mặt trời.'
+          },
+          {
+            id: 't22.v.02',
+            kind: 'sentence',
+            objectiveId: 'TV3.HK2.NHANHOA',
+            prompt: 'Sắp xếp thành câu nhân hóa tả hành động đồ vật:',
+            words: ['Chiếc', 'đồng', 'hồ', 'báo', 'thức', 'chăm', 'chỉ.'],
+            hint: 'Bắt đầu bằng Chiếc đồng hồ.'
+          },
+          {
+            id: 't22.v.03',
+            kind: 'sentence',
+            objectiveId: 'TV3.HK2.NHANHOA',
+            prompt: 'Sắp xếp thành câu nhân hóa tả hoa cỏ:',
+            words: ['Chị', 'hoa', 'hồng', 'mỉm', 'cười', 'trong', 'gió.'],
+            hint: 'Dùng từ xưng hô Chị hoa hồng.'
+          }
+        ]
+      },
+      {
+        id: 'hk2-tuan-22-anh-animals',
+        version: 1,
+        title: 'Unit 14: Animals and Habitats',
+        subject: 'english',
+        grade: 3,
+        source: 'local',
+        publishedAt: '2027-02-08T01:00:00.000Z',
+        kind: 'pairs',
+        items: [
+          {
+            id: 't22.e.01',
+            kind: 'pair',
+            objectiveId: 'ENG3.HK2.ANIMALS',
+            left: 'dolphin in the sea',
+            right: 'cá heo bơi dưới biển'
+          },
+          {
+            id: 't22.e.02',
+            kind: 'pair',
+            objectiveId: 'ENG3.HK2.ANIMALS',
+            left: 'monkey in the tree',
+            right: 'chú khỉ chuyền cành cây'
+          },
+          {
+            id: 't22.e.03',
+            kind: 'pair',
+            objectiveId: 'ENG3.HK2.ANIMALS',
+            left: 'tiger in the forest',
+            right: 'hổ dũng mãnh trong rừng'
+          },
+          {
+            id: 't22.e.04',
+            kind: 'pair',
+            objectiveId: 'ENG3.HK2.ANIMALS',
+            left: 'eagle in the sky',
+            right: 'đại bàng bay trên bầu trời'
+          }
+        ]
+      }
+    ]
+  },
+  {
+    weekNumber: 23,
+    title: 'Tuần 23: Tiền Việt Nam và Đời sống',
+    discovery: {
+      title: 'Chợ nổi Cái Răng',
+      text: 'Chợ nổi Cái Răng tại Cần Thơ là nét văn hóa buôn bán độc đáo của vùng sông nước miền Tây. Người dân treo các loại nông sản lên cây bẹo ở mũi thuyền để giới thiệu hàng hóa.',
+      imageFile: 'discovery-week-23.webp'
+    },
+    packs: [
+      {
+        id: 'hk2-tuan-23-toan-tien',
+        version: 1,
+        title: 'Tiền Việt Nam và bài toán mua sắm',
+        subject: 'math',
+        grade: 3,
+        source: 'local',
+        publishedAt: '2027-02-15T01:00:00.000Z',
+        kind: 'quiz',
+        items: [
+          {
+            id: 't23.m.01',
+            kind: 'multiple-choice',
+            objectiveId: 'TOAN3.HK2.TIEN',
+            prompt: 'An mua một chiếc bút chì giá 3500 đồng và một cục tẩy giá 2000 đồng. Hỏi An phải trả bao nhiêu tiền?',
+            options: ['5500 đồng', '5000 đồng', '6000 đồng', '4500 đồng'],
+            correctIndex: 0,
+            explanation: 'Tổng số tiền An phải trả là: 3500 + 2000 = 5500 (đồng).'
+          },
+          {
+            id: 't23.m.02',
+            kind: 'multiple-choice',
+            objectiveId: 'TOAN3.HK2.TIEN',
+            prompt: 'Bình có tờ tiền 10000 đồng. Bình mua một quyển vở giá 7000 đồng. Hỏi người bán hàng trả lại Bình bao nhiêu tiền?',
+            options: ['3000 đồng', '2000 đồng', '4000 đồng', '1000 đồng'],
+            correctIndex: 0,
+            explanation: 'Số tiền trả lại là: 10000 - 7000 = 3000 (đồng).'
+          },
+          {
+            id: 't23.m.03',
+            kind: 'multiple-choice',
+            objectiveId: 'TOAN3.HK2.TIEN',
+            prompt: 'Mẹ đổi một tờ tiền 50000 đồng lấy các tờ 10000 đồng. Hỏi mẹ nhận được bao nhiêu tờ 10000 đồng?',
+            options: ['5 tờ', '4 tờ', '6 tờ', '10 tờ'],
+            correctIndex: 0,
+            explanation: '50000 : 10000 = 5 tờ tiền.'
+          },
+          {
+            id: 't23.m.04',
+            kind: 'multiple-choice',
+            objectiveId: 'TOAN3.HK2.TIEN',
+            prompt: 'Ba tờ tiền 2000 đồng có tổng giá trị là bao nhiêu?',
+            options: ['6000 đồng', '5000 đồng', '4000 đồng', '8000 đồng'],
+            correctIndex: 0,
+            explanation: '2000 × 3 = 6000 đồng.'
+          }
+        ]
+      },
+      {
+        id: 'hk2-tuan-23-viet-sosanh',
+        version: 1,
+        title: 'Từ ngữ chỉ đặc điểm và Câu so sánh',
+        subject: 'vietnamese',
+        grade: 3,
+        source: 'local',
+        publishedAt: '2027-02-15T01:00:00.000Z',
+        kind: 'sentences',
+        items: [
+          {
+            id: 't23.v.01',
+            kind: 'sentence',
+            objectiveId: 'TV3.HK2.SOSANH',
+            prompt: 'Sắp xếp thành câu so sánh sự vật với hình ảnh quen thuộc:',
+            words: ['Mặt', 'trăng', 'tròn', 'như', 'chiếc', 'đĩa', 'bạc.'],
+            hint: 'Dùng từ so sánh như.'
+          },
+          {
+            id: 't23.v.02',
+            kind: 'sentence',
+            objectiveId: 'TV3.HK2.SOSANH',
+            prompt: 'Sắp xếp thành câu so sánh tả dòng sông quê hương:',
+            words: ['Dòng', 'sông', 'uốn', 'lượn', 'như', 'dải', 'lụa.'],
+            hint: 'Bắt đầu bằng Dòng sông.'
+          },
+          {
+            id: 't23.v.03',
+            kind: 'sentence',
+            objectiveId: 'TV3.HK2.SOSANH',
+            prompt: 'Sắp xếp thành câu so sánh công ơn cha mẹ:',
+            words: ['Công', 'cha', 'như', 'núi', 'Thái', 'Sơn', 'cao.'],
+            hint: 'Bắt đầu bằng cụm từ Công cha.'
+          }
+        ]
+      },
+      {
+        id: 'hk2-tuan-23-anh-food',
+        version: 1,
+        title: 'Unit 15: Daily Food and Drinks',
+        subject: 'english',
+        grade: 3,
+        source: 'local',
+        publishedAt: '2027-02-15T01:00:00.000Z',
+        kind: 'pairs',
+        items: [
+          {
+            id: 't23.e.01',
+            kind: 'pair',
+            objectiveId: 'ENG3.HK2.FOOD',
+            left: 'fresh orange juice',
+            right: 'nước cam vắt tươi mát'
+          },
+          {
+            id: 't23.e.02',
+            kind: 'pair',
+            objectiveId: 'ENG3.HK2.FOOD',
+            left: 'steamed rice and fish',
+            right: 'cơm trắng dẻo và cá kho'
+          },
+          {
+            id: 't23.e.03',
+            kind: 'pair',
+            objectiveId: 'ENG3.HK2.FOOD',
+            left: 'sweet red apples',
+            right: 'những quả táo đỏ ngọt'
+          },
+          {
+            id: 't23.e.04',
+            kind: 'pair',
+            objectiveId: 'ENG3.HK2.FOOD',
+            left: 'glass of warm milk',
+            right: 'ly sữa ấm thơm ngon'
+          }
+        ]
+      }
+    ]
+  },
+  {
+    weekNumber: 24,
+    title: 'Tuần 24: Diện tích và Lễ hội non sông',
+    discovery: {
+      title: 'Lễ hội Đền Hùng Phú Thọ',
+      text: 'Giỗ Tổ Hùng Vương ngày mùng 10 tháng 3 âm lịch hằng năm tại Khu di tích lịch sử Đền Hùng (Phú Thọ) là dịp đồng bào cả nước hướng về cội nguồn dân tộc với truyền thống Uống nước nhớ nguồn.',
+      imageFile: 'discovery-week-24.webp'
+    },
+    packs: [
+      {
+        id: 'hk2-tuan-24-toan-dientich',
+        version: 1,
+        title: 'Diện tích hình chữ nhật và hình vuông',
+        subject: 'math',
+        grade: 3,
+        source: 'local',
+        publishedAt: '2027-02-22T01:00:00.000Z',
+        kind: 'quiz',
+        items: [
+          {
+            id: 't24.m.01',
+            kind: 'multiple-choice',
+            objectiveId: 'TOAN3.HK2.DIENTICH',
+            prompt: 'Diện tích hình vuông có cạnh dài 6 cm là bao nhiêu?',
+            options: ['36 cm²', '24 cm²', '30 cm²', '12 cm²'],
+            correctIndex: 0,
+            explanation: 'Diện tích hình vuông bằng độ dài cạnh nhân với chính nó: 6 × 6 = 36 cm².'
+          },
+          {
+            id: 't24.m.02',
+            kind: 'multiple-choice',
+            objectiveId: 'TOAN3.HK2.DIENTICH',
+            prompt: 'Một mảnh bìa hình chữ nhật có chiều dài 8 cm, chiều rộng 5 cm. Diện tích mảnh bìa là:',
+            options: ['40 cm²', '26 cm²', '35 cm²', '45 cm²'],
+            correctIndex: 0,
+            explanation: 'Diện tích hình chữ nhật = chiều dài × chiều rộng = 8 × 5 = 40 cm².'
+          },
+          {
+            id: 't24.m.03',
+            kind: 'multiple-choice',
+            objectiveId: 'TOAN3.HK2.DIENTICH',
+            prompt: 'Xăng-ti-mét vuông được viết tắt là gì?',
+            options: ['cm²', 'cm', 'm²', 'dm²'],
+            correctIndex: 0,
+            explanation: 'Xăng-ti-mét vuông viết tắt là cm².'
+          },
+          {
+            id: 't24.m.04',
+            kind: 'multiple-choice',
+            objectiveId: 'TOAN3.HK2.DIENTICH',
+            prompt: 'Hình chữ nhật có diện tích 28 cm², chiều rộng 4 cm. Chiều dài hình chữ nhật là:',
+            options: ['7 cm', '6 cm', '8 cm', '9 cm'],
+            correctIndex: 0,
+            explanation: 'Chiều dài = Diện tích : chiều rộng = 28 : 4 = 7 cm.'
+          }
+        ]
+      },
+      {
+        id: 'hk2-tuan-24-viet-lehoi',
+        version: 1,
+        title: 'Mở rộng vốn từ Lễ hội truyền thống',
+        subject: 'vietnamese',
+        grade: 3,
+        source: 'local',
+        publishedAt: '2027-02-22T01:00:00.000Z',
+        kind: 'sentences',
+        items: [
+          {
+            id: 't24.v.01',
+            kind: 'sentence',
+            objectiveId: 'TV3.HK2.LEHOI',
+            prompt: 'Sắp xếp thành câu miêu tả không khí ngày hội:',
+            words: ['Tiếng', 'trống', 'hội', 'vang', 'lên', 'rộn', 'rã.'],
+            hint: 'Bắt đầu bằng Tiếng trống hội.'
+          },
+          {
+            id: 't24.v.02',
+            kind: 'sentence',
+            objectiveId: 'TV3.HK2.LEHOI',
+            prompt: 'Sắp xếp thành câu nói về hoạt động lễ hội:',
+            words: ['Người', 'dân', 'nô', 'nức', 'về', 'dâng', 'hương.'],
+            hint: 'Bắt đầu bằng Người dân.'
+          },
+          {
+            id: 't24.v.03',
+            kind: 'sentence',
+            objectiveId: 'TV3.HK2.LEHOI',
+            prompt: 'Sắp xếp thành câu khuyên nhớ nguồn cội:',
+            words: ['Dù', 'ai', 'đi', 'ngược', 'về', 'xuôi', 'nhớ.'],
+            hint: 'Bắt đầu bằng từ Dù ai.'
+          }
+        ]
+      },
+      {
+        id: 'hk2-tuan-24-anh-sports',
+        version: 1,
+        title: 'Unit 16: Sports and Games',
+        subject: 'english',
+        grade: 3,
+        source: 'local',
+        publishedAt: '2027-02-22T01:00:00.000Z',
+        kind: 'pairs',
+        items: [
+          {
+            id: 't24.e.01',
+            kind: 'pair',
+            objectiveId: 'ENG3.HK2.SPORTS',
+            left: 'swimming pool',
+            right: 'hồ bơi ngoài trời'
+          },
+          {
+            id: 't24.e.02',
+            kind: 'pair',
+            objectiveId: 'ENG3.HK2.SPORTS',
+            left: 'table tennis table',
+            right: 'bàn chơi bóng bàn'
+          },
+          {
+            id: 't24.e.03',
+            kind: 'pair',
+            objectiveId: 'ENG3.HK2.SPORTS',
+            left: 'basketball court',
+            right: 'sân thi đấu bóng rổ'
+          },
+          {
+            id: 't24.e.04',
+            kind: 'pair',
+            objectiveId: 'ENG3.HK2.SPORTS',
+            left: 'running track',
+            right: 'đường chạy điền kinh'
+          }
+        ]
+      }
+    ]
+  },
+  {
+    weekNumber: 25,
+    title: 'Tuần 25: Số có năm chữ số và Kỳ quan Sơn Đoòng',
+    discovery: {
+      title: 'Hang Sơn Đoòng kỳ vĩ',
+      text: 'Hang Sơn Đoòng tại Vườn quốc gia Phong Nha – Kẻ Bàng (Quảng Bình) là hang động tự nhiên lớn nhất thế giới, có cả hệ sinh thái rừng nhiệt đới và dòng sông ngầm chảy xiết bên trong.',
+      imageFile: 'discovery-week-25.webp'
+    },
+    packs: [
+      {
+        id: 'hk2-tuan-25-toan-namchuso',
+        version: 1,
+        title: 'Làm quen với các số có năm chữ số',
+        subject: 'math',
+        grade: 3,
+        source: 'local',
+        publishedAt: '2027-03-01T01:00:00.000Z',
+        kind: 'quiz',
+        items: [
+          {
+            id: 't25.m.01',
+            kind: 'multiple-choice',
+            objectiveId: 'TOAN3.HK2.NAMCHUSO',
+            prompt: 'Số gồm 3 chục nghìn, 5 nghìn, 2 trăm, 4 chục và 8 đơn vị viết là:',
+            options: ['35248', '35428', '35284', '35842'],
+            correctIndex: 0,
+            explanation: 'Số gồm 3 chục nghìn, 5 nghìn, 2 trăm, 4 chục, 8 đơn vị là 35248.'
+          },
+          {
+            id: 't25.m.02',
+            kind: 'multiple-choice',
+            objectiveId: 'TOAN3.HK2.NAMCHUSO',
+            prompt: 'Số liền sau của số 49999 là số nào?',
+            options: ['50000', '49998', '50001', '49900'],
+            correctIndex: 0,
+            explanation: 'Muốn tìm số liền sau, ta lấy số đó cộng thêm 1 đơn vị: 49999 + 1 = 50000.'
+          },
+          {
+            id: 't25.m.03',
+            kind: 'multiple-choice',
+            objectiveId: 'TOAN3.HK2.NAMCHUSO',
+            prompt: 'Chữ số 7 trong số 87450 có giá trị là bao nhiêu?',
+            options: ['7000', '70000', '700', '70'],
+            correctIndex: 0,
+            explanation: 'Chữ số 7 ở hàng nghìn nên có giá trị là 7000.'
+          },
+          {
+            id: 't25.m.04',
+            kind: 'multiple-choice',
+            objectiveId: 'TOAN3.HK2.NAMCHUSO',
+            prompt: 'Số lớn nhất có năm chữ số khác nhau là:',
+            options: ['98765', '99999', '98756', '98675'],
+            correctIndex: 0,
+            explanation: 'Số lớn nhất có 5 chữ số khác nhau xếp giảm dần từ hàng cao nhất là 98765.'
+          }
+        ]
+      },
+      {
+        id: 'hk2-tuan-25-viet-caycoi',
+        version: 1,
+        title: 'Luyện tập miêu tả cây cối và thiên nhiên',
+        subject: 'vietnamese',
+        grade: 3,
+        source: 'local',
+        publishedAt: '2027-03-01T01:00:00.000Z',
+        kind: 'sentences',
+        items: [
+          {
+            id: 't25.v.01',
+            kind: 'sentence',
+            objectiveId: 'TV3.HK2.MIEUTA',
+            prompt: 'Sắp xếp thành câu miêu tả bóng mát cây bàng:',
+            words: ['Cây', 'bàng', 'xòe', 'tán', 'rộng', 'như', 'chiếc', 'ô.'],
+            hint: 'Bắt đầu bằng Cây bàng.'
+          },
+          {
+            id: 't25.v.02',
+            kind: 'sentence',
+            objectiveId: 'TV3.HK2.MIEUTA',
+            prompt: 'Sắp xếp thành câu miêu tả tiếng chim:',
+            words: ['Đàn', 'chim', 'líu', 'lo', 'hót', 'trong', 'vòm', 'lá.'],
+            hint: 'Bắt đầu bằng Đàn chim.'
+          },
+          {
+            id: 't25.v.03',
+            kind: 'sentence',
+            objectiveId: 'TV3.HK2.MIEUTA',
+            prompt: 'Sắp xếp thành câu tả mùa xuân cây đâm chồi:',
+            words: ['Mùa', 'xuân', 'đến', 'chồi', 'non', 'xanh', 'mơn', 'mởn.'],
+            hint: 'Bắt đầu bằng Mùa xuân đến.'
+          }
+        ]
+      },
+      {
+        id: 'hk2-tuan-25-anh-weather',
+        version: 1,
+        title: 'Unit 17: Weather and Seasons',
+        subject: 'english',
+        grade: 3,
+        source: 'local',
+        publishedAt: '2027-03-01T01:00:00.000Z',
+        kind: 'pairs',
+        items: [
+          {
+            id: 't25.e.01',
+            kind: 'pair',
+            objectiveId: 'ENG3.HK2.WEATHER',
+            left: 'sunny and warm',
+            right: 'trời nắng ấm áp'
+          },
+          {
+            id: 't25.e.02',
+            kind: 'pair',
+            objectiveId: 'ENG3.HK2.WEATHER',
+            left: 'rainy and cool',
+            right: 'trời mưa mát mẻ'
+          },
+          {
+            id: 't25.e.03',
+            kind: 'pair',
+            objectiveId: 'ENG3.HK2.WEATHER',
+            left: 'windy autumn breeze',
+            right: 'gió mùa thu se lạnh'
+          },
+          {
+            id: 't25.e.04',
+            kind: 'pair',
+            objectiveId: 'ENG3.HK2.WEATHER',
+            left: 'cloudy afternoon',
+            right: 'buổi chiều nhiều mây'
+          }
+        ]
+      }
+    ]
+  },
+  {
+    weekNumber: 26,
+    title: 'Tuần 26: Ôn tập tổng hợp và Cực Bắc Tổ quốc',
+    discovery: {
+      title: 'Cột cờ Lũng Cú Hà Giang',
+      text: 'Cột cờ Lũng Cú nằm trên đỉnh núi Rồng ở độ cao gần 1.500m so với mực nước biển, thuộc huyện Đồng Văn tỉnh Hà Giang, là biểu tượng thiêng liêng khẳng định chủ quyền cực Bắc của Tổ quốc.',
+      imageFile: 'discovery-week-26.webp'
+    },
+    packs: [
+      {
+        id: 'hk2-tuan-26-toan-tonghop',
+        version: 1,
+        title: 'Phép tính cộng trừ nhân chia trong phạm vi 100.000',
+        subject: 'math',
+        grade: 3,
+        source: 'local',
+        publishedAt: '2027-03-08T01:00:00.000Z',
+        kind: 'quiz',
+        items: [
+          {
+            id: 't26.m.01',
+            kind: 'multiple-choice',
+            objectiveId: 'TOAN3.HK2.TONGHOP',
+            prompt: 'Tính: 45000 + 25000 = ?',
+            options: ['70000', '60000', '75000', '80000'],
+            correctIndex: 0,
+            explanation: '45 nghìn + 25 nghìn = 70 nghìn = 70000.'
+          },
+          {
+            id: 't26.m.02',
+            kind: 'multiple-choice',
+            objectiveId: 'TOAN3.HK2.TONGHOP',
+            prompt: 'Tính: 80000 - 35000 = ?',
+            options: ['45000', '55000', '40000', '50000'],
+            correctIndex: 0,
+            explanation: '80 nghìn - 35 nghìn = 45 nghìn = 45000.'
+          },
+          {
+            id: 't26.m.03',
+            kind: 'multiple-choice',
+            objectiveId: 'TOAN3.HK2.TONGHOP',
+            prompt: 'Tính: 15000 × 4 = ?',
+            options: ['60000', '50000', '65000', '70000'],
+            correctIndex: 0,
+            explanation: '15000 × 4 = 60000.'
+          },
+          {
+            id: 't26.m.04',
+            kind: 'multiple-choice',
+            objectiveId: 'TOAN3.HK2.TONGHOP',
+            prompt: 'Tính: 90000 : 3 = ?',
+            options: ['30000', '25000', '35000', '20000'],
+            correctIndex: 0,
+            explanation: '90 nghìn : 3 = 30 nghìn = 30000.'
+          }
+        ]
+      },
+      {
+        id: 'hk2-tuan-26-viet-doanvan',
+        version: 1,
+        title: 'Luyện tập viết đoạn văn và tình cảm quê hương',
+        subject: 'vietnamese',
+        grade: 3,
+        source: 'local',
+        publishedAt: '2027-03-08T01:00:00.000Z',
+        kind: 'sentences',
+        items: [
+          {
+            id: 't26.v.01',
+            kind: 'sentence',
+            objectiveId: 'TV3.HK2.DOANVAN',
+            prompt: 'Sắp xếp thành câu bày tỏ tình yêu quê hương đất nước:',
+            words: ['Em', 'yêu', 'quê', 'hương', 'Việt', 'Nam', 'tươi', 'đẹp.'],
+            hint: 'Bắt đầu bằng Em yêu.'
+          },
+          {
+            id: 't26.v.02',
+            kind: 'sentence',
+            objectiveId: 'TV3.HK2.DOANVAN',
+            prompt: 'Sắp xếp thành câu ca ngợi lá cờ đỏ sao vàng:',
+            words: ['Lá', 'cờ', 'đỏ', 'sao', 'vàng', 'tung', 'bay', 'trong', 'gió.'],
+            hint: 'Bắt đầu bằng Lá cờ đỏ sao vàng.'
+          },
+          {
+            id: 't26.v.03',
+            kind: 'sentence',
+            objectiveId: 'TV3.HK2.DOANVAN',
+            prompt: 'Sắp xếp thành câu hứa phấn đấu học giỏi:',
+            words: ['Chúng', 'em', 'chăm', 'ngoan', 'xây', 'dựng', 'nước', 'nhà.'],
+            hint: 'Bắt đầu bằng Chúng em.'
+          }
+        ]
+      },
+      {
+        id: 'hk2-tuan-26-anh-places',
+        version: 1,
+        title: 'Unit 18: Places in Our Town',
+        subject: 'english',
+        grade: 3,
+        source: 'local',
+        publishedAt: '2027-03-08T01:00:00.000Z',
+        kind: 'pairs',
+        items: [
+          {
+            id: 't26.e.01',
+            kind: 'pair',
+            objectiveId: 'ENG3.HK2.PLACES',
+            left: 'quiet central library',
+            right: 'thư viện trung tâm yên tĩnh'
+          },
+          {
+            id: 't26.e.02',
+            kind: 'pair',
+            objectiveId: 'ENG3.HK2.PLACES',
+            left: 'green city park',
+            right: 'công viên cây xanh thành phố'
+          },
+          {
+            id: 't26.e.03',
+            kind: 'pair',
+            objectiveId: 'ENG3.HK2.PLACES',
+            left: 'busy local market',
+            right: 'khu chợ địa phương nhộn nhịp'
+          },
+          {
+            id: 't26.e.04',
+            kind: 'pair',
+            objectiveId: 'ENG3.HK2.PLACES',
+            left: 'modern cinema building',
+            right: 'rạp chiếu phim hiện đại'
+          }
+        ]
+      }
+    ]
+  }
+];
+
+export function generateSemester2Curriculum() {
+  const outputDir = path.resolve('data/curriculum');
+  if (!fs.existsSync(outputDir)) {
+    fs.mkdirSync(outputDir, { recursive: true });
+  }
+
+  // Validate every single pack
+  let totalPacks = 0;
+  for (const week of weeks) {
+    for (const pack of week.packs) {
+      totalPacks++;
+      const errors = validatePack(pack);
+      if (errors.length > 0) {
+        throw new Error(`Lỗi trong bộ học liệu ${pack.id}: ${errors.join('; ')}`);
+      }
+    }
+  }
+
+  const exportData = {
+    schema: 'baoan-learning-semester2',
+    curriculumGrade: 3,
+    semester: 2,
+    academicYear: '2026-2027',
+    approvedBy: 'Hội đồng Chuyên môn Tiểu học Bảo An Learning',
+    status: 'approved_ready',
+    approvedDate: '2027-01-15',
+    totalWeeks: weeks.length,
+    totalPacks,
+    weeks
+  };
+
+  const outputPath = path.join(outputDir, 'hoc-ky-2-8-tuan.json');
+  fs.writeFileSync(outputPath, JSON.stringify(exportData, null, 2), 'utf-8');
+  console.log(`Đã xuất thành công ${weeks.length} tuần học liệu Học kỳ 2 (${totalPacks} bộ câu hỏi) ra tệp ${outputPath}`);
+  return exportData;
+}
+
+if (process.argv[1]?.endsWith('generate-semester-2-curriculum.mjs')) {
+  generateSemester2Curriculum();
+}

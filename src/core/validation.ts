@@ -4,7 +4,18 @@ import {gameRestrictionError} from './game-policy.ts';
 
 const validSubjects = new Set(['math', 'vietnamese', 'english', 'thinking']);
 const limits = { title: 90, prompt: 320, answer: 120, explanation: 500 };
-const moduleKinds: Record<ModuleId,ContentPack['kind']> = { 'math-quest':'quiz','memory-match':'pairs','sentence-builder':'sentences','word-connect':'pairs','sequence-trail':'sentences' };
+const moduleKinds: Record<ModuleId,ContentPack['kind']> = {
+  'math-quest':'quiz',
+  'memory-match':'pairs',
+  'sentence-builder':'sentences',
+  'word-connect':'pairs',
+  'sequence-trail':'sentences',
+  'balance-scale':'compare',
+  'basket-sort':'categorize',
+  'treasure-flip':'pairs',
+  'fox-kitchen':'sentences',
+  'boat-race':'quiz'
+};
 const norm = (v: string) => v.trim().replace(/\s+/g, ' ').toLocaleLowerCase('vi');
 
 export function validatePack(pack: ContentPack): string[] {
@@ -21,7 +32,7 @@ export function validatePack(pack: ContentPack): string[] {
   if (!validSubjects.has(pack.subject)) errors.push('Môn học không hợp lệ.');
   if (!Number.isInteger(pack.grade) || pack.grade < 1 || pack.grade > 12) errors.push('Lớp học phải từ 1 đến 12.');
   if (!Array.isArray(pack.items) || pack.items.length < 2 || pack.items.length > 30) errors.push('Mỗi bộ phải có từ 2 đến 30 câu/cặp.');
-  if (!['pairs', 'quiz', 'sentences','learning'].includes(pack.kind)) errors.push('Loại học liệu chưa được hỗ trợ.');
+  if (!['pairs', 'quiz', 'sentences','learning','compare','categorize'].includes(pack.kind)) errors.push('Loại học liệu chưa được hỗ trợ.');
   if (!Array.isArray(pack.items)) return errors;
   const idSet = new Set<string>();
   const contentSet = new Set<string>();
@@ -67,6 +78,24 @@ export function validatePack(pack: ContentPack): string[] {
       if (!sentence.hint?.trim() || sentence.hint.length > 160) errors.push(`Câu ${n}: cần gợi ý ngắn (tối đa 160 ký tự).`);
       const key = Array.isArray(sentence.words) ? norm(sentence.words.join(' ')) : '';
       if (contentSet.has(key)) errors.push(`Câu ${n}: câu hoàn chỉnh bị trùng.`);
+      contentSet.add(key);
+    } else if (pack.kind === 'compare') {
+      const cmp = item as import('./contracts.ts').CompareItem;
+      if (cmp.kind !== 'compare' || !cmp.left?.trim() || !cmp.right?.trim()) errors.push(`Câu ${n}: cần cả hai vế so sánh.`);
+      if ((cmp.left?.length ?? 0) > limits.answer || (cmp.right?.length ?? 0) > limits.answer) errors.push(`Câu ${n}: mỗi vế tối đa 120 ký tự.`);
+      if (!['>', '<', '='].includes(cmp.operator)) errors.push(`Câu ${n}: dấu so sánh phải là >, < hoặc =.`);
+      if (!cmp.explanation?.trim() || cmp.explanation.length > limits.explanation) errors.push(`Câu ${n}: thiếu lời giải hoặc lời giải quá dài.`);
+      const key = `${norm(cmp.left ?? '')}::${norm(cmp.right ?? '')}`;
+      if (contentSet.has(key)) errors.push(`Câu ${n}: biểu thức so sánh bị trùng.`);
+      contentSet.add(key);
+    } else if (pack.kind === 'categorize') {
+      const cat = item as import('./contracts.ts').CategorizeItem;
+      if (cat.kind !== 'categorize' || !cat.prompt?.trim() || cat.prompt.length > limits.prompt) errors.push(`Câu ${n}: yêu cầu phân loại trống hoặc quá dài.`);
+      if (!Array.isArray(cat.categories) || cat.categories.length < 2 || cat.categories.length > 6 || cat.categories.some(c => !c?.trim() || c.length > limits.answer)) errors.push(`Câu ${n}: cần 2–6 nhóm phân loại không trống.`);
+      if (!Array.isArray(cat.elements) || cat.elements.length < 2 || cat.elements.length > 20 || cat.elements.some(e => !e.text?.trim() || !cat.categories.includes(e.category))) errors.push(`Câu ${n}: cần 2–20 thẻ thuộc đúng các nhóm đã khai báo.`);
+      if (!cat.explanation?.trim() || cat.explanation.length > limits.explanation) errors.push(`Câu ${n}: thiếu lời giải hoặc lời giải quá dài.`);
+      const key = norm(cat.prompt ?? '');
+      if (contentSet.has(key)) errors.push(`Câu ${n}: câu phân loại bị trùng.`);
       contentSet.add(key);
     } else {
       const quiz = item as QuizItem;

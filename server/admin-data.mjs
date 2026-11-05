@@ -52,3 +52,43 @@ export async function adminWeekCheck(store,auth,input){
   if(input.replaceWeekId&&!candidates.length)revisionError='Tuần gốc không còn trong lớp.';
   return{...(duplicateWeek?{duplicateWeek}:{}),...(conflictWeek?{conflictWeek}:{}),...(revision?{revision}:{}),revisionError};
 }
+
+const EXPORT_EVENT_LIMIT=50000;
+const median=values=>{if(!values.length)return null;const sorted=[...values].sort((a,b)=>a-b),mid=Math.floor(sorted.length/2);return Math.round(sorted.length%2?sorted[mid]:(sorted[mid-1]+sorted[mid])/2);};
+const wrongLabel=response=>!response?undefined:response.kind==='choice'&&Number.isInteger(response.choiceIndex)?'ABCD'[response.choiceIndex]:response.kind==='text'&&typeof response.value==='string'?response.value.normalize('NFC').trim().replace(/\s+/g,' ').slice(0,60):undefined;
+/** Per question: who tried it, first-try accuracy, wrong answers and the stars the class holds. Numbers and answers only, no student names. */
+export function exportQuestionStats(sets,events,awards,classStudents){
+  const stats={};
+  for(const {pack} of sets){stats[pack.id]={};for(const item of pack.items)stats[pack.id][item.id]={students:0,firstTryCorrect:0,attempts:0,wrong:0,medianCorrectMs:null,tiers:[classStudents,0,0,0],commonWrong:null};}
+  const grouped=new Map();
+  for(const {studentId,event} of events){const row=stats[event?.packId]?.[event?.itemId];if(!row)continue;const key=JSON.stringify([event.packId,event.itemId,studentId]);if(!grouped.has(key))grouped.set(key,[]);grouped.get(key).push(event);}
+  const correctMs=new Map(),wrongAnswers=new Map();
+  for(const [key,list] of grouped){
+    const [packId,itemId]=JSON.parse(key),row=stats[packId][itemId],ordered=list.sort((a,b)=>String(a.occurredAt).localeCompare(String(b.occurredAt))||(a.gameSequence??0)-(b.gameSequence??0));
+    row.students++;row.attempts+=ordered.length;if(ordered[0].correct)row.firstTryCorrect++;
+    for(const event of ordered){const id=packId+'\u0000'+itemId;
+      if(event.correct){if(Number.isFinite(event.elapsedMs)&&event.elapsedMs>=0){if(!correctMs.has(id))correctMs.set(id,[]);correctMs.get(id).push(event.elapsedMs);}}
+      else{row.wrong++;const label=wrongLabel(event.response);if(label){if(!wrongAnswers.has(id))wrongAnswers.set(id,new Map());const counts=wrongAnswers.get(id);counts.set(label,(counts.get(label)??0)+1);}}}
+  }
+  for(const [packId,items] of Object.entries(stats))for(const [itemId,row] of Object.entries(items)){const id=packId+'\u0000'+itemId;row.medianCorrectMs=median(correctMs.get(id)??[]);
+    const counts=[...(wrongAnswers.get(id)??new Map()).entries()].sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0]));if(counts.length)row.commonWrong={answer:counts[0][0],count:counts[0][1]};}
+  for(const {pack_id:packId,json} of awards){const tiers=parse(json)?.questionLedger?.questionTiers??{};for(const [itemId,tier] of Object.entries(tiers)){const row=stats[packId]?.[itemId];if(!row||![1,2,3].includes(tier))continue;row.tiers[0]=Math.max(0,row.tiers[0]-1);row.tiers[tier]++;}}
+  return stats;
+}
+/** Everything needed to rebuild one week as an importable workbook: answers, file names and class statistics. */
+export async function adminExport(store,auth,weekId){
+  admin(auth);const week=await adminWeek(store,auth,text(weekId,'Mã tuần',100)),db=access(store),t=db.table;
+  const cls=(await db.rows(`SELECT name FROM ${t('classes')} WHERE workspace_id=? AND id=?`,[auth.workspaceId,week.classId]))[0];
+  const mediaIds=[...new Set(week.sets.flatMap(set=>[...store.referencedMedia(set.pack)]))];
+  const media=mediaIds.length?(await db.rows(`SELECT id,name,mime,kind,size,sha256 FROM ${t('media')} WHERE workspace_id=? AND id IN (${mediaIds.map(()=>'?').join(',')})`,[auth.workspaceId,...mediaIds])).map(row=>store.publicMedia(row)):[];
+  const packIds=[...new Set(week.sets.map(set=>set.pack.id))],classStudents=Number((await db.rows(`SELECT count(*) AS n FROM ${t('students')} WHERE workspace_id=? AND class_id=?`,[auth.workspaceId,week.classId]))[0].n);
+  let events=[],awards=[],truncated=false;
+  if(packIds.length&&classStudents){
+    const slots=packIds.map(()=>'?').join(','),scope=`p.workspace_id=? AND p.student_id IN (SELECT id FROM ${t('students')} WHERE workspace_id=? AND class_id=?)`;
+    const rows=await db.rows(`SELECT a.json AS json,p.student_id AS student_id FROM ${t('attempts')} a JOIN ${t('plays')} p ON p.workspace_id=a.workspace_id AND p.id=a.play_id WHERE ${scope} AND ${db.json('a.json','packId')} IN (${slots}) LIMIT ${EXPORT_EVENT_LIMIT+1}`,[auth.workspaceId,auth.workspaceId,week.classId,...packIds]);
+    truncated=rows.length>EXPORT_EVENT_LIMIT;events=rows.slice(0,EXPORT_EVENT_LIMIT).map(row=>({studentId:row.student_id,event:parse(row.json)}));
+    awards=await db.rows(`SELECT pack_id,json FROM ${t('awards')} WHERE workspace_id=? AND pack_id IN (${slots}) AND student_id IN (SELECT id FROM ${t('students')} WHERE workspace_id=? AND class_id=?)`,[auth.workspaceId,...packIds,auth.workspaceId,week.classId]);
+  }
+  await store.audit(auth,'questions.export',week.id);
+  return{exportedAt:new Date().toISOString(),week:{id:week.id,title:week.title,position:week.position,classId:week.classId,className:cls?.name??''},sets:week.sets.map(set=>({subjectLabel:set.subjectLabel,pack:set.pack})),media,classStudents,statsTruncated:truncated,stats:exportQuestionStats(week.sets,events,awards,classStudents)};
+}

@@ -1,3 +1,5 @@
+import '../styles/game-base.css';
+import '../styles/game-context-themes.css';
 import {useQuestionSpeech} from './useQuestionSpeech';
 import {saveFailureMessage} from './save-failure-message';
 import QuestionMedia,{QuestionImageRecovery} from '../components/QuestionMedia';
@@ -49,6 +51,7 @@ export default function WordConnect({ pack, onAttempt, onComplete, onExit,questi
   const [feedback, setFeedback] = useState<'correct' | 'retry' | null>(null);
   const [status, setStatus] = useState<'playing' | 'done'>('playing');
   const [locked, setLocked] = useState(false);
+  const [contextTheme, setContextTheme] = useState<'default' | 'bridge'>('bridge');
   const [error, setError] = useState('');
   const [finishing, setFinishing] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -193,18 +196,33 @@ export default function WordConnect({ pack, onAttempt, onComplete, onExit,questi
   }
 
   return (
-    <section ref={layout.ref} {...layout.layoutProps} className="play-panel word-connect-panel world-stage world-sentence">
+    <section ref={layout.ref} {...layout.layoutProps} className={`play-panel word-connect-panel world-stage world-sentence ${contextTheme === 'bridge' ? 'context-theme-bridge' : ''}`}>
       <div className="stage-backdrop" aria-hidden="true" />
       <div className="stage-overlay" aria-hidden="true" />
+      {contextTheme === 'bridge' && <div className="bridge-river-stream" aria-hidden="true" />}
       {speech.notice&&<p className="notice speech-notice" role="status">{speech.notice}</p>}
       <div className="world-hud">
         <span className="hud-label">
-          <span className="ba37-hud-symbol" aria-hidden="true">🔗</span> XƯỞNG NGÔN TỪ · NỐI TỪ
+          <span className="ba37-hud-symbol" aria-hidden="true">🔗</span> {contextTheme === 'bridge' ? 'CẦU NỐI ĐÔI BỜ' : 'XƯỞNG NGÔN TỪ · NỐI TỪ'}
         </span>
-        <span className="hud-score">
-          <span aria-hidden="true">★</span> {matched.length}/{content.items.length} cặp đúng
-        </span>
+        <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+          <button type="button" className="game-theme-toggle-btn" onClick={() => setContextTheme(t => t === 'bridge' ? 'default' : 'bridge')} title="Đổi bối cảnh">
+            🌉 {contextTheme === 'bridge' ? 'Bối cảnh: Cầu nối' : 'Bối cảnh: Chuẩn'}
+          </button>
+          <span className="hud-score">
+            <span aria-hidden="true">★</span> {matched.length}/{content.items.length} cặp đúng
+          </span>
+        </div>
       </div>
+      {contextTheme === 'bridge' && (
+        <div className="bridge-span-container" aria-label="Nhịp cầu đôi bờ">
+          {roundItems.map((item, idx) => {
+            const isBuilt = matched.includes(item.id);
+            return <div key={idx} className={`bridge-plank ${isBuilt ? 'built' : ''}`} title={`Nhịp cầu ${idx + 1}`} />;
+          })}
+          {matched.length === content.items.length && <span className="bridge-fox-walker" role="img" aria-label="Cáo đi qua cầu">🦊🎉</span>}
+        </div>
+      )}
 
       <div className="connect-feedback-slot" aria-live="polite">
         <FeedbackEffects

@@ -1,0 +1,415 @@
+.gift-shelf-dialog {
+  width: min(880px, 94vw);
+  max-height: 90vh;
+  border-radius: 20px;
+  border: 2px solid #ecd4a4;
+  background: #fdfbf7;
+  padding: 0;
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.gift-shelf-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  background: linear-gradient(135deg, #fff3d6, #ffe6ad);
+  border-bottom: 2px solid #ecd4a4;
+}
+
+.gift-shelf-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.gift-shelf-title-wrap h2 {
+  margin: 0;
+  font-size: 1.4rem;
+  color: #5c3500;
+  font-weight: 800;
+}
+
+.gift-shelf-star-badge {
+  background: #fff;
+  border: 1.5px solid #d49332;
+  color: #b25e00;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-weight: 800;
+  font-size: 0.9rem;
+  box-shadow: 0 2px 6px rgba(178, 94, 0, 0.15);
+}
+
+.gift-shelf-close {
+  background: none;
+  border: none;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #8a6435;
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 8px;
+  transition: background 0.15s;
+}
+
+.gift-shelf-close:hover {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.gift-shelf-tabs {
+  display: flex;
+  gap: 8px;
+  padding: 12px 24px 0;
+  background: #faf4e8;
+  border-bottom: 1px solid #ecd4a4;
+}
+
+.gift-tab-btn {
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  padding: 8px 16px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #7b5932;
+  cursor: pointer;
+  border-radius: 8px 8px 0 0;
+  transition: all 0.15s ease;
+}
+
+.gift-tab-btn:hover {
+  background: rgba(255, 255, 255, 0.5);
+  color: #4a2c00;
+}
+
+.gift-tab-btn.active {
+  background: #fff;
+  border-bottom-color: #d97706;
+  color: #b45309;
+}
+
+.gift-shelf-body {
+  padding: 20px 24px;
+  overflow-y: auto;
+  flex: 1 1 auto;
+}
+
+.gift-shelf-loading,
+.gift-shelf-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: #7b654e;
+}
+
+.empty-shelf-icon {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.gift-shelf-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 18px;
+}
+
+.gift-card {
+  background: #fff;
+  border: 1.5px solid #ebd9bf;
+  border-radius: 14px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  position: relative;
+}
+
+.gift-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+}
+
+.gift-card.is-pinned {
+  border-color: #d97706;
+  box-shadow: 0 0 0 2px #f59e0b;
+}
+
+.gift-card-media {
+  position: relative;
+  height: 130px;
+  background: #fbf5eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.gift-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.gift-card-fallback-icon {
+  font-size: 3.5rem;
+  line-height: 1;
+}
+
+.gift-kind-pill {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(4px);
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #6b4004;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.gift-card-content {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  gap: 8px;
+}
+
+.gift-card-title {
+  margin: 0;
+  font-size: 1rem;
+  color: #2b1c05;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.gift-card-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+}
+
+.gift-price-tag {
+  color: #d97706;
+  font-weight: 800;
+}
+
+.gift-stock-tag {
+  color: #7b654e;
+  font-size: 0.78rem;
+}
+
+.gift-progress-block {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.gift-meter-track {
+  height: 8px;
+  background: #eee5d8;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.gift-meter-fill {
+  height: 100%;
+  background: #f59e0b;
+  border-radius: 999px;
+  transition: width 0.3s ease;
+}
+
+.gift-meter-fill.is-ready {
+  background: #10b981;
+}
+
+.gift-progress-text {
+  font-size: 0.72rem;
+  color: #8c735c;
+  text-align: right;
+  font-weight: 600;
+}
+
+.gift-card-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: auto;
+  padding-top: 6px;
+}
+
+.gift-pin-btn,
+.gift-redeem-btn {
+  flex: 1 1 50%;
+  padding: 6px 8px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  transition: background 0.15s ease;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.gift-pin-btn {
+  background: #f3ede2;
+  color: #5c4125;
+  border: 1px solid #ddd1bf;
+}
+
+.gift-pin-btn.is-active {
+  background: #fef3c7;
+  color: #92400e;
+  border-color: #f59e0b;
+}
+
+.gift-redeem-btn {
+  background: #10b981;
+  color: #fff;
+}
+
+.gift-redeem-btn:disabled {
+  background: #e2dcd3;
+  color: #9c9183;
+  cursor: not-allowed;
+}
+
+.gift-redeem-btn:not(:disabled):hover {
+  background: #059669;
+}
+
+/* Memorial Cabinet */
+.memorial-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.memorial-item {
+  background: #fff;
+  border: 1.5px solid #ebd9bf;
+  border-radius: 12px;
+  padding: 14px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.memorial-item.is-received {
+  border-color: #a7f3d0;
+  background: #f0fdf4;
+}
+
+.memorial-item-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.memorial-item-icon {
+  font-size: 1.8rem;
+  line-height: 1;
+}
+
+.memorial-item-info {
+  flex: 1 1 auto;
+}
+
+.memorial-title {
+  display: block;
+  font-size: 1.05rem;
+  color: #3b280e;
+}
+
+.memorial-meta {
+  font-size: 0.82rem;
+  color: #7b654e;
+}
+
+.memorial-history {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-left: 36px;
+  color: #8c735c;
+  font-size: 0.78rem;
+}
+
+.memorial-item-foot {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 6px;
+  border-top: 1px solid #f2e9dc;
+}
+
+.memorial-received-badge {
+  color: #059669;
+  font-weight: 700;
+  font-size: 0.88rem;
+}
+
+.confirm-received-btn {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(217, 119, 6, 0.3);
+  transition: transform 0.15s ease;
+}
+
+.confirm-received-btn:hover {
+  transform: translateY(-1px);
+}
+
+.memorial-waiting-text {
+  font-size: 0.85rem;
+  color: #92400e;
+  font-style: italic;
+}
+
+.gift-shelf-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 24px;
+  background: #faf4e8;
+  border-top: 1px solid #ecd4a4;
+  font-size: 0.85rem;
+  color: #7b654e;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.gift-shelf-footer-note {
+  margin: 0;
+}
+
+.legacy-wallet-link-btn {
+  background: none;
+  border: 1px dashed #c49a5b;
+  color: #8b5314;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.legacy-wallet-link-btn:hover {
+  background: #fff8eb;
+}

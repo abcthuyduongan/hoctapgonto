@@ -26,3 +26,35 @@ for(const [name,fixture]of[['SQLite',sqlite],['PostgreSQL',createPostgresFixture
  const other=await store.createClass(admin,{name:'Other class',grade:3});await store.updateStudent(admin,child.id,{classId:other.id});await denied(()=>start(packs[0],'first-source'),403);assert.equal((await store.play(auth,first.session.sessionId)).pack.id,packs[0].id,'immutable historical evidence remains on server');
 });
 test('summary cursors reject malformed and out-of-range input',()=>{for(const cursor of ['01','1.5','-1','abc','99999999',{},null])assert.throws(()=>summaryPage({weeks:[],current:null},cursor),error=>error.status===400);});
+
+for(const [name,fixture]of[['SQLite',sqlite],['PostgreSQL',createPostgresFixture]])test(`${name}: discovery card viewed status is tracked on server and awards zero stars or attempts`,async t=>{
+  const {store,admin}=await fixture(t),cls=await store.createClass(admin,{name:'Discovery class',grade:3});
+  const child=await store.createStudent(admin,{name:'Bao An',username:'discovery.child',classId:cls.id},'salt:hash','discovery.child');
+  const user=name==='SQLite'?store.db.prepare("SELECT * FROM users WHERE username='discovery.child'").get():await store.findUserByUsername('discovery.child');
+  const auth={id:user.id,workspaceId:admin.workspaceId,studentId:child.id,role:'student',username:user.username};
+  const packWithDiscovery={...source(99),discovery:{title:'Khám phá Đảo Số',text:'Những con số diệu kỳ.',imageFile:'dao-so.png'}};
+  await seedLegacyWeek(store,admin,{requestId:'discovery-week',title:'Tuần khám phá',classId:cls.id,sets:[{subjectLabel:'Toán',pack:packWithDiscovery}]});
+
+  // Initial summary: pack discovery is preserved, viewedDiscoveryPacks is empty
+  let summary=await store.studentSummary(auth);
+  assert.ok(summary.weeks[0].sets[0].pack.discovery,'discovery card metadata must be present');
+  assert.equal(summary.weeks[0].sets[0].pack.discovery.title,'Khám phá Đảo Số');
+  assert.deepEqual(summary.viewedDiscoveryPacks,[]);
+  assert.equal(summary.balance.earned,0);
+
+  // Student views discovery card
+  const res=await store.viewDiscovery(auth,packWithDiscovery.id);
+  assert.deepEqual(res,{ok:true,packId:packWithDiscovery.id});
+
+  // Verify server state after view: viewedDiscoveryPacks contains packId, 0 stars awarded
+  summary=await store.studentSummary(auth);
+  assert.deepEqual(summary.viewedDiscoveryPacks,[packWithDiscovery.id]);
+  assert.equal(summary.balance.earned,0,'Viewing discovery card must award zero stars');
+  assert.equal(summary.weeks[0].sets[0].stars,0,'Viewing discovery card must award zero stars to set');
+
+  // Second view call is idempotent
+  const res2=await store.viewDiscovery(auth,packWithDiscovery.id);
+  assert.deepEqual(res2,{ok:true,packId:packWithDiscovery.id});
+  summary=await store.studentSummary(auth);
+  assert.deepEqual(summary.viewedDiscoveryPacks,[packWithDiscovery.id]);
+});

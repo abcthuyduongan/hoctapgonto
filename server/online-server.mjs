@@ -1,7 +1,9 @@
 import {createServer} from 'node:http';
-import {adminSummary,adminWeek,adminMedia,adminWeekCheck} from './admin-data.mjs';
+import {adminSummary,adminWeek,adminMedia,adminWeekCheck,adminExport} from './admin-data.mjs';
 import {audioDurationMs,validateUploadedAudio} from './audio-duration.mjs';
 import {createFailureReporter,ONLINE_RUNTIME_VERSION} from './api-diagnostics.mjs';
+import {readBuildIdentity} from './build-identity.mjs';
+import {parseJsonBody} from './json-body.mjs';
 import {createReadStream} from 'node:fs';
 import {stat,realpath,readFile} from 'node:fs/promises';
 import {resolve,relative,extname,sep,isAbsolute} from 'node:path';
@@ -23,7 +25,7 @@ async function verifyPassword(value,stored){const[salt,expected]=(stored??dummyH
 async function body(req,maxBytes=MAX_BODY){if(!/^application\/json(?:\s*;|$)/i.test(req.headers['content-type']??''))fail(415,'Yêu cầu phải dùng dữ liệu JSON.');
   if(Number(req.headers['content-length']??0)>maxBytes)fail(413,'Gói dữ liệu vượt giới hạn kích thước.');const chunks=[];let size=0;
   for await(const chunk of req){size+=chunk.length;if(size>maxBytes)fail(413,'Gói dữ liệu vượt giới hạn kích thước.');chunks.push(chunk);}
-  let result;try{result=JSON.parse(Buffer.concat(chunks).toString('utf8'));}catch{fail(400,'Dữ liệu JSON không đọc được.');}if(!result||typeof result!=='object'||Array.isArray(result))fail(400,'Dữ liệu gửi lên cần là một đối tượng JSON.');return result;
+  return parseJsonBody(Buffer.concat(chunks),req.headers['content-encoding'],maxBytes);
 }
 const MIME={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json; charset=utf-8','.webmanifest':'application/manifest+json','.glb':'model/gltf-binary','.svg':'image/svg+xml','.png':'image/png','.webp':'image/webp','.jpg':'image/jpeg','.wav':'audio/wav','.mp3':'audio/mpeg','.wasm':'application/wasm','.zip':'application/zip','.docx':'application/vnd.openxmlformats-officedocument.wordprocessingml.document','.xlsx':'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet','.csv':'text/csv; charset=utf-8','.woff2':'font/woff2'};
 
@@ -56,7 +58,15 @@ export function createOnlineServer({databasePath,staticRoot=resolve('dist'),publ
   function cookie(res,token,origin,clear=false){const secure=secureCookies??origin.startsWith('https:');res.setHeader('Set-Cookie',`${COOKIE}=${token}; HttpOnly; SameSite=Lax; Path=/; Max-Age=${clear?0:43200}${secure?'; Secure':''}`);}
   function login(res,user,origin){const token=secret(),csrfToken=secret();db.prepare('DELETE FROM auth_sessions WHERE expires_at<?').run(Date.now());db.prepare('INSERT INTO auth_sessions VALUES(?,?,?,?)').run(hash(token),user.id,csrfToken,Date.now()+43200000);cookie(res,token,origin);
     return identity({id:user.id,workspaceId:user.workspace_id,username:user.username,role:user.role,...(user.student_id?{studentId:user.student_id}:{}),csrfToken});}
-  function role(auth,expected){if(auth.role!==expected)fail(403,expected==='admin'?'Chỉ quản lý được thực hiện thao tác này.':'Hãy dùng tài khoản học sinh để vào luyện tập.');}
+  function role(auth,expected){
+    const allowed=Array.isArray(expected)?expected:[expected];
+    if(!allowed.includes(auth.role)){
+      if(allowed.includes('admin')&&allowed.length===1)fail(403,'Chỉ quản lý được thực hiện thao tác này.');
+      if(allowed.includes('student')&&allowed.length===1)fail(403,'Hãy dùng tài khoản học sinh để vào luyện tập.');
+      if(allowed.includes('parent')&&allowed.length===1)fail(403,'Chỉ tài khoản phụ huynh mới được thực hiện thao tác này.');
+      fail(403,'Không có quyền thực hiện thao tác này.');
+    }
+  }
   function authenticatedActor(req,expectedRole){const auth=actor(req);
     if(!sameSecret(req.headers['x-csrf-token'],auth.csrfToken))fail(403,'Phiên xác thực của biểu mẫu đã thay đổi. Hãy tải lại.');
     if(expectedRole)role(auth,expectedRole);return auth;
@@ -64,7 +74,10 @@ export function createOnlineServer({databasePath,staticRoot=resolve('dist'),publ
   /** A request can stay open while its cookie is revoked or its account is locked. */
   async function authenticatedBody(req,expectedRole,maxBytes=MAX_BODY){const input=await body(req,maxBytes);return{input,auth:authenticatedActor(req,expectedRole)};}
   function rateLimit(req,name,passwordChange=false){const address=req.socket.remoteAddress??'local',keys=[hash(`${passwordChange?'password-ip':'ip'}:${address}`),hash(`${passwordChange?'password-user':'user'}:${name}`)],time=Date.now();
-    store.tx(()=>{for(const [index,key]of keys.entries()){const row=db.prepare('SELECT * FROM login_limits WHERE key=?').get(key),count=row&&row.reset_at>time?row.count:0;
+    store.tx(()=>{
+      // Bound cleanup work and leave the current counters to the existing reset logic.
+      db.prepare('DELETE FROM login_limits WHERE key IN (SELECT key FROM login_limits WHERE reset_at<=? AND key NOT IN (?,?) ORDER BY reset_at,key LIMIT 100)').run(time,...keys);
+      for(const [index,key]of keys.entries()){const row=db.prepare('SELECT * FROM login_limits WHERE key=?').get(key),count=row&&row.reset_at>time?row.count:0;
       if(count>=(index===0?100:12))fail(429,passwordChange?'Đã thử đổi mật khẩu quá nhiều lần. Hãy đợi 15 phút rồi thử lại.':'Đã thử đăng nhập quá nhiều lần. Hãy đợi 15 phút rồi thử lại.');
       db.prepare('INSERT INTO login_limits VALUES(?,?,?) ON CONFLICT(key) DO UPDATE SET count=excluded.count,reset_at=excluded.reset_at').run(key,count+1,row&&row.reset_at>time?row.reset_at:time+900000);
     }});
@@ -83,7 +96,8 @@ export function createOnlineServer({databasePath,staticRoot=resolve('dist'),publ
         if(mutable&&(req.headers.origin!==origin||req.headers['sec-fetch-site']==='cross-site'))fail(403,'Yêu cầu phải xuất phát từ chính website này.');
         if(method==='OPTIONS')fail(405,'API chỉ dùng cùng origin.');
         const route=path.slice('/api/online'.length);
-        if(method==='GET'&&route==='/status')return json(res,200,{available:true,configured:store.configured(),runtimeVersion:ONLINE_RUNTIME_VERSION,questionProtocolVersion:1});
+        if(method==='GET'&&route==='/status')return json(res,200,{available:true,configured:store.configured(),runtimeVersion:ONLINE_RUNTIME_VERSION,questionProtocolVersion:1,mediaUploadEncoding:'gzip',build:await readBuildIdentity(root)});
+        if(method==='GET'&&route==='/contest/presets')return json(res,200,store.contestPresets());
         if(method==='POST'&&route==='/setup'){
           const input=shape(await body(req),['token','name','username','password']);available();if(store.configured())fail(409,'Máy chủ đã được khởi tạo. Hãy đăng nhập.');
           rateLimit(req,'bootstrap');if(!setupToken||!sameSecret(input.token,setupToken))fail(403,'Mã khởi tạo không đúng. Lấy mã riêng từ quản trị máy chủ.');
@@ -141,6 +155,8 @@ export function createOnlineServer({databasePath,staticRoot=resolve('dist'),publ
         const adminWeekMatch=route.match(/^\/admin\/weeks\/([^/]+)$/);
         if(method==='GET'&&adminWeekMatch)return json(res,200,await adminWeek(store,auth,decodeURIComponent(adminWeekMatch[1])));
         if(method==='GET'&&route==='/admin/media')return json(res,200,await adminMedia(store,auth,Object.fromEntries(url.searchParams)));
+        const exportMatch=route.match(/^\/admin\/export\/weeks\/([^/]+)$/);
+        if(method==='GET'&&exportMatch)return json(res,200,await adminExport(store,auth,decodeURIComponent(exportMatch[1])));
         if(method==='POST'&&route==='/admin/media/lookup'){const{input,auth:current}=await authenticatedBody(req,'admin');return json(res,200,await adminMedia(store,current,input));}
         if(method==='POST'&&route==='/admin/week-check'){const{input,auth:current}=await authenticatedBody(req,'admin');return json(res,200,await adminWeekCheck(store,current,input));}
         if(method==='GET'&&route==='/dashboard'){role(auth,'admin');return json(res,200,store.dashboard(auth));}
@@ -153,12 +169,16 @@ export function createOnlineServer({databasePath,staticRoot=resolve('dist'),publ
             if(!Number.isSafeInteger(start)||!Number.isSafeInteger(end)||start<0||start>end||start>=bytes.length){res.setHeader('Content-Range',`bytes */${bytes.length}`);fail(416,'Khoảng dữ liệu không hợp lệ.');}status=206;
           }
           if(method==='GET'&&auth.role==='student'&&asset.kind==='audio'&&url.searchParams.has('playId')&&start===0&&end===bytes.length-1){const duration=await audioDurationMs(bytes,asset.mime,8*1024*1024);store.recordAudioDelivery(actor(req),url.searchParams.get('playId'),url.searchParams.get('itemId'),mediaMatch[1],duration);}
-          res.writeHead(status,{'Content-Type':asset.mime,'Cache-Control':'no-store, private','Vary':'Cookie','Accept-Ranges':'bytes','Content-Length':end-start+1,'Content-Disposition':`inline; filename*=UTF-8''${encodeURIComponent(asset.name)}`,...(status===206?{'Content-Range':`bytes ${start}-${end}/${bytes.length}`}:{})});res.end(method==='HEAD'?undefined:bytes.subarray(start,end+1));return;
+          const etag=`"${asset.sha256}"`,image=asset.kind==='image',cache=image?{'Cache-Control':'private, max-age=31536000, immutable','ETag':etag}:{'Cache-Control':'no-store, private'};
+          if(image&&method==='GET'&&!req.headers.range&&String(req.headers['if-none-match']??'').split(',').map(value=>value.trim().replace(/^W\//,'')).includes(etag)){res.writeHead(304,{...cache,'Vary':'Cookie'});res.end();return;}
+          res.writeHead(status,{'Content-Type':asset.mime,...cache,'Vary':'Cookie','Accept-Ranges':'bytes','Content-Length':end-start+1,'Content-Disposition':`inline; filename*=UTF-8''${encodeURIComponent(asset.name)}`,...(status===206?{'Content-Range':`bytes ${start}-${end}/${bytes.length}`}:{})});res.end(method==='HEAD'?undefined:bytes.subarray(start,end+1));return;
         }
         if(method==='GET'&&route==='/student'){role(auth,'student');if(req.headers['x-bao-an-question-protocol']!=='1')fail(409,'Ứng dụng đã được cập nhật. Hãy tải lại trang; sao đã lưu vẫn được giữ.');return json(res,200,store.studentSummary(auth));}
+        if(method==='GET'&&route==='/student/map'){role(auth,'student');const query=Object.fromEntries(url.searchParams.entries());return json(res,200,store.studentMap(auth,query));}
         if(method==='GET'&&route==='/student/summary'){role(auth,'student');const cursor=url.searchParams.get('cursor')??'0';if(cursor!=='current'&&!/^(0|[1-9]\d{0,6})$/.test(cursor))fail(400,'Trang hành trình không hợp lệ.');return json(res,200,store.studentSummary(auth,cursor));}
         if(method==='POST'&&route==='/student/journey'){const{input,auth:current}=await authenticatedBody(req,'student');return json(res,200,store.ensureJourney(current,input));}
         if(method==='POST'&&route==='/student/advance-week'){const{input,auth:current}=await authenticatedBody(req,'student');return json(res,200,store.advanceWeek(current,input));}
+        if(method==='POST'&&route==='/student/discovery/view'){const{input,auth:current}=await authenticatedBody(req,'student');return json(res,200,store.viewDiscovery(current,input.packId));}
         const gamesMatch=route.match(/^\/student\/pack\/([^/]+)\/(\d+)\/games$/);
         if(method==='GET'&&gamesMatch){role(auth,'student');return json(res,200,store.packGames(auth,text(decodeURIComponent(gamesMatch[1]),'Mã bộ',80),integer(Number(gamesMatch[2]),'Phiên bản')));}
         if(method==='POST'&&route==='/classes'){role(auth,'admin');const{input,auth:current}=await authenticatedBody(req,'admin');return json(res,201,store.createClass(current,input));}
@@ -181,7 +201,139 @@ export function createOnlineServer({databasePath,staticRoot=resolve('dist'),publ
         }
         if(method==='POST'&&route==='/redemptions'){role(auth,'student');const{input,auth:current}=await authenticatedBody(req,'student');return json(res,201,store.requestReward(current,input));}
         const redemption=route.match(/^\/redemptions\/([^/]+)\/(transition|cancel)$/);
-        if(method==='POST'&&redemption){const expected=redemption[2]==='cancel'?'student':'admin';role(auth,expected);const{input,auth:current}=await authenticatedBody(req,expected);return json(res,200,store.transitionReward(current,decodeURIComponent(redemption[1]),input,redemption[2]==='cancel'));}
+        if(method==='POST'&&redemption){const expected=redemption[2]==='cancel'?'student':(auth.role==='parent'?'parent':'admin');role(auth,expected);const{input,auth:current}=await authenticatedBody(req,expected);return json(res,200,store.transitionReward(current,decodeURIComponent(redemption[1]),input,redemption[2]==='cancel'));}
+        if(method==='GET'&&route==='/gifts'){return json(res,200,store.gifts(auth,url.searchParams.get('classId')));}
+        if(method==='POST'&&route==='/gifts'){role(auth,'admin');const{input,auth:current}=await authenticatedBody(req,'admin');return json(res,201,store.createGift(current,input));}
+        const giftMatch=route.match(/^\/gifts\/([^/]+)$/);
+        if(giftMatch&&(method==='PATCH'||method==='PUT'||method==='POST')){role(auth,'admin');const{input,auth:current}=await authenticatedBody(req,'admin');return json(res,200,store.updateGift(current,decodeURIComponent(giftMatch[1]),input));}
+        if(method==='GET'&&route==='/student/goal'){role(auth,'student');return json(res,200,store.studentGoal(auth));}
+        if(method==='POST'&&route==='/student/goal'){role(auth,'student');const{input,auth:current}=await authenticatedBody(req,'student');return json(res,200,store.setStudentGoal(current,input.giftId));}
+        if(method==='POST'&&route==='/student/redeem-gift'){role(auth,'student');const{input,auth:current}=await authenticatedBody(req,'student');return json(res,201,store.redeemGift(current,input));}
+        const confirmMatch=route.match(/^\/student\/redemptions\/([^/]+)\/confirm-received$/);
+        if(method==='POST'&&confirmMatch){role(auth,'student');return json(res,200,store.confirmReceived(auth,decodeURIComponent(confirmMatch[1])));}
+        if(method==='GET'&&route==='/student/badges'){role(auth,'student');return json(res,200,store.studentBadges(auth));}
+        if(method==='GET'&&route==='/student/streak'){role(auth,'student');return json(res,200,store.studentStreak(auth));}
+        if(method==='GET'&&route==='/student/daily-missions'){role(auth,'student');return json(res,200,store.studentDailyMissions(auth));}
+        if(method==='POST'&&route==='/student/daily-riddle/answer'){role(auth,'student');const{input,auth:current}=await authenticatedBody(req,'student');return json(res,200,store.answerDailyRiddle(current,input));}
+        if(method==='POST'&&route==='/parent/setup-pin'){
+          role(auth,['student','admin','parent']);
+          const{input,auth:current}=await authenticatedBody(req,auth.role);
+          const studentId=auth.role==='student'?auth.studentId:input.studentId;
+          return json(res,200,store.setupParentPin(current,studentId,input));
+        }
+        if(method==='POST'&&route==='/parent/verify-pin'){
+          role(auth,'student');
+          const{input,auth:current}=await authenticatedBody(req,'student');
+          return json(res,200,store.verifyParentPin(current,current.studentId,input.pin));
+        }
+        if(method==='GET'&&route==='/parent/dashboard'){
+          role(auth,['student','admin','parent']);
+          const studentId=auth.role==='student'?auth.studentId:(url.searchParams.get('studentId')||auth.studentId);
+          const weekId=url.searchParams.get('weekId')||undefined;
+          return json(res,200,store.parentDashboard(auth,studentId,weekId));
+        }
+        if(method==='POST'&&route==='/parent/settings'){
+          role(auth,['student','admin','parent']);
+          const{input,auth:current}=await authenticatedBody(req,auth.role);
+          const studentId=auth.role==='student'?auth.studentId:input.studentId;
+          return json(res,200,store.updateParentSettings(current,studentId,input));
+        }
+        if(method==='GET'&&route==='/parent/students'){
+          role(auth,'parent');
+          return json(res,200,store.parentStudents(auth));
+        }
+        if(method==='POST'&&route==='/parents'){
+          role(auth,'admin');
+          const{input,auth:current}=await authenticatedBody(req,'admin');
+          const pwdHash=await passwordHash(input.password);
+          const nameUser=username(input.username);
+          return json(res,201,store.createParent(current,input,pwdHash,nameUser));
+        }
+        if(method==='GET'&&route==='/contest/presets'){
+          role(auth,['student','admin','parent']);
+          return json(res,200,store.contestPresets(auth));
+        }
+        if(method==='POST'&&route==='/contest/start'){
+          role(auth,'student');
+          const{input,auth:current}=await authenticatedBody(req,'student');
+          return json(res,200,await store.startContest(current,input));
+        }
+        if(method==='GET'&&route==='/contest/active'){
+          role(auth,'student');
+          return json(res,200,await store.activeContest(auth));
+        }
+        if(method==='POST'&&/^\/contest\/([^/]+)\/save$/.test(route)){
+          role(auth,'student');
+          const sessionId=decodeURIComponent(route.match(/^\/contest\/([^/]+)\/save$/)[1]);
+          const{input,auth:current}=await authenticatedBody(req,'student');
+          return json(res,200,await store.saveContestProgress(current,sessionId,input));
+        }
+        if(method==='POST'&&/^\/contest\/([^/]+)\/submit$/.test(route)){
+          role(auth,'student');
+          const sessionId=decodeURIComponent(route.match(/^\/contest\/([^/]+)\/submit$/)[1]);
+          const{input,auth:current}=await authenticatedBody(req,'student');
+          return json(res,200,await store.submitContest(current,sessionId,input));
+        }
+        if(method==='GET'&&route==='/contest/history'){
+          role(auth,['student','admin','parent']);
+          const studentId=auth.role==='student'?auth.studentId:(url.searchParams.get('studentId')||auth.studentId);
+          const presetId=url.searchParams.get('presetId')||undefined;
+          return json(res,200,await store.contestHistory(auth,studentId,presetId));
+        }
+        if(method==='POST'&&/^\/contest\/([^/]+)\/review-pack$/.test(route)){
+          role(auth,'student');
+          const sessionId=decodeURIComponent(route.match(/^\/contest\/([^/]+)\/review-pack$/)[1]);
+          return json(res,200,await store.contestReviewPack(auth,sessionId));
+        }
+        if(method==='GET'&&route==='/town'){
+          const studentId=auth.role==='student'?auth.studentId:url.searchParams.get('studentId');
+          if(!studentId)fail(400,'Thiếu mã học sinh.');
+          return json(res,200,await store.townSummary(auth,studentId));
+        }
+        if(method==='POST'&&route==='/town/build'){
+          role(auth,'student');
+          return json(res,200,await store.placeBuilding(auth,auth.studentId,input));
+        }
+        if(method==='POST'&&route==='/town/recalculate'){
+          const studentId=auth.role==='student'?auth.studentId:(input.studentId||url.searchParams.get('studentId'));
+          if(!studentId)fail(400,'Thiếu mã học sinh.');
+          return json(res,200,await store.recalculateMaterials(auth,studentId));
+        }
+        if(method==='GET'&&route==='/town/animals'){
+          const studentId=auth.role==='student'?auth.studentId:url.searchParams.get('studentId');
+          if(!studentId)fail(400,'Thiếu mã học sinh.');
+          return json(res,200,await store.townAnimals(auth,studentId));
+        }
+        if(method==='POST'&&route==='/town/animals/name'){
+          role(auth,'student');
+          return json(res,200,await store.nameTownAnimal(auth,auth.studentId,input));
+        }
+        if(method==='GET'&&route==='/town/classmates'){
+          role(auth,'student');
+          return json(res,200,await store.classmatesTowns(auth,auth.studentId));
+        }
+        if(method==='GET'&&route==='/town/visit'){
+          role(auth,'student');
+          const targetStudentId=url.searchParams.get('studentId');
+          if(!targetStudentId)fail(400,'Thiếu mã học sinh cần ghé thăm.');
+          return json(res,200,await store.visitTown(auth,auth.studentId,targetStudentId));
+        }
+        if(method==='POST'&&route==='/town/cheer'){
+          role(auth,'student');
+          if(!input.targetStudentId)fail(400,'Thiếu mã học sinh được cổ vũ.');
+          return json(res,200,await store.cheerClassmate(auth,auth.studentId,input.targetStudentId));
+        }
+        if(method==='GET'&&route==='/class-feed'){
+          const student=auth.role==='student'?this.onlineStore.student(auth,auth.studentId):null;
+          const classId=student?student.class_id:url.searchParams.get('classId');
+          if(!classId)fail(400,'Thiếu mã lớp học.');
+          return json(res,200,await store.classFeed(auth,classId));
+        }
+        if(method==='POST'&&/^\/classes\/[^/]+\/feed-toggle$/.test(route)){
+          role(auth,'admin');
+          const classId=decodeURIComponent(route.match(/^\/classes\/([^/]+)\/feed-toggle$/)[1]);
+          return json(res,200,await store.updateClassSettings(auth,classId,input));
+        }
         fail(404,'Không có thao tác API này.');
       }
       if(!['GET','HEAD'].includes(method))fail(405,'Phương thức không được hỗ trợ.');

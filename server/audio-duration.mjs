@@ -1,10 +1,24 @@
 import {fail} from './online-errors.mjs';
-/** Bounded input, no retained buffers and no client-supplied duration. */
-export async function audioDurationMs(bytes,mime,maxBytes=2*1024*1024){
- if(!Number.isInteger(maxBytes)||maxBytes<12||maxBytes>8*1024*1024||bytes.length>maxBytes)fail(422,'Âm thanh vượt giới hạn xác minh.');
- try{const{parseBuffer}=await import('music-metadata');const result=await parseBuffer(bytes,{mimeType:mime,size:bytes.length},{duration:true,skipCovers:true,maxBufferSize:maxBytes});const ms=Math.ceil(result.format.duration*1000);if(Number.isFinite(ms)&&ms>0&&ms<=600000)return ms;}catch{}
- fail(422,'Không xác minh được thời lượng âm thanh. Hãy nhờ giáo viên xuất lại WAV, MP3 hoặc OGG.');
+import {createHash} from 'node:crypto';
+const parseAudio=async(bytes,mime,maxBytes)=>{
+ const{parseBuffer}=await import('music-metadata');return parseBuffer(bytes,{mimeType:mime,size:bytes.length},{duration:true,skipCovers:true,maxBufferSize:maxBytes});
+};
+/** Cache verified durations, never media buffers or delivery receipts. Limits are checked on every call. */
+export function createAudioDurationReader({parse=parseAudio,now=Date.now,maxEntries=64,ttlMs=300000}={}){
+ const cache=new Map();
+ return async(bytes,mime,maxBytes=2*1024*1024)=>{
+  if(!Number.isInteger(maxBytes)||maxBytes<12||maxBytes>8*1024*1024||bytes.length>maxBytes)fail(422,'Âm thanh vượt giới hạn xác minh.');
+  for(const[key,entry]of cache)if(now()-entry.at>ttlMs)cache.delete(key);
+  const key=mime+':'+createHash('sha256').update(bytes).digest('hex'),existing=cache.get(key);if(existing)return existing.promise;
+  const entry={at:now(),promise:undefined};
+  entry.promise=(async()=>{
+   try{const result=await parse(bytes,mime,maxBytes),ms=Math.ceil(result.format.duration*1000);if(Number.isFinite(ms)&&ms>0&&ms<=600000)return ms;}catch{}
+   fail(422,'Không xác minh được thời lượng âm thanh. Hãy nhờ giáo viên xuất lại WAV, MP3 hoặc OGG.');
+  })().catch(error=>{if(cache.get(key)===entry)cache.delete(key);throw error;});
+  cache.set(key,entry);while(cache.size>maxEntries)cache.delete(cache.keys().next().value);return entry.promise;
+ };
 }
+export const audioDurationMs=createAudioDurationReader();
 /** The SQLite upload store is synchronous. Validate audio before calling it,
  * while leaving its existing shape, size and MIME errors authoritative. */
 export async function validateUploadedAudio(input,maxBytes=2*1024*1024){

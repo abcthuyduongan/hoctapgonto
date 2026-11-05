@@ -1,7 +1,7 @@
 {
   "name": "Bảo An Learning",
   "short_name": "Bảo An",
-  "description": "Ôn luyện qua năm trò chơi, thêm câu hỏi và tích sao đổi thưởng cùng gia đình.",
+  "description": "Bản đồ học tập và trò chơi thông minh, tích sao đổi thưởng cùng gia đình và lớp học.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

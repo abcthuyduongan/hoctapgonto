@@ -1,0 +1,388 @@
+{
+  "artVersion": 1,
+  "generatedAt": "2026-11-05T02:01:33.677Z",
+  "totalAssets": 28,
+  "totalBytes": 2326716,
+  "assets": [
+    {
+      "id": "map-world-wide",
+      "role": "background",
+      "type": "map",
+      "src": "/art/maps/map-world-wide.webp",
+      "width": 1600,
+      "height": 1000,
+      "mime": "image/webp",
+      "bytes": 144438,
+      "sha256": "42ce39cc241140cd8967affa7bda72fcf258ae700d9a58756f6b97dc366a3e9d"
+    },
+    {
+      "id": "map-world-tall",
+      "role": "background",
+      "type": "map",
+      "src": "/art/maps/map-world-tall.webp",
+      "width": 1024,
+      "height": 1365,
+      "mime": "image/webp",
+      "bytes": 131644,
+      "sha256": "314ff67e5b54aeec701af95a0c094df2df9885c59e7902f4c8f6b66527c84081"
+    },
+    {
+      "id": "map-math-wide",
+      "role": "background",
+      "type": "map",
+      "src": "/art/maps/map-math-wide.webp",
+      "width": 1600,
+      "height": 1000,
+      "mime": "image/webp",
+      "bytes": 222302,
+      "sha256": "f1a14eb2730a81813e31be084ca5888bab648464c85dffe751f53d1b3f8c3227",
+      "slotAnchors": {
+        "1": { "x": 12, "y": 72 },
+        "2": { "x": 24, "y": 50 },
+        "3": { "x": 38, "y": 70 },
+        "4": { "x": 50, "y": 44 },
+        "5": { "x": 63, "y": 66 },
+        "6": { "x": 77, "y": 40 },
+        "7": { "x": 89, "y": 62 }
+      }
+    },
+    {
+      "id": "map-math-tall",
+      "role": "background",
+      "type": "map",
+      "src": "/art/maps/map-math-tall.webp",
+      "width": 1024,
+      "height": 1365,
+      "mime": "image/webp",
+      "bytes": 214492,
+      "sha256": "1d61884e635f43ae43030ae6534c132b727665e47b649b01629934ea05c3d64b",
+      "slotAnchors": {
+        "1": { "x": 26, "y": 82 },
+        "2": { "x": 67, "y": 72 },
+        "3": { "x": 30, "y": 60 },
+        "4": { "x": 68, "y": 49 },
+        "5": { "x": 31, "y": 37 },
+        "6": { "x": 69, "y": 25 },
+        "7": { "x": 45, "y": 13 }
+      }
+    },
+    {
+      "id": "map-vietnamese-wide",
+      "role": "background",
+      "type": "map",
+      "src": "/art/maps/map-vietnamese-wide.webp",
+      "width": 1600,
+      "height": 1000,
+      "mime": "image/webp",
+      "bytes": 197638,
+      "sha256": "abb9e665c6bccf7ed71c20aadaa2378d3db6b64248b2b7a3cfc79d0454db7e31",
+      "slotAnchors": {
+        "1": { "x": 12, "y": 72 },
+        "2": { "x": 24, "y": 50 },
+        "3": { "x": 38, "y": 70 },
+        "4": { "x": 50, "y": 44 },
+        "5": { "x": 63, "y": 66 },
+        "6": { "x": 77, "y": 40 },
+        "7": { "x": 89, "y": 62 }
+      }
+    },
+    {
+      "id": "map-vietnamese-tall",
+      "role": "background",
+      "type": "map",
+      "src": "/art/maps/map-vietnamese-tall.webp",
+      "width": 1024,
+      "height": 1365,
+      "mime": "image/webp",
+      "bytes": 214324,
+      "sha256": "b608d8e581aec851c875d17f5213f135b560441e6870c60a5c087ec0f5f96152",
+      "slotAnchors": {
+        "1": { "x": 26, "y": 82 },
+        "2": { "x": 67, "y": 72 },
+        "3": { "x": 30, "y": 60 },
+        "4": { "x": 68, "y": 49 },
+        "5": { "x": 31, "y": 37 },
+        "6": { "x": 69, "y": 25 },
+        "7": { "x": 45, "y": 13 }
+      }
+    },
+    {
+      "id": "map-english-wide",
+      "role": "background",
+      "type": "map",
+      "src": "/art/maps/map-english-wide.webp",
+      "width": 1600,
+      "height": 1000,
+      "mime": "image/webp",
+      "bytes": 95018,
+      "sha256": "1a089f57f42312e45db72b48ac7bb2cabb3d58bdfe4ae9d6b3997e91df671e9c",
+      "slotAnchors": {
+        "1": { "x": 12, "y": 72 },
+        "2": { "x": 24, "y": 50 },
+        "3": { "x": 38, "y": 70 },
+        "4": { "x": 50, "y": 44 },
+        "5": { "x": 63, "y": 66 },
+        "6": { "x": 77, "y": 40 },
+        "7": { "x": 89, "y": 62 }
+      }
+    },
+    {
+      "id": "map-english-tall",
+      "role": "background",
+      "type": "map",
+      "src": "/art/maps/map-english-tall.webp",
+      "width": 1024,
+      "height": 1365,
+      "mime": "image/webp",
+      "bytes": 105422,
+      "sha256": "6c88f4cbfbd9e6e48ebc7f0c3f466497237d889265ec84e276f5ac674d300c02",
+      "slotAnchors": {
+        "1": { "x": 26, "y": 82 },
+        "2": { "x": 67, "y": 72 },
+        "3": { "x": 30, "y": 60 },
+        "4": { "x": 68, "y": 49 },
+        "5": { "x": 31, "y": 37 },
+        "6": { "x": 69, "y": 25 },
+        "7": { "x": 45, "y": 13 }
+      }
+    },
+    {
+      "id": "map-computing-wide",
+      "role": "background",
+      "type": "map",
+      "src": "/art/maps/map-computing-wide.webp",
+      "width": 1600,
+      "height": 1000,
+      "mime": "image/webp",
+      "bytes": 152296,
+      "sha256": "cb6571a7d3acbe61dcc92d4cf05c65139e32ca8f16cc76e528d447def01c943d",
+      "slotAnchors": {
+        "1": { "x": 12, "y": 72 },
+        "2": { "x": 24, "y": 50 },
+        "3": { "x": 38, "y": 70 },
+        "4": { "x": 50, "y": 44 },
+        "5": { "x": 63, "y": 66 },
+        "6": { "x": 77, "y": 40 },
+        "7": { "x": 89, "y": 62 }
+      }
+    },
+    {
+      "id": "map-computing-tall",
+      "role": "background",
+      "type": "map",
+      "src": "/art/maps/map-computing-tall.webp",
+      "width": 1024,
+      "height": 1365,
+      "mime": "image/webp",
+      "bytes": 142840,
+      "sha256": "441c8d30691751230683805bfb9f3d8d95d74ac49aa28cd12e8812c1693bcb6c",
+      "slotAnchors": {
+        "1": { "x": 26, "y": 82 },
+        "2": { "x": 67, "y": 72 },
+        "3": { "x": 30, "y": 60 },
+        "4": { "x": 68, "y": 49 },
+        "5": { "x": 31, "y": 37 },
+        "6": { "x": 69, "y": 25 },
+        "7": { "x": 45, "y": 13 }
+      }
+    },
+    {
+      "id": "place-math-number-house",
+      "role": "place",
+      "type": "landmark",
+      "src": "/art/landmarks/place-math-number-house.webp",
+      "width": 512,
+      "height": 512,
+      "mime": "image/webp",
+      "bytes": 26840,
+      "sha256": "9b99959d5e59d011654fc0d493841fba11ac88b5a55e87c95e66956b105193a4"
+    },
+    {
+      "id": "place-math-garden",
+      "role": "place",
+      "type": "landmark",
+      "src": "/art/landmarks/place-math-garden.webp",
+      "width": 512,
+      "height": 512,
+      "mime": "image/webp",
+      "bytes": 33436,
+      "sha256": "5113ea7f6c4a5bdae1bf1d37e9e3b0519b5b06a760e81ca88add5ac12fc2e0ef"
+    },
+    {
+      "id": "place-math-market",
+      "role": "place",
+      "type": "landmark",
+      "src": "/art/landmarks/place-math-market.webp",
+      "width": 512,
+      "height": 512,
+      "mime": "image/webp",
+      "bytes": 33626,
+      "sha256": "f61be569429a80cd6559e856d5000ef41809582658a2ec8fbbbdae714c9d245e"
+    },
+    {
+      "id": "place-vietnamese-library",
+      "role": "place",
+      "type": "landmark",
+      "src": "/art/landmarks/place-vietnamese-library.webp",
+      "width": 512,
+      "height": 512,
+      "mime": "image/webp",
+      "bytes": 30348,
+      "sha256": "2ef4546e69765aca7412f8d9ef148210143ba3d96b18896afb81f6874b50c148"
+    },
+    {
+      "id": "place-vietnamese-word-tree",
+      "role": "place",
+      "type": "landmark",
+      "src": "/art/landmarks/place-vietnamese-word-tree.webp",
+      "width": 512,
+      "height": 512,
+      "mime": "image/webp",
+      "bytes": 27278,
+      "sha256": "bb185bdc3bf01a284c295ae332e6b11db19da5b425d3270e84ec77e954770730"
+    },
+    {
+      "id": "place-vietnamese-story-house",
+      "role": "place",
+      "type": "landmark",
+      "src": "/art/landmarks/place-vietnamese-story-house.webp",
+      "width": 512,
+      "height": 512,
+      "mime": "image/webp",
+      "bytes": 27614,
+      "sha256": "e259562be76e520f5fe6619abf381e0896a1d4dd0f25071754efb840e6e26cdc"
+    },
+    {
+      "id": "place-english-harbor",
+      "role": "place",
+      "type": "landmark",
+      "src": "/art/landmarks/place-english-harbor.webp",
+      "width": 512,
+      "height": 512,
+      "mime": "image/webp",
+      "bytes": 22844,
+      "sha256": "f5ec9aea76de44b1026530461c1c59fad16324b66ceaa2c653aac0bc810bc04f"
+    },
+    {
+      "id": "place-english-lighthouse",
+      "role": "place",
+      "type": "landmark",
+      "src": "/art/landmarks/place-english-lighthouse.webp",
+      "width": 512,
+      "height": 512,
+      "mime": "image/webp",
+      "bytes": 20050,
+      "sha256": "92baadd50c398b763fb5e42513ded458449899a45b5af44f79237d678de4620c"
+    },
+    {
+      "id": "place-english-cafe",
+      "role": "place",
+      "type": "landmark",
+      "src": "/art/landmarks/place-english-cafe.webp",
+      "width": 512,
+      "height": 512,
+      "mime": "image/webp",
+      "bytes": 29352,
+      "sha256": "31ac62b277faf6dd9196bfaf6d7ee0cac127a65b2535bc6c10063c11c5ab5ebb"
+    },
+    {
+      "id": "place-computing-workshop",
+      "role": "place",
+      "type": "landmark",
+      "src": "/art/landmarks/place-computing-workshop.webp",
+      "width": 512,
+      "height": 512,
+      "mime": "image/webp",
+      "bytes": 29262,
+      "sha256": "3445ff5e8547303284d39a0e7f9c8e1182b840bc68304e1ec331cce555971abb"
+    },
+    {
+      "id": "place-computing-keyboard-garden",
+      "role": "place",
+      "type": "landmark",
+      "src": "/art/landmarks/place-computing-keyboard-garden.webp",
+      "width": 512,
+      "height": 512,
+      "mime": "image/webp",
+      "bytes": 30088,
+      "sha256": "04a7a0a34ea61fca2e781a132dbf68ba1c45f98c7e108ba475dc9139599537d7"
+    },
+    {
+      "id": "place-computing-info-station",
+      "role": "place",
+      "type": "landmark",
+      "src": "/art/landmarks/place-computing-info-station.webp",
+      "width": 512,
+      "height": 512,
+      "mime": "image/webp",
+      "bytes": 27252,
+      "sha256": "edca8ab4f4d94664c75c81446bba2ebf916ac1ea65c05354ea8eaf2990aac1cc"
+    },
+    {
+      "id": "game-card-question-island",
+      "role": "thumbnail",
+      "type": "card",
+      "src": "/art/game-cards/game-card-question-island.webp",
+      "width": 720,
+      "height": 480,
+      "mime": "image/webp",
+      "bytes": 61316,
+      "sha256": "094a9c026a771d38a131bae05380f6bdfff6673842397658bd22081d4a4d1c80"
+    },
+    {
+      "id": "game-card-memory-grove",
+      "role": "thumbnail",
+      "type": "card",
+      "src": "/art/game-cards/game-card-memory-grove.webp",
+      "width": 720,
+      "height": 480,
+      "mime": "image/webp",
+      "bytes": 64242,
+      "sha256": "718ffa364e85e4f896b7d3e1383d39b6f712309634623e940b66c32e0d7ef4ae"
+    },
+    {
+      "id": "game-card-sentence-house",
+      "role": "thumbnail",
+      "type": "card",
+      "src": "/art/game-cards/game-card-sentence-house.webp",
+      "width": 720,
+      "height": 480,
+      "mime": "image/webp",
+      "bytes": 54470,
+      "sha256": "0ac0c2c2e003ee892ebd8ca9fc7e6e853e97930708338d074143876e3ac2b89d"
+    },
+    {
+      "id": "game-card-word-bridge",
+      "role": "thumbnail",
+      "type": "card",
+      "src": "/art/game-cards/game-card-word-bridge.webp",
+      "width": 720,
+      "height": 480,
+      "mime": "image/webp",
+      "bytes": 60310,
+      "sha256": "ab8afbc61c50c853c957c1c31922fbdf947cbd38468755f4103acc42d4c9a6b1"
+    },
+    {
+      "id": "game-card-sequence-trail",
+      "role": "thumbnail",
+      "type": "card",
+      "src": "/art/game-cards/game-card-sequence-trail.webp",
+      "width": 720,
+      "height": 480,
+      "mime": "image/webp",
+      "bytes": 58548,
+      "sha256": "bbc7e9fa9eb5d2c99168e3cd614e761cba76aeae9251934a9a1ad2b731d1669d"
+    },
+    {
+      "id": "auth-welcome",
+      "role": "banner",
+      "type": "auth",
+      "src": "/art/auth/auth-welcome.webp",
+      "width": 1200,
+      "height": 900,
+      "mime": "image/webp",
+      "bytes": 69426,
+      "sha256": "3a7dbcdc4c87e79c47d79cbbb69ab605152e0a7f424aca60fbb85957b3fa6479"
+    }
+  ]
+}

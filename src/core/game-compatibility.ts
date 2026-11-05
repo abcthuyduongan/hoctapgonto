@@ -4,7 +4,18 @@ import {onlinePresentation} from './online-exercises.ts';
 import {GAME_REGISTRY} from './registry.ts';
 import {validatePack} from './validation.ts';
 
-const gameLabels:Record<ModuleId,string>={'math-quest':'Đảo Câu Hỏi','memory-match':'Trí Nhớ','word-connect':'Nối Từ','sentence-builder':'Ghép Câu','sequence-trail':'Bậc Thang Quy Luật'};
+const gameLabels: Record<ModuleId, string> = {
+  'math-quest': 'Đảo Câu Hỏi',
+  'memory-match': 'Trí Nhớ',
+  'word-connect': 'Nối Từ',
+  'sentence-builder': 'Ghép Câu',
+  'sequence-trail': 'Bậc Thang Quy Luật',
+  'balance-scale': 'Cân Thăng Bằng',
+  'basket-sort': 'Phân Loại Vào Giỏ',
+  'treasure-flip': 'Lật Thẻ Kho Báu',
+  'fox-kitchen': 'Bếp Nhỏ Của Cáo',
+  'boat-race': 'Đua Thuyền Rồng'
+};
 const normalized=(value:string)=>value.normalize('NFC').trim().replace(/\s+/g,' ').toLocaleLowerCase('vi');
 export type GameCompatibility={id:ModuleId;label:string;allowed:boolean;reason?:string};
 export type QuestionCompatibility={itemId:string;index:number;games:GameCompatibility[]};
@@ -21,13 +32,19 @@ export function onlineGameCompatibility(pack:ContentPack):PackGameCompatibility 
     if(pack.kind==='learning'){
       if(game.id!=='math-quest')reason='Câu đọc, nghe hoặc nhập đáp án cần dùng Đảo Câu Hỏi để giữ đủ ngữ cảnh và cách chấm.';
     }else if(pack.kind==='sentences'){
-      if(game.id!=='sentence-builder'&&game.id!=='sequence-trail')reason='Câu xếp thứ tự chỉ dùng Ghép Câu hoặc Bậc Thang Quy Luật; không tự tạo đáp án khác.';
-    }else if(game.id==='sentence-builder'||game.id==='sequence-trail')reason='Câu này chưa có thứ tự từ do tác giả cung cấp.';
-    else if(pack.kind==='pairs'&&item.kind==='pair'&&game.id==='math-quest'){
+      if(game.id!=='sentence-builder'&&game.id!=='sequence-trail'&&game.id!=='fox-kitchen')reason='Câu xếp thứ tự chỉ dùng Ghép Câu, Bậc Thang Quy Luật hoặc Bếp Nhỏ Của Cáo; không tự tạo đáp án khác.';
+    }else if(pack.kind==='compare'){
+      if(game.id!=='balance-scale'&&game.id!=='math-quest'&&game.id!=='boat-race')reason='Câu so sánh chỉ dùng cho Cân Thăng Bằng, Đảo Câu Hỏi hoặc Đua Thuyền.';
+    }else if(pack.kind==='categorize'){
+      if(game.id!=='basket-sort')reason='Câu phân loại chỉ dùng cho trò Phân Loại Vào Giỏ.';
+    }else if(game.id==='sentence-builder'||game.id==='sequence-trail'||game.id==='fox-kitchen')reason='Câu này chưa có thứ tự từ do tác giả cung cấp.';
+    else if(game.id==='balance-scale')reason='Cân thăng bằng chỉ dùng cho câu so sánh hai vế.';
+    else if(game.id==='basket-sort'&&pack.kind!=='pairs')reason='Phân loại vào giỏ chỉ dùng cho câu phân loại hoặc ghép cặp.';
+    else if(pack.kind==='pairs'&&item.kind==='pair'&&(game.id==='math-quest'||game.id==='boat-race')){
       if(pack.items.length<4)reason='Cả bộ cần ít nhất 4 cặp để tạo đủ 4 phương án trắc nghiệm.';
       else if((answerCounts.get(normalized(item.right))??0)>1)reason='Đáp án bên phải trùng câu khác; chưa thể tạo trắc nghiệm có một đáp án rõ ràng.';
       else if(`${pack.title}: ${item.left} → ?`.length>320)reason='Đề trắc nghiệm sau chuyển dạng vượt 320 ký tự.';
-    }else if(game.id==='memory-match'||game.id==='word-connect'){
+    }else if(game.id==='memory-match'||game.id==='word-connect'||game.id==='treasure-flip'){
       const cardFaces=item.kind==='pair'?[item.left,item.right]:item.kind==='multiple-choice'?[item.prompt,item.options[item.correctIndex]]:[];
       if(cardFaces.some(face=>face.length>120))reason='Đề hoặc đáp án đúng dài hơn giới hạn 120 ký tự trên một mặt thẻ.';
       else if(cardFaces.length===2&&normalized(cardFaces[0])===normalized(cardFaces[1]))reason='Hai mặt của câu giống nhau; ghép thẻ có thể mơ hồ.';

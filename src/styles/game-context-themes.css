@@ -1,0 +1,220 @@
+/* Contextual Game Presentations — Bối cảnh 3 Minigame */
+
+/* 1. Cáo Câu Cá (Fishing Presentation for Math Quest) */
+.context-theme-fishing {
+  background: radial-gradient(circle at 50% 30%, #e0f2fe 0%, #bae6fd 60%, #7dd3fc 100%) !important;
+  position: relative;
+  overflow: hidden;
+}
+
+[data-motion="off"] .context-theme-fishing * {
+  animation: none !important;
+  transition: none !important;
+}
+
+.fishing-water-surface {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 120px;
+  background: linear-gradient(180deg, rgba(56, 189, 248, 0.4) 0%, rgba(14, 165, 233, 0.7) 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.fishing-dock-fox {
+  position: absolute;
+  bottom: 80px;
+  right: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 2;
+  user-select: none;
+}
+
+.fishing-rod {
+  width: 4px;
+  height: 90px;
+  background: #78350f;
+  transform: rotate(-35deg);
+  transform-origin: bottom center;
+  position: relative;
+}
+
+.fishing-line {
+  position: absolute;
+  top: 0;
+  right: -20px;
+  width: 2px;
+  height: 110px;
+  background: rgba(255, 255, 255, 0.8);
+  animation: floatBob 2s ease-in-out infinite;
+}
+
+@keyframes floatBob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(8px); }
+}
+
+.fishing-bobber {
+  position: absolute;
+  bottom: 0;
+  left: -5px;
+  width: 12px;
+  height: 16px;
+  background: radial-gradient(circle at 50% 30%, #ef4444 50%, #ffffff 50%);
+  border-radius: 6px;
+}
+
+.fishing-fish-caught {
+  position: absolute;
+  bottom: 50px;
+  right: 120px;
+  font-size: 2.5rem;
+  animation: fishHop 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+  z-index: 3;
+}
+
+@keyframes fishHop {
+  0% { transform: scale(0.3) translateY(60px); opacity: 0; }
+  60% { transform: scale(1.2) translateY(-20px); opacity: 1; }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+/* 2. Cầu Nối Đôi Bờ (Bridge Presentation for Word Connect) */
+.context-theme-bridge {
+  background: radial-gradient(circle at 50% 20%, #f0fdf4 0%, #dcfce7 60%, #bbf7d0 100%) !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.bridge-river-stream {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(50% - 60px);
+  width: 120px;
+  background: linear-gradient(90deg, rgba(56, 189, 248, 0.3) 0%, rgba(14, 165, 233, 0.5) 50%, rgba(56, 189, 248, 0.3) 100%);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.bridge-span-container {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+  margin: 0.5rem 0 1rem;
+  z-index: 2;
+}
+
+.bridge-plank {
+  width: 32px;
+  height: 14px;
+  background: #94a3b8;
+  border-radius: 4px;
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.bridge-plank.built {
+  background: linear-gradient(180deg, #d97706 0%, #b45309 100%);
+  box-shadow: 0 4px 8px rgba(180, 83, 9, 0.3);
+  transform: scaleY(1.2);
+}
+
+.bridge-fox-walker {
+  font-size: 1.8rem;
+  margin-left: 8px;
+  animation: walkBounce 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes walkBounce {
+  from { transform: translateY(0); }
+  to { transform: translateY(-6px); }
+}
+
+/* 3. Xây Câu Lâu Đài (Castle Presentation for Sentence Builder) */
+.context-theme-castle {
+  background: radial-gradient(circle at 50% 30%, #fdf4ff 0%, #fae8ff 60%, #f5d0fe 100%) !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.castle-wall-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0.5rem 0 1rem;
+  z-index: 2;
+}
+
+.castle-battlements {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+
+.castle-tower-cap {
+  width: 24px;
+  height: 16px;
+  background: #c084fc;
+  border-radius: 4px 4px 0 0;
+}
+
+.castle-tower-cap.placed {
+  background: linear-gradient(180deg, #f59e0b 0%, #d97706 100%);
+  box-shadow: 0 2px 6px rgba(217, 119, 6, 0.4);
+}
+
+.castle-brick-row {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+}
+
+.castle-brick {
+  width: 28px;
+  height: 16px;
+  background: #e9d5ff;
+  border-radius: 3px;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.castle-brick.built {
+  background: linear-gradient(180deg, #a855f7 0%, #7e22ce 100%);
+  box-shadow: 0 2px 5px rgba(126, 34, 206, 0.3);
+  transform: translateY(-2px);
+}
+
+.castle-flag {
+  font-size: 1.5rem;
+  margin-bottom: -6px;
+  animation: flagWave 1s ease-in-out infinite alternate;
+}
+
+@keyframes flagWave {
+  from { transform: rotate(-5deg); }
+  to { transform: rotate(10deg); }
+}
+
+/* Context selector toggle button in game hud */
+.game-theme-toggle-btn {
+  padding: 0.35rem 0.75rem;
+  border-radius: 12px;
+  border: 1px solid currentColor;
+  background: rgba(255, 255, 255, 0.6);
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: all 0.2s;
+}
+
+.game-theme-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.95);
+  transform: scale(1.04);
+}

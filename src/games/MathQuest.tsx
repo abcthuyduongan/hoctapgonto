@@ -1,6 +1,8 @@
+import '../styles/game-base.css';
+import '../styles/game-context-themes.css';
 import {useQuestionSpeech} from './useQuestionSpeech';
 import {saveFailureMessage} from './save-failure-message';
-import QuestionMedia from '../components/QuestionMedia';
+import QuestionMedia,{useNextQuestionImage} from '../components/QuestionMedia';
 import GameMascot from './GameMascot';
 import { useEffect, useRef, useState } from 'react';
 import { playFeedbackTone } from '../core/experience';
@@ -20,6 +22,7 @@ export default function MathQuest({pack,onAttempt,onComplete,onExit,questionMode
   const [status,setStatus] = useState<'playing'|'done'>('playing');
   const [busy,setBusy] = useState(false);
   const [error,setError] = useState('');
+  const [contextTheme, setContextTheme] = useState<'default' | 'fishing'>('fishing');
   const [pending,setPending] = useState<AttemptInput|null>(null);
   const [outcome,setOutcome]=useState<AttemptOutcome|null>(null),[hintBusy,setHintBusy]=useState(false),[hintText,setHintText]=useState('');
   const answerLock = useRef(false);
@@ -30,6 +33,7 @@ export default function MathQuest({pack,onAttempt,onComplete,onExit,questionMode
   const [imageReadyQuestion,setImageReadyQuestion]=useState<string|null>(null);
   const imageReady=!sourceQuestion.media?.imageId||imageReadyQuestion===sourceQuestion.id;
   const correctSelected=selected!==null&&(serverScored?outcome?.correct===true:selected===legacyQuestion.correctIndex);
+  useNextQuestionImage(content.items[index+1]?.media,correctSelected);
   const clock=useQuestionClock({enabled:questionMode,itemId:sourceQuestion.id,canOpen:imageReady,finished:correctSelected||status==='done',onQuestionOpen,requireItem:serverScored});
   const question=clock.item?.kind==='multiple-choice'?clock.item:sourceQuestion;
   const correctIndex=serverScored?outcome?.feedback?.correctIndex:legacyQuestion.correctIndex;
@@ -74,11 +78,32 @@ export default function MathQuest({pack,onAttempt,onComplete,onExit,questionMode
   }
 
   async function requestHint(){if(hintBusy||hints||pendingRef.current||busy||!clock.ready)return;setHintBusy(true);setError('');try{if(serverScored){if(!onQuestionHint)throw new Error('Chưa kết nối được gợi ý.');const result=await onQuestionHint(question.id);setHints(result.hintsUsed);setHintText(result.hint);}else{setHints(1);setHintText('Hãy thử loại bỏ các đáp án con chắc chắn là không đúng.');}}catch(error){setError(error instanceof Error?error.message:'Chưa tải được gợi ý.');}finally{setHintBusy(false);}}
-  return <section ref={layout.ref} {...layout.layoutProps} className="play-panel math-panel world-stage world-math">
+  return <section ref={layout.ref} {...layout.layoutProps} className={`play-panel math-panel world-stage world-math ${contextTheme === 'fishing' ? 'context-theme-fishing' : ''}`}>
     <div className="stage-backdrop" aria-hidden="true"/>
     <div className="stage-overlay" aria-hidden="true"/>
+    {contextTheme === 'fishing' && (
+      <>
+        <div className="fishing-water-surface" aria-hidden="true" />
+        <div className="fishing-dock-fox" aria-hidden="true">
+          <div className="fishing-rod">
+            <div className="fishing-line">
+              <div className="fishing-bobber" />
+            </div>
+          </div>
+        </div>
+        {correctSelected && <div className="fishing-fish-caught" aria-hidden="true">🐟</div>}
+      </>
+    )}
     {speech.notice&&<p className="notice speech-notice" role="status">{speech.notice}</p>}
-    <div className="world-hud"><span className="hud-label"><span className="ba37-hud-symbol" aria-hidden="true">∑</span> ĐẢO TOÁN HỌC</span><span className="hud-score"><span aria-hidden="true">✓</span> {correctCount} câu đúng</span></div>
+    <div className="world-hud">
+      <span className="hud-label"><span className="ba37-hud-symbol" aria-hidden="true">∑</span> {contextTheme === 'fishing' ? 'CÁO CÂU CÁ' : 'ĐẢO TOÁN HỌC'}</span>
+      <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+        <button type="button" className="game-theme-toggle-btn" onClick={() => setContextTheme(t => t === 'fishing' ? 'default' : 'fishing')} title="Đổi bối cảnh">
+          🎣 {contextTheme === 'fishing' ? 'Bối cảnh: Câu cá' : 'Bối cảnh: Chuẩn'}
+        </button>
+        <span className="hud-score"><span aria-hidden="true">✓</span> {correctCount} câu đúng</span>
+      </div>
+    </div>
     <div className="math-adventure-layout">
       <aside className="world-guide"><div className="guide-figure"><GameMascot alt="Cáo nhỏ đồng hành" mood={selected===null?'idle':correctSelected?'happy':'encourage'}/></div><div className="guide-speech">{selected===null ? "Con cứ suy nghĩ kỹ rồi chọn nhé! 🌟" : (correctSelected ? "Cậu làm tốt lắm! 🎉" : "Sai cũng là một cách học nhé! 🌱")}</div></aside>
       <div className="challenge-card">

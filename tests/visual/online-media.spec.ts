@@ -97,8 +97,8 @@ test('memory cards contain long labels and images without clipping at short, mob
     expect(imageLabel).toHaveLength(120);expect(plainLabel).toHaveLength(120);
     const pack={...f.pack,items:f.pack.items.map((item,index)=>index===0?{...item,left:imageLabel,right:'Xe đạp'}:index===1?{...item,left:plainLabel,right:'Thư viện',media:undefined}:item)};
     await f.api(page.request,'/weeks',{requestId:'long-memory-week',classId:f.cls.id,title:'Tuần thẻ có câu dài',sets:[{subjectLabel:'Quan sát',pack}]});
-    await page.context().clearCookies();await f.login(page,'media.child');await startAssignedGame(page,'Khu Rừng Trí Nhớ');
-    await page.route(`**/api/online/media/${f.image.id}*`,route=>route.abort());
+    // Card images are prefetched when the game starts, so the failure must exist before entering.
+    await page.context().clearCookies();await f.login(page,'media.child');await page.route(`**/api/online/media/${f.image.id}*`,route=>route.abort());await startAssignedGame(page,'Khu Rừng Trí Nhớ');
     await page.setViewportSize(viewports[0]);const longCard=page.locator('.memory-card').filter({hasText:imageLabel});
     await longCard.evaluate(()=>new Promise<void>(resolve=>requestAnimationFrame(()=>requestAnimationFrame(()=>resolve()))));const closedHeight=(await longCard.boundingBox())!.height;await longCard.click();
     await expect(page.getByRole('button',{name:'Tải lại hình',exact:true})).toBeVisible();

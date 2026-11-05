@@ -1,0 +1,170 @@
+/* src/styles/streak.css */
+
+.streak-pill-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: linear-gradient(135deg, rgba(234, 88, 12, 0.2) 0%, rgba(180, 83, 9, 0.25) 100%);
+  border: 1px solid rgba(249, 115, 22, 0.4);
+  color: #ffedd5;
+  padding: 0.35rem 0.75rem;
+  border-radius: 9999px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.study-timer-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(14, 165, 233, 0.18);
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  color: #e0f2fe;
+  padding: 0.35rem 0.75rem;
+  border-radius: 9999px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.streak-pill-btn:hover {
+  background: linear-gradient(135deg, rgba(234, 88, 12, 0.35) 0%, rgba(180, 83, 9, 0.4) 100%);
+  border-color: #fb923c;
+  transform: translateY(-1px);
+}
+
+.streak-flame-icon {
+  font-size: 1.1rem;
+  line-height: 1;
+  filter: drop-shadow(0 0 4px rgba(249, 115, 22, 0.6));
+}
+
+.streak-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(4px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.streak-dialog {
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  border: 1px solid rgba(249, 115, 22, 0.3);
+  border-radius: 1.25rem;
+  width: 100%;
+  max-width: 480px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+  color: #f8fafc;
+  overflow: hidden;
+  padding: 1.5rem;
+  text-align: center;
+  position: relative;
+}
+
+.streak-dialog-flame {
+  font-size: 3.5rem;
+  margin-bottom: 0.5rem;
+  display: inline-block;
+  animation: streakFlamePulse 2s infinite ease-in-out;
+}
+
+@keyframes streakFlamePulse {
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 10px rgba(249, 115, 22, 0.6)); }
+  50% { transform: scale(1.08); filter: drop-shadow(0 0 18px rgba(249, 115, 22, 0.9)); }
+}
+
+.streak-dialog-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #ffedd5;
+  margin-bottom: 0.25rem;
+}
+
+.streak-dialog-sub {
+  font-size: 0.95rem;
+  color: #94a3b8;
+  margin-bottom: 1.25rem;
+}
+
+.streak-progress-box {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.85rem;
+  padding: 1rem;
+  margin-bottom: 1.25rem;
+  text-align: left;
+}
+
+.streak-progress-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #cbd5e1;
+  margin-bottom: 0.5rem;
+}
+
+.streak-progress-track {
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 9999px;
+  overflow: hidden;
+  margin-bottom: 0.6rem;
+}
+
+.streak-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #f97316, #fb923c);
+  border-radius: 9999px;
+  transition: width 0.3s ease;
+}
+
+.streak-status-msg {
+  font-size: 0.85rem;
+  color: #fdba74;
+  line-height: 1.4;
+}
+
+.streak-freeze-box {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  border-radius: 0.75rem;
+  padding: 0.75rem;
+  font-size: 0.825rem;
+  color: #93c5fd;
+  text-align: left;
+  margin-bottom: 1.25rem;
+}
+
+.streak-dialog-close {
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+  color: white;
+  border: none;
+  font-weight: 700;
+  padding: 0.6rem 1.5rem;
+  border-radius: 0.65rem;
+  cursor: pointer;
+  width: 100%;
+  font-size: 0.95rem;
+}
+
+@media (prefers-reduced-motion: reduce), (update: slow) {
+  .streak-dialog-flame {
+    animation: none !important;
+  }
+}
+
+[data-motion="off"] .streak-dialog-flame {
+  animation: none !important;
+  filter: none !important;
+}

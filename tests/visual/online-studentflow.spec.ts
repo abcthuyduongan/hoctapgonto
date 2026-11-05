@@ -6,7 +6,7 @@ import {createOnlineServer} from '../../server/online-server.mjs';
 import {seedLegacyApiWeek} from '../helpers/legacy-weeks.mjs';
 
 function gate(){let release=()=>{};const held=new Promise<void>(resolve=>{release=resolve;});return{held,release};}
-async function fixture(page:Page){
+async function fixture(page:Page,withSecondSubject=false){
   const root=path.resolve('test-results');await mkdir(root,{recursive:true});
   const directory=await mkdtemp(path.join(root,'student-flow-'));
   const server=createOnlineServer({databasePath:path.join(directory,'data.sqlite'),staticRoot:path.resolve(process.env.BAO_AN_STATIC_ROOT??'dist'),setupToken:'student-flow-bootstrap',secureCookies:false});
@@ -23,24 +23,50 @@ async function fixture(page:Page){
     const cls=await api('/classes',{name:'Lớp 3A5',grade:3});
     await api('/students',{name:'Đặng Ngọc Bảo An',classId:cls.id,username:'flow.child',password});
     const pack={id:'flow-quiz',version:1,title:'Công nghệ | quiz | Tuần 01',kind:'quiz',subject:'thinking',grade:3,source:'local',publishedAt:'2026-10-18T00:00:00Z',items:[1,2].map(i=>({id:`flow-${i}`,objectiveId:'FLOW',kind:'multiple-choice',prompt:`Câu hỏi ${i}`,options:[`Đúng ${i}`,'Sai A','Sai B','Sai C'],correctIndex:0,explanation:'Đáp án đúng.'}))};
-    await api('/weeks',{requestId:'flow-week',classId:cls.id,title:'Tuần 01',sets:[{subjectLabel:'Công nghệ',pack}]});
+    await api('/weeks',{requestId:'flow-week',classId:cls.id,title:'Tuần 01',sets:[{subjectLabel:'Công nghệ',pack},...(withSecondSubject?[{subjectLabel:'Tiếng Anh',pack:{...pack,id:'flow-english',title:'Khám phá English',items:pack.items.map((item,index)=>({...item,id:`english-${index}`,prompt:`Câu hỏi Tiếng Anh ${index+1}`}))}}]:[])]});
     await page.context().clearCookies();await api('/login',{username:'flow.child',password});await page.goto(origin+'/');
+    await page.getByRole('button',{name:'📋 Thu gọn bản đồ',exact:true}).click();
     await expect(page.locator('[data-hub-mode="light"]')).toBeVisible();
     return{server,async close(){await page.unrouteAll({behavior:'ignoreErrors'});server.closeAllConnections?.();await new Promise<void>(resolve=>server.close(()=>resolve()));server.onlineClose();expect(path.dirname(directory)).toBe(root);expect(path.basename(directory)).toMatch(/^student-flow-/);await rm(directory,{recursive:true,force:true});}};
   }catch(error){server.closeAllConnections?.();await new Promise<void>(resolve=>server.close(()=>resolve()));server.onlineClose();expect(path.dirname(path.resolve(directory))).toBe(root);expect(path.basename(directory)).toMatch(/^student-flow-/);await rm(directory,{recursive:true,force:true});throw error;}
 }
 
-test('phone heading uses the available width and puts the wallet below the lesson title',async({page},testInfo)=>{
+test('the lightweight exploration map and wallet remain usable on phone and desktop',async({page},testInfo)=>{
   const f=await fixture(page);
   try{
-    for(const width of [320,390,620]){
+    for(const width of [320,390,620,1440]){
       await page.setViewportSize({width,height:844});
-      const heading=page.locator('.student-light-heading'),text=heading.locator(':scope>div'),wallet=heading.getByRole('button',{name:'Ví đổi sao',exact:true});
-      await expect.poll(async()=>{const container=await heading.boundingBox(),copy=await text.boundingBox();return copy!.width/container!.width;}).toBeGreaterThan(.9);
-      expect((await wallet.boundingBox())!.y).toBeGreaterThanOrEqual((await text.boundingBox())!.y+(await text.boundingBox())!.height);
+      const wallet=page.getByRole('button',{name:'Ví đổi sao',exact:true});
+      await expect(page.getByRole('heading',{name:'Chào Đặng Ngọc Bảo An'})).toBeVisible();
+      await expect(page.getByRole('button',{name:'Khám phá Công nghệ · Công nghệ | quiz | Tuần 01',exact:true})).toHaveAttribute('aria-pressed','true');
+      await expect(page.getByRole('progressbar',{name:'Số câu đạt yêu cầu tuần này'})).toHaveAttribute('value','0');
+      await expect(wallet).toBeVisible();await wallet.focus();await page.keyboard.press('Enter');
+      await expect(page.getByRole('dialog',{name:'⭐ Ví đổi sao của con'})).toBeVisible();
+      await page.getByRole('button',{name:'Đóng ✕',exact:true}).click();await expect(wallet).toBeFocused();
+      await expect(page.locator('canvas,.ba37-mascot-window img')).toHaveCount(0);
       expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
       await page.screenshot({path:testInfo.outputPath(`student-home-${width}.png`),fullPage:true});
     }
+  }finally{await f.close();}
+});
+
+test('choosing a map destination opens its own assigned questions without awarding stars',async({page})=>{
+  const f=await fixture(page,true);
+  try{
+    const english=page.getByRole('button',{name:'Khám phá Tiếng Anh · Khám phá English',exact:true});
+    await english.click();await expect(english).toHaveAttribute('aria-pressed','true');
+    const start=page.getByRole('button',{name:'Chơi Đảo Câu Hỏi bằng bộ được giao',exact:true});
+    await expect(start).toBeEnabled();await start.click();
+    await expect(page.locator('.quiz-question')).toHaveText('Câu hỏi Tiếng Anh 1');
+    await expect(page.getByRole('img',{name:'Cáo nhỏ đồng hành',exact:true})).toContainText('🦊');
+    await page.getByRole('button',{name:'← Thoát trò chơi',exact:true}).click();
+    await expect(start).toBeFocused();
+    expect(f.server.onlineStore.db.prepare('SELECT count(*) AS n FROM attempts').get().n).toBe(0);
+    expect(f.server.onlineStore.db.prepare('SELECT count(*) AS n FROM awards').get().n).toBe(0);
+    await page.getByRole('button',{name:'Khám phá Công nghệ · Công nghệ | quiz | Tuần 01',exact:true}).click();
+    await expect(start).toBeEnabled();await start.click();
+    await expect(page.locator('.quiz-question')).toHaveText('Câu hỏi 1');
+    await page.getByRole('button',{name:'← Thoát trò chơi',exact:true}).click();
   }finally{await f.close();}
 });
 

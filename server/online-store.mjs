@@ -9,16 +9,31 @@ import {onlinePresentation,onlineEvidenceErrors,onlineScoreResponse,onlineAward}
 import {makeRewardRequest,changeRewardRequest,rewardStatus,rewardBalance} from '../src/core/reward-wallet.ts';
 import {onlineImmutablePackIdentity,onlinePackQuestionKind,onlineSemanticPackIdentity,onlineWeekIdentity,onlineIdentityText,onlineRevisionOrder,onlinePreserveQuestionIds} from '../src/core/online-import-identity.ts';
 import {summaryWeeks,summaryPage,compactPlay} from './student-summary.mjs';
+import {projectStudentMap} from './world-map-summary.mjs';
 import {createWeeklyPlan,weeklyPlanErrors,validateWeeklyPlan} from '../src/core/weekly-plan.ts';
 import {readWeekPolicies,closedStudentCount,changesQuestionMeaning} from './weekly-policy.mjs';
 import {journeyProgress,selectReviewItems,filterPlayPresentation,timedQuestion} from './question-journey.mjs';
 import {initializeQuestionRewardLedger,applyQuestionRewardCandidates,questionRewardCandidates,questionRewardProgress,questionRewardThresholds,earnedQuestionRewardStars,v2QuestionCompletionErrors} from '../src/core/question-rewards.ts';
 import {openProtocolQuestion,protocolAudioDelivery,protocolHint,answerFeedback} from './question-protocol.mjs';
+import {toVietnamDateString,getVietnamWeekKey,computeStreakState,registerDailyCorrectAnswer,buildDailyMissions,buildStudentBadgeStatuses,BADGE_CATALOG} from '../src/core/badges.ts';
+import {getVietnamTimeParts,checkCurfewHours,checkDailyScreenTime,msToMinutes,MAX_PIN_FAILURES,PIN_LOCKOUT_MS} from '../src/core/parent-controls.ts';
+import {buildParentWeeklyReport,hashParentPin,verifyParentPin} from './parent-data.mjs';
+import {CONTEST_PRESETS,CONTESTANT_BADGE,sanitizeContestItem,evaluateContestSubmission,checkReadinessForExam,generateContestQuestions,buildReviewMistakesPack} from './contest-data.mjs';
+import {TOWN_BUILDING_CATALOG,TOWN_BUILDING_MAP,resolveTownSubject,getMaterialForSubject,calculateEarnedMaterialsFromAwards,calculateTotalSpentMaterials,calculateAvailableMaterials,canAffordBuilding,defaultTownState,evaluateBuildingPlacement} from './town-data.mjs';
+import {ANIMAL_CATALOG,ANIMAL_MAP,getUnlockedAnimals,validateAnimalName} from '../src/core/animal-neighbors.ts';
+import {sanitizeClassFeedEvent,verifyPrivacyCompliance} from '../src/core/class-feed.ts';
 
 import {OnlineError,fail,text,integer,shape} from './online-errors.mjs';
 export {OnlineError,fail,text,integer,shape};
 const id=()=>randomUUID();
 const now=()=>new Date().toISOString();
+const role=(auth,expected)=>{
+  if(Array.isArray(expected)){
+    if(!expected.includes(auth.role))fail(403,'Không có quyền thực hiện thao tác này.');
+  }else if(auth.role!==expected){
+    fail(403,expected==='admin'?'Chỉ quản lý được thực hiện thao tác này.':'Hãy dùng tài khoản học sinh để vào luyện tập.');
+  }
+};
 const json=JSON.stringify;
 const parse=JSON.parse;
 const stable=value=>JSON.stringify(value,(_key,row)=>row&&typeof row==='object'&&!Array.isArray(row)?Object.fromEntries(Object.entries(row).sort(([a],[b])=>a.localeCompare(b))):row);
@@ -30,9 +45,10 @@ export class OnlineStore{
     this.db=new DatabaseSync(databasePath);this.db.exec(`PRAGMA foreign_keys=ON; PRAGMA journal_mode=WAL; PRAGMA busy_timeout=5000;
       CREATE TABLE IF NOT EXISTS schema_version(version INTEGER PRIMARY KEY); INSERT OR IGNORE INTO schema_version VALUES(1);
       CREATE TABLE IF NOT EXISTS workspaces(id TEXT PRIMARY KEY,name TEXT NOT NULL,wallet_enabled INTEGER NOT NULL DEFAULT 0,rate_vnd INTEGER NOT NULL DEFAULT 1000,created_at TEXT NOT NULL);
-      CREATE TABLE IF NOT EXISTS users(id TEXT PRIMARY KEY,workspace_id TEXT NOT NULL REFERENCES workspaces(id),username TEXT NOT NULL UNIQUE,password_hash TEXT NOT NULL,role TEXT NOT NULL CHECK(role IN ('admin','student')),student_id TEXT,active INTEGER NOT NULL DEFAULT 1,created_at TEXT NOT NULL);
+      CREATE TABLE IF NOT EXISTS users(id TEXT PRIMARY KEY,workspace_id TEXT NOT NULL REFERENCES workspaces(id),username TEXT NOT NULL UNIQUE,password_hash TEXT NOT NULL,role TEXT NOT NULL CHECK(role IN ('admin','student','parent')),student_id TEXT,active INTEGER NOT NULL DEFAULT 1,created_at TEXT NOT NULL);
       CREATE TABLE IF NOT EXISTS auth_sessions(token_hash TEXT PRIMARY KEY,user_id TEXT NOT NULL REFERENCES users(id),csrf_token TEXT NOT NULL,expires_at INTEGER NOT NULL);
       CREATE TABLE IF NOT EXISTS login_limits(key TEXT PRIMARY KEY,count INTEGER NOT NULL,reset_at INTEGER NOT NULL);
+      CREATE INDEX IF NOT EXISTS login_limit_expiry ON login_limits(reset_at,key);
       CREATE TABLE IF NOT EXISTS classes(id TEXT NOT NULL,workspace_id TEXT NOT NULL REFERENCES workspaces(id),name TEXT NOT NULL,grade INTEGER NOT NULL,created_at TEXT NOT NULL,PRIMARY KEY(workspace_id,id));
       CREATE TABLE IF NOT EXISTS students(id TEXT NOT NULL,workspace_id TEXT NOT NULL,class_id TEXT NOT NULL,name TEXT NOT NULL,user_id TEXT NOT NULL REFERENCES users(id),active INTEGER NOT NULL DEFAULT 1,created_at TEXT NOT NULL,PRIMARY KEY(workspace_id,id),FOREIGN KEY(workspace_id,class_id) REFERENCES classes(workspace_id,id));
       CREATE TABLE IF NOT EXISTS packs(workspace_id TEXT NOT NULL REFERENCES workspaces(id),pack_id TEXT NOT NULL,version INTEGER NOT NULL,subject_label TEXT NOT NULL,json TEXT NOT NULL,content_hash TEXT NOT NULL,PRIMARY KEY(workspace_id,pack_id,version));
@@ -44,8 +60,36 @@ export class OnlineStore{
       CREATE TABLE IF NOT EXISTS redemptions(workspace_id TEXT NOT NULL,id TEXT NOT NULL,student_id TEXT NOT NULL,status TEXT NOT NULL,json TEXT NOT NULL,PRIMARY KEY(workspace_id,id),FOREIGN KEY(workspace_id,student_id) REFERENCES students(workspace_id,id));
       CREATE TABLE IF NOT EXISTS audit(id TEXT PRIMARY KEY,workspace_id TEXT NOT NULL,user_id TEXT NOT NULL,action TEXT NOT NULL,target_id TEXT NOT NULL,at TEXT NOT NULL);
       CREATE TABLE IF NOT EXISTS media(id TEXT NOT NULL,workspace_id TEXT NOT NULL,name TEXT NOT NULL,mime TEXT NOT NULL,kind TEXT NOT NULL,size INTEGER NOT NULL,sha256 TEXT NOT NULL,bytes BLOB NOT NULL,created_at TEXT NOT NULL,PRIMARY KEY(workspace_id,id),UNIQUE(workspace_id,name,sha256));
+      CREATE TABLE IF NOT EXISTS gift_catalog(workspace_id TEXT NOT NULL,id TEXT NOT NULL,class_id TEXT,title TEXT NOT NULL,image_media_id TEXT,price_stars INTEGER NOT NULL,kind TEXT NOT NULL,weekly_limit INTEGER NOT NULL DEFAULT 0,stock INTEGER NOT NULL DEFAULT -1,unlock_after_week INTEGER NOT NULL DEFAULT 0,active INTEGER NOT NULL DEFAULT 1,sort_order INTEGER NOT NULL DEFAULT 0,created_at TEXT NOT NULL,PRIMARY KEY(workspace_id,id),FOREIGN KEY(workspace_id) REFERENCES workspaces(id));
+      CREATE TABLE IF NOT EXISTS student_goals(workspace_id TEXT NOT NULL,student_id TEXT NOT NULL,gift_id TEXT NOT NULL,pinned_at TEXT NOT NULL,PRIMARY KEY(workspace_id,student_id),FOREIGN KEY(workspace_id,student_id) REFERENCES students(workspace_id,id));
+      CREATE TABLE IF NOT EXISTS badge_awards(workspace_id TEXT NOT NULL,student_id TEXT NOT NULL,badge_id TEXT NOT NULL,unlocked_at TEXT NOT NULL,json TEXT NOT NULL DEFAULT '{}',PRIMARY KEY(workspace_id,student_id,badge_id),FOREIGN KEY(workspace_id,student_id) REFERENCES students(workspace_id,id));
+      CREATE TABLE IF NOT EXISTS student_streaks(workspace_id TEXT NOT NULL,student_id TEXT NOT NULL,current_streak INTEGER NOT NULL DEFAULT 0,longest_streak INTEGER NOT NULL DEFAULT 0,last_active_date TEXT,freeze_used_week TEXT,today_correct_count INTEGER NOT NULL DEFAULT 0,today_date TEXT,updated_at TEXT NOT NULL,PRIMARY KEY(workspace_id,student_id),FOREIGN KEY(workspace_id,student_id) REFERENCES students(workspace_id,id));
+      CREATE TABLE IF NOT EXISTS daily_missions(workspace_id TEXT NOT NULL,student_id TEXT NOT NULL,date TEXT NOT NULL,mission_id TEXT NOT NULL,mission_type TEXT NOT NULL,target_count INTEGER NOT NULL DEFAULT 1,progress_count INTEGER NOT NULL DEFAULT 0,completed INTEGER NOT NULL DEFAULT 0,completed_at TEXT,json TEXT NOT NULL DEFAULT '{}',PRIMARY KEY(workspace_id,student_id,date,mission_id),FOREIGN KEY(workspace_id,student_id) REFERENCES students(workspace_id,id));
+      CREATE TABLE IF NOT EXISTS parent_controls(workspace_id TEXT NOT NULL,student_id TEXT NOT NULL,pin_hash TEXT,pin_salt TEXT,pin_failed_count INTEGER NOT NULL DEFAULT 0,pin_locked_until TEXT,max_minutes_per_day INTEGER NOT NULL DEFAULT 0,allowed_start_hour INTEGER NOT NULL DEFAULT 0,allowed_end_hour INTEGER NOT NULL DEFAULT 24,updated_at TEXT NOT NULL,PRIMARY KEY(workspace_id,student_id),FOREIGN KEY(workspace_id,student_id) REFERENCES students(workspace_id,id));
+      CREATE TABLE IF NOT EXISTS parent_students(workspace_id TEXT NOT NULL,parent_user_id TEXT NOT NULL,student_id TEXT NOT NULL,created_at TEXT NOT NULL,PRIMARY KEY(workspace_id,parent_user_id,student_id),FOREIGN KEY(workspace_id,student_id) REFERENCES students(workspace_id,id));
+      CREATE TABLE IF NOT EXISTS contest_sessions(workspace_id TEXT NOT NULL,student_id TEXT NOT NULL,session_id TEXT PRIMARY KEY,request_id TEXT,preset_id TEXT NOT NULL,title TEXT NOT NULL,subject TEXT NOT NULL,grade INTEGER NOT NULL,duration_seconds INTEGER NOT NULL,started_at TEXT NOT NULL,deadline_at TEXT NOT NULL,status TEXT NOT NULL DEFAULT 'active',items_json TEXT NOT NULL,submitted_at TEXT,score INTEGER DEFAULT 0,max_score INTEGER DEFAULT 0,correct_count INTEGER DEFAULT 0,total_items INTEGER DEFAULT 0,answers_json TEXT DEFAULT '{}',skipped_keys TEXT DEFAULT '[]',created_at TEXT NOT NULL,FOREIGN KEY(workspace_id,student_id) REFERENCES students(workspace_id,id));
+      CREATE TABLE IF NOT EXISTS town_states(workspace_id TEXT NOT NULL,student_id TEXT NOT NULL,grid_width INTEGER NOT NULL DEFAULT 10,grid_height INTEGER NOT NULL DEFAULT 10,revision INTEGER NOT NULL DEFAULT 1,buildings_json TEXT NOT NULL DEFAULT '[]',updated_at TEXT NOT NULL,PRIMARY KEY(workspace_id,student_id),FOREIGN KEY(workspace_id,student_id) REFERENCES students(workspace_id,id));
+      CREATE TABLE IF NOT EXISTS materials_ledger(workspace_id TEXT NOT NULL,student_id TEXT NOT NULL,id TEXT PRIMARY KEY,pack_id TEXT,material_type TEXT NOT NULL CHECK(material_type IN ('stone', 'wood', 'fish', 'component')),delta INTEGER NOT NULL,reason TEXT NOT NULL,request_id TEXT,created_at TEXT NOT NULL,FOREIGN KEY(workspace_id,student_id) REFERENCES students(workspace_id,id));
+      CREATE TABLE IF NOT EXISTS town_animals(workspace_id TEXT NOT NULL,student_id TEXT NOT NULL,animal_id TEXT NOT NULL,name TEXT NOT NULL,arrived_at_week INTEGER NOT NULL,created_at TEXT NOT NULL,PRIMARY KEY(workspace_id,student_id,animal_id),FOREIGN KEY(workspace_id,student_id) REFERENCES students(workspace_id,id));
+      CREATE TABLE IF NOT EXISTS town_cheers(workspace_id TEXT NOT NULL,from_student_id TEXT NOT NULL,to_student_id TEXT NOT NULL,day_key TEXT NOT NULL,created_at TEXT NOT NULL,PRIMARY KEY(workspace_id,from_student_id,to_student_id,day_key),FOREIGN KEY(workspace_id,from_student_id) REFERENCES students(workspace_id,id),FOREIGN KEY(workspace_id,to_student_id) REFERENCES students(workspace_id,id));
+      CREATE TABLE IF NOT EXISTS class_feed_events(workspace_id TEXT NOT NULL,class_id TEXT NOT NULL,id TEXT NOT NULL,student_id TEXT NOT NULL,student_name TEXT NOT NULL,event_type TEXT NOT NULL,details_json TEXT NOT NULL,created_at TEXT NOT NULL,PRIMARY KEY(workspace_id,class_id,id),FOREIGN KEY(workspace_id,class_id) REFERENCES classes(workspace_id,id));
+      CREATE INDEX IF NOT EXISTS town_states_student ON town_states(workspace_id,student_id);
+      CREATE INDEX IF NOT EXISTS materials_student ON materials_ledger(workspace_id,student_id);
+      CREATE INDEX IF NOT EXISTS materials_request ON materials_ledger(workspace_id,student_id,request_id);
+      CREATE INDEX IF NOT EXISTS town_animals_student ON town_animals(workspace_id,student_id);
+      CREATE INDEX IF NOT EXISTS town_cheers_target ON town_cheers(workspace_id,to_student_id);
+      CREATE INDEX IF NOT EXISTS class_feed_lookup ON class_feed_events(workspace_id,class_id,created_at DESC);
+      CREATE INDEX IF NOT EXISTS contest_sessions_student ON contest_sessions(workspace_id,student_id,created_at);
+      CREATE INDEX IF NOT EXISTS contest_sessions_request ON contest_sessions(workspace_id,student_id,request_id);
+      CREATE INDEX IF NOT EXISTS parent_controls_student ON parent_controls(workspace_id,student_id);
+      CREATE INDEX IF NOT EXISTS parent_students_parent ON parent_students(workspace_id,parent_user_id);
       CREATE INDEX IF NOT EXISTS plays_student ON plays(workspace_id,student_id); CREATE INDEX IF NOT EXISTS redemption_student ON redemptions(workspace_id,student_id);
+      CREATE INDEX IF NOT EXISTS gift_workspace_active ON gift_catalog(workspace_id,active,sort_order);
+      CREATE INDEX IF NOT EXISTS student_goal_gift ON student_goals(workspace_id,gift_id);
+      CREATE INDEX IF NOT EXISTS badge_awards_student ON badge_awards(workspace_id,student_id);
+      CREATE INDEX IF NOT EXISTS daily_missions_date ON daily_missions(workspace_id,student_id,date);
       CREATE INDEX IF NOT EXISTS auth_expiry ON auth_sessions(expires_at);`);
+    try { this.db.prepare('ALTER TABLE classes ADD COLUMN feed_enabled INTEGER NOT NULL DEFAULT 1').run(); } catch {}
     this.db.function('baoan_fold',{deterministic:true},value=>typeof value==='string'?value.normalize('NFC').toLocaleLowerCase('vi'):value);
     if(this.db.prepare('SELECT max(version) AS version FROM schema_version').get().version!==1)fail(500,'Phiên bản dữ liệu online chưa được hỗ trợ.');
   }
@@ -71,7 +115,15 @@ export class OnlineStore{
     if(auth.role==='student'&&auth.studentId!==studentId)fail(404,'Không tìm thấy học sinh.');
     return this.db.prepare('SELECT s.*,u.username FROM students s JOIN users u ON u.id=s.user_id WHERE s.workspace_id=? AND s.id=?').get(auth.workspaceId,studentId)??fail(404,'Không tìm thấy học sinh.');
   }
-  publicClass(row){return{id:row.id,name:row.name,grade:row.grade,createdAt:row.created_at};}
+  publicClass(row){return{id:row.id,name:row.name,grade:row.grade,feedEnabled:row.feed_enabled===undefined||row.feed_enabled===null?true:!!row.feed_enabled,createdAt:row.created_at};}
+  updateClassSettings(auth,classId,input){
+    role(auth,'admin');
+    shape(input,['feedEnabled']);
+    const cls=this.class(auth,classId);
+    const feedEnabled=input.feedEnabled===undefined?true:!!input.feedEnabled;
+    this.db.prepare('UPDATE classes SET feed_enabled=? WHERE workspace_id=? AND id=?').run(feedEnabled?1:0,auth.workspaceId,classId);
+    return this.publicClass({...cls,feed_enabled:feedEnabled?1:0});
+  }
   publicMedia(row){return{id:row.id,name:row.name,mime:row.mime,kind:row.kind,size:row.size,sha256:row.sha256};}
   listMedia(auth){return this.db.prepare('SELECT id,name,mime,kind,size,sha256 FROM media WHERE workspace_id=? ORDER BY created_at').all(auth.workspaceId).map(row=>this.publicMedia(row));}
   uploadMedia(auth,input){shape(input,['name','mime','base64']);const name=text(input.name,'Tên tệp',180);if(/[\\/]/.test(name))fail(400,'Tên tệp không được chứa đường dẫn.');
@@ -105,7 +157,7 @@ export class OnlineStore{
   }}
   createClass(auth,input){shape(input,['name','grade']);const name=text(input.name,'Tên lớp',120),grade=integer(input.grade,'Khối lớp',1,12);
     return this.tx(()=>{if(this.db.prepare('SELECT count(*) AS n FROM classes WHERE workspace_id=?').get(auth.workspaceId).n>=200)fail(400,'Mỗi đơn vị hỗ trợ tối đa 200 lớp trong bản này.');
-      const row={id:id(),name,grade,created_at:now()};this.db.prepare('INSERT INTO classes VALUES(?,?,?,?,?)').run(row.id,auth.workspaceId,name,grade,row.created_at);this.audit(auth,'class.create',row.id);return this.publicClass(row);});}
+      const row={id:id(),name,grade,created_at:now()};this.db.prepare('INSERT INTO classes(id,workspace_id,name,grade,created_at) VALUES(?,?,?,?,?)').run(row.id,auth.workspaceId,name,grade,row.created_at);this.audit(auth,'class.create',row.id);return this.publicClass(row);});}
   rewards(auth,studentId){return this.db.prepare('SELECT json FROM awards WHERE workspace_id=? AND student_id=? ORDER BY pack_id').all(auth.workspaceId,studentId).map(row=>parse(row.json));}
   requests(auth,studentId){return this.db.prepare('SELECT json FROM redemptions WHERE workspace_id=? AND student_id=? ORDER BY rowid').all(auth.workspaceId,studentId).map(row=>parse(row.json));}
   balance(auth,studentId){return rewardBalance(earnedQuestionRewardStars(this.rewards(auth,studentId)),{requests:this.requests(auth,studentId)});}
@@ -132,7 +184,7 @@ export class OnlineStore{
     return this.tx(()=>{
       const cls=this.class(auth,classId),catalog=this.db.prepare('SELECT * FROM packs WHERE workspace_id=? ORDER BY version').all(auth.workspaceId).map(row=>({...row,pack:parse(row.json)})),seen=new Set(),sets=input.sets.map((set,index)=>{
         shape(set,['subjectLabel','subjectId','pack']);const label=set.subjectLabel===undefined||set.subjectLabel===''?'':text(set.subjectLabel,'Tên môn/chủ đề',120);
-        if(!set.pack||typeof set.pack!=='object'||!['quiz','pairs','sentences','learning'].includes(set.pack.kind))fail(400,`Bộ ${index+1}: dạng câu chưa có trò chơi phù hợp.`);
+        if(!set.pack||typeof set.pack!=='object'||!['quiz','pairs','sentences','learning','compare','categorize'].includes(set.pack.kind))fail(400,`Bộ ${index+1}: dạng câu chưa có trò chơi phù hợp.`);
         // Grade belongs to the published source; the receiving class keeps its own grade.
         const source=catalog.find(row=>row.pack_id===set.pack.id&&row.version===set.pack.version)??catalog.find(row=>row.pack_id===set.pack.id);
         let parsed;try{parsed=parseContentImport(json({schema:'baoan-learning-content',formatVersion:set.pack.kind==='learning'?2:1,packs:[{...set.pack,grade:source?.pack.grade??cls.grade,subject:'thinking'}]}))[0];}catch(error){fail(400,`Bộ ${index+1}: ${error.message}`);}this.validateMedia(auth,parsed);
@@ -189,7 +241,7 @@ export class OnlineStore{
   progress(auth,student){return journeyProgress(this.weeks(auth,student.class_id),this.rewards(auth,student.id),this.journeyMarker(auth,student));}
   summaryProgress(auth,student,awards=this.rewards(auth,student.id)){
     const rows=this.db.prepare(`SELECT w.id AS week_id,w.class_id,w.title AS week_title,w.position AS week_position,w.created_at,p.subject_label,
-      CASE WHEN p.pack_id IS NOT NULL THEN json_object('id',p.pack_id,'version',p.version,'title',json_extract(p.json,'$.title'),'kind',json_extract(p.json,'$.kind'),'subject',json_extract(p.json,'$.subject'),'grade',json_extract(p.json,'$.grade'),'itemCount',json_array_length(p.json,'$.items'),'questionIds',json((SELECT json_group_array(json_extract(item.value,'$.id')) FROM json_each(p.json,'$.items') item))) END AS summary
+      CASE WHEN p.pack_id IS NOT NULL THEN json_object('id',p.pack_id,'version',p.version,'title',json_extract(p.json,'$.title'),'kind',json_extract(p.json,'$.kind'),'subject',json_extract(p.json,'$.subject'),'grade',json_extract(p.json,'$.grade'),'itemCount',json_array_length(p.json,'$.items'),'discovery',case when json_extract(p.json,'$.discovery') is not null then json(json_extract(p.json,'$.discovery')) else null end,'questionIds',json((SELECT json_group_array(json_extract(item.value,'$.id')) FROM json_each(p.json,'$.items') item))) END AS summary
       FROM weeks w LEFT JOIN week_sets s ON s.workspace_id=w.workspace_id AND s.week_id=w.id LEFT JOIN packs p ON p.workspace_id=s.workspace_id AND p.pack_id=s.pack_id AND p.version=s.version WHERE w.workspace_id=? AND w.class_id=? ORDER BY w.position,s.position`).all(auth.workspaceId,student.class_id);
     return journeyProgress(summaryWeeks(rows),awards,this.journeyMarker(auth,student));
   }
@@ -199,7 +251,30 @@ export class OnlineStore{
     const keys=progress.current?[progress.current.pack]:[];
     const games=new Map(keys.length?this.db.prepare(`SELECT * FROM packs WHERE workspace_id=? AND (${keys.map(()=>'(pack_id=? AND version=?)').join(' OR ')})`).all(auth.workspaceId,...keys.flatMap(p=>[p.id,p.version])).map(row=>[`${row.pack_id}@${row.version}`,this.packRecord(row).games]):[]);
     const decorate=set=>({...set,games:games.get(`${set.pack.id}@${set.pack.version}`)??[]});progress.weeks=progress.weeks.map(w=>({...w,sets:w.sets.map(decorate)}));if(progress.current)progress.current=decorate(progress.current);
-    return{student:{id:student.id,classId:student.class_id,name:student.name,username:student.username,active:!!student.active,createdAt:student.created_at,balance,...(progress.current?{currentWeek:progress.current.weekTitle}:{})},profile:{profileId:student.id,name:student.name,avatar:'fox',grade:cls.grade,colorTheme:'teal',createdAt:student.created_at,updatedAt:student.created_at},className:cls.name,...progress,balance,wallet:{enabled:!!workspace.wallet_enabled,rateVnd:workspace.rate_vnd},requests};
+    const viewedRows=this.db.prepare("SELECT target_id FROM audit WHERE workspace_id=? AND user_id=? AND action='student.discovery.view'").all(auth.workspaceId,auth.id);
+    const viewedDiscoveryPacks=[...new Set(viewedRows.map(r=>r.target_id))];
+    const gifts=this.gifts(auth,student.class_id);
+    const goal=this.studentGoal(auth,student.id);
+    const streak=this.studentStreak(auth,student.id);
+    const badges=this.studentBadges(auth,student.id);
+    const dailyMissions=this.studentDailyMissions(auth,student.id);
+    const dailyRiddle=this.studentDailyRiddle(auth,student.id,student.class_id);
+    const parentCtrl=this.parentControls(auth,student.id);
+    const todayStudyMinutes=this.todayStudentStudyMinutes(auth,student.id);
+    return{student:{id:student.id,classId:student.class_id,name:student.name,username:student.username,active:!!student.active,createdAt:student.created_at,balance,...(progress.current?{currentWeek:progress.current.weekTitle}:{})},profile:{profileId:student.id,name:student.name,avatar:'fox',grade:cls.grade,colorTheme:'teal',createdAt:student.created_at,updatedAt:student.created_at},className:cls.name,...progress,balance,wallet:{enabled:!!workspace.wallet_enabled,rateVnd:workspace.rate_vnd},requests,viewedDiscoveryPacks,gifts,goal,streak,badges,dailyMissions,dailyRiddle,todayStudyMinutes,hasParentPin:!!parentCtrl.pinHash};
+  }
+  viewDiscovery(auth,packId){
+    if(auth.role!=='student')fail(403,'Hãy dùng tài khoản học sinh để ghi nhận khám phá.');
+    if(typeof packId!=='string'||!packId.trim()||packId.length>100)fail(400,'Mã bộ câu hỏi không hợp lệ.');
+    const existing=this.db.prepare("SELECT 1 FROM audit WHERE workspace_id=? AND user_id=? AND action='student.discovery.view' AND target_id=? LIMIT 1").get(auth.workspaceId,auth.id,packId);
+    if(!existing)this.audit(auth,'student.discovery.view',packId);
+    return{ok:true,packId};
+  }
+  studentMap(auth,query={}){
+    if(auth.role!=='student')fail(403,'Hãy dùng tài khoản học sinh để xem bản đồ.');
+    const student=this.student(auth,auth.studentId);
+    const progress=this.summaryProgress(auth,student);
+    return projectStudentMap(progress,query);
   }
   pinJourney(auth,student){
     let marker=this.journeyMarker(auth,student);if(marker)return marker;
@@ -228,12 +303,14 @@ export class OnlineStore{
   dashboard(auth){const classes=this.db.prepare('SELECT * FROM classes WHERE workspace_id=? ORDER BY created_at').all(auth.workspaceId).map(row=>this.publicClass(row));
     const students=this.db.prepare('SELECT s.*,u.username FROM students s JOIN users u ON u.id=s.user_id WHERE s.workspace_id=? ORDER BY s.created_at').all(auth.workspaceId).map(row=>this.publicStudent(auth,row));
     const weeks=classes.flatMap(cls=>this.weeks(auth,cls.id)),redemptions=this.db.prepare('SELECT r.json,s.id AS student_id,s.name,s.class_id FROM redemptions r JOIN students s ON s.workspace_id=r.workspace_id AND s.id=r.student_id WHERE r.workspace_id=? ORDER BY r.rowid DESC').all(auth.workspaceId).map(row=>({...parse(row.json),studentId:row.student_id,studentName:row.name,classId:row.class_id})),workspace=this.workspace(auth.workspaceId);
-    return{classes,students,weeks,redemptions,wallet:{enabled:!!workspace.wallet_enabled,rateVnd:workspace.rate_vnd},stats:{students:students.length,classes:classes.length,questions:this.db.prepare('SELECT json FROM packs WHERE workspace_id=?').all(auth.workspaceId).reduce((sum,row)=>sum+parse(row.json).items.length,0),pendingRequests:redemptions.filter(row=>['pending','approved'].includes(rewardStatus(row))).length}};}
+    return{classes,students,weeks,redemptions,wallet:{enabled:!!workspace.wallet_enabled,rateVnd:workspace.rate_vnd},gifts:this.gifts(auth),stats:{students:students.length,classes:classes.length,questions:this.db.prepare('SELECT json FROM packs WHERE workspace_id=?').all(auth.workspaceId).reduce((sum,row)=>sum+parse(row.json).items.length,0),pendingRequests:redemptions.filter(row=>['pending','approved'].includes(rewardStatus(row))).length}};}
   play(auth,playId){const row=this.db.prepare('SELECT * FROM plays WHERE workspace_id=? AND id=? AND student_id=?').get(auth.workspaceId,playId,auth.studentId);if(!row)fail(404,'Không tìm thấy lượt chơi.');const session=parse(row.json);
     const packed=this.db.prepare('SELECT * FROM packs WHERE workspace_id=? AND pack_id=? AND version=?').get(auth.workspaceId,session.packId,session.contentVersion);if(!packed)fail(409,'Bộ câu hỏi của lượt chơi không còn sẵn sàng.');return{session,pack:parse(packed.json)};}
   abandonActive(auth,studentId){for(const row of this.db.prepare('SELECT * FROM plays WHERE workspace_id=? AND student_id=?').all(auth.workspaceId,studentId)){const session=parse(row.json);if(session.status==='active'){session.status='abandoned';session.endedAt=now();this.db.prepare('UPDATE plays SET json=? WHERE workspace_id=? AND id=?').run(json(session),auth.workspaceId,session.sessionId);}}}
   startPlay(auth,input,compact=false,secure=false){if(auth.role!=='student')fail(403,'Hãy dùng tài khoản học sinh để vào luyện tập.');shape(input,compact?['requestId','moduleId','packId','contentVersion','reviewItemIds']:['requestId','moduleId','packId','contentVersion']);const requestId=text(input.requestId,'Mã lượt chơi',100),moduleId=text(input.moduleId,'Trò chơi',80),packId=text(input.packId,'Mã bộ',80),version=integer(input.contentVersion,'Phiên bản');
-    return this.tx(()=>{const student=this.student(auth,auth.studentId),marker=this.pinJourney(auth,student),prior=this.db.prepare('SELECT id FROM plays WHERE workspace_id=? AND student_id=? AND request_id=?').get(auth.workspaceId,auth.studentId,requestId);
+    return this.tx(()=>{const student=this.student(auth,auth.studentId);
+      this.assertStudentScreenTimeAllowed(auth, student.id);
+      const marker=this.pinJourney(auth,student),prior=this.db.prepare('SELECT id FROM plays WHERE workspace_id=? AND student_id=? AND request_id=?').get(auth.workspaceId,auth.studentId,requestId);
       const choice=this.assignedPack(auth,packId,version);if(!choice.games.some(game=>game.id===moduleId))fail(400,'Dạng câu của bộ này chưa phù hợp với trò chơi đã chọn.');
       const presentation=onlinePresentation(moduleId,choice.pack),requiredItemIds=compact?selectReviewItems(input.reviewItemIds,choice.pack,presentation):undefined;
       if(prior){const value=this.play(auth,prior.id);if(secure&&value.session.questionProtocolVersion!==1)fail(409,'Lượt cũ cần mở lại trên ứng dụng mới. Sao đã lưu vẫn được giữ.');if(value.session.packId!==packId||value.session.contentVersion!==version||value.session.moduleId!==moduleId||value.session.journeyWeekId&&value.session.journeyWeekId!==marker?.weekId||compact&&(value.session.rewardPolicyVersion!==2||json(value.session.requiredItemIds)!==json(requiredItemIds)))fail(409,'Mã lượt chơi đã dùng cho nội dung khác.');if(value.session.status==='abandoned')fail(409,'Lượt chơi đã thoát. Hãy mở lượt mới.');const result={...value,presentation:filterPlayPresentation(value.session,value.pack,onlinePresentation(moduleId,value.pack))};return compact||secure?compactPlay(result):result;}
@@ -250,15 +327,16 @@ export class OnlineStore{
   }
   questionHint(auth,playId,input){if(auth.role!=='student')fail(403,'Hãy dùng tài khoản học sinh.');shape(input,['itemId']);const itemId=text(input.itemId,'Mã câu',80);return this.tx(()=>{const{session,pack}=this.play(auth,playId);this.assertCurrentPlay(auth,session);if(session.status!=='active'||session.questionProtocolVersion!==1||Date.now()-Date.parse(session.startedAt)>86400000)fail(409,'Lượt chơi cần được mở lại.');const result=protocolHint(session,pack,this.events(auth,playId),itemId);this.db.prepare('UPDATE plays SET json=? WHERE workspace_id=? AND id=?').run(json(session),auth.workspaceId,playId);return result;});}
   recordAudioDelivery(auth,playId,itemId,mediaId,durationMs){if(auth.role!=='student')fail(403,'Hãy dùng tài khoản học sinh.');text(playId,'Mã lượt',100);text(itemId,'Mã câu',80);return this.tx(()=>{const{session,pack}=this.play(auth,playId);this.assertCurrentPlay(auth,session);if(session.status!=='active'||session.questionProtocolVersion!==1||Date.now()-Date.parse(session.startedAt)>86400000)fail(409,'Lượt chơi cần được mở lại.');protocolAudioDelivery(session,pack,this.events(auth,playId),itemId,mediaId,durationMs);this.db.prepare('UPDATE plays SET json=? WHERE workspace_id=? AND id=?').run(json(session),auth.workspaceId,playId);});}
-  openQuestion(auth,playId,input,requireProtocol=false){if(auth.role!=='student')fail(403,'Hãy dùng tài khoản học sinh để vào luyện tập.');shape(input,['itemId']);const itemId=text(input.itemId,'Mã câu',80);
+  openQuestion(auth,playId,input,requireProtocol=false){if(auth.role!=='student')fail(403,'Hãy dùng tài khoản học sinh để vào luyện tập.');shape(input,['itemId','openedAt']);const itemId=text(input.itemId,'Mã câu',80);
+    const openedTime=input.openedAt?Date.parse(input.openedAt):Date.now();
     return this.tx(()=>{
       const{session,pack}=this.play(auth,playId);this.assertCurrentPlay(auth,session);
       if(session.status!=='active'||Date.now()-Date.parse(session.startedAt)>86400000)fail(409,'Lượt chơi đã kết thúc hoặc quá hạn.');
       if(requireProtocol&&session.questionProtocolVersion!==1)fail(409,'Lượt cũ cần mở lại trên ứng dụng mới. Sao đã lưu vẫn được giữ.');
-      if(session.questionProtocolVersion===1){const receipt=openProtocolQuestion(session,pack,this.events(auth,playId),itemId);this.db.prepare('UPDATE plays SET json=? WHERE workspace_id=? AND id=?').run(json(session),auth.workspaceId,playId);return receipt;}
+      if(session.questionProtocolVersion===1){const receipt=openProtocolQuestion(session,pack,this.events(auth,playId),itemId,openedTime);this.db.prepare('UPDATE plays SET json=? WHERE workspace_id=? AND id=?').run(json(session),auth.workspaceId,playId);return receipt;}
       const presentation=onlinePresentation(session.moduleId,pack),item=presentation?.items.find(item=>item.id===itemId);
       if(!timedQuestion(session,presentation)||!item||!session.requiredItemIds?.includes(itemId))fail(400,'Câu hỏi không dùng bộ đếm thời gian của lượt chơi này.');
-      const clock=session.questionClocks??{},openedAt=Object.hasOwn(clock,itemId)?clock[itemId]:now();if(!Object.hasOwn(clock,itemId)){
+      const clock=session.questionClocks??{},openedAt=Object.hasOwn(clock,itemId)?clock[itemId]:(input.openedAt||now());if(!Object.hasOwn(clock,itemId)){
         Object.defineProperty(clock,itemId,{value:openedAt,enumerable:true,writable:true,configurable:true});session.questionClocks=clock;this.db.prepare('UPDATE plays SET json=? WHERE workspace_id=? AND id=?').run(json(session),auth.workspaceId,playId);
       }
       return{openedAt,serverNow:now(),...questionRewardThresholds(item)};
@@ -283,6 +361,7 @@ export class OnlineStore{
       const event={eventId:`${session.sessionId}:${key}`,sessionId:session.sessionId,profileId:session.profileId,packId:pack.id,contentVersion:pack.version,moduleId:session.moduleId,moduleVersion:session.moduleVersion,itemId,objectiveId:item.objectiveId,correct:outcome.correct,hintsUsed:session.questionProtocolVersion===1?(Object.hasOwn(session.questionHints??{},itemId)?session.questionHints[itemId].used:0):hintsUsed,elapsedMs,occurredAt,response:input.response,gameSequence:events.length+1};
       const errors=onlineEvidenceErrors(session,[...events,event],pack);if(errors.length)fail(400,errors[0]);
       this.db.prepare('INSERT INTO attempts VALUES(?,?,?,?,?)').run(auth.workspaceId,playId,key,hash,json(event));
+      this.onAttemptRecorded(auth, session, event, pack);
       let questionRewards=session.rewardPolicyVersion===2?{gained:0,questions:[]}:undefined;if(session.rewardPolicyVersion===2&&outcome.correct){const previous=this.db.prepare('SELECT json FROM awards WHERE workspace_id=? AND student_id=? AND pack_id=?').get(auth.workspaceId,auth.studentId,pack.id),reward=previous?parse(previous.json):null;
         const result=applyQuestionRewardCandidates(reward?.questionLedger??initializeQuestionRewardLedger(pack.id,reward?.starTier??0),questionRewardCandidates(session,[...events,event],pack)),progress=questionRewardProgress(pack,result.ledger),tier=Math.max(1,progress.bestTier);
         if(!reward||json(reward.questionLedger)!==json(result.ledger)){const award={...(reward??{profileId:auth.studentId,packId:pack.id,sessionId:session.sessionId,completedAt:event.occurredAt,totalItems:pack.items.length,firstTryCorrect:0}),starTier:tier,questionLedger:result.ledger};this.db.prepare('INSERT INTO awards VALUES(?,?,?,?,?) ON CONFLICT(workspace_id,student_id,pack_id) DO UPDATE SET tier=excluded.tier,json=excluded.json').run(auth.workspaceId,auth.studentId,pack.id,tier,json(award));}
@@ -295,10 +374,14 @@ export class OnlineStore{
     if(!abandon){const errors=session.rewardPolicyVersion===2?v2QuestionCompletionErrors(completed,events,pack):onlineEvidenceErrors(completed,events,pack,true);if(errors.length)fail(400,errors[0]);const previous=this.db.prepare('SELECT json FROM awards WHERE workspace_id=? AND student_id=? AND pack_id=?').get(auth.workspaceId,auth.studentId,pack.id),prior=previous?parse(previous.json):null;
       if(session.rewardPolicyVersion===2){tier=questionRewardProgress(pack,prior?.questionLedger??initializeQuestionRewardLedger(pack.id,prior?.starTier??0)).bestTier;}
       else{const award=onlineAward(completed,events,pack);if(!award)fail(400,'Chưa đủ dữ liệu để xác nhận sao.');const legacyStars=Math.max(award.starTier,prior?.questionLedger?.legacyStars??prior?.starTier??0),result=applyQuestionRewardCandidates(prior?.questionLedger??initializeQuestionRewardLedger(pack.id,prior?.starTier??0),[],legacyStars);gained=result.gained;tier=legacyStars;
-        const value={...award,starTier:Math.max(1,questionRewardProgress(pack,result.ledger).bestTier),questionLedger:result.ledger};this.db.prepare('INSERT INTO awards VALUES(?,?,?,?,?) ON CONFLICT(workspace_id,student_id,pack_id) DO UPDATE SET tier=excluded.tier,json=excluded.json').run(auth.workspaceId,auth.studentId,pack.id,value.starTier,json(value));
+        const value={...award,starTier:Math.max(1,questionRewardProgress(pack,result.ledger).bestTier),questionLedger:result.ledger};this.db.prepare('INSERT INTO awards VALUES(?,?,?,?,?) ON CONFLICT(workspace_id,student_id,pack_id) DO UPDATE SET tier=excluded.tier,json=excluded.json').run(auth.workspaceId,auth.studentId,pack.id,value.starTier,json(value));this.syncAwardMaterial(auth,auth.studentId,pack.id,value.starTier);
       }
     }
-    this.db.prepare('UPDATE plays SET json=? WHERE workspace_id=? AND id=?').run(json(completed),auth.workspaceId,playId);this.audit(auth,abandon?'play.abandon':'play.complete',playId);return abandon?{}:{state:compact?this.studentSummary(auth,'current'):this.studentState(auth),gained,tier};
+    this.db.prepare('UPDATE plays SET json=? WHERE workspace_id=? AND id=?').run(json(completed),auth.workspaceId,playId);this.audit(auth,abandon?'play.abandon':'play.complete',playId);
+    if(!abandon){
+      this.onPlayCompleted(auth, session, pack, events, completed.endedAt);
+    }
+    return abandon?{}:{state:compact?this.studentSummary(auth,'current'):this.studentState(auth),gained,tier};
   });}
   configureWallet(auth,input){shape(input,['enabled','rateVnd']);if(typeof input.enabled!=='boolean')fail(400,'Trạng thái đổi sao không hợp lệ.');const rate=integer(input.rateVnd,'Giá trị mỗi sao',1,1000000);
     return this.tx(()=>{this.db.prepare('UPDATE workspaces SET wallet_enabled=?,rate_vnd=? WHERE id=?').run(Number(input.enabled),rate,auth.workspaceId);this.audit(auth,'wallet.configure',auth.workspaceId);return{enabled:input.enabled,rateVnd:rate};});}
@@ -307,9 +390,1325 @@ export class OnlineStore{
     try{request=makeRewardRequest(wallet,this.balance(auth,auth.studentId).earned,input,now());}catch(error){fail(400,error.message);}
     this.db.prepare('INSERT OR IGNORE INTO redemptions VALUES(?,?,?,?,?)').run(auth.workspaceId,request.requestId,auth.studentId,rewardStatus(request),json(request));this.audit(auth,'redemption.request',request.requestId);return request;
   });}
+  publicGift(row){
+    return{id:row.id,workspaceId:row.workspace_id,classId:row.class_id,title:row.title,imageMediaId:row.image_media_id,priceStars:row.price_stars,kind:row.kind,weeklyLimit:row.weekly_limit,stock:row.stock,unlockAfterWeek:row.unlock_after_week,active:!!row.active,sortOrder:row.sort_order,createdAt:row.created_at};
+  }
+  gifts(auth,classId=null){
+    if(auth.role==='student'){
+      const student=this.student(auth,auth.studentId);
+      return this.db.prepare('SELECT * FROM gift_catalog WHERE workspace_id=? AND active=1 AND (class_id IS NULL OR class_id=?) ORDER BY sort_order ASC, created_at DESC').all(auth.workspaceId,student.class_id).map(r=>this.publicGift(r));
+    }
+    const query=classId?'SELECT * FROM gift_catalog WHERE workspace_id=? AND (class_id IS NULL OR class_id=?) ORDER BY sort_order ASC, created_at DESC':'SELECT * FROM gift_catalog WHERE workspace_id=? ORDER BY sort_order ASC, created_at DESC';
+    const params=classId?[auth.workspaceId,classId]:[auth.workspaceId];
+    return this.db.prepare(query).all(...params).map(r=>this.publicGift(r));
+  }
+  createGift(auth,input){
+    if(auth.role!=='admin')fail(403,'Chỉ quản trị viên mới có quyền tạo phần thưởng.');
+    shape(input,['title','priceStars','kind','classId','imageMediaId','weeklyLimit','stock','unlockAfterWeek','active','sortOrder']);
+    const title=text(input.title,'Tên phần thưởng',120),priceStars=integer(input.priceStars,'Giá sao',1,100000),kind=['item','experience','privilege','saving'].includes(input.kind)?input.kind:'item';
+    const classId=input.classId?text(input.classId,'Lớp',100):null;if(classId)this.class(auth,classId);
+    const imageMediaId=input.imageMediaId?text(input.imageMediaId,'Ảnh phần thưởng',100):null;
+    const weeklyLimit=(input.weeklyLimit!==undefined&&input.weeklyLimit!==null)?integer(input.weeklyLimit,'Giới hạn tuần',0,100):0;
+    const stock=(input.stock!==undefined&&input.stock!==null)?integer(input.stock,'Tồn kho',-1,1000000):-1;
+    const unlockAfterWeek=(input.unlockAfterWeek!==undefined&&input.unlockAfterWeek!==null)?integer(input.unlockAfterWeek,'Mở sau tuần',0,100):0;
+    const active=input.active!==undefined?(input.active?1:0):1;
+    const sortOrder=(input.sortOrder!==undefined&&input.sortOrder!==null)?integer(input.sortOrder,'Thứ tự',-1000,1000):0;
+    const giftId=id(),createdAt=now();
+    this.db.prepare('INSERT INTO gift_catalog(workspace_id,id,class_id,title,image_media_id,price_stars,kind,weekly_limit,stock,unlock_after_week,active,sort_order,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)').run(auth.workspaceId,giftId,classId,title,imageMediaId,priceStars,kind,weeklyLimit,stock,unlockAfterWeek,active,sortOrder,createdAt);
+    this.audit(auth,'gift.create',giftId);
+    return this.publicGift({workspace_id:auth.workspaceId,id:giftId,class_id:classId,title,image_media_id:imageMediaId,price_stars:priceStars,kind,weekly_limit:weeklyLimit,stock,unlock_after_week:unlockAfterWeek,active,sort_order:sortOrder,created_at:createdAt});
+  }
+  updateGift(auth,giftId,input){
+    if(auth.role!=='admin')fail(403,'Chỉ quản trị viên mới có quyền cập nhật phần thưởng.');
+    text(giftId,'Mã phần thưởng',100);
+    const existing=this.db.prepare('SELECT * FROM gift_catalog WHERE workspace_id=? AND id=?').get(auth.workspaceId,giftId);
+    if(!existing)fail(404,'Không tìm thấy phần thưởng.');
+    const title=input.title!==undefined?text(input.title,'Tên phần thưởng',120):existing.title;
+    const priceStars=input.priceStars!==undefined?integer(input.priceStars,'Giá sao',1,100000):existing.price_stars;
+    const kind=input.kind!==undefined?(['item','experience','privilege','saving'].includes(input.kind)?input.kind:existing.kind):existing.kind;
+    const classId=input.classId!==undefined?(input.classId?text(input.classId,'Lớp',100):null):existing.class_id;
+    if(classId)this.class(auth,classId);
+    const imageMediaId=input.imageMediaId!==undefined?(input.imageMediaId?text(input.imageMediaId,'Ảnh phần thưởng',100):null):existing.image_media_id;
+    const weeklyLimit=(input.weeklyLimit!==undefined&&input.weeklyLimit!==null)?integer(input.weeklyLimit,'Giới hạn tuần',0,100):(input.weeklyLimit===null?0:existing.weekly_limit);
+    const stock=(input.stock!==undefined&&input.stock!==null)?integer(input.stock,'Tồn kho',-1,1000000):(input.stock===null?-1:existing.stock);
+    const unlockAfterWeek=(input.unlockAfterWeek!==undefined&&input.unlockAfterWeek!==null)?integer(input.unlockAfterWeek,'Mở sau tuần',0,100):(input.unlockAfterWeek===null?0:existing.unlock_after_week);
+    const active=input.active!==undefined?(input.active?1:0):existing.active;
+    const sortOrder=(input.sortOrder!==undefined&&input.sortOrder!==null)?integer(input.sortOrder,'Thứ tự',-1000,1000):(input.sortOrder===null?0:existing.sort_order);
+    this.db.prepare('UPDATE gift_catalog SET class_id=?,title=?,image_media_id=?,price_stars=?,kind=?,weekly_limit=?,stock=?,unlock_after_week=?,active=?,sort_order=? WHERE workspace_id=? AND id=?').run(classId,title,imageMediaId,priceStars,kind,weeklyLimit,stock,unlockAfterWeek,active,sortOrder,auth.workspaceId,giftId);
+    this.audit(auth,'gift.update',giftId);
+    return this.publicGift({workspace_id:auth.workspaceId,id:giftId,class_id:classId,title,image_media_id:imageMediaId,price_stars:priceStars,kind,weekly_limit:weeklyLimit,stock,unlock_after_week:unlockAfterWeek,active,sort_order:sortOrder,created_at:existing.created_at});
+  }
+  studentGoal(auth,studentId=auth.studentId){
+    const row=this.db.prepare('SELECT * FROM student_goals WHERE workspace_id=? AND student_id=?').get(auth.workspaceId,studentId);
+    if(!row)return null;
+    const giftRow=this.db.prepare('SELECT * FROM gift_catalog WHERE workspace_id=? AND id=?').get(auth.workspaceId,row.gift_id);
+    return{studentId:row.student_id,giftId:row.gift_id,pinnedAt:row.pinned_at,gift:giftRow?this.publicGift(giftRow):undefined};
+  }
+  setStudentGoal(auth,giftId){
+    if(auth.role!=='student')fail(403,'Chỉ học sinh mới có thể ghim mục tiêu.');
+    text(giftId,'Mã phần thưởng',100);
+    const student=this.student(auth,auth.studentId);
+    const gift=this.db.prepare('SELECT * FROM gift_catalog WHERE workspace_id=? AND id=? AND active=1 AND (class_id IS NULL OR class_id=?)').get(auth.workspaceId,giftId,student.class_id);
+    if(!gift)fail(404,'Không tìm thấy phần thưởng khả dụng.');
+    const pinnedAt=now();
+    this.db.prepare('INSERT INTO student_goals(workspace_id,student_id,gift_id,pinned_at) VALUES(?,?,?,?) ON CONFLICT(workspace_id,student_id) DO UPDATE SET gift_id=excluded.gift_id,pinned_at=excluded.pinned_at').run(auth.workspaceId,student.id,giftId,pinnedAt);
+    this.audit(auth,'student.goal.pin',giftId);
+    return{studentId:student.id,giftId,pinnedAt,gift:this.publicGift(gift)};
+  }
+  redeemGift(auth,input){
+    if(auth.role!=='student')fail(403,'Chỉ học sinh mới có thể đổi quà.');
+    shape(input,['requestId','giftId']);
+    const requestId=text(input.requestId,'Mã yêu cầu',100),giftId=text(input.giftId,'Mã quà tặng',100);
+    return this.tx(()=>{
+      const student=this.student(auth,auth.studentId);
+      const prior=this.db.prepare('SELECT student_id FROM redemptions WHERE workspace_id=? AND id=?').get(auth.workspaceId,requestId);
+      if(prior){
+        if(prior.student_id!==auth.studentId)fail(409,'Mã yêu cầu không thể sử dụng.');
+        return parse(this.db.prepare('SELECT json FROM redemptions WHERE workspace_id=? AND id=?').get(auth.workspaceId,requestId).json);
+      }
+      const gift=this.db.prepare('SELECT * FROM gift_catalog WHERE workspace_id=? AND id=? AND active=1 AND (class_id IS NULL OR class_id=?)').get(auth.workspaceId,giftId,student.class_id);
+      if(!gift)fail(404,'Món quà không tồn tại hoặc đã ngừng áp dụng.');
+      if(gift.stock===0)fail(409,'Món quà đã hết hàng trong kho.');
+      if(gift.unlock_after_week>0){
+        const marker=this.journeyMarker(auth,student);
+        const currentPos=marker?marker.position:1;
+        if(currentPos<gift.unlock_after_week)fail(403,`Món quà này mở khóa sau khi hoàn thành tuần ${gift.unlock_after_week}.`);
+      }
+      if(gift.weekly_limit>0){
+        const studentRequests=this.requests(auth,auth.studentId);
+        const oneWeekAgo=new Date(Date.now()-7*86400000).toISOString();
+        const countInWeek=studentRequests.filter(r=>r.giftId===giftId&&r.requestedAt>=oneWeekAgo&&['pending','approved','fulfilled'].includes(rewardStatus(r))).length;
+        if(countInWeek>=gift.weekly_limit)fail(400,`Con đã đạt giới hạn đổi món quà này (${gift.weekly_limit} lần/tuần).`);
+      }
+      const balance=this.balance(auth,auth.studentId);
+      if(balance.available<gift.price_stars)fail(400,`Con cần ${gift.price_stars} sao nhưng chỉ có ${balance.available} sao khả dụng.`);
+      if(gift.stock>0){
+        this.db.prepare('UPDATE gift_catalog SET stock=stock-1 WHERE workspace_id=? AND id=?').run(auth.workspaceId,giftId);
+      }
+      const workspace=this.workspace(auth.workspaceId),currentTime=now();
+      const request={
+        requestId,
+        title:gift.title,
+        giftId:gift.id,
+        kind:gift.kind,
+        stars:gift.price_stars,
+        goalVnd:gift.price_stars*workspace.rate_vnd,
+        rateVnd:workspace.rate_vnd,
+        amountVnd:gift.price_stars*workspace.rate_vnd,
+        requestedAt:currentTime,
+        history:[{status:'pending',at:currentTime}]
+      };
+      this.db.prepare('INSERT INTO redemptions(workspace_id,id,student_id,status,json) VALUES(?,?,?,?,?)').run(auth.workspaceId,requestId,auth.studentId,'pending',json(request));
+      this.audit(auth,'redemption.request',requestId);
+      return request;
+    });
+  }
+  confirmReceived(auth,requestId){
+    if(auth.role!=='student')fail(403,'Chỉ học sinh mới có thể xác nhận đã nhận quà.');
+    text(requestId,'Mã yêu cầu',100);
+    return this.tx(()=>{
+      const row=this.db.prepare('SELECT * FROM redemptions WHERE workspace_id=? AND id=? AND student_id=?').get(auth.workspaceId,requestId,auth.studentId);
+      if(!row)fail(404,'Không tìm thấy yêu cầu đổi thưởng.');
+      const request=parse(row.json);
+      if(request.receivedAt)return request;
+      const status=rewardStatus(request);
+      if(status!=='fulfilled'&&status!=='approved')fail(400,'Chỉ có thể xác nhận khi quà đã được trao hoặc duyệt.');
+      request.receivedAt=now();
+      this.db.prepare('UPDATE redemptions SET json=? WHERE workspace_id=? AND id=?').run(json(request),auth.workspaceId,requestId);
+      this.audit(auth,'redemption.received',requestId);
+      return request;
+    });
+  }
   transitionReward(auth,requestId,input,cancel=false){shape(input,cancel?[]:['status','note']);return this.tx(()=>{const row=this.db.prepare('SELECT * FROM redemptions WHERE workspace_id=? AND id=?').get(auth.workspaceId,requestId);if(!row||cancel&&row.student_id!==auth.studentId)fail(404,'Không tìm thấy yêu cầu đổi sao.');
+    if(auth.role==='parent'){
+      const linked=this.db.prepare('SELECT 1 FROM parent_students WHERE workspace_id=? AND parent_user_id=? AND student_id=?').get(auth.workspaceId,auth.id,row.student_id);
+      if(!linked)fail(403,'Phụ huynh chỉ có thể duyệt quà cho con của mình.');
+    }
     const status=cancel?'cancelled':input.status;if(!['approved','rejected','fulfilled','cancelled'].includes(status)||!cancel&&status==='cancelled')fail(400,'Trạng thái đổi thưởng không hợp lệ.');
-    let request;try{request=changeRewardRequest(parse(row.json),status,now(),input.note);}catch(error){fail(409,error.message);}
+    const previous=parse(row.json);
+    let request;try{request=changeRewardRequest(previous,status,now(),input.note);}catch(error){fail(409,error.message);}
+    if(['cancelled','rejected'].includes(status)&&previous.giftId){
+      const gift=this.db.prepare('SELECT stock FROM gift_catalog WHERE workspace_id=? AND id=?').get(auth.workspaceId,previous.giftId);
+      if(gift&&gift.stock>=0){
+        this.db.prepare('UPDATE gift_catalog SET stock=stock+1 WHERE workspace_id=? AND id=?').run(auth.workspaceId,previous.giftId);
+      }
+    }
     this.db.prepare('UPDATE redemptions SET status=?,json=? WHERE workspace_id=? AND id=?').run(status,json(request),auth.workspaceId,requestId);this.audit(auth,`redemption.${status}`,requestId);return request;
   });}
+  studentStreak(auth, studentId = auth.studentId, nowIso = now()){
+    const row = this.db.prepare('SELECT * FROM student_streaks WHERE workspace_id=? AND student_id=?').get(auth.workspaceId, studentId);
+    return computeStreakState(row, nowIso);
+  }
+  recordDailyActivity(auth, studentId, wasCorrect, nowIso = now()){
+    const row = this.db.prepare('SELECT * FROM student_streaks WHERE workspace_id=? AND student_id=?').get(auth.workspaceId, studentId);
+    const {newStreakRecord, streakIncreased} = registerDailyCorrectAnswer(row, wasCorrect, nowIso);
+    this.db.prepare(`
+      INSERT INTO student_streaks(workspace_id, student_id, current_streak, longest_streak, last_active_date, freeze_used_week, today_correct_count, today_date, updated_at)
+      VALUES(?,?,?,?,?,?,?,?,?)
+      ON CONFLICT(workspace_id, student_id) DO UPDATE SET
+        current_streak=excluded.current_streak,
+        longest_streak=excluded.longest_streak,
+        last_active_date=excluded.last_active_date,
+        freeze_used_week=excluded.freeze_used_week,
+        today_correct_count=excluded.today_correct_count,
+        today_date=excluded.today_date,
+        updated_at=excluded.updated_at
+    `).run(
+      auth.workspaceId,
+      studentId,
+      newStreakRecord.current_streak,
+      newStreakRecord.longest_streak,
+      newStreakRecord.last_active_date,
+      newStreakRecord.freeze_used_week,
+      newStreakRecord.today_correct_count,
+      newStreakRecord.today_date,
+      nowIso
+    );
+    if(streakIncreased){
+      this.audit(auth, 'student.streak.increase', json({studentId, streak: newStreakRecord.current_streak}));
+    }
+    return newStreakRecord;
+  }
+  studentDailyMissions(auth, studentId = auth.studentId, nowIso = now()){
+    const today = toVietnamDateString(nowIso);
+    let rows = this.db.prepare('SELECT * FROM daily_missions WHERE workspace_id=? AND student_id=? AND date=?').all(auth.workspaceId, studentId, today);
+    if(!rows.length){
+      const defaults = buildDailyMissions(today);
+      for(const m of defaults){
+        this.db.prepare('INSERT OR IGNORE INTO daily_missions VALUES(?,?,?,?,?,?,?,?,?,?)').run(
+          auth.workspaceId, studentId, today, m.id, m.type, m.targetCount, 0, 0, null, '{}'
+        );
+      }
+      rows = this.db.prepare('SELECT * FROM daily_missions WHERE workspace_id=? AND student_id=? AND date=?').all(auth.workspaceId, studentId, today);
+    }
+    return rows.map(r=>({
+      id: r.mission_id,
+      date: r.date,
+      type: r.mission_type,
+      title: r.mission_type==='new_lesson'?'Bài tập mới':r.mission_type==='review_error'?'Sửa sai ôn luyện':'Câu đố hôm nay',
+      description: r.mission_type==='new_lesson'?'Hoàn thành 1 bài tập trong tuần học hiện tại.':r.mission_type==='review_error'?'Làm đúng 1 câu hỏi con từng trả lời sai hoặc chỉ đạt 1 sao.':'Trả lời đúng câu đố nhanh của ngày hôm nay.',
+      targetCount: r.target_count,
+      progressCount: r.progress_count,
+      completed: !!r.completed,
+      completedAt: r.completed_at
+    }));
+  }
+  updateDailyMissionProgress(auth, studentId, missionType, delta = 1, nowIso = now()){
+    const today = toVietnamDateString(nowIso);
+    this.studentDailyMissions(auth, studentId, nowIso);
+    const row = this.db.prepare('SELECT * FROM daily_missions WHERE workspace_id=? AND student_id=? AND date=? AND mission_type=?').get(auth.workspaceId, studentId, today, missionType);
+    if(row && !row.completed){
+      const progress = row.progress_count + delta;
+      const completed = progress >= row.target_count ? 1 : 0;
+      const completedAt = completed ? nowIso : null;
+      this.db.prepare('UPDATE daily_missions SET progress_count=?, completed=?, completed_at=? WHERE workspace_id=? AND student_id=? AND date=? AND mission_type=?').run(
+        progress, completed, completedAt, auth.workspaceId, studentId, today, missionType
+      );
+      if(completed){
+        this.audit(auth, 'student.mission.complete', json({studentId, missionType, date: today}));
+      }
+    }
+  }
+  studentDailyRiddle(auth, studentId = auth.studentId, classId = null, nowIso = now()){
+    const targetStudent = this.student(auth, studentId);
+    const targetClassId = classId || targetStudent.class_id;
+    const today = toVietnamDateString(nowIso);
+    const packRows = this.db.prepare(`
+      SELECT p.json FROM week_sets s
+      JOIN weeks w ON w.workspace_id=s.workspace_id AND w.id=s.week_id
+      JOIN packs p ON p.workspace_id=s.workspace_id AND p.pack_id=s.pack_id AND p.version=s.version
+      WHERE s.workspace_id=? AND w.class_id=?
+      ORDER BY w.position, s.position
+    `).all(auth.workspaceId, targetClassId);
+    if(!packRows.length) return null;
+    const allItems = [];
+    for(const row of packRows){
+      let pack;
+      try { pack = parse(row.json); } catch { continue; }
+      if(pack && Array.isArray(pack.items)){
+        for(const item of pack.items){
+          if(item.kind === 'choice' && Array.isArray(item.options) && item.options.length >= 2){
+            allItems.push({packId: pack.id, packTitle: pack.title, item});
+          } else if(item.left && item.right){
+            allItems.push({
+              packId: pack.id,
+              packTitle: pack.title,
+              item: {
+                id: item.id,
+                prompt: `Cặp đôi phù hợp với "${item.left}" là gì?`,
+                options: [item.right, 'Không xác định', 'Khác'],
+                correctIndex: 0
+              }
+            });
+          }
+        }
+      }
+    }
+    if(!allItems.length) return null;
+    const seed = `${today}:${targetClassId}`;
+    let hashVal = 0;
+    for(let i=0; i<seed.length; i++){
+      hashVal = ((hashVal << 5) - hashVal) + seed.charCodeAt(i);
+      hashVal |= 0;
+    }
+    const chosen = allItems[Math.abs(hashVal) % allItems.length];
+    const missionRow = this.db.prepare('SELECT completed FROM daily_missions WHERE workspace_id=? AND student_id=? AND date=? AND mission_type=?').get(auth.workspaceId, studentId, today, 'daily_riddle');
+    return {
+      packId: chosen.packId,
+      packTitle: chosen.packTitle,
+      itemId: chosen.item.id,
+      prompt: chosen.item.prompt || chosen.item.title || 'Câu hỏi đố vui',
+      options: chosen.item.options || [],
+      correctIndex: chosen.item.correctIndex ?? 0,
+      explanation: chosen.item.explanation || 'Rất chính xác!',
+      alreadySolved: !!missionRow?.completed
+    };
+  }
+  answerDailyRiddle(auth, input, nowIso = now()){
+    if(auth.role!=='student') fail(403, 'Hãy dùng tài khoản học sinh để trả lời câu đố.');
+    shape(input, ['chosenIndex']);
+    const chosenIndex = integer(input.chosenIndex, 'Đáp án lựa chọn', 0, 10);
+    return this.tx(()=>{
+      const student = this.student(auth, auth.studentId);
+      const riddle = this.studentDailyRiddle(auth, student.id, student.class_id, nowIso);
+      if(!riddle) fail(404, 'Hôm nay chưa có câu đố ngày.');
+      const correct = chosenIndex === riddle.correctIndex;
+      if(correct){
+        this.updateDailyMissionProgress(auth, student.id, 'daily_riddle', 1, nowIso);
+        this.recordDailyActivity(auth, student.id, true, nowIso);
+        this.evaluateAndAwardBadges(auth, student.id, nowIso);
+      }
+      return {
+        correct,
+        alreadySolved: correct || riddle.alreadySolved,
+        streak: this.studentStreak(auth, student.id, nowIso),
+        missions: this.studentDailyMissions(auth, student.id, nowIso)
+      };
+    });
+  }
+  awardBadge(auth, studentId, badgeId, metadata = {}, nowIso = now()){
+    const exists = this.db.prepare('SELECT 1 FROM badge_awards WHERE workspace_id=? AND student_id=? AND badge_id=?').get(auth.workspaceId, studentId, badgeId);
+    if(exists) return false;
+    this.db.prepare('INSERT OR IGNORE INTO badge_awards VALUES(?,?,?,?,?)').run(
+      auth.workspaceId, studentId, badgeId, nowIso, json(metadata)
+    );
+    this.audit(auth, 'student.badge.award', json({studentId, badgeId}));
+    return true;
+  }
+  studentBadges(auth, studentId = auth.studentId, nowIso = now()){
+    const earnedRows = this.db.prepare('SELECT badge_id, unlocked_at, json FROM badge_awards WHERE workspace_id=? AND student_id=?').all(auth.workspaceId, studentId);
+    const earnedBadges = earnedRows.map(r=>({badgeId: r.badge_id, unlockedAt: r.unlocked_at, json: r.json}));
+    const metrics = this.computeStudentMetrics(auth, studentId, nowIso);
+    const evaluated = buildStudentBadgeStatuses(earnedBadges, metrics);
+    for(const b of evaluated){
+      if(b.currentProgress >= b.targetCount && !earnedBadges.some(e=>e.badgeId === b.id)){
+        this.awardBadge(auth, studentId, b.id, {progress: b.currentProgress}, nowIso);
+        b.unlocked = true;
+        b.unlockedAt = nowIso;
+        b.missingRequirement = 'Đã mở khóa huy hiệu!';
+      }
+    }
+    return evaluated;
+  }
+  computeStudentMetrics(auth, studentId, nowIso = now()){
+    const streak = this.studentStreak(auth, studentId, nowIso);
+    const attemptRows = this.db.prepare(`
+      SELECT a.json AS json FROM attempts a
+      JOIN plays p ON p.workspace_id=a.workspace_id AND p.id=a.play_id
+      WHERE p.workspace_id=? AND p.student_id=?
+      ORDER BY a.play_id, a.attempt_key
+    `).all(auth.workspaceId, studentId);
+    const attempts = attemptRows.map(r=>{try{return parse(r.json);}catch{return null;}}).filter(Boolean);
+    const totalQuestionsAttempted = attempts.length;
+    const wrongItems = new Set();
+    const fixedItems = new Set();
+    for(const a of attempts){
+      if(!a.correct){
+        wrongItems.add(a.itemId);
+      } else if(wrongItems.has(a.itemId)){
+        fixedItems.add(a.itemId);
+      }
+    }
+    const retryFixedCount = fixedItems.size;
+    let maxConsecutive = 0;
+    let currConsecutive = 0;
+    for(const a of attempts){
+      if(a.correct){
+        currConsecutive++;
+        if(currConsecutive > maxConsecutive) maxConsecutive = currConsecutive;
+      } else {
+        currConsecutive = 0;
+      }
+    }
+    const playRows = this.db.prepare('SELECT id, json FROM plays WHERE workspace_id=? AND student_id=?').all(auth.workspaceId, studentId);
+    const completedPlays = playRows.map(r=>{try{return {id: r.id, ...parse(r.json)};}catch{return null;}}).filter(p=>p && p.status==='completed');
+    const completedPacksCount = completedPlays.length;
+    const distinctGamesPlayed = new Set(completedPlays.map(p=>p.moduleId)).size;
+    let perfectMemoryCount = 0;
+    for(const p of completedPlays){
+      if(p.moduleId === 'memory-match' && p.id){
+        const pEvents = this.db.prepare('SELECT json FROM attempts WHERE workspace_id=? AND play_id=?').all(auth.workspaceId, p.id).map(r=>{try{return parse(r.json);}catch{return null;}}).filter(Boolean);
+        const wrongMoves = pEvents.filter(e=>!e.correct);
+        if(wrongMoves.length === 0 && pEvents.length > 0){
+          perfectMemoryCount++;
+        }
+      }
+    }
+    const awardRows = this.db.prepare('SELECT pack_id, tier, json FROM awards WHERE workspace_id=? AND student_id=?').all(auth.workspaceId, studentId);
+    let mathPacks3Star = 0;
+    let vietnamesePacks3Star = 0;
+    let englishPacks3Star = 0;
+    const packSubjects = new Map();
+    const packRows = this.db.prepare('SELECT pack_id, json FROM packs WHERE workspace_id=?').all(auth.workspaceId);
+    for(const pr of packRows){
+      try{
+        const p = parse(pr.json);
+        packSubjects.set(p.id, (p.subject || '').toLowerCase());
+      }catch{}
+    }
+    for(const ar of awardRows){
+      if(ar.tier === 3){
+        const subj = packSubjects.get(ar.pack_id) || '';
+        if(subj.includes('toan') || subj.includes('math')) mathPacks3Star++;
+        else if(subj.includes('viet') || subj.includes('tieng-viet')) vietnamesePacks3Star++;
+        else if(subj.includes('anh') || subj.includes('english')) englishPacks3Star++;
+      }
+    }
+    const student = this.student(auth, studentId);
+    const weekRows = this.db.prepare('SELECT id FROM weeks WHERE workspace_id=? AND class_id=?').all(auth.workspaceId, student.class_id);
+    const weekSetRows = this.db.prepare('SELECT week_id, pack_id FROM week_sets WHERE workspace_id=?').all(auth.workspaceId);
+    const weekSetsByWeek = new Map();
+    for(const ws of weekSetRows){
+      let list = weekSetsByWeek.get(ws.week_id);
+      if(!list){ list = []; weekSetsByWeek.set(ws.week_id, list); }
+      list.push(ws.pack_id);
+    }
+    let perfectWeekCount = 0;
+    for(const w of weekRows){
+      const packIds = weekSetsByWeek.get(w.id);
+      if(packIds && packIds.length > 0 && packIds.every(pid=>{
+        const aw = awardRows.find(a=>a.pack_id === pid);
+        return aw && aw.tier === 3;
+      })){
+        perfectWeekCount++;
+      }
+    }
+    return {
+      streak,
+      retryFixedCount,
+      perfectMemoryCount,
+      perfectWeekCount,
+      distinctGamesPlayed,
+      consecutiveFirstTryCount: maxConsecutive,
+      completedPacksCount,
+      totalQuestionsAttempted,
+      mathPacks3Star,
+      vietnamesePacks3Star,
+      englishPacks3Star
+    };
+  }
+  onAttemptRecorded(auth, session, event, pack){
+    const studentId = session.profileId || auth.studentId;
+    this.recordDailyActivity(auth, studentId, !!event.correct, event.occurredAt);
+    if(event.correct){
+      const priorFail = this.db.prepare(`
+        SELECT 1 FROM attempts a
+        JOIN plays p ON p.workspace_id=a.workspace_id AND p.id=a.play_id
+        WHERE p.workspace_id=? AND p.student_id=? AND json_extract(a.json, '$.itemId')=? AND json_extract(a.json, '$.correct')=0
+        LIMIT 1
+      `).get(auth.workspaceId, studentId, event.itemId);
+      if(priorFail){
+        this.updateDailyMissionProgress(auth, studentId, 'review_error', 1, event.occurredAt);
+      }
+    }
+    this.evaluateAndAwardBadges(auth, studentId, event.occurredAt);
+  }
+  onPlayCompleted(auth, session, pack, events, completedAt = now()){
+    const studentId = session.profileId || auth.studentId;
+    this.updateDailyMissionProgress(auth, studentId, 'new_lesson', 1, completedAt);
+    if(session.moduleId === 'memory-match'){
+      const wrongMoves = events.filter(e=>!e.correct);
+      if(wrongMoves.length === 0 && events.length > 0){
+        this.awardBadge(auth, studentId, 'perfect_memory', {earnedAt: completedAt}, completedAt);
+      }
+    }
+    this.evaluateAndAwardBadges(auth, studentId, completedAt);
+  }
+  evaluateAndAwardBadges(auth, studentId, nowIso = now()){
+    this.studentBadges(auth, studentId, nowIso);
+  }
+  assertStudentScreenTimeAllowed(auth, studentId){
+    const controls = this.parentControls(auth, studentId);
+    if (!controls) return;
+    const curfew = checkCurfewHours(controls.allowedStartHour, controls.allowedEndHour);
+    if (!curfew.allowed) fail(403, curfew.reason);
+    if (controls.maxMinutesPerDay > 0) {
+      const todayMinutes = this.todayStudentStudyMinutes(auth, studentId);
+      const limit = checkDailyScreenTime(todayMinutes, controls.maxMinutesPerDay);
+      if (!limit.allowed) fail(403, limit.reason);
+    }
+  }
+  todayStudentStudyMinutes(auth, studentId){
+    const { dateStr } = getVietnamTimeParts();
+    const rows = this.db.prepare('SELECT a.json FROM attempts a JOIN plays p ON p.workspace_id=a.workspace_id AND p.id=a.play_id WHERE a.workspace_id=? AND p.student_id=?').all(auth.workspaceId, studentId);
+    let totalMs = 0;
+    for (const r of rows) {
+      try {
+        const ev = parse(r.json);
+        if (ev?.occurredAt && Number.isFinite(ev.elapsedMs) && ev.elapsedMs > 0) {
+          const evDate = new Date(ev.occurredAt).toLocaleDateString('en-CA', { timeZone: 'Asia/Ho_Chi_Minh' });
+          if (evDate === dateStr) totalMs += ev.elapsedMs;
+        }
+      } catch {}
+    }
+    return msToMinutes(totalMs);
+  }
+  parentControls(auth, studentId){
+    text(studentId, 'Mã học sinh', 100);
+    const row = this.db.prepare('SELECT * FROM parent_controls WHERE workspace_id=? AND student_id=?').get(auth.workspaceId, studentId);
+    if (!row) {
+      return {
+        workspaceId: auth.workspaceId,
+        studentId,
+        pinHash: null,
+        pinSalt: null,
+        pinFailedCount: 0,
+        pinLockedUntil: null,
+        maxMinutesPerDay: 0,
+        allowedStartHour: 0,
+        allowedEndHour: 24,
+        updatedAt: now()
+      };
+    }
+    return {
+      workspaceId: row.workspace_id,
+      studentId: row.student_id,
+      pinHash: row.pin_hash,
+      pinSalt: row.pin_salt,
+      pinFailedCount: row.pin_failed_count,
+      pinLockedUntil: row.pin_locked_until,
+      maxMinutesPerDay: row.max_minutes_per_day,
+      allowedStartHour: row.allowed_start_hour,
+      allowedEndHour: row.allowed_end_hour,
+      updatedAt: row.updated_at
+    };
+  }
+  setupParentPin(auth, studentId, input){
+    shape(input, ['pin', 'oldPin', 'studentId']);
+    const pin = text(input.pin, 'Mã PIN mới', 10);
+    if (!/^\d{4,6}$/.test(pin)) fail(400, 'Mã PIN phụ huynh phải gồm từ 4 đến 6 chữ số.');
+    const current = this.parentControls(auth, studentId);
+    if (current.pinHash && auth.role !== 'admin') {
+      const oldPin = text(input.oldPin, 'Mã PIN hiện tại', 10);
+      if (!verifyParentPin(oldPin, current.pinHash, current.pinSalt)) {
+        fail(403, 'Mã PIN cũ không chính xác.');
+      }
+    }
+    const { pinHash, pinSalt } = hashParentPin(pin);
+    const updatedAt = now();
+    this.db.prepare(`
+      INSERT INTO parent_controls(workspace_id, student_id, pin_hash, pin_salt, pin_failed_count, pin_locked_until, max_minutes_per_day, allowed_start_hour, allowed_end_hour, updated_at)
+      VALUES(?,?,?,?,0,NULL,?,?,?,?)
+      ON CONFLICT(workspace_id, student_id) DO UPDATE SET
+        pin_hash=excluded.pin_hash,
+        pin_salt=excluded.pin_salt,
+        pin_failed_count=0,
+        pin_locked_until=NULL,
+        updated_at=excluded.updated_at
+    `).run(auth.workspaceId, studentId, pinHash, pinSalt, current.maxMinutesPerDay, current.allowedStartHour, current.allowedEndHour, updatedAt);
+    return { success: true };
+  }
+  verifyParentPin(auth, studentId, pin){
+    const controls = this.parentControls(auth, studentId);
+    if (!controls.pinHash) fail(400, 'Chưa thiết lập mã PIN cho học sinh này.');
+    if (controls.pinLockedUntil && new Date(controls.pinLockedUntil).getTime() > Date.now()) {
+      const remainingMinutes = Math.ceil((new Date(controls.pinLockedUntil).getTime() - Date.now()) / 60000);
+      fail(429, `Mã PIN đang bị tạm khóa do nhập sai nhiều lần. Vui lòng thử lại sau ${remainingMinutes} phút.`);
+    }
+    const isCorrect = verifyParentPin(pin, controls.pinHash, controls.pinSalt);
+    if (!isCorrect) {
+      const newFailed = controls.pinFailedCount + 1;
+      let lockedUntil = null;
+      if (newFailed >= MAX_PIN_FAILURES) {
+        lockedUntil = new Date(Date.now() + PIN_LOCKOUT_MS).toISOString();
+      }
+      this.db.prepare('UPDATE parent_controls SET pin_failed_count=?, pin_locked_until=? WHERE workspace_id=? AND student_id=?')
+        .run(newFailed, lockedUntil, auth.workspaceId, studentId);
+      if (lockedUntil) {
+        fail(429, 'Bạn đã nhập sai PIN 5 lần. Mã PIN bị tạm khóa 15 phút để bảo vệ tài khoản.');
+      }
+      fail(403, `Sai mã PIN phụ huynh. Bạn còn ${MAX_PIN_FAILURES - newFailed} lần thử.`);
+    }
+    this.db.prepare('UPDATE parent_controls SET pin_failed_count=0, pin_locked_until=NULL WHERE workspace_id=? AND student_id=?')
+      .run(auth.workspaceId, studentId);
+    const parentToken = createHash('sha256').update(`${auth.id}:${studentId}:${controls.pinHash}:${now()}`).digest('hex');
+    return { success: true, parentToken, studentId };
+  }
+  updateParentSettings(auth, studentId, input){
+    shape(input, ['maxMinutesPerDay', 'allowedStartHour', 'allowedEndHour', 'studentId']);
+    const maxMinutes = input.maxMinutesPerDay !== undefined ? integer(input.maxMinutesPerDay, 'Thời gian học', 0, 480) : 0;
+    const startHour = input.allowedStartHour !== undefined ? integer(input.allowedStartHour, 'Giờ bắt đầu', 0, 23) : 0;
+    const endHour = input.allowedEndHour !== undefined ? integer(input.allowedEndHour, 'Giờ kết thúc', 1, 24) : 24;
+    if (endHour <= startHour && endHour !== 24 && startHour !== 0) {
+      fail(400, 'Giờ kết thúc phải sau giờ bắt đầu.');
+    }
+    const current = this.parentControls(auth, studentId);
+    const updatedAt = now();
+    this.db.prepare(`
+      INSERT INTO parent_controls(workspace_id, student_id, pin_hash, pin_salt, pin_failed_count, pin_locked_until, max_minutes_per_day, allowed_start_hour, allowed_end_hour, updated_at)
+      VALUES(?,?,?,?,?,?,?,?,?,?)
+      ON CONFLICT(workspace_id, student_id) DO UPDATE SET
+        max_minutes_per_day=excluded.max_minutes_per_day,
+        allowed_start_hour=excluded.allowed_start_hour,
+        allowed_end_hour=excluded.allowed_end_hour,
+        updated_at=excluded.updated_at
+    `).run(auth.workspaceId, studentId, current.pinHash, current.pinSalt, current.pinFailedCount, current.pinLockedUntil, maxMinutes, startHour, endHour, updatedAt);
+    return this.parentControls(auth, studentId);
+  }
+  createParent(auth, input, passwordHash, username){
+    shape(input, ['name', 'username', 'password', 'studentIds']);
+    const name = text(input.name, 'Tên phụ huynh', 100);
+    const studentIds = input.studentIds;
+    if (!Array.isArray(studentIds) || studentIds.length < 1 || studentIds.length > 3) {
+      fail(400, 'Tài khoản phụ huynh cần gắn với từ 1 đến 3 học sinh.');
+    }
+    return this.tx(() => {
+      const userId = id(), createdAt = now();
+      this.db.prepare('INSERT INTO users(id,workspace_id,username,password_hash,role,created_at) VALUES(?,?,?,?,?,?)')
+        .run(userId, auth.workspaceId, username, passwordHash, 'parent', createdAt);
+      for (const sId of studentIds) {
+        const student = this.student(auth, sId);
+        this.db.prepare('INSERT INTO parent_students(workspace_id, parent_user_id, student_id, created_at) VALUES(?,?,?,?)')
+          .run(auth.workspaceId, userId, student.id, createdAt);
+      }
+      return { id: userId, username, name, studentIds };
+    });
+  }
+  parentStudents(auth){
+    if (auth.role !== 'parent') fail(403, 'Chỉ phụ huynh mới dùng hàm này.');
+    const rows = this.db.prepare('SELECT s.*, c.name AS class_name FROM parent_students ps JOIN students s ON s.workspace_id=ps.workspace_id AND s.id=ps.student_id JOIN classes c ON c.workspace_id=s.workspace_id AND c.id=s.class_id WHERE ps.workspace_id=? AND ps.parent_user_id=?').all(auth.workspaceId, auth.id);
+    return rows.map(r => ({
+      id: r.id,
+      name: r.name,
+      className: r.class_name,
+      grade: r.grade,
+      active: !!r.active
+    }));
+  }
+  parentDashboard(auth, studentId, weekId){
+    text(studentId, 'Mã học sinh', 100);
+    if (auth.role === 'parent') {
+      const linked = this.db.prepare('SELECT 1 FROM parent_students WHERE workspace_id=? AND parent_user_id=? AND student_id=?').get(auth.workspaceId, auth.id, studentId);
+      if (!linked) fail(403, 'Phụ huynh không có quyền xem thông tin học sinh này.');
+    } else if (auth.role === 'student' && auth.studentId !== studentId) {
+      fail(403, 'Không có quyền truy cập.');
+    }
+    const student = this.student(auth, studentId);
+    const cls = this.class(auth, student.class_id);
+    const controls = this.parentControls(auth, studentId);
+    const todayMinutes = this.todayStudentStudyMinutes(auth, studentId);
+
+    let week;
+    if (weekId) {
+      week = this.db.prepare('SELECT * FROM weeks WHERE workspace_id=? AND id=?').get(auth.workspaceId, weekId);
+    }
+    if (!week) {
+      const marker = this.journeyMarker(auth, student) ?? this.pinJourney(auth, student);
+      if (marker) {
+        week = this.db.prepare('SELECT * FROM weeks WHERE workspace_id=? AND id=?').get(auth.workspaceId, marker.weekId);
+      }
+    }
+    if (!week) {
+      week = this.db.prepare('SELECT * FROM weeks WHERE workspace_id=? AND class_id=? ORDER BY position DESC LIMIT 1').get(auth.workspaceId, student.class_id);
+    }
+
+    let weekSets = [];
+    if (week) {
+      weekSets = this.db.prepare('SELECT s.position, p.* FROM week_sets s JOIN packs p ON p.workspace_id=s.workspace_id AND p.pack_id=s.pack_id AND p.version=s.version WHERE s.workspace_id=? AND s.week_id=? ORDER BY s.position').all(auth.workspaceId, week.id).map(r => ({
+        subjectLabel: r.subject_label,
+        pack: parse(r.json)
+      }));
+    }
+
+    const nowD = new Date();
+    const dayOfWeek = (nowD.getDay() + 6) % 7;
+    const monday = new Date(nowD.getTime() - dayOfWeek * 86400000);
+    monday.setHours(0, 0, 0, 0);
+    const sunday = new Date(monday.getTime() + 6 * 86400000 + 86399999);
+    const startDateIso = monday.toISOString();
+    const endDateIso = sunday.toISOString();
+
+    const attemptRows = this.db.prepare(`
+      SELECT a.json FROM attempts a
+      JOIN plays p ON p.workspace_id=a.workspace_id AND p.id=a.play_id
+      WHERE a.workspace_id=? AND p.student_id=?
+    `).all(auth.workspaceId, studentId);
+    const events = attemptRows.map(r => {
+      try { return parse(r.json); } catch { return null; }
+    }).filter(Boolean);
+
+    const badgeRows = this.db.prepare('SELECT * FROM badge_awards WHERE workspace_id=? AND student_id=?').all(auth.workspaceId, studentId);
+    const redRows = this.db.prepare('SELECT * FROM redemptions WHERE workspace_id=? AND student_id=?').all(auth.workspaceId, studentId);
+
+    const report = buildParentWeeklyReport({
+      student,
+      className: cls.name,
+      week: week ? { id: week.id, title: week.title, sets: weekSets } : null,
+      events,
+      badges: badgeRows,
+      redemptions: redRows,
+      startDateIso,
+      endDateIso
+    });
+
+    let children = [];
+    if (auth.role === 'parent') {
+      children = this.parentStudents(auth);
+    }
+
+    return {
+      student: { id: student.id, name: student.name, className: cls.name },
+      controls: {
+        hasPin: !!controls.pinHash,
+        maxMinutesPerDay: controls.maxMinutesPerDay,
+        allowedStartHour: controls.allowedStartHour,
+        allowedEndHour: controls.allowedEndHour,
+        pinLocked: !!(controls.pinLockedUntil && new Date(controls.pinLockedUntil).getTime() > Date.now())
+      },
+      todayMinutes,
+      report,
+      children
+    };
+  }
+
+  contestPresets(auth){
+    return Object.values(CONTEST_PRESETS);
+  }
+
+  startContest(auth, input){
+    role(auth, 'student');
+    shape(input, ['presetId', 'requestId']);
+    const presetId = text(input.presetId, 'Mã ma trận đề', 80);
+    const requestId = input.requestId ? text(input.requestId, 'Mã yêu cầu', 100) : null;
+    const preset = CONTEST_PRESETS[presetId];
+    if (!preset) fail(404, 'Không tìm thấy ma trận đề thi này.');
+
+    this.assertStudentScreenTimeAllowed(auth, auth.studentId);
+
+    return this.tx(() => {
+      if (requestId) {
+        const prior = this.db.prepare('SELECT * FROM contest_sessions WHERE workspace_id=? AND student_id=? AND request_id=?').get(auth.workspaceId, auth.studentId, requestId);
+        if (prior) {
+          const remainingSeconds = Math.max(0, Math.floor((Date.parse(prior.deadline_at) - Date.now()) / 1000));
+          const items = parse(prior.items_json);
+          return {
+            sessionId: prior.session_id,
+            preset,
+            startedAt: prior.started_at,
+            deadlineAt: prior.deadline_at,
+            remainingSeconds,
+            status: prior.status,
+            items: items.map(sanitizeContestItem),
+            answers: parse(prior.answers_json || '{}'),
+            skippedKeys: parse(prior.skipped_keys || '[]')
+          };
+        }
+      }
+
+      const active = this.db.prepare("SELECT * FROM contest_sessions WHERE workspace_id=? AND student_id=? AND preset_id=? AND status='active' ORDER BY created_at DESC LIMIT 1").get(auth.workspaceId, auth.studentId, presetId);
+      if (active) {
+        const remainingSeconds = Math.max(0, Math.floor((Date.parse(active.deadline_at) - Date.now()) / 1000));
+        if (remainingSeconds > 0) {
+          const items = parse(active.items_json);
+          return {
+            sessionId: active.session_id,
+            preset,
+            startedAt: active.started_at,
+            deadlineAt: active.deadline_at,
+            remainingSeconds,
+            status: 'active',
+            items: items.map(sanitizeContestItem),
+            answers: parse(active.answers_json || '{}'),
+            skippedKeys: parse(active.skipped_keys || '[]')
+          };
+        } else {
+          this.submitContest(auth, active.session_id, { answers: parse(active.answers_json || '{}') });
+        }
+      }
+
+      const sessionId = id();
+      const startedAt = now();
+      const deadlineAt = new Date(Date.now() + preset.durationSeconds * 1000).toISOString();
+
+      const student = this.student(auth, auth.studentId);
+      const weekRows = this.db.prepare('SELECT ws.pack_id, ws.version, p.json FROM week_sets ws JOIN weeks w ON w.workspace_id=ws.workspace_id AND w.id=ws.week_id JOIN packs p ON p.workspace_id=ws.workspace_id AND p.pack_id=ws.pack_id AND p.version=ws.version WHERE ws.workspace_id=? AND w.class_id=?').all(auth.workspaceId, student.class_id);
+      const assignedPacks = weekRows.map(r => {
+        try { return parse(r.json); } catch { return null; }
+      }).filter(Boolean);
+
+      const items = generateContestQuestions(preset, auth.studentId, sessionId, assignedPacks);
+
+      this.db.prepare('INSERT INTO contest_sessions(workspace_id, student_id, session_id, request_id, preset_id, title, subject, grade, duration_seconds, started_at, deadline_at, status, items_json, created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)').run(
+        auth.workspaceId, auth.studentId, sessionId, requestId, presetId, preset.title, preset.subject, preset.grade, preset.durationSeconds, startedAt, deadlineAt, 'active', json(items), startedAt
+      );
+
+      this.audit(auth, 'contest.start', json({ sessionId, presetId }));
+
+      return {
+        sessionId,
+        preset,
+        startedAt,
+        deadlineAt,
+        remainingSeconds: preset.durationSeconds,
+        status: 'active',
+        items: items.map(sanitizeContestItem),
+        answers: {},
+        skippedKeys: []
+      };
+    });
+  }
+
+  activeContest(auth){
+    role(auth, 'student');
+    const row = this.db.prepare("SELECT * FROM contest_sessions WHERE workspace_id=? AND student_id=? AND status='active' ORDER BY created_at DESC LIMIT 1").get(auth.workspaceId, auth.studentId);
+    if (!row) return { active: false };
+
+    const remainingSeconds = Math.max(0, Math.floor((Date.parse(row.deadline_at) - Date.now()) / 1000));
+    if (remainingSeconds <= 0) {
+      const res = this.submitContest(auth, row.session_id, { answers: parse(row.answers_json || '{}') });
+      return { active: false, lastResult: res };
+    }
+
+    const preset = CONTEST_PRESETS[row.preset_id];
+    const items = parse(row.items_json);
+    return {
+      active: true,
+      session: {
+        sessionId: row.session_id,
+        preset,
+        startedAt: row.started_at,
+        deadlineAt: row.deadline_at,
+        remainingSeconds,
+        status: 'active',
+        items: items.map(sanitizeContestItem),
+        answers: parse(row.answers_json || '{}'),
+        skippedKeys: parse(row.skipped_keys || '[]')
+      }
+    };
+  }
+
+  saveContestProgress(auth, sessionId, input){
+    role(auth, 'student');
+    text(sessionId, 'Mã lượt thi', 100);
+    shape(input, ['answers', 'skippedKeys']);
+    return this.tx(() => {
+      const row = this.db.prepare("SELECT * FROM contest_sessions WHERE workspace_id=? AND student_id=? AND session_id=? AND status='active'").get(auth.workspaceId, auth.studentId, sessionId);
+      if (!row) fail(404, 'Không tìm thấy lượt thi đang làm.');
+
+      const remainingSeconds = Math.max(0, Math.floor((Date.parse(row.deadline_at) - Date.now()) / 1000));
+      if (remainingSeconds <= 0) {
+        return this.submitContest(auth, sessionId, { answers: input.answers ?? parse(row.answers_json || '{}') });
+      }
+
+      const answers = input.answers !== undefined ? json(input.answers) : row.answers_json;
+      const skipped = input.skippedKeys !== undefined ? json(input.skippedKeys) : row.skipped_keys;
+      this.db.prepare('UPDATE contest_sessions SET answers_json=?, skipped_keys=? WHERE workspace_id=? AND session_id=?').run(answers, skipped, auth.workspaceId, sessionId);
+      return { success: true, remainingSeconds };
+    });
+  }
+
+  submitContest(auth, sessionId, input = {}){
+    role(auth, 'student');
+    text(sessionId, 'Mã lượt thi', 100);
+    return this.tx(() => {
+      const row = this.db.prepare('SELECT * FROM contest_sessions WHERE workspace_id=? AND student_id=? AND session_id=?').get(auth.workspaceId, auth.studentId, sessionId);
+      if (!row) fail(404, 'Không tìm thấy lượt thi.');
+
+      const preset = CONTEST_PRESETS[row.preset_id];
+      const items = parse(row.items_json);
+
+      if (row.status !== 'active') {
+        const historyRows = this.db.prepare("SELECT score, max_score, status FROM contest_sessions WHERE workspace_id=? AND student_id=? AND preset_id=? AND status IN ('submitted', 'timeout') ORDER BY created_at DESC").all(auth.workspaceId, auth.studentId, row.preset_id);
+        const readiness = checkReadinessForExam(historyRows.map(r => ({ percent: r.max_score > 0 ? Math.round((r.score / r.max_score) * 100) : 0, passed: (r.max_score > 0 ? Math.round((r.score / r.max_score) * 100) : 0) >= preset.passPercent })));
+        const evaluation = evaluateContestSubmission(items, parse(row.answers_json || '{}'), preset, Math.min(preset.durationSeconds * 1000, Math.max(0, Date.parse(row.submitted_at || row.deadline_at) - Date.parse(row.started_at))), row.status);
+        return {
+          sessionId,
+          ...evaluation,
+          readyForExam: readiness.readyForExam,
+          consecutivePasses: readiness.consecutiveCount
+        };
+      }
+
+      const nowMs = Date.now();
+      const deadlineMs = Date.parse(row.deadline_at);
+      const isTimeout = nowMs > deadlineMs + 3000;
+      const finishReason = isTimeout ? 'timeout' : 'submitted';
+      const submittedAt = now();
+      const answers = input.answers !== undefined ? input.answers : parse(row.answers_json || '{}');
+      const elapsedMs = Math.min(preset.durationSeconds * 1000, Math.max(0, nowMs - Date.parse(row.started_at)));
+
+      const evaluation = evaluateContestSubmission(items, answers, preset, elapsedMs, finishReason);
+
+      this.db.prepare(`
+        UPDATE contest_sessions SET
+          status=?,
+          submitted_at=?,
+          score=?,
+          max_score=?,
+          correct_count=?,
+          total_items=?,
+          answers_json=?
+        WHERE workspace_id=? AND session_id=?
+      `).run(finishReason, submittedAt, evaluation.score, evaluation.maxScore, evaluation.correctCount, evaluation.totalItems, json(answers), auth.workspaceId, sessionId);
+
+      let badgeAwarded = false;
+      const existingBadge = this.db.prepare('SELECT 1 FROM badge_awards WHERE workspace_id=? AND student_id=? AND badge_id=?').get(auth.workspaceId, auth.studentId, CONTESTANT_BADGE.id);
+      if (!existingBadge) {
+        this.awardBadge(auth, auth.studentId, CONTESTANT_BADGE.id, { title: CONTESTANT_BADGE.title, unlockedAt: submittedAt }, submittedAt);
+        badgeAwarded = true;
+      }
+
+      this.audit(auth, 'contest.submit', json({ sessionId, score: evaluation.score, maxScore: evaluation.maxScore, finishReason }));
+
+      const historyRows = this.db.prepare("SELECT score, max_score, status FROM contest_sessions WHERE workspace_id=? AND student_id=? AND preset_id=? AND status IN ('submitted', 'timeout') ORDER BY created_at DESC").all(auth.workspaceId, auth.studentId, row.preset_id);
+      const readiness = checkReadinessForExam(historyRows.map(r => ({ percent: r.max_score > 0 ? Math.round((r.score / r.max_score) * 100) : 0, passed: (r.max_score > 0 ? Math.round((r.score / r.max_score) * 100) : 0) >= preset.passPercent })));
+
+      return {
+        sessionId,
+        ...evaluation,
+        readyForExam: readiness.readyForExam,
+        consecutivePasses: readiness.consecutiveCount,
+        badgeAwarded
+      };
+    });
+  }
+
+  contestHistory(auth, studentId = auth.studentId, presetId = null){
+    if (auth.role === 'student' && auth.studentId !== studentId) fail(403, 'Không có quyền truy cập.');
+    text(studentId, 'Mã học sinh', 100);
+    const sql = presetId
+      ? "SELECT * FROM contest_sessions WHERE workspace_id=? AND student_id=? AND preset_id=? AND status IN ('submitted', 'timeout') ORDER BY created_at DESC"
+      : "SELECT * FROM contest_sessions WHERE workspace_id=? AND student_id=? AND status IN ('submitted', 'timeout') ORDER BY created_at DESC";
+    const params = presetId ? [auth.workspaceId, studentId, presetId] : [auth.workspaceId, studentId];
+    const rows = this.db.prepare(sql).all(...params);
+
+    const attempts = rows.map(r => {
+      const preset = CONTEST_PRESETS[r.preset_id];
+      const percent = r.max_score > 0 ? Math.round((r.score / r.max_score) * 100) : 0;
+      const elapsedMs = r.submitted_at ? Math.max(0, Date.parse(r.submitted_at) - Date.parse(r.started_at)) : r.duration_seconds * 1000;
+      return {
+        sessionId: r.session_id,
+        presetId: r.preset_id,
+        presetTitle: preset?.title || r.title,
+        contest: preset?.contest || 'violympic',
+        subject: r.subject,
+        grade: r.grade,
+        startedAt: r.started_at,
+        submittedAt: r.submitted_at,
+        score: r.score,
+        maxScore: r.max_score,
+        percent,
+        passed: percent >= (preset?.passPercent || 80),
+        finishReason: r.status,
+        elapsedMs
+      };
+    });
+
+    const readiness = checkReadinessForExam(attempts);
+
+    return {
+      attempts,
+      readyForExam: readiness.readyForExam,
+      consecutiveCount: readiness.consecutiveCount
+    };
+  }
+
+  contestReviewPack(auth, sessionId){
+    role(auth, 'student');
+    text(sessionId, 'Mã lượt thi', 100);
+    const row = this.db.prepare('SELECT * FROM contest_sessions WHERE workspace_id=? AND student_id=? AND session_id=?').get(auth.workspaceId, auth.studentId, sessionId);
+    if (!row) fail(404, 'Không tìm thấy lượt thi.');
+    const items = parse(row.items_json);
+    const answers = parse(row.answers_json || '{}');
+    const preset = CONTEST_PRESETS[row.preset_id];
+    const evaluation = evaluateContestSubmission(items, answers, preset, 0, row.status);
+    return buildReviewMistakesPack({ sessionId: row.session_id, title: row.title, subject: row.subject, grade: row.grade }, evaluation.mistakes);
+  }
+
+  resolvePackSubject(auth, packId) {
+    const row = this.db.prepare('SELECT subject_label, json FROM packs WHERE workspace_id=? AND pack_id=? ORDER BY version DESC LIMIT 1').get(auth.workspaceId, packId);
+    if (!row) return 'math';
+    try {
+      const p = parse(row.json);
+      return resolveTownSubject(p.subject || row.subject_label);
+    } catch {
+      return resolveTownSubject(row.subject_label);
+    }
+  }
+
+  syncAwardMaterial(auth, studentId, packId, stars) {
+    if (!stars || stars <= 0) return;
+    try {
+      const subject = this.resolvePackSubject(auth, packId);
+      const material = getMaterialForSubject(subject);
+      const existingEarned = this.db.prepare("SELECT coalesce(sum(delta), 0) as total FROM materials_ledger WHERE workspace_id=? AND student_id=? AND pack_id=? AND delta > 0").get(auth.workspaceId, studentId, packId)?.total || 0;
+      const gained = stars - existingEarned;
+      if (gained > 0) {
+        this.db.prepare('INSERT INTO materials_ledger(workspace_id, student_id, id, pack_id, material_type, delta, reason, request_id, created_at) VALUES(?,?,?,?,?,?,?,?,?)').run(
+          auth.workspaceId, studentId, id(), packId, material, gained, 'award', `award:${packId}:${stars}`, now()
+        );
+      }
+    } catch (e) {
+      // Ignore background sync errors
+    }
+  }
+
+  townState(auth, studentId, { allowClassmate = false } = {}) {
+    if (auth.role === 'student' && auth.studentId !== studentId && !allowClassmate) fail(404, 'Không tìm thấy học sinh.');
+    let row = this.db.prepare('SELECT * FROM town_states WHERE workspace_id=? AND student_id=?').get(auth.workspaceId, studentId);
+    if (!row) {
+      const initial = defaultTownState(studentId, now());
+      this.db.prepare('INSERT INTO town_states(workspace_id, student_id, grid_width, grid_height, revision, buildings_json, updated_at) VALUES(?,?,?,?,?,?,?)').run(
+        auth.workspaceId, studentId, initial.gridWidth, initial.gridHeight, initial.revision, json(initial.buildings), initial.updatedAt
+      );
+      return initial;
+    }
+    return {
+      gridWidth: row.grid_width,
+      gridHeight: row.grid_height,
+      revision: row.revision,
+      buildings: parse(row.buildings_json || '[]'),
+      updatedAt: row.updated_at,
+    };
+  }
+
+  materials(auth, studentId) {
+    if (auth.role === 'student' && auth.studentId !== studentId) fail(404, 'Không tìm thấy học sinh.');
+    const count = this.db.prepare('SELECT count(*) as c FROM materials_ledger WHERE workspace_id=? AND student_id=?').get(auth.workspaceId, studentId)?.c || 0;
+    if (count === 0) {
+      return this.recalculateMaterials(auth, studentId);
+    }
+    const rows = this.db.prepare('SELECT material_type, coalesce(sum(delta), 0) as balance FROM materials_ledger WHERE workspace_id=? AND student_id=? GROUP BY material_type').all(auth.workspaceId, studentId);
+    const balances = { stone: 0, wood: 0, fish: 0, component: 0 };
+    for (const r of rows) {
+      if (r.material_type in balances) {
+        balances[r.material_type] = Math.max(0, Number(r.balance));
+      }
+    }
+    return balances;
+  }
+
+  recalculateMaterials(auth, studentId) {
+    if (auth.role === 'student' && auth.studentId !== studentId) fail(404, 'Không tìm thấy học sinh.');
+    return this.tx(() => {
+      this.db.prepare('DELETE FROM materials_ledger WHERE workspace_id=? AND student_id=?').run(auth.workspaceId, studentId);
+
+      const awards = this.db.prepare('SELECT pack_id, tier, json FROM awards WHERE workspace_id=? AND student_id=?').all(auth.workspaceId, studentId).map(r => ({
+        packId: r.pack_id,
+        tier: r.tier,
+        ...parse(r.json)
+      }));
+
+      const packRows = this.db.prepare('SELECT pack_id, subject_label, json FROM packs WHERE workspace_id=?').all(auth.workspaceId);
+      const subjectMap = new Map();
+      for (const pr of packRows) {
+        try {
+          const p = parse(pr.json);
+          subjectMap.set(pr.pack_id, resolveTownSubject(p.subject || pr.subject_label));
+        } catch {
+          subjectMap.set(pr.pack_id, resolveTownSubject(pr.subject_label));
+        }
+      }
+
+      const earned = calculateEarnedMaterialsFromAwards(awards, (id) => subjectMap.get(id) || 'math');
+      const currentTime = now();
+
+      for (const [mat, amount] of Object.entries(earned)) {
+        if (amount > 0) {
+          this.db.prepare('INSERT INTO materials_ledger(workspace_id, student_id, id, pack_id, material_type, delta, reason, request_id, created_at) VALUES(?,?,?,?,?,?,?,?,?)').run(
+            auth.workspaceId, studentId, id(), null, mat, amount, 'award', `recalc:${studentId}:${mat}:${amount}`, currentTime
+          );
+        }
+      }
+
+      const town = this.townState(auth, studentId);
+      for (const placed of town.buildings) {
+        const item = TOWN_BUILDING_MAP.get(placed.buildingId);
+        if (!item) continue;
+        for (const [mat, cost] of Object.entries(item.cost)) {
+          if (cost && cost > 0) {
+            this.db.prepare('INSERT INTO materials_ledger(workspace_id, student_id, id, pack_id, material_type, delta, reason, request_id, created_at) VALUES(?,?,?,?,?,?,?,?,?)').run(
+              auth.workspaceId, studentId, id(), null, mat, -cost, 'build', `spend:${placed.id}:${mat}`, currentTime
+            );
+          }
+        }
+      }
+
+      const spent = calculateTotalSpentMaterials(town.buildings);
+      return calculateAvailableMaterials(earned, spent);
+    });
+  }
+
+  placeBuilding(auth, studentId, input) {
+    if (auth.role === 'student' && auth.studentId !== studentId) fail(404, 'Không tìm thấy học sinh.');
+    shape(input, ['buildingId', 'x', 'y', 'expectedRevision', 'requestId', 'studentId']);
+    text(input.buildingId, 'Mã công trình', 64);
+    let requestId = input.requestId || id();
+
+    return this.tx(() => {
+      const existingTx = this.db.prepare("SELECT 1 FROM materials_ledger WHERE workspace_id=? AND student_id=? AND request_id=? AND reason='build' LIMIT 1").get(auth.workspaceId, studentId, requestId);
+      if (existingTx) {
+        const currentTown = this.townState(auth, studentId);
+        const currentMaterials = this.materials(auth, studentId);
+        return { ok: true, town: currentTown, materials: currentMaterials, duplicate: true };
+      }
+
+      const currentTown = this.townState(auth, studentId);
+      const currentMaterials = this.materials(auth, studentId);
+      const placementId = id();
+      const currentTime = now();
+
+      const { updatedTownState, placedBuilding, cost } = evaluateBuildingPlacement({
+        currentTownState: currentTown,
+        buildingId: input.buildingId,
+        x: input.x,
+        y: input.y,
+        expectedRevision: input.expectedRevision,
+        availableMaterials: currentMaterials,
+        nowIso: currentTime,
+        placementId,
+      });
+
+      for (const [mat, amount] of Object.entries(cost)) {
+        if (amount && amount > 0) {
+          this.db.prepare('INSERT INTO materials_ledger(workspace_id, student_id, id, pack_id, material_type, delta, reason, request_id, created_at) VALUES(?,?,?,?,?,?,?,?,?)').run(
+            auth.workspaceId, studentId, id(), null, mat, -amount, 'build', requestId, currentTime
+          );
+        }
+      }
+
+      this.db.prepare('UPDATE town_states SET revision=?, buildings_json=?, updated_at=? WHERE workspace_id=? AND student_id=?').run(
+        updatedTownState.revision, json(updatedTownState.buildings), updatedTownState.updatedAt, auth.workspaceId, studentId
+      );
+
+      const updatedMaterials = calculateAvailableMaterials(
+        currentMaterials,
+        calculateTotalSpentMaterials([placedBuilding])
+      );
+
+      try {
+        const student = this.db.prepare('SELECT class_id, name FROM students WHERE workspace_id=? AND id=?').get(auth.workspaceId, studentId);
+        if (student) {
+          this.publishClassFeedEvent(auth, student.class_id, studentId, student.name, 'building_built', {
+            buildingId: placedBuilding.buildingId,
+            buildingName: placedBuilding.name,
+            buildingIcon: placedBuilding.icon,
+          });
+        }
+      } catch {}
+
+      return {
+        ok: true,
+        town: updatedTownState,
+        materials: updatedMaterials,
+        placedBuilding
+      };
+    });
+  }
+
+  townSummary(auth, studentId) {
+    const town = this.townState(auth, studentId);
+    const materials = this.materials(auth, studentId);
+    const catalog = TOWN_BUILDING_CATALOG;
+    let walletAvailableStars = 0;
+    try {
+      const rewards = this.rewards(auth, studentId);
+      const requests = this.requests(auth, studentId);
+      const balance = rewardBalance(earnedQuestionRewardStars(rewards), { requests });
+      walletAvailableStars = balance.available;
+    } catch {}
+    return { town, materials, catalog, walletAvailableStars };
+  }
+
+  townAnimals(auth, studentId, { allowClassmate = false } = {}) {
+    if (auth.role === 'student' && auth.studentId !== studentId && !allowClassmate) fail(404, 'Không tìm thấy học sinh.');
+    const student = this.db.prepare('SELECT * FROM students WHERE workspace_id=? AND id=?').get(auth.workspaceId, studentId);
+    if (!student) fail(404, 'Không tìm thấy học sinh.');
+    const awards = this.db.prepare('SELECT json FROM awards WHERE workspace_id=? AND student_id=? ORDER BY pack_id').all(auth.workspaceId, studentId).map(row => parse(row.json));
+    const prog = this.summaryProgress(auth, student, awards);
+    const completedWeeksCount = prog.weeks.filter(w => w.done || w.closed).length;
+    const unlockedDefs = getUnlockedAnimals(completedWeeksCount);
+    const rows = this.db.prepare('SELECT animal_id, name, arrived_at_week, created_at FROM town_animals WHERE workspace_id=? AND student_id=?').all(auth.workspaceId, studentId);
+    const animals = unlockedDefs.map(def => {
+      const saved = rows.find(r => r.animal_id === def.id);
+      return {
+        animalId: def.id,
+        species: def.species,
+        defaultName: def.defaultName,
+        name: saved ? saved.name : def.defaultName,
+        hasCustomName: !!saved,
+        icon: def.icon,
+        requiredWeeks: def.requiredWeeks,
+        description: def.description,
+        arrivedAtWeek: saved ? saved.arrived_at_week : def.requiredWeeks,
+      };
+    });
+    return { animals, completedWeeksCount };
+  }
+
+  nameTownAnimal(auth, studentId, input) {
+    shape(input, ['animalId', 'name']);
+    if (auth.role === 'student' && auth.studentId !== studentId) fail(404, 'Không tìm thấy học sinh.');
+    const student = this.db.prepare('SELECT * FROM students WHERE workspace_id=? AND id=?').get(auth.workspaceId, studentId);
+    if (!student) fail(404, 'Không tìm thấy học sinh.');
+
+    const validation = validateAnimalName(input.name);
+    if (!validation.valid) fail(400, validation.error || 'Tên bạn nhỏ không hợp lệ.');
+
+    const prog = this.summaryProgress(auth, student);
+    const completedWeeksCount = prog.weeks.filter(w => w.done || w.closed).length;
+    const unlockedDefs = getUnlockedAnimals(completedWeeksCount);
+    const def = unlockedDefs.find(d => d.id === input.animalId);
+    if (!def) fail(400, 'Bạn động vật này chưa chuyển đến thị trấn.');
+
+    const cleanName = validation.cleanName;
+    this.db.prepare(`
+      INSERT INTO town_animals(workspace_id, student_id, animal_id, name, arrived_at_week, created_at)
+      VALUES(?,?,?,?,?,?)
+      ON CONFLICT(workspace_id, student_id, animal_id) DO UPDATE SET name=excluded.name
+    `).run(auth.workspaceId, studentId, def.id, cleanName, def.requiredWeeks, now());
+
+    return {
+      ok: true,
+      animal: {
+        animalId: def.id,
+        species: def.species,
+        name: cleanName,
+        arrivedAtWeek: def.requiredWeeks,
+        icon: def.icon,
+      }
+    };
+  }
+
+  classmatesTowns(auth, studentId) {
+    const student = this.db.prepare('SELECT * FROM students WHERE workspace_id=? AND id=?').get(auth.workspaceId, studentId);
+    if (!student) fail(404, 'Không tìm thấy học sinh.');
+    const classmates = this.db.prepare('SELECT id, name FROM students WHERE workspace_id=? AND class_id=? AND active=1').all(auth.workspaceId, student.class_id);
+
+    return classmates.map(c => {
+      const townRow = this.db.prepare('SELECT buildings_json FROM town_states WHERE workspace_id=? AND student_id=?').get(auth.workspaceId, c.id);
+      const buildings = townRow ? parse(townRow.buildings_json || '[]') : [];
+      const cheersCount = this.db.prepare('SELECT count(*) as count FROM town_cheers WHERE workspace_id=? AND to_student_id=?').get(auth.workspaceId, c.id)?.count || 0;
+      const animalsCount = this.db.prepare('SELECT count(*) as count FROM town_animals WHERE workspace_id=? AND student_id=?').get(auth.workspaceId, c.id)?.count || 0;
+
+      return {
+        studentId: c.id,
+        name: c.name, // Display name only, NEVER username
+        buildingsCount: buildings.length,
+        cheersCount,
+        animalsCount,
+        isSelf: c.id === studentId,
+      };
+    });
+  }
+
+  visitTown(auth, callerStudentId, targetStudentId) {
+    const caller = this.db.prepare('SELECT * FROM students WHERE workspace_id=? AND id=?').get(auth.workspaceId, callerStudentId);
+    const target = this.db.prepare('SELECT * FROM students WHERE workspace_id=? AND id=?').get(auth.workspaceId, targetStudentId);
+    if (!caller || !target) fail(404, 'Không tìm thấy học sinh.');
+
+    if (caller.class_id !== target.class_id) {
+      fail(403, 'Bạn chỉ có thể ghé thăm thị trấn của bạn cùng lớp!');
+    }
+
+    const town = this.townState(auth, targetStudentId, { allowClassmate: true });
+    const animalsData = this.townAnimals(auth, targetStudentId, { allowClassmate: true });
+    const cheersCount = this.db.prepare('SELECT count(*) as count FROM town_cheers WHERE workspace_id=? AND to_student_id=?').get(auth.workspaceId, targetStudentId)?.count || 0;
+
+    return {
+      studentName: target.name, // Display name only
+      town,
+      animals: animalsData.animals,
+      cheersCount,
+      isSelf: callerStudentId === targetStudentId,
+    };
+  }
+
+  cheerClassmate(auth, fromStudentId, targetStudentId) {
+    if (fromStudentId === targetStudentId) {
+      fail(400, 'Không thể tự cổ vũ thị trấn của chính mình!');
+    }
+
+    const caller = this.db.prepare('SELECT * FROM students WHERE workspace_id=? AND id=?').get(auth.workspaceId, fromStudentId);
+    const target = this.db.prepare('SELECT * FROM students WHERE workspace_id=? AND id=?').get(auth.workspaceId, targetStudentId);
+    if (!caller || !target) fail(404, 'Không tìm thấy học sinh.');
+
+    if (caller.class_id !== target.class_id) {
+      fail(403, 'Chỉ có thể cổ vũ bạn cùng lớp!');
+    }
+
+    const dayKey = new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Ho_Chi_Minh' });
+    const existing = this.db.prepare('SELECT 1 FROM town_cheers WHERE workspace_id=? AND from_student_id=? AND to_student_id=? AND day_key=?').get(auth.workspaceId, fromStudentId, targetStudentId, dayKey);
+
+    if (!existing) {
+      this.db.prepare('INSERT INTO town_cheers(workspace_id, from_student_id, to_student_id, day_key, created_at) VALUES(?,?,?,?,?)').run(
+        auth.workspaceId, fromStudentId, targetStudentId, dayKey, now()
+      );
+      const totalCheers = this.db.prepare('SELECT count(*) as count FROM town_cheers WHERE workspace_id=? AND to_student_id=?').get(auth.workspaceId, targetStudentId)?.count || 1;
+      this.publishClassFeedEvent(auth, target.class_id, targetStudentId, target.name, 'cheer_received', {
+        cheerCount: totalCheers,
+      });
+    }
+
+    const count = this.db.prepare('SELECT count(*) as count FROM town_cheers WHERE workspace_id=? AND to_student_id=?').get(auth.workspaceId, targetStudentId)?.count || 0;
+    return {
+      ok: true,
+      alreadyCheeredToday: !!existing,
+      cheersCount: count,
+    };
+  }
+
+  publishClassFeedEvent(auth, classId, studentId, studentName, eventType, details) {
+    try {
+      const cls = this.db.prepare('SELECT feed_enabled FROM classes WHERE workspace_id=? AND id=?').get(auth.workspaceId, classId);
+      if (!cls || cls.feed_enabled === 0) return;
+
+      const event = sanitizeClassFeedEvent({
+        id: id(),
+        classId,
+        studentId,
+        studentName,
+        eventType,
+        details,
+        createdAt: now(),
+      });
+
+      if (!verifyPrivacyCompliance(event)) return;
+
+      this.db.prepare('INSERT INTO class_feed_events(workspace_id, class_id, id, student_id, student_name, event_type, details_json, created_at) VALUES(?,?,?,?,?,?,?,?)').run(
+        auth.workspaceId, classId, event.id, event.studentId, event.studentName, event.eventType, json(event.details), event.createdAt
+      );
+    } catch {}
+  }
+
+  classFeed(auth, classId, limit = 50) {
+    const cls = this.class(auth, classId);
+    const feedEnabled = cls.feed_enabled === undefined || cls.feed_enabled === null || cls.feed_enabled === 1;
+    if (!feedEnabled) {
+      return { enabled: false, events: [] };
+    }
+
+    const rows = this.db.prepare('SELECT * FROM class_feed_events WHERE workspace_id=? AND class_id=? ORDER BY created_at DESC LIMIT ?').all(auth.workspaceId, classId, limit);
+    const events = rows.map(r => sanitizeClassFeedEvent({
+      id: r.id,
+      classId: r.class_id,
+      studentId: r.student_id,
+      studentName: r.student_name,
+      eventType: r.event_type,
+      details: parse(r.details_json || '{}'),
+      createdAt: r.created_at,
+    })).filter(verifyPrivacyCompliance);
+
+    return { enabled: true, events };
+  }
 }

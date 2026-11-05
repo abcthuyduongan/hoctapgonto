@@ -38,3 +38,13 @@ test('performance reporting is opt-in, sampled, bounded per minute and cannot ch
  assert.equal((await broken('/api/online/login','POST',action)).status,200);
  const expected=new Error('original error');await assert.rejects(broken('/api/online/login','POST',async()=>{throw expected;}),error=>error===expected);
 });
+
+test('failure categories allowlist database codes and correlate with the sampled request without exposing errors',async()=>{
+ const failures=[],samples=[],failure=createFailureReporter({logger:value=>failures.push(JSON.parse(value))}),report=createPerformanceReporter({enabled:true,sampleEvery:1,logger:value=>samples.push(JSON.parse(value))});
+ await report('/api/online/play/private/attempt','POST',async()=>{
+  failure('/api/online/play/private/attempt','POST',500,15,{code:'55P03',message:'PRIVATE_SQL_AND_PASSWORD',detail:'PRIVATE_DETAIL'});
+  return new Response('{}',{status:500});
+ });
+ assert.equal(failures[0].requestId,samples[0].requestId);assert.equal(failures[0].failureKind,'lock-timeout');assert.equal(failures[0].databaseCode,'55P03');assert.doesNotMatch(JSON.stringify(failures),/PRIVATE/);
+ failure('/api/online/login','POST',500,1,{code:'PRIVATE_ERROR',message:'SECRET'});assert.equal(failures[1].failureKind,undefined);assert.doesNotMatch(JSON.stringify(failures),/PRIVATE_ERROR|SECRET/);
+});

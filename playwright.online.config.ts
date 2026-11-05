@@ -3,7 +3,7 @@ const channels=process.env.BAO_AN_BROWSER_CHANNEL?[process.env.BAO_AN_BROWSER_CH
 
 // Each online spec starts a real local HTTP server and isolated SQLite database.
 export default defineConfig({
-  testDir:'./tests/visual',testMatch:/online(?:-[a-z]+)?\.spec\.ts$/,timeout:180000,
+  testDir:'./tests/visual',testMatch:/online(?:-[a-z0-9]+)*\.spec\.ts$/,timeout:180000,
   expect:{timeout:15000},fullyParallel:false,workers:1,retries:0,
   outputDir:'test-results/online-browser-output',
   reporter:[['list'],['json',{outputFile:'test-results/online-browser-report.json'}]],

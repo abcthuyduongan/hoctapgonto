@@ -1,3 +1,5 @@
+import '../styles/game-base.css';
+import '../styles/game-context-themes.css';
 import {useQuestionSpeech} from './useQuestionSpeech';
 import {saveFailureMessage} from './save-failure-message';
 import QuestionMedia from '../components/QuestionMedia';
@@ -25,6 +27,7 @@ export default function SentenceBuilder({pack,onAttempt,onComplete,onExit,questi
   const [done,setDone] = useState(false);
   const [busy,setBusy] = useState(false);
   const [error,setError] = useState('');
+  const [contextTheme, setContextTheme] = useState<'default' | 'castle'>('castle');
   const [pending,setPending]=useState<AttemptInput|null>(null);
   const pendingRef=useRef<AttemptInput|null>(null);
   const started = useRef(performance.now());
@@ -90,10 +93,33 @@ export default function SentenceBuilder({pack,onAttempt,onComplete,onExit,questi
     if (busy || !!pendingRef.current || feedback === 'correct' || placed.includes(wordIndex)) return;
     setPlaced(prev=>[...prev,wordIndex]);setFeedback(null);
   }
-  return <section ref={layout.ref} {...layout.layoutProps} className="play-panel sentence-panel world-stage world-sentence">
+  return <section ref={layout.ref} {...layout.layoutProps} className={`play-panel sentence-panel world-stage world-sentence ${contextTheme === 'castle' ? 'context-theme-castle' : ''}`}>
     <div className="stage-backdrop" aria-hidden="true"/><div className="stage-overlay" aria-hidden="true"/>
     {speech.notice&&<p className="notice speech-notice" role="status">{speech.notice}</p>}
-    <div className="world-hud"><span className="hud-label"><span className="ba37-hud-symbol" aria-hidden="true">Aa</span> XƯỞNG NGÔN TỪ</span><span className="hud-score"><span aria-hidden="true">★</span> {firstTry} câu đúng lần đầu</span></div>
+    <div className="world-hud">
+      <span className="hud-label"><span className="ba37-hud-symbol" aria-hidden="true">Aa</span> {contextTheme === 'castle' ? 'XÂY CÂU LÂU ĐÀI' : 'XƯỞNG NGÔN TỪ'}</span>
+      <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+        <button type="button" className="game-theme-toggle-btn" onClick={() => setContextTheme(t => t === 'castle' ? 'default' : 'castle')} title="Đổi bối cảnh">
+          🏰 {contextTheme === 'castle' ? 'Bối cảnh: Lâu đài' : 'Bối cảnh: Chuẩn'}
+        </button>
+        <span className="hud-score"><span aria-hidden="true">★</span> {firstTry} câu đúng lần đầu</span>
+      </div>
+    </div>
+    {contextTheme === 'castle' && (
+      <div className="castle-wall-container" aria-label="Tường thành lâu đài">
+        {feedback === 'correct' && <span className="castle-flag" role="img" aria-label="Lâu đài hoàn thành">🚩🏰</span>}
+        <div className="castle-battlements">
+          <div className={`castle-tower-cap ${placed.length >= Math.ceil(item.words.length / 2) ? 'placed' : ''}`} />
+          <div className={`castle-tower-cap ${feedback === 'correct' ? 'placed' : ''}`} />
+          <div className={`castle-tower-cap ${placed.length >= item.words.length ? 'placed' : ''}`} />
+        </div>
+        <div className="castle-brick-row">
+          {item.words.map((_, idx) => (
+            <div key={idx} className={`castle-brick ${idx < placed.length ? 'built' : ''}`} title={`Viên gạch ${idx + 1}`} />
+          ))}
+        </div>
+      </div>
+    )}
     <div className="sentence-adventure-layout"><aside className="sentence-guide"><GameMascot alt="Cáo nhỏ dẫn đường" mood={feedback==='correct'?'happy':feedback==='retry'?'encourage':'idle'}/><div className="guide-speech">Chạm hoặc kéo từ vào ô để tạo câu nhé! ✨</div></aside>
       <div className="sentence-scroll">
         <div className="quest-progress"><span>CÂU {index+1}/{content.items.length}</span><span>✎ GHÉP CÂU VUI</span></div>

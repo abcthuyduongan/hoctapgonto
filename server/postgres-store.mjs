@@ -8,15 +8,25 @@ import {onlinePresentation,onlineEvidenceErrors,onlineScoreResponse,onlineAward}
 import {makeRewardRequest,changeRewardRequest,rewardStatus,rewardBalance} from '../src/core/reward-wallet.ts';
 import {onlineImmutablePackIdentity,onlinePackQuestionKind,onlineSemanticPackIdentity,onlineWeekIdentity,onlineIdentityText,onlineRevisionOrder,onlinePreserveQuestionIds} from '../src/core/online-import-identity.ts';
 import {summaryWeeks,summaryPage,compactPlay} from './student-summary.mjs';
+import {projectStudentMap} from './world-map-summary.mjs';
 import {createWeeklyPlan,weeklyPlanErrors,validateWeeklyPlan} from '../src/core/weekly-plan.ts';
 import {readWeekPolicies,closedStudentCount,changesQuestionMeaning} from './weekly-policy.mjs';
 import {journeyProgress,selectReviewItems,filterPlayPresentation,timedQuestion} from './question-journey.mjs';
 import {initializeQuestionRewardLedger,applyQuestionRewardCandidates,questionRewardCandidates,questionRewardProgress,questionRewardThresholds,earnedQuestionRewardStars,v2QuestionCompletionErrors} from '../src/core/question-rewards.ts';
 import {openProtocolQuestion,protocolAudioDelivery,protocolHint,answerFeedback} from './question-protocol.mjs';
 import {measureApiSpan} from './api-diagnostics.mjs';
+import {toVietnamDateString,getVietnamWeekKey,computeStreakState,registerDailyCorrectAnswer,buildDailyMissions,buildStudentBadgeStatuses,BADGE_CATALOG} from '../src/core/badges.ts';
+import {checkCurfewHours,checkDailyScreenTime,msToMinutes,getVietnamTimeParts} from '../src/core/parent-controls.ts';
+import {buildParentWeeklyReport,hashParentPin,verifyParentPin} from './parent-data.mjs';
+import {CONTEST_PRESETS,CONTESTANT_BADGE,sanitizeContestItem,evaluateContestSubmission,checkReadinessForExam,generateContestQuestions,buildReviewMistakesPack} from './contest-data.mjs';
+import {TOWN_BUILDING_CATALOG,TOWN_BUILDING_MAP,resolveTownSubject,getMaterialForSubject,calculateEarnedMaterialsFromAwards,calculateTotalSpentMaterials,calculateAvailableMaterials,canAffordBuilding,defaultTownState,evaluateBuildingPlacement} from './town-data.mjs';
+import {ANIMAL_CATALOG,ANIMAL_MAP,getUnlockedAnimals,validateAnimalName} from '../src/core/animal-neighbors.ts';
+import {sanitizeClassFeedEvent,verifyPrivacyCompliance} from '../src/core/class-feed.ts';
 
 const now=()=>new Date().toISOString(),id=()=>randomUUID(),json=JSON.stringify;
 const parse=value=>typeof value==='string'?JSON.parse(value):value;
+const MAX_PIN_FAILURES=5;
+const PIN_LOCKOUT_MS=15*60*1000;
 const currentMarker=(values,student)=>(values??[]).flatMap(value=>{try{const marker=parse(value);return marker?.studentId===student.id&&marker.classId===student.class_id?[marker]:[];}catch{return[];}}).sort((a,b)=>b.position-a.position)[0]??null;
 const stable=value=>JSON.stringify(value,(_key,row)=>row&&typeof row==='object'&&!Array.isArray(row)?Object.fromEntries(Object.entries(row).sort(([a],[b])=>a.localeCompare(b))):row);
 const digest=value=>createHash('sha256').update(stable(value)).digest('hex');
@@ -36,7 +46,7 @@ export class PostgresStore{
   }
   async ready(){const row=await this.one('SELECT max(version) AS version FROM bao_an.schema_version');if(row?.version!==1)fail(500,'Cần chạy migration dữ liệu online phiên bản 1.');return this;}
   async close(){if(this.ownsPool)await this.pool.end();}
-  async query(sql,values=[],client=this.pool){return measureApiSpan('sql',()=>/\bFOR UPDATE\b/i.test(sql)?measureApiSpan('lockingSql',()=>client.query(sql,values)):client.query(sql,values));}
+  async query(sql,values=[],client=this.pool){return measureApiSpan('sql',()=>/\bFOR (UPDATE|SHARE)\b/i.test(sql)?measureApiSpan('lockingSql',()=>client.query(sql,values)):client.query(sql,values));}
   async rows(sql,values=[],client=this.pool){return(await this.query(sql,values,client)).rows;}
   async one(sql,values=[],client=this.pool){return(await this.rows(sql,values,client))[0];}
   async exec(sql,values=[],client=this.pool){return this.query(sql,values,client);}
@@ -59,10 +69,13 @@ export class PostgresStore{
     if(auth.tokenHash!==undefined&&!user.session_active)fail(401,'Phiên đăng nhập đã hết hạn hoặc đã được thu hồi. Hãy đăng nhập lại.');
     if(user.role==='student'&&!user.student_active)fail(401,'Tài khoản học sinh đã được khóa.');
   }
-  async mutate(auth,action){return this.transaction(async client=>{await this.workspace(auth.workspaceId,client,true);await this.activeActor(auth,client);return action(client);});}
+  // Student actions share the workspace lock: students no longer queue behind each other, while an
+  // admin change (exclusive lock) still waits for in-flight student work and blocks new work.
+  // activeActor's FOR UPDATE on the user row keeps one student's own requests serialized.
+  async mutate(auth,action){return this.transaction(async client=>{await this.workspace(auth.workspaceId,client,auth.role==='student'?'share':true);await this.activeActor(auth,client);return action(client);});}
   async audit(auth,action,target,client){await this.exec('INSERT INTO bao_an.audit(id,workspace_id,user_id,action,target_id,at) VALUES($1,$2,$3,$4,$5,$6)',[id(),auth.workspaceId,auth.id,action,target,now()],client);}
   async configured(client=this.pool){return!!await this.one("SELECT id FROM bao_an.users WHERE role='admin' LIMIT 1",[],client);}
-  async workspace(workspaceId,client=this.pool,lock=false){return await this.one(`SELECT * FROM bao_an.workspaces WHERE id=$1${lock?' FOR UPDATE':''}`,[workspaceId],client)??fail(404,'Không tìm thấy đơn vị.');}
+  async workspace(workspaceId,client=this.pool,lock=false){return await this.one(`SELECT * FROM bao_an.workspaces WHERE id=$1${lock==='share'?' FOR SHARE':lock?' FOR UPDATE':''}`,[workspaceId],client)??fail(404,'Không tìm thấy đơn vị.');}
   async findUserByUsername(name){return this.one('SELECT * FROM bao_an.users WHERE username=$1',[name]);}
   async findUserById(userId){return this.one('SELECT * FROM bao_an.users WHERE id=$1',[userId]);}
   async changeOwnPassword(auth,expectedHash,newHash){
@@ -91,24 +104,31 @@ export class PostgresStore{
     text(tokenHash,'Mã phiên',64);text(csrfToken,'Mã biểu mẫu',200);integer(expiresAt,'Hạn phiên',1,Number.MAX_SAFE_INTEGER);
     const expectedWorkspace=workspaceId??(await this.findUserById(userId))?.workspace_id;if(!expectedWorkspace)fail(401,'Tên đăng nhập hoặc mật khẩu chưa đúng.');
     return this.transaction(async client=>{
-      const workspace=await this.workspace(expectedWorkspace,client,true),user=await this.one('SELECT * FROM bao_an.users WHERE id=$1 FOR UPDATE',[userId],client);
+      const workspace=await this.workspace(expectedWorkspace,client,'share'),user=await this.one('SELECT * FROM bao_an.users WHERE id=$1 FOR UPDATE',[userId],client);
       if(!user?.active||user.workspace_id!==expectedWorkspace||typeof passwordHash!=='string'||user.password_hash!==passwordHash)fail(401,'Tên đăng nhập hoặc mật khẩu chưa đúng.');
-      await this.exec('DELETE FROM bao_an.auth_sessions WHERE expires_at<$1',[Date.now()],client);
+      // Concurrent logins only share the workspace lock now; skip rows another login is already removing.
+      await this.exec('DELETE FROM bao_an.auth_sessions WHERE token_hash IN (SELECT token_hash FROM bao_an.auth_sessions WHERE expires_at<$1 LIMIT 500 FOR UPDATE SKIP LOCKED)',[Date.now()],client);
       await this.exec('INSERT INTO bao_an.auth_sessions(token_hash,user_id,csrf_token,expires_at) VALUES($1,$2,$3,$4)',[tokenHash,userId,csrfToken,expiresAt],client);return{...user,session_workspace:{id:workspace.id,name:workspace.name}};
     });
   }
   async revokeSession(tokenHash){
     const session=await this.one('SELECT u.workspace_id FROM bao_an.auth_sessions s JOIN bao_an.users u ON u.id=s.user_id WHERE s.token_hash=$1',[tokenHash]);
     if(!session)return;
-    await this.transaction(async client=>{await this.workspace(session.workspace_id,client,true);await this.exec('DELETE FROM bao_an.auth_sessions WHERE token_hash=$1',[tokenHash],client);});
+    await this.transaction(async client=>{await this.workspace(session.workspace_id,client,'share');await this.exec('DELETE FROM bao_an.auth_sessions WHERE token_hash=$1',[tokenHash],client);});
   }
   async consumeLoginLimit({addressHash,userHash,now:time=Date.now(),purpose='login'}){
     const entries=[{key:addressHash,max:100},{key:userHash,max:12}].sort((a,b)=>a.key.localeCompare(b.key));
     for(const entry of entries)text(entry.key,'Mã giới hạn đăng nhập',100);
     await this.transaction(async client=>{
+      // Skip counters being renewed by another request rather than waiting on them.
+      // Exclude our own keys; their expiry is handled atomically by the UPSERT below.
       // A single ordered UPSERT locks both counters. Throwing rolls back both,
       // including a previously absent address counter when the user is limited.
-      const rows=await this.rows(`INSERT INTO bao_an.login_limits(key,count,reset_at)
+      const rows=await this.rows(`WITH expired AS (
+        DELETE FROM bao_an.login_limits WHERE key IN (
+          SELECT key FROM bao_an.login_limits WHERE reset_at<=$2 AND NOT(key=ANY($1::text[]))
+          ORDER BY reset_at,key LIMIT 100 FOR UPDATE SKIP LOCKED) RETURNING key
+      ) INSERT INTO bao_an.login_limits(key,count,reset_at)
         SELECT key,1,$2::bigint+900000 FROM unnest($1::text[]) AS entry(key) ORDER BY key
         ON CONFLICT(key) DO UPDATE SET count=CASE WHEN bao_an.login_limits.reset_at>$2 THEN bao_an.login_limits.count+1 ELSE 1 END,
           reset_at=CASE WHEN bao_an.login_limits.reset_at>$2 THEN bao_an.login_limits.reset_at ELSE $2::bigint+900000 END
@@ -122,7 +142,15 @@ export class PostgresStore{
     if(auth.role==='student'&&auth.studentId!==studentId)fail(404,'Không tìm thấy học sinh.');
     return await this.one('SELECT s.*,u.username FROM bao_an.students s JOIN bao_an.users u ON u.id=s.user_id AND u.workspace_id=s.workspace_id WHERE s.workspace_id=$1 AND s.id=$2',[auth.workspaceId,studentId],client)??fail(404,'Không tìm thấy học sinh.');
   }
-  publicClass(row){return{id:row.id,name:row.name,grade:row.grade,createdAt:row.created_at};}
+  publicClass(row){return{id:row.id,name:row.name,grade:row.grade,feedEnabled:row.feed_enabled===undefined||row.feed_enabled===null?true:!!row.feed_enabled,createdAt:row.created_at};}
+  async updateClassSettings(auth,classId,input,client=this.pool){
+    role(auth,'admin');
+    shape(input,['feedEnabled']);
+    const cls=await this.class(auth,classId,client);
+    const feedEnabled=input.feedEnabled===undefined?true:!!input.feedEnabled;
+    await this.exec('UPDATE bao_an.classes SET feed_enabled=$3 WHERE workspace_id=$1 AND id=$2',[auth.workspaceId,classId,feedEnabled],client);
+    return this.publicClass({...cls,feed_enabled:feedEnabled});
+  }
   publicMedia(row){return{id:row.id,name:row.name,mime:row.mime,kind:row.kind,size:row.size,sha256:row.sha256};}
   async listMedia(auth){role(auth,'admin');return(await this.rows('SELECT * FROM bao_an.media WHERE workspace_id=$1 ORDER BY created_at,id',[auth.workspaceId])).map(row=>this.publicMedia(row));}
   prepareMedia(auth,{id:mediaId,name,mime,bytes,objectPath}){
@@ -241,7 +269,7 @@ export class PostgresStore{
       const cls=await this.class(auth,classId,client),catalog=(await this.rows('SELECT * FROM bao_an.packs WHERE workspace_id=$1 ORDER BY version',[auth.workspaceId],client)).map(row=>({...row,pack:parse(row.json)})),seen=new Set(),sets=[];
       for(const[ index,set]of input.sets.entries()){
         shape(set,['subjectLabel','subjectId','pack']);const label=set.subjectLabel===undefined||set.subjectLabel===''?'':text(set.subjectLabel,'Tên môn/chủ đề',120);
-        if(!set.pack||typeof set.pack!=='object'||!['quiz','pairs','sentences','learning'].includes(set.pack.kind))fail(400,`Bộ ${index+1}: dạng câu chưa có trò chơi phù hợp.`);
+        if(!set.pack||typeof set.pack!=='object'||!['quiz','pairs','sentences','learning','compare','categorize'].includes(set.pack.kind))fail(400,`Bộ ${index+1}: dạng câu chưa có trò chơi phù hợp.`);
         // Grade belongs to the published source; the receiving class keeps its own grade.
         const source=catalog.find(row=>row.pack_id===set.pack.id&&row.version===set.pack.version)??catalog.find(row=>row.pack_id===set.pack.id);
         let pack;try{pack=parseContentImport(json({schema:'baoan-learning-content',formatVersion:set.pack.kind==='learning'?2:1,packs:[{...set.pack,grade:source?.pack.grade??cls.grade,subject:'thinking'}]}))[0];}catch(error){fail(400,`Bộ ${index+1}: ${error.message}`);}await this.validateMedia(auth,pack,client);
@@ -300,10 +328,35 @@ export class PostgresStore{
     const row=await this.one(`SELECT s.*,u.username,
       coalesce((SELECT jsonb_agg(a.target_id) FROM bao_an.audit a WHERE a.workspace_id=s.workspace_id AND a.user_id=s.user_id AND a.action IN ('student.journey.init','student.journey.advance')),'[]'::jsonb) AS journey_markers,
       (SELECT p.id FROM bao_an.plays p WHERE p.workspace_id=s.workspace_id AND p.student_id=s.id AND p.request_id=$3) AS prior_id,
-      coalesce((SELECT jsonb_agg(jsonb_build_object('weekId',w.id,'version',ws.version)) FROM bao_an.week_sets ws JOIN bao_an.weeks w ON w.workspace_id=ws.workspace_id AND w.id=ws.week_id WHERE ws.workspace_id=s.workspace_id AND w.class_id=s.class_id AND ws.pack_id=$4),'[]'::jsonb) AS assignments
+      coalesce((SELECT jsonb_agg(jsonb_build_object('weekId',w.id,'version',ws.version)) FROM bao_an.week_sets ws JOIN bao_an.weeks w ON w.workspace_id=ws.workspace_id AND w.id=ws.week_id WHERE ws.workspace_id=s.workspace_id AND w.class_id=s.class_id AND ws.pack_id=$4),'[]'::jsonb) AS assignments,
+      (SELECT row_to_json(pc) FROM bao_an.parent_controls pc WHERE pc.workspace_id=s.workspace_id AND pc.student_id=s.id) AS parent_controls_row
       FROM bao_an.students s JOIN bao_an.users u ON u.id=s.user_id AND u.workspace_id=s.workspace_id WHERE s.workspace_id=$1 AND s.id=$2`,[auth.workspaceId,auth.studentId,requestId,packId],client);
     if(!row)fail(404,'Không tìm thấy học sinh.');
-    const{journey_markers,prior_id,assignments,...student}=row;return{student,marker:currentMarker(journey_markers,student),prior:prior_id?{id:prior_id}:null,assignments};
+    const{journey_markers,prior_id,assignments,parent_controls_row,...student}=row;
+    const parentControls=parent_controls_row?{
+      workspaceId:parent_controls_row.workspace_id,
+      studentId:parent_controls_row.student_id,
+      pinHash:parent_controls_row.pin_hash,
+      pinSalt:parent_controls_row.pin_salt,
+      pinFailedCount:parent_controls_row.pin_failed_count,
+      pinLockedUntil:parent_controls_row.pin_locked_until,
+      maxMinutesPerDay:parent_controls_row.max_minutes_per_day,
+      allowedStartHour:parent_controls_row.allowed_start_hour,
+      allowedEndHour:parent_controls_row.allowed_end_hour,
+      updatedAt:parent_controls_row.updated_at
+    }:{
+      workspaceId:auth.workspaceId,
+      studentId:student.id,
+      pinHash:null,
+      pinSalt:null,
+      pinFailedCount:0,
+      pinLockedUntil:null,
+      maxMinutesPerDay:0,
+      allowedStartHour:0,
+      allowedEndHour:24,
+      updatedAt:student.created_at
+    };
+    return{student,marker:currentMarker(journey_markers,student),prior:prior_id?{id:prior_id}:null,assignments,parentControls};
   }
   async progress(auth,student,client=this.pool,awards){return journeyProgress(await this.weeks(auth,student.class_id,client),awards??await this.rewards(auth,student.id,client),await this.journeyMarker(auth,student,client));}
   async studentState(auth,client=this.pool){role(auth,'student');const student=await this.student(auth,auth.studentId,client),cls=await this.class(auth,student.class_id,client),workspace=await this.workspace(auth.workspaceId,client),rewards=await this.rewards(auth,student.id,client),requests=await this.requests(auth,student.id,client),progress=await this.progress(auth,student,client,rewards),balance=rewardBalance(earnedQuestionRewardStars(rewards),{requests});
@@ -311,7 +364,7 @@ export class PostgresStore{
   }
   async summaryProgress(auth,student,client=this.pool,awards,marker){
     const rows=await this.rows(`SELECT w.id AS week_id,w.class_id,w.title AS week_title,w.position AS week_position,w.created_at,p.subject_label,
-      CASE WHEN p.pack_id IS NOT NULL THEN jsonb_build_object('id',p.pack_id,'version',p.version,'title',p.json->>'title','kind',p.json->>'kind','subject',p.json->>'subject','grade',(p.json->>'grade')::int,'itemCount',jsonb_array_length(p.json->'items'),'questionIds',(SELECT jsonb_agg(item->>'id') FROM jsonb_array_elements(p.json->'items') item)) END AS summary
+      CASE WHEN p.pack_id IS NOT NULL THEN jsonb_build_object('id',p.pack_id,'version',p.version,'title',p.json->>'title','kind',p.json->>'kind','subject',p.json->>'subject','grade',(p.json->>'grade')::int,'itemCount',jsonb_array_length(p.json->'items'),'discovery',p.json->'discovery','questionIds',(SELECT jsonb_agg(item->>'id') FROM jsonb_array_elements(p.json->'items') item)) END AS summary
       FROM bao_an.weeks w LEFT JOIN bao_an.week_sets s ON s.workspace_id=w.workspace_id AND s.week_id=w.id LEFT JOIN bao_an.packs p ON p.workspace_id=s.workspace_id AND p.pack_id=s.pack_id AND p.version=s.version WHERE w.workspace_id=$1 AND w.class_id=$2 ORDER BY w.position,s.position`,[auth.workspaceId,student.class_id],client);
     return journeyProgress(summaryWeeks(rows),awards??await this.rewards(auth,student.id,client),marker===undefined?await this.journeyMarker(auth,student,client):marker);
   }
@@ -320,15 +373,66 @@ export class PostgresStore{
       coalesce((SELECT jsonb_agg(a.json ORDER BY a.pack_id) FROM bao_an.awards a WHERE a.workspace_id=s.workspace_id AND a.student_id=s.id),'[]'::jsonb) AS rewards,
       coalesce((SELECT jsonb_agg(r.json ORDER BY r.created_order) FROM bao_an.redemptions r WHERE r.workspace_id=s.workspace_id AND r.student_id=s.id),'[]'::jsonb) AS requests
       ,coalesce((SELECT jsonb_agg(a.target_id) FROM bao_an.audit a WHERE a.workspace_id=s.workspace_id AND a.user_id=s.user_id AND a.action IN ('student.journey.init','student.journey.advance')),'[]'::jsonb) AS journey_markers
+      ,coalesce((SELECT jsonb_agg(DISTINCT a.target_id) FROM bao_an.audit a WHERE a.workspace_id=s.workspace_id AND a.user_id=s.user_id AND a.action='student.discovery.view'),'[]'::jsonb) AS viewed_discovery
+      ,(SELECT json_build_object('studentId',sg.student_id,'giftId',sg.gift_id,'pinnedAt',sg.pinned_at,'giftTitle',gc.title,'targetStars',gc.price_stars,'giftImageMediaId',gc.image_media_id,'gift',row_to_json(gc)) FROM bao_an.student_goals sg JOIN bao_an.gift_catalog gc ON gc.workspace_id=sg.workspace_id AND gc.id=sg.gift_id WHERE sg.workspace_id=s.workspace_id AND sg.student_id=s.id) AS student_goal
+      ,(SELECT row_to_json(st) FROM bao_an.student_streaks st WHERE st.workspace_id=s.workspace_id AND st.student_id=s.id) AS streak_row
+      ,coalesce((SELECT jsonb_agg(json_build_object('badgeId',b.badge_id,'unlockedAt',b.unlocked_at,'json',b.json)) FROM bao_an.badge_awards b WHERE b.workspace_id=s.workspace_id AND b.student_id=s.id),'[]'::jsonb) AS badges_json
+      ,coalesce((SELECT jsonb_agg(row_to_json(m)) FROM bao_an.daily_missions m WHERE m.workspace_id=s.workspace_id AND m.student_id=s.id AND m.date=$3),'[]'::jsonb) AS daily_missions_json
+      ,(SELECT pc.pin_hash IS NOT NULL FROM bao_an.parent_controls pc WHERE pc.workspace_id=s.workspace_id AND pc.student_id=s.id) AS has_parent_pin
+      ,coalesce((SELECT sum((a.json->>'elapsedMs')::int) FROM bao_an.attempts a JOIN bao_an.plays p ON p.workspace_id=a.workspace_id AND p.id=a.play_id WHERE a.workspace_id=s.workspace_id AND p.student_id=s.id AND substring(a.json->>'occurredAt' from 1 for 10)=$3),0)::int AS today_study_ms
       FROM bao_an.students s JOIN bao_an.users u ON u.id=s.user_id AND u.workspace_id=s.workspace_id
       JOIN bao_an.classes c ON c.workspace_id=s.workspace_id AND c.id=s.class_id JOIN bao_an.workspaces w ON w.id=s.workspace_id
-      WHERE s.workspace_id=$1 AND s.id=$2`,[auth.workspaceId,auth.studentId],client);
+      WHERE s.workspace_id=$1 AND s.id=$2`,[auth.workspaceId,auth.studentId,toVietnamDateString()],client);
     if(!row)fail(404,'Không tìm thấy học sinh.');
-    const{class_row:cls,workspace_row:workspace,rewards:rewardRows,requests:requestRows,journey_markers,...student}=row,rewards=rewardRows.map(parse),requests=requestRows.map(parse),progress=summaryPage(await this.summaryProgress(auth,student,client,rewards,currentMarker(journey_markers,student)),cursor),balance=rewardBalance(earnedQuestionRewardStars(rewards),{requests});
+    const{class_row:cls,workspace_row:workspace,rewards:rewardRows,requests:requestRows,journey_markers,viewed_discovery,student_goal,streak_row,badges_json,daily_missions_json,has_parent_pin,today_study_ms,...student}=row,rewards=rewardRows.map(parse),requests=requestRows.map(parse),progress=summaryPage(await this.summaryProgress(auth,student,client,rewards,currentMarker(journey_markers,student)),cursor),balance=rewardBalance(earnedQuestionRewardStars(rewards),{requests});
     const keys=progress.current?[progress.current.pack]:[];
     const values=[auth.workspaceId,...keys.flatMap(p=>[p.id,p.version])],games=new Map(keys.length?(await this.rows(`SELECT * FROM bao_an.packs WHERE workspace_id=$1 AND (${keys.map((_,i)=>`(pack_id=$${2+i*2} AND version=$${3+i*2})`).join(' OR ')})`,values,client)).map(row=>[`${row.pack_id}@${row.version}`,this.packRecord(row).games]):[]);
     const decorate=set=>({...set,games:games.get(`${set.pack.id}@${set.pack.version}`)??[]});progress.weeks=progress.weeks.map(w=>({...w,sets:w.sets.map(decorate)}));if(progress.current)progress.current=decorate(progress.current);
-    return{student:this.studentRecord(student,progress.current,balance),profile:{profileId:student.id,name:student.name,avatar:'fox',grade:cls.grade,colorTheme:'teal',createdAt:student.created_at,updatedAt:student.created_at},className:cls.name,...progress,balance,wallet:{enabled:!!workspace.wallet_enabled,rateVnd:workspace.rate_vnd},requests};
+    const viewedDiscoveryPacks = viewed_discovery ? JSON.parse(JSON.stringify(viewed_discovery)) : [];
+    const goal = student_goal ? (student_goal.gift ? {...student_goal, gift: this.publicGift(student_goal.gift)} : student_goal) : null;
+    const streak = computeStreakState(streak_row);
+    let dailyMissions = (daily_missions_json || []).map(r=>({
+      id: r.mission_id,
+      date: r.date,
+      type: r.mission_type,
+      title: r.mission_type==='new_lesson'?'Bài tập mới':r.mission_type==='review_error'?'Sửa sai ôn luyện':'Câu đố hôm nay',
+      description: r.mission_type==='new_lesson'?'Hoàn thành 1 bài tập trong tuần học hiện tại.':r.mission_type==='review_error'?'Làm đúng 1 câu hỏi con từng trả lời sai hoặc chỉ đạt 1 sao.':'Trả lời đúng câu đố nhanh của ngày hôm nay.',
+      targetCount: r.target_count,
+      progressCount: r.progress_count,
+      completed: !!r.completed,
+      completedAt: r.completed_at
+    }));
+    if(!dailyMissions.length){
+      dailyMissions = buildDailyMissions(toVietnamDateString());
+    }
+    const badges = buildStudentBadgeStatuses(badges_json || [], {
+      streak,
+      retryFixedCount: 0,
+      perfectMemoryCount: 0,
+      perfectWeekCount: 0,
+      distinctGamesPlayed: 0,
+      consecutiveFirstTryCount: 0,
+      completedPacksCount: rewards.length,
+      totalQuestionsAttempted: 0,
+      mathPacks3Star: 0,
+      vietnamesePacks3Star: 0,
+      englishPacks3Star: 0
+    });
+    const dailyRiddle = this.computeDailyRiddle(progress.weeks, student.id, student.class_id, daily_missions_json);
+    const todayStudyMinutes = msToMinutes(today_study_ms || 0);
+    return{student:this.studentRecord(student,progress.current,balance),profile:{profileId:student.id,name:student.name,avatar:'fox',grade:cls.grade,colorTheme:'teal',createdAt:student.created_at,updatedAt:student.created_at},className:cls.name,...progress,balance,wallet:{enabled:!!workspace.wallet_enabled,rateVnd:workspace.rate_vnd},requests,viewedDiscoveryPacks,goal,streak,badges,dailyMissions,dailyRiddle,todayStudyMinutes,hasParentPin:!!has_parent_pin};
+  }
+  async viewDiscovery(auth,packId,client=this.pool){
+    role(auth,'student');
+    if(typeof packId!=='string'||!packId.trim()||packId.length>100)fail(400,'Mã bộ câu hỏi không hợp lệ.');
+    const existing=await this.one("SELECT 1 FROM bao_an.audit WHERE workspace_id=$1 AND user_id=$2 AND action='student.discovery.view' AND target_id=$3 LIMIT 1",[auth.workspaceId,auth.id,packId],client);
+    if(!existing)await this.audit(auth,'student.discovery.view',packId,client);
+    return{ok:true,packId};
+  }
+  async studentMap(auth,query={},client=this.pool){role(auth,'student');
+    const student=await this.student(auth,auth.studentId,client);
+    const progress=await this.summaryProgress(auth,student,client);
+    return projectStudentMap(progress,query);
   }
   async pinJourney(auth,student,client,context={}){
     let marker=Object.hasOwn(context,'marker')?context.marker:await this.journeyMarker(auth,student,client);context.marker=marker;if(marker)return marker;
@@ -361,12 +465,12 @@ export class PostgresStore{
     for(const row of await this.rows('SELECT s.*,u.username FROM bao_an.students s JOIN bao_an.users u ON u.id=s.user_id AND u.workspace_id=s.workspace_id WHERE s.workspace_id=$1 ORDER BY s.created_at,s.id',[auth.workspaceId]))students.push(await this.publicStudent(auth,row));
     for(const cls of classes)weeks.push(...await this.weeks(auth,cls.id));
     const redemptions=(await this.rows('SELECT r.json,s.id AS student_id,s.name,s.class_id FROM bao_an.redemptions r JOIN bao_an.students s ON s.workspace_id=r.workspace_id AND s.id=r.student_id WHERE r.workspace_id=$1 ORDER BY r.created_order DESC',[auth.workspaceId])).map(row=>({...parse(row.json),studentId:row.student_id,studentName:row.name,classId:row.class_id})),workspace=await this.workspace(auth.workspaceId);
-    return{classes,students,weeks,redemptions,wallet:{enabled:!!workspace.wallet_enabled,rateVnd:workspace.rate_vnd},stats:{students:students.length,classes:classes.length,questions:(await this.rows('SELECT json FROM bao_an.packs WHERE workspace_id=$1',[auth.workspaceId])).reduce((sum,row)=>sum+parse(row.json).items.length,0),pendingRequests:redemptions.filter(row=>['pending','approved'].includes(rewardStatus(row))).length}};
+    return{classes,students,weeks,redemptions,wallet:{enabled:!!workspace.wallet_enabled,rateVnd:workspace.rate_vnd},gifts:await this.gifts(auth,null,this.pool),stats:{students:students.length,classes:classes.length,questions:(await this.rows('SELECT json FROM bao_an.packs WHERE workspace_id=$1',[auth.workspaceId])).reduce((sum,row)=>sum+parse(row.json).items.length,0),pendingRequests:redemptions.filter(row=>['pending','approved'].includes(rewardStatus(row))).length}};
   }
-  async play(auth,playId,client=this.pool,{includeEvents=false}={}){const row=await this.one(`SELECT p.json,pack.json AS pack_json${includeEvents?",coalesce((SELECT jsonb_agg(a.json ORDER BY a.sequence) FROM bao_an.attempts a WHERE a.workspace_id=p.workspace_id AND a.play_id=p.id),'[]'::jsonb) AS events":''}
+  async play(auth,playId,client=this.pool,{includeEvents=false}={}){const row=await this.one(`SELECT p.json,pack.json AS pack_json${includeEvents?",coalesce((SELECT jsonb_agg(a.json ORDER BY a.sequence) FROM bao_an.attempts a WHERE a.workspace_id=p.workspace_id AND a.play_id=p.id),'[]'::jsonb) AS events":''},(SELECT row_to_json(st) FROM bao_an.student_streaks st WHERE st.workspace_id=p.workspace_id AND st.student_id=p.student_id) AS streak_row
     FROM (SELECT * FROM bao_an.plays WHERE workspace_id=$1 AND id=$2 AND student_id=$3) p
     LEFT JOIN LATERAL (SELECT json FROM bao_an.packs WHERE workspace_id=p.workspace_id AND pack_id=p.json->>'packId' AND version=(p.json->>'contentVersion')::integer) pack ON true`,[auth.workspaceId,playId,auth.studentId],client);if(!row)fail(404,'Không tìm thấy lượt chơi.');
-    if(!row.pack_json)fail(409,'Bộ câu hỏi của lượt chơi không còn sẵn sàng.');return{session:parse(row.json),pack:parse(row.pack_json),...(includeEvents?{events:row.events.map(parse)}:{})};
+    if(!row.pack_json)fail(409,'Bộ câu hỏi của lượt chơi không còn sẵn sàng.');return{session:parse(row.json),pack:parse(row.pack_json),streakRow:row.streak_row,...(includeEvents?{events:row.events.map(parse)}:{})};
   }
   async abandonActive(auth,studentId,client){
     if(!client)return this.mutate(auth,async owned=>{await this.student(auth,studentId,owned);await this.abandonActive(auth,studentId,owned);await this.audit(auth,'play.abandon-active',studentId,owned);});
@@ -375,6 +479,7 @@ export class PostgresStore{
   async startPlay(auth,input,compact=false,secure=false){role(auth,'student');shape(input,compact?['requestId','moduleId','packId','contentVersion','reviewItemIds']:['requestId','moduleId','packId','contentVersion']);const requestId=text(input.requestId,'Mã lượt chơi',100),moduleId=text(input.moduleId,'Trò chơi',80),packId=text(input.packId,'Mã bộ',80),version=integer(input.contentVersion,'Phiên bản');
     return this.mutate(auth,async client=>{
       const context=await this.studentPlayContext(auth,client,{requestId}),{student,prior}=context,marker=await this.pinJourney(auth,student,client,context);
+      await this.assertStudentScreenTimeAllowed(auth,student.id,client,context.parentControls);
       const choice=await this.assignedPack(auth,packId,version,client,context);if(!choice.games.some(game=>game.id===moduleId))fail(400,'Dạng câu của bộ này chưa phù hợp với trò chơi đã chọn.');
       const presentation=onlinePresentation(moduleId,choice.pack),requiredItemIds=compact?selectReviewItems(input.reviewItemIds,choice.pack,presentation):undefined;
       if(prior){const value=await this.play(auth,prior.id,client);if(secure&&value.session.questionProtocolVersion!==1)fail(409,'Lượt cũ cần mở lại trên ứng dụng mới. Sao đã lưu vẫn được giữ.');if(value.session.packId!==packId||value.session.contentVersion!==version||value.session.moduleId!==moduleId||value.session.journeyWeekId&&value.session.journeyWeekId!==marker?.weekId||compact&&(value.session.rewardPolicyVersion!==2||json(value.session.requiredItemIds)!==json(requiredItemIds)))fail(409,'Mã lượt chơi đã dùng cho nội dung khác.');if(value.session.status==='abandoned')fail(409,'Lượt chơi đã thoát. Hãy mở lượt mới.');const result={...value,presentation:filterPlayPresentation(value.session,value.pack,onlinePresentation(moduleId,value.pack))};return compact||secure?compactPlay(result):result;}
@@ -390,15 +495,16 @@ export class PostgresStore{
   }
   async questionHint(auth,playId,input){if(auth.role!=='student')fail(403,'Hãy dùng tài khoản học sinh.');shape(input,['itemId']);const itemId=text(input.itemId,'Mã câu',80);return this.mutate(auth,async client=>{const{session,pack,events}=await this.play(auth,playId,client,{includeEvents:true});await this.assertCurrentPlay(auth,session,client);if(session.status!=='active'||session.questionProtocolVersion!==1||Date.now()-Date.parse(session.startedAt)>86400000)fail(409,'Lượt chơi cần được mở lại.');const result=protocolHint(session,pack,events,itemId);await this.exec('UPDATE bao_an.plays SET json=$3::jsonb WHERE workspace_id=$1 AND id=$2',[auth.workspaceId,playId,json(session)],client);return result;});}
   async recordAudioDelivery(auth,playId,itemId,mediaId,durationMs){if(auth.role!=='student')fail(403,'Hãy dùng tài khoản học sinh.');text(playId,'Mã lượt',100);text(itemId,'Mã câu',80);return this.mutate(auth,async client=>{const{session,pack,events}=await this.play(auth,playId,client,{includeEvents:true});await this.assertCurrentPlay(auth,session,client);if(session.status!=='active'||session.questionProtocolVersion!==1||Date.now()-Date.parse(session.startedAt)>86400000)fail(409,'Lượt chơi cần được mở lại.');protocolAudioDelivery(session,pack,events,itemId,mediaId,durationMs);await this.exec('UPDATE bao_an.plays SET json=$3::jsonb WHERE workspace_id=$1 AND id=$2',[auth.workspaceId,playId,json(session)],client);});}
-  async openQuestion(auth,playId,input,requireProtocol=false){role(auth,'student');shape(input,['itemId']);const itemId=text(input.itemId,'Mã câu',80);
+  async openQuestion(auth,playId,input,requireProtocol=false){role(auth,'student');shape(input,['itemId','openedAt']);const itemId=text(input.itemId,'Mã câu',80);
+    const openedTime=input.openedAt?Date.parse(input.openedAt):Date.now();
     return this.mutate(auth,async client=>{
       const{session,pack,events}=await this.play(auth,playId,client,{includeEvents:true});await this.assertCurrentPlay(auth,session,client);
       if(session.status!=='active'||Date.now()-Date.parse(session.startedAt)>86400000)fail(409,'Lượt chơi đã kết thúc hoặc quá hạn.');
       if(requireProtocol&&session.questionProtocolVersion!==1)fail(409,'Lượt cũ cần mở lại trên ứng dụng mới. Sao đã lưu vẫn được giữ.');
-      if(session.questionProtocolVersion===1){const receipt=openProtocolQuestion(session,pack,events,itemId);await this.exec('UPDATE bao_an.plays SET json=$3::jsonb WHERE workspace_id=$1 AND id=$2',[auth.workspaceId,playId,json(session)],client);return receipt;}
+      if(session.questionProtocolVersion===1){const receipt=openProtocolQuestion(session,pack,events,itemId,openedTime);await this.exec('UPDATE bao_an.plays SET json=$3::jsonb WHERE workspace_id=$1 AND id=$2',[auth.workspaceId,playId,json(session)],client);return receipt;}
       const presentation=onlinePresentation(session.moduleId,pack),item=presentation?.items.find(item=>item.id===itemId);
       if(!timedQuestion(session,presentation)||!item||!session.requiredItemIds?.includes(itemId))fail(400,'Câu hỏi không dùng bộ đếm thời gian của lượt chơi này.');
-      const clock=session.questionClocks??{},openedAt=Object.hasOwn(clock,itemId)?clock[itemId]:now();if(!Object.hasOwn(clock,itemId)){
+      const clock=session.questionClocks??{},openedAt=Object.hasOwn(clock,itemId)?clock[itemId]:(input.openedAt||now());if(!Object.hasOwn(clock,itemId)){
         Object.defineProperty(clock,itemId,{value:openedAt,enumerable:true,writable:true,configurable:true});session.questionClocks=clock;await this.exec('UPDATE bao_an.plays SET json=$3::jsonb WHERE workspace_id=$1 AND id=$2',[auth.workspaceId,playId,json(session)],client);
       }
       return{openedAt,serverNow:now(),...questionRewardThresholds(item)};
@@ -409,7 +515,7 @@ export class PostgresStore{
   async attempt(auth,playId,input,requireProtocol=false){role(auth,'student');shape(input,['attemptKey','itemId','response','hintsUsed','elapsedMs']);const key=text(input.attemptKey,'Mã lần trả lời',120);if(!/^[a-zA-Z0-9._:-]+$/.test(key))fail(400,'Mã lần trả lời không hợp lệ.');const itemId=text(input.itemId,'Mã câu',80),hintsUsed=integer(input.hintsUsed??0,'Số gợi ý',0,20);
     const hash=digest({key,itemId,response:input.response,hintsUsed});
     return this.mutate(auth,async client=>{
-      const{session,pack,events}=await this.play(auth,playId,client,{includeEvents:true});await this.assertCurrentPlay(auth,session,client);if(requireProtocol&&session.questionProtocolVersion!==1)fail(409,'Lượt cũ cần mở lại trên ứng dụng mới. Sao đã lưu vẫn được giữ.');const prior=await this.one('SELECT payload_hash,json FROM bao_an.attempts WHERE workspace_id=$1 AND play_id=$2 AND attempt_key=$3',[auth.workspaceId,playId,key],client);
+      const{session,pack,events,streakRow}=await this.play(auth,playId,client,{includeEvents:true});await this.assertCurrentPlay(auth,session,client);if(requireProtocol&&session.questionProtocolVersion!==1)fail(409,'Lượt cũ cần mở lại trên ứng dụng mới. Sao đã lưu vẫn được giữ.');const prior=await this.one('SELECT payload_hash,json FROM bao_an.attempts WHERE workspace_id=$1 AND play_id=$2 AND attempt_key=$3',[auth.workspaceId,playId,key],client);
       if(prior){if(prior.payload_hash!==hash)fail(409,'Lần trả lời đã được lưu với đáp án khác.');if(session.status==='abandoned')fail(409,'Lượt chơi đã thoát.');const event=parse(prior.json);let questionRewards;if(session.rewardPolicyVersion===2){questionRewards={gained:0,questions:[]};if(event.correct){const previous=await this.one('SELECT json FROM bao_an.awards WHERE workspace_id=$1 AND student_id=$2 AND pack_id=$3',[auth.workspaceId,auth.studentId,pack.id],client),reward=previous?parse(previous.json):null,touched=onlineScoreResponse(pack,session.moduleId,event.itemId,event.response).touchedItemIds;questionRewards.questions=questionRewardProgress(pack,reward?.questionLedger??initializeQuestionRewardLedger(pack.id,reward?.starTier??0)).questions.filter(q=>touched.includes(q.itemId));}}return{event,duplicate:true,...(session.questionProtocolVersion===1&&event.correct?{feedback:answerFeedback(pack,session,event)}:{}),...(questionRewards?{questionRewards}:{})};}
       if(session.status!=='active')fail(409,'Lượt chơi đã kết thúc hoặc được thay bằng lượt mới ở thiết bị khác.');if(Date.now()-Date.parse(session.startedAt)>86400000)fail(409,'Lượt chơi đã quá hạn. Hãy mở lượt mới.');
       if(events.length>=5000)fail(400,'Lượt chơi đã đạt giới hạn số lần thử.');const item=pack.items.find(row=>row.id===itemId);if(!item)fail(400,'Câu hỏi không thuộc lượt chơi.');let outcome;try{outcome=onlineScoreResponse(pack,session.moduleId,itemId,input.response);}catch(error){fail(400,error.message);}
@@ -418,7 +524,30 @@ export class PostgresStore{
       else if(session.rewardPolicyVersion===2)elapsedMs=0;
       if(!Number.isFinite(elapsedMs)||elapsedMs<0||elapsedMs>14400000)fail(400,'Thời gian trả lời không hợp lệ.');
       const event={eventId:`${session.sessionId}:${key}`,sessionId:session.sessionId,profileId:session.profileId,packId:pack.id,contentVersion:pack.version,moduleId:session.moduleId,moduleVersion:session.moduleVersion,itemId,objectiveId:item.objectiveId,correct:outcome.correct,hintsUsed:session.questionProtocolVersion===1?(Object.hasOwn(session.questionHints??{},itemId)?session.questionHints[itemId].used:0):hintsUsed,elapsedMs,occurredAt,response:input.response,gameSequence:events.length+1};
-      const errors=onlineEvidenceErrors(session,[...events,event],pack);if(errors.length)fail(400,errors[0]);await this.exec('INSERT INTO bao_an.attempts(workspace_id,play_id,attempt_key,payload_hash,json,sequence) VALUES($1,$2,$3,$4,$5::jsonb,$6)',[auth.workspaceId,playId,key,hash,json(event),event.gameSequence],client);
+      const errors=onlineEvidenceErrors(session,[...events,event],pack);if(errors.length)fail(400,errors[0]);
+      const {newStreakRecord, streakIncreased} = registerDailyCorrectAnswer(streakRow, outcome.correct, occurredAt);
+      await this.exec(`
+        WITH ins_att AS (
+          INSERT INTO bao_an.attempts(workspace_id,play_id,attempt_key,payload_hash,json,sequence)
+          VALUES($1,$2,$3,$4,$5::jsonb,$6)
+        )
+        INSERT INTO bao_an.student_streaks(workspace_id, student_id, current_streak, longest_streak, last_active_date, freeze_used_week, today_correct_count, today_date, updated_at)
+        VALUES($7,$8,$9,$10,$11,$12,$13,$14,$15)
+        ON CONFLICT(workspace_id, student_id) DO UPDATE SET
+          current_streak=EXCLUDED.current_streak,
+          longest_streak=EXCLUDED.longest_streak,
+          last_active_date=EXCLUDED.last_active_date,
+          freeze_used_week=EXCLUDED.freeze_used_week,
+          today_correct_count=EXCLUDED.today_correct_count,
+          today_date=EXCLUDED.today_date,
+          updated_at=EXCLUDED.updated_at
+      `, [
+        auth.workspaceId, playId, key, hash, json(event), event.gameSequence,
+        auth.workspaceId, auth.studentId, newStreakRecord.current_streak, newStreakRecord.longest_streak, newStreakRecord.last_active_date, newStreakRecord.freeze_used_week, newStreakRecord.today_correct_count, newStreakRecord.today_date, occurredAt
+      ], client);
+      if(streakIncreased){
+        await this.audit(auth, 'student.streak.increase', json({studentId: auth.studentId, streak: newStreakRecord.current_streak}), client);
+      }
       let questionRewards;if(session.rewardPolicyVersion===2){questionRewards={gained:0,questions:[]};if(outcome.correct){const previous=await this.one('SELECT json FROM bao_an.awards WHERE workspace_id=$1 AND student_id=$2 AND pack_id=$3',[auth.workspaceId,auth.studentId,pack.id],client),reward=previous?parse(previous.json):null;
         const result=applyQuestionRewardCandidates(reward?.questionLedger??initializeQuestionRewardLedger(pack.id,reward?.starTier??0),questionRewardCandidates(session,[...events,event],pack)),progress=questionRewardProgress(pack,result.ledger),tier=Math.max(1,progress.bestTier);
         if(!reward||json(reward.questionLedger)!==json(result.ledger)){const award={...(reward??{profileId:auth.studentId,packId:pack.id,sessionId:session.sessionId,completedAt:event.occurredAt,totalItems:pack.items.length,firstTryCorrect:0}),starTier:tier,questionLedger:result.ledger};await this.exec('INSERT INTO bao_an.awards(workspace_id,student_id,pack_id,tier,json) VALUES($1,$2,$3,$4,$5::jsonb) ON CONFLICT(workspace_id,student_id,pack_id) DO UPDATE SET tier=excluded.tier,json=excluded.json',[auth.workspaceId,auth.studentId,pack.id,tier,json(award)],client);}
@@ -433,10 +562,14 @@ export class PostgresStore{
     if(!abandon){const errors=session.rewardPolicyVersion===2?v2QuestionCompletionErrors(completed,events,pack):onlineEvidenceErrors(completed,events,pack,true);if(errors.length)fail(400,errors[0]);const previous=await this.one('SELECT json FROM bao_an.awards WHERE workspace_id=$1 AND student_id=$2 AND pack_id=$3',[auth.workspaceId,auth.studentId,pack.id],client),prior=previous?parse(previous.json):null;
       if(session.rewardPolicyVersion===2){tier=questionRewardProgress(pack,prior?.questionLedger??initializeQuestionRewardLedger(pack.id,prior?.starTier??0)).bestTier;}
       else{const award=onlineAward(completed,events,pack);if(!award)fail(400,'Chưa đủ dữ liệu để xác nhận sao.');const legacyStars=Math.max(award.starTier,prior?.questionLedger?.legacyStars??prior?.starTier??0),result=applyQuestionRewardCandidates(prior?.questionLedger??initializeQuestionRewardLedger(pack.id,prior?.starTier??0),[],legacyStars);gained=result.gained;tier=legacyStars;
-        const value={...award,starTier:Math.max(1,questionRewardProgress(pack,result.ledger).bestTier),questionLedger:result.ledger};await this.exec('INSERT INTO bao_an.awards(workspace_id,student_id,pack_id,tier,json) VALUES($1,$2,$3,$4,$5::jsonb) ON CONFLICT(workspace_id,student_id,pack_id) DO UPDATE SET tier=excluded.tier,json=excluded.json',[auth.workspaceId,auth.studentId,pack.id,value.starTier,json(value)],client);
+        const value={...award,starTier:Math.max(1,questionRewardProgress(pack,result.ledger).bestTier),questionLedger:result.ledger};await this.exec('INSERT INTO bao_an.awards(workspace_id,student_id,pack_id,tier,json) VALUES($1,$2,$3,$4,$5::jsonb) ON CONFLICT(workspace_id,student_id,pack_id) DO UPDATE SET tier=excluded.tier,json=excluded.json',[auth.workspaceId,auth.studentId,pack.id,value.starTier,json(value)],client);await this.syncAwardMaterial(auth,auth.studentId,pack.id,value.starTier,client);
       }
     }
-    await this.exec('UPDATE bao_an.plays SET json=$3::jsonb WHERE workspace_id=$1 AND id=$2',[auth.workspaceId,playId,json(completed)],client);await this.audit(auth,abandon?'play.abandon':'play.complete',playId,client);return abandon?{}:{state:compact?await this.studentSummary(auth,'current',client):await this.studentState(auth,client),gained,tier};
+    await this.exec('UPDATE bao_an.plays SET json=$3::jsonb WHERE workspace_id=$1 AND id=$2',[auth.workspaceId,playId,json(completed)],client);await this.audit(auth,abandon?'play.abandon':'play.complete',playId,client);
+    if(!abandon){
+      await this.onPlayCompleted(auth, session, pack, events, completed.endedAt, client);
+    }
+    return abandon?{}:{state:compact?await this.studentSummary(auth,'current',client):await this.studentState(auth,client),gained,tier};
   });}
   async configureWallet(auth,input){role(auth,'admin');shape(input,['enabled','rateVnd']);if(typeof input.enabled!=='boolean')fail(400,'Trạng thái đổi sao không hợp lệ.');const rate=integer(input.rateVnd,'Giá trị mỗi sao',1,1000000);
     return this.mutate(auth,async client=>{await this.exec('UPDATE bao_an.workspaces SET wallet_enabled=$2,rate_vnd=$3 WHERE id=$1',[auth.workspaceId,input.enabled,rate],client);await this.audit(auth,'wallet.configure',auth.workspaceId,client);return{enabled:input.enabled,rateVnd:rate};});
@@ -447,9 +580,1339 @@ export class PostgresStore{
       await this.exec('INSERT INTO bao_an.redemptions(workspace_id,id,student_id,status,json) VALUES($1,$2,$3,$4,$5::jsonb) ON CONFLICT(workspace_id,id) DO NOTHING',[auth.workspaceId,request.requestId,auth.studentId,rewardStatus(request),json(request)],client);await this.audit(auth,'redemption.request',request.requestId,client);return request;
     });
   }
-  async transitionReward(auth,requestId,input,cancel=false){role(auth,cancel?'student':'admin');shape(input,cancel?[]:['status','note']);return this.mutate(auth,async client=>{
-    const row=await this.one('SELECT * FROM bao_an.redemptions WHERE workspace_id=$1 AND id=$2',[auth.workspaceId,requestId],client);if(!row||cancel&&row.student_id!==auth.studentId)fail(404,'Không tìm thấy yêu cầu đổi sao.');const status=cancel?'cancelled':input.status;
-    if(!['approved','rejected','fulfilled','cancelled'].includes(status)||!cancel&&status==='cancelled')fail(400,'Trạng thái đổi thưởng không hợp lệ.');let request;try{request=changeRewardRequest(parse(row.json),status,now(),input.note);}catch(error){fail(409,error.message);}
+  publicGift(row){
+    return{id:row.id,workspaceId:row.workspace_id,classId:row.class_id,title:row.title,imageMediaId:row.image_media_id,priceStars:row.price_stars,kind:row.kind,weeklyLimit:row.weekly_limit,stock:row.stock,unlockAfterWeek:row.unlock_after_week,active:!!row.active,sortOrder:row.sort_order,createdAt:row.created_at};
+  }
+  async gifts(auth,classId=null,client=this.pool){
+    if(auth.role==='student'){
+      const student=await this.student(auth,auth.studentId,client);
+      return(await this.rows('SELECT * FROM bao_an.gift_catalog WHERE workspace_id=$1 AND active=true AND (class_id IS NULL OR class_id=$2) ORDER BY sort_order ASC, created_at DESC',[auth.workspaceId,student.class_id],client)).map(r=>this.publicGift(r));
+    }
+    const query=classId?'SELECT * FROM bao_an.gift_catalog WHERE workspace_id=$1 AND (class_id IS NULL OR class_id=$2) ORDER BY sort_order ASC, created_at DESC':'SELECT * FROM bao_an.gift_catalog WHERE workspace_id=$1 ORDER BY sort_order ASC, created_at DESC';
+    const params=classId?[auth.workspaceId,classId]:[auth.workspaceId];
+    return(await this.rows(query,params,client)).map(r=>this.publicGift(r));
+  }
+  async createGift(auth,input){
+    role(auth,'admin');
+    shape(input,['title','priceStars','kind','classId','imageMediaId','weeklyLimit','stock','unlockAfterWeek','active','sortOrder']);
+    const title=text(input.title,'Tên phần thưởng',120),priceStars=integer(input.priceStars,'Giá sao',1,100000),kind=['item','experience','privilege','saving'].includes(input.kind)?input.kind:'item';
+    const classId=input.classId?text(input.classId,'Lớp',100):null;
+    const imageMediaId=input.imageMediaId?text(input.imageMediaId,'Ảnh phần thưởng',100):null;
+    const weeklyLimit=(input.weeklyLimit!==undefined&&input.weeklyLimit!==null)?integer(input.weeklyLimit,'Giới hạn tuần',0,100):0;
+    const stock=(input.stock!==undefined&&input.stock!==null)?integer(input.stock,'Tồn kho',-1,1000000):-1;
+    const unlockAfterWeek=(input.unlockAfterWeek!==undefined&&input.unlockAfterWeek!==null)?integer(input.unlockAfterWeek,'Mở sau tuần',0,100):0;
+    const active=input.active!==undefined?Boolean(input.active):true;
+    const sortOrder=(input.sortOrder!==undefined&&input.sortOrder!==null)?integer(input.sortOrder,'Thứ tự',-1000,1000):0;
+    const giftId=id(),createdAt=now();
+    return this.mutate(auth,async client=>{
+      if(classId)await this.class(auth,classId,client);
+      await this.exec('INSERT INTO bao_an.gift_catalog(workspace_id,id,class_id,title,image_media_id,price_stars,kind,weekly_limit,stock,unlock_after_week,active,sort_order,created_at) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)',[auth.workspaceId,giftId,classId,title,imageMediaId,priceStars,kind,weeklyLimit,stock,unlockAfterWeek,active,sortOrder,createdAt],client);
+      await this.audit(auth,'gift.create',giftId,client);
+      return this.publicGift({workspace_id:auth.workspaceId,id:giftId,class_id:classId,title,image_media_id:imageMediaId,price_stars:priceStars,kind,weekly_limit:weeklyLimit,stock,unlock_after_week:unlockAfterWeek,active,sort_order:sortOrder,created_at:createdAt});
+    });
+  }
+  async updateGift(auth,giftId,input){
+    role(auth,'admin');
+    text(giftId,'Mã phần thưởng',100);
+    return this.mutate(auth,async client=>{
+      const existing=await this.one('SELECT * FROM bao_an.gift_catalog WHERE workspace_id=$1 AND id=$2',[auth.workspaceId,giftId],client);
+      if(!existing)fail(404,'Không tìm thấy phần thưởng.');
+      const title=input.title!==undefined?text(input.title,'Tên phần thưởng',120):existing.title;
+      const priceStars=input.priceStars!==undefined?integer(input.priceStars,'Giá sao',1,100000):existing.price_stars;
+      const kind=input.kind!==undefined?(['item','experience','privilege','saving'].includes(input.kind)?input.kind:existing.kind):existing.kind;
+      const classId=input.classId!==undefined?(input.classId?text(input.classId,'Lớp',100):null):existing.class_id;
+      if(classId)await this.class(auth,classId,client);
+      const imageMediaId=input.imageMediaId!==undefined?(input.imageMediaId?text(input.imageMediaId,'Ảnh phần thưởng',100):null):existing.image_media_id;
+      const weeklyLimit=(input.weeklyLimit!==undefined&&input.weeklyLimit!==null)?integer(input.weeklyLimit,'Giới hạn tuần',0,100):(input.weeklyLimit===null?0:existing.weekly_limit);
+      const stock=(input.stock!==undefined&&input.stock!==null)?integer(input.stock,'Tồn kho',-1,1000000):(input.stock===null?-1:existing.stock);
+      const unlockAfterWeek=(input.unlockAfterWeek!==undefined&&input.unlockAfterWeek!==null)?integer(input.unlockAfterWeek,'Mở sau tuần',0,100):(input.unlockAfterWeek===null?0:existing.unlock_after_week);
+      const active=input.active!==undefined?Boolean(input.active):existing.active;
+      const sortOrder=(input.sortOrder!==undefined&&input.sortOrder!==null)?integer(input.sortOrder,'Thứ tự',-1000,1000):(input.sortOrder===null?0:existing.sort_order);
+      await this.exec('UPDATE bao_an.gift_catalog SET class_id=$3,title=$4,image_media_id=$5,price_stars=$6,kind=$7,weekly_limit=$8,stock=$9,unlock_after_week=$10,active=$11,sort_order=$12 WHERE workspace_id=$1 AND id=$2',[auth.workspaceId,giftId,classId,title,imageMediaId,priceStars,kind,weeklyLimit,stock,unlockAfterWeek,active,sortOrder],client);
+      await this.audit(auth,'gift.update',giftId,client);
+      return this.publicGift({workspace_id:auth.workspaceId,id:giftId,class_id:classId,title,image_media_id:imageMediaId,price_stars:priceStars,kind,weekly_limit:weeklyLimit,stock,unlock_after_week:unlockAfterWeek,active,sort_order:sortOrder,created_at:existing.created_at});
+    });
+  }
+  async studentGoal(auth,studentId=auth.studentId,client=this.pool){
+    const row=await this.one('SELECT * FROM bao_an.student_goals WHERE workspace_id=$1 AND student_id=$2',[auth.workspaceId,studentId],client);
+    if(!row)return null;
+    const giftRow=await this.one('SELECT * FROM bao_an.gift_catalog WHERE workspace_id=$1 AND id=$2',[auth.workspaceId,row.gift_id],client);
+    return{studentId:row.student_id,giftId:row.gift_id,pinnedAt:row.pinned_at,gift:giftRow?this.publicGift(giftRow):undefined};
+  }
+  async setStudentGoal(auth,giftId){
+    role(auth,'student');
+    text(giftId,'Mã phần thưởng',100);
+    return this.mutate(auth,async client=>{
+      const student=await this.student(auth,auth.studentId,client);
+      const gift=await this.one('SELECT * FROM bao_an.gift_catalog WHERE workspace_id=$1 AND id=$2 AND active=true AND (class_id IS NULL OR class_id=$3)',[auth.workspaceId,giftId,student.class_id],client);
+      if(!gift)fail(404,'Không tìm thấy phần thưởng khả dụng.');
+      const pinnedAt=now();
+      await this.exec('INSERT INTO bao_an.student_goals(workspace_id,student_id,gift_id,pinned_at) VALUES($1,$2,$3,$4) ON CONFLICT(workspace_id,student_id) DO UPDATE SET gift_id=excluded.gift_id,pinned_at=excluded.pinned_at',[auth.workspaceId,student.id,giftId,pinnedAt],client);
+      await this.audit(auth,'student.goal.pin',giftId,client);
+      return{studentId:student.id,giftId,pinnedAt,gift:this.publicGift(gift)};
+    });
+  }
+  async redeemGift(auth,input){
+    role(auth,'student');
+    shape(input,['requestId','giftId']);
+    const requestId=text(input.requestId,'Mã yêu cầu',100),giftId=text(input.giftId,'Mã quà tặng',100);
+    return this.mutate(auth,async client=>{
+      const student=await this.student(auth,auth.studentId,client);
+      const prior=await this.one('SELECT student_id FROM bao_an.redemptions WHERE workspace_id=$1 AND id=$2',[auth.workspaceId,requestId],client);
+      if(prior){
+        if(prior.student_id!==auth.studentId)fail(409,'Mã yêu cầu không thể sử dụng.');
+        return parse((await this.one('SELECT json FROM bao_an.redemptions WHERE workspace_id=$1 AND id=$2',[auth.workspaceId,requestId],client)).json);
+      }
+      const gift=await this.one('SELECT * FROM bao_an.gift_catalog WHERE workspace_id=$1 AND id=$2 AND active=true AND (class_id IS NULL OR class_id=$3) FOR UPDATE',[auth.workspaceId,giftId,student.class_id],client);
+      if(!gift)fail(404,'Món quà không tồn tại hoặc đã ngừng áp dụng.');
+      if(gift.stock===0)fail(409,'Món quà đã hết hàng trong kho.');
+      if(gift.unlock_after_week>0){
+        const marker=await this.journeyMarker(auth,student,client);
+        const currentPos=marker?marker.position:1;
+        if(currentPos<gift.unlock_after_week)fail(403,`Món quà này mở khóa sau khi hoàn thành tuần ${gift.unlock_after_week}.`);
+      }
+      if(gift.weekly_limit>0){
+        const studentRequests=await this.requests(auth,auth.studentId,client);
+        const oneWeekAgo=new Date(Date.now()-7*86400000).toISOString();
+        const countInWeek=studentRequests.filter(r=>r.giftId===giftId&&r.requestedAt>=oneWeekAgo&&['pending','approved','fulfilled'].includes(rewardStatus(r))).length;
+        if(countInWeek>=gift.weekly_limit)fail(400,`Con đã đạt giới hạn đổi món quà này (${gift.weekly_limit} lần/tuần).`);
+      }
+      const balance=await this.balance(auth,auth.studentId,client);
+      if(balance.available<gift.price_stars)fail(400,`Con cần ${gift.price_stars} sao nhưng chỉ có ${balance.available} sao khả dụng.`);
+      if(gift.stock>0){
+        await this.exec('UPDATE bao_an.gift_catalog SET stock=stock-1 WHERE workspace_id=$1 AND id=$2',[auth.workspaceId,giftId],client);
+      }
+      const workspace=await this.workspace(auth.workspaceId,client),currentTime=now();
+      const request={
+        requestId,
+        title:gift.title,
+        giftId:gift.id,
+        kind:gift.kind,
+        stars:gift.price_stars,
+        goalVnd:gift.price_stars*workspace.rate_vnd,
+        rateVnd:workspace.rate_vnd,
+        amountVnd:gift.price_stars*workspace.rate_vnd,
+        requestedAt:currentTime,
+        history:[{status:'pending',at:currentTime}]
+      };
+      await this.exec('INSERT INTO bao_an.redemptions(workspace_id,id,student_id,status,json) VALUES($1,$2,$3,$4,$5::jsonb) ON CONFLICT(workspace_id,id) DO NOTHING',[auth.workspaceId,requestId,auth.studentId,'pending',json(request)],client);
+      await this.audit(auth,'redemption.request',requestId,client);
+      return request;
+    });
+  }
+  async confirmReceived(auth,requestId){
+    role(auth,'student');
+    text(requestId,'Mã yêu cầu',100);
+    return this.mutate(auth,async client=>{
+      const row=await this.one('SELECT * FROM bao_an.redemptions WHERE workspace_id=$1 AND id=$2 AND student_id=$3',[auth.workspaceId,requestId,auth.studentId],client);
+      if(!row)fail(404,'Không tìm thấy yêu cầu đổi thưởng.');
+      const request=parse(row.json);
+      if(request.receivedAt)return request;
+      const status=rewardStatus(request);
+      if(status!=='fulfilled'&&status!=='approved')fail(400,'Chỉ có thể xác nhận khi quà đã được trao hoặc duyệt.');
+      request.receivedAt=now();
+      await this.exec('UPDATE bao_an.redemptions SET json=$3::jsonb WHERE workspace_id=$1 AND id=$2',[auth.workspaceId,requestId,json(request)],client);
+      await this.audit(auth,'redemption.received',requestId,client);
+      return request;
+    });
+  }
+  async transitionReward(auth,requestId,input,cancel=false){shape(input,cancel?[]:['status','note']);return this.mutate(auth,async client=>{
+    const row=await this.one('SELECT * FROM bao_an.redemptions WHERE workspace_id=$1 AND id=$2',[auth.workspaceId,requestId],client);if(!row||cancel&&row.student_id!==auth.studentId)fail(404,'Không tìm thấy yêu cầu đổi sao.');
+    if(auth.role==='parent'){
+      const linked=await this.one('SELECT 1 FROM bao_an.parent_students WHERE workspace_id=$1 AND parent_user_id=$2 AND student_id=$3',[auth.workspaceId,auth.id,row.student_id],client);
+      if(!linked)fail(403,'Phụ huynh chỉ có thể duyệt quà cho con của mình.');
+    } else if (auth.role !== 'admin' && !cancel) {
+      fail(403,'Chỉ giáo viên hoặc phụ huynh mới có quyền duyệt quà.');
+    }
+    const status=cancel?'cancelled':input.status;
+    if(!['approved','rejected','fulfilled','cancelled'].includes(status)||!cancel&&status==='cancelled')fail(400,'Trạng thái đổi thưởng không hợp lệ.');
+    const previous=parse(row.json);
+    let request;try{request=changeRewardRequest(previous,status,now(),input.note);}catch(error){fail(409,error.message);}
+    if(['cancelled','rejected'].includes(status)&&previous.giftId){
+      const gift=await this.one('SELECT stock FROM bao_an.gift_catalog WHERE workspace_id=$1 AND id=$2',[auth.workspaceId,previous.giftId],client);
+      if(gift&&gift.stock>=0){
+        await this.exec('UPDATE bao_an.gift_catalog SET stock=stock+1 WHERE workspace_id=$1 AND id=$2',[auth.workspaceId,previous.giftId],client);
+      }
+    }
     await this.exec('UPDATE bao_an.redemptions SET status=$3,json=$4::jsonb WHERE workspace_id=$1 AND id=$2',[auth.workspaceId,requestId,status,json(request)],client);await this.audit(auth,`redemption.${status}`,requestId,client);return request;
   });}
+  computeDailyRiddle(weeks, studentId, classId, missionRows = [], nowIso = now()){
+    if(!weeks || !weeks.length) return null;
+    const today = toVietnamDateString(nowIso);
+    const allItems = [];
+    for(const w of weeks){
+      for(const s of (w.sets || [])){
+        const pack = s.pack;
+        if(pack && Array.isArray(pack.items)){
+          for(const item of pack.items){
+            if(item.kind === 'choice' && Array.isArray(item.options) && item.options.length >= 2){
+              allItems.push({packId: pack.id, packTitle: pack.title, item});
+            } else if(item.left && item.right){
+              allItems.push({
+                packId: pack.id,
+                packTitle: pack.title,
+                item: {
+                  id: item.id,
+                  prompt: `Cặp đôi phù hợp với "${item.left}" là gì?`,
+                  options: [item.right, 'Không xác định', 'Khác'],
+                  correctIndex: 0
+                }
+              });
+            }
+          }
+        }
+      }
+    }
+    if(!allItems.length) return null;
+    const seed = `${today}:${classId}`;
+    let hashVal = 0;
+    for(let i=0; i<seed.length; i++){
+      hashVal = ((hashVal << 5) - hashVal) + seed.charCodeAt(i);
+      hashVal |= 0;
+    }
+    const chosen = allItems[Math.abs(hashVal) % allItems.length];
+    const isSolved = (missionRows || []).some(m=>m.mission_type==='daily_riddle' && !!m.completed);
+    return {
+      packId: chosen.packId,
+      packTitle: chosen.packTitle,
+      itemId: chosen.item.id,
+      prompt: chosen.item.prompt || chosen.item.title || 'Câu hỏi đố vui',
+      options: chosen.item.options || [],
+      correctIndex: chosen.item.correctIndex ?? 0,
+      explanation: chosen.item.explanation || 'Rất chính xác!',
+      alreadySolved: isSolved
+    };
+  }
+  async studentStreak(auth, studentId = auth.studentId, client = this.pool, nowIso = now()){
+    const row = await this.one('SELECT * FROM bao_an.student_streaks WHERE workspace_id=$1 AND student_id=$2', [auth.workspaceId, studentId], client);
+    return computeStreakState(row, nowIso);
+  }
+  async recordDailyActivity(auth, studentId, wasCorrect, nowIso = now(), client = this.pool, existingRow = null){
+    const row = existingRow || await this.one('SELECT * FROM bao_an.student_streaks WHERE workspace_id=$1 AND student_id=$2', [auth.workspaceId, studentId], client);
+    const {newStreakRecord, streakIncreased} = registerDailyCorrectAnswer(row, wasCorrect, nowIso);
+    await this.exec(`
+      INSERT INTO bao_an.student_streaks(workspace_id, student_id, current_streak, longest_streak, last_active_date, freeze_used_week, today_correct_count, today_date, updated_at)
+      VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9)
+      ON CONFLICT(workspace_id, student_id) DO UPDATE SET
+        current_streak=EXCLUDED.current_streak,
+        longest_streak=EXCLUDED.longest_streak,
+        last_active_date=EXCLUDED.last_active_date,
+        freeze_used_week=EXCLUDED.freeze_used_week,
+        today_correct_count=EXCLUDED.today_correct_count,
+        today_date=EXCLUDED.today_date,
+        updated_at=EXCLUDED.updated_at
+    `, [auth.workspaceId, studentId, newStreakRecord.current_streak, newStreakRecord.longest_streak, newStreakRecord.last_active_date, newStreakRecord.freeze_used_week, newStreakRecord.today_correct_count, newStreakRecord.today_date, nowIso], client);
+    if(streakIncreased){
+      await this.audit(auth, 'student.streak.increase', json({studentId, streak: newStreakRecord.current_streak}), client);
+    }
+    return newStreakRecord;
+  }
+  async studentDailyMissions(auth, studentId = auth.studentId, nowIso = now(), client = this.pool){
+    const today = toVietnamDateString(nowIso);
+    let rows = await this.rows('SELECT * FROM bao_an.daily_missions WHERE workspace_id=$1 AND student_id=$2 AND date=$3', [auth.workspaceId, studentId, today], client);
+    if(!rows.length){
+      const defaults = buildDailyMissions(today);
+      for(const m of defaults){
+        await this.exec('INSERT INTO bao_an.daily_missions(workspace_id, student_id, date, mission_id, mission_type, target_count, progress_count, completed, completed_at, json) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10::jsonb) ON CONFLICT(workspace_id, student_id, date, mission_id) DO NOTHING', [
+          auth.workspaceId, studentId, today, m.id, m.type, m.targetCount, 0, false, null, '{}'
+        ], client);
+      }
+      rows = await this.rows('SELECT * FROM bao_an.daily_missions WHERE workspace_id=$1 AND student_id=$2 AND date=$3', [auth.workspaceId, studentId, today], client);
+    }
+    return rows.map(r=>({
+      id: r.mission_id,
+      date: r.date,
+      type: r.mission_type,
+      title: r.mission_type==='new_lesson'?'Bài tập mới':r.mission_type==='review_error'?'Sửa sai ôn luyện':'Câu đố hôm nay',
+      description: r.mission_type==='new_lesson'?'Hoàn thành 1 bài tập trong tuần học hiện tại.':r.mission_type==='review_error'?'Làm đúng 1 câu hỏi con từng trả lời sai hoặc chỉ đạt 1 sao.':'Trả lời đúng câu đố nhanh của ngày hôm nay.',
+      targetCount: r.target_count,
+      progressCount: r.progress_count,
+      completed: !!r.completed,
+      completedAt: r.completed_at
+    }));
+  }
+  async updateDailyMissionProgress(auth, studentId, missionType, delta = 1, nowIso = now(), client = this.pool){
+    const today = toVietnamDateString(nowIso);
+    await this.studentDailyMissions(auth, studentId, nowIso, client);
+    const row = await this.one('SELECT * FROM bao_an.daily_missions WHERE workspace_id=$1 AND student_id=$2 AND date=$3 AND mission_type=$4', [auth.workspaceId, studentId, today, missionType], client);
+    if(row && !row.completed){
+      const progress = row.progress_count + delta;
+      const completed = progress >= row.target_count;
+      const completedAt = completed ? nowIso : null;
+      await this.exec('UPDATE bao_an.daily_missions SET progress_count=$1, completed=$2, completed_at=$3 WHERE workspace_id=$4 AND student_id=$5 AND date=$6 AND mission_type=$7', [
+        progress, completed, completedAt, auth.workspaceId, studentId, today, missionType
+      ], client);
+      if(completed){
+        await this.audit(auth, 'student.mission.complete', json({studentId, missionType, date: today}), client);
+      }
+    }
+  }
+  async studentDailyRiddle(auth, studentId = auth.studentId, classId = null, nowIso = now(), client = this.pool){
+    const targetStudent = await this.student(auth, studentId, client);
+    const targetClassId = classId || targetStudent.class_id;
+    const today = toVietnamDateString(nowIso);
+    const packRows = await this.rows(`
+      SELECT p.json FROM bao_an.week_sets s
+      JOIN bao_an.weeks w ON w.workspace_id=s.workspace_id AND w.id=s.week_id
+      JOIN bao_an.packs p ON p.workspace_id=s.workspace_id AND p.pack_id=s.pack_id AND p.version=s.version
+      WHERE s.workspace_id=$1 AND w.class_id=$2
+      ORDER BY w.position, s.position
+    `, [auth.workspaceId, targetClassId], client);
+    const missionRows = await this.rows('SELECT * FROM bao_an.daily_missions WHERE workspace_id=$1 AND student_id=$2 AND date=$3 AND mission_type=$4', [auth.workspaceId, studentId, today, 'daily_riddle'], client);
+    const fakeWeeks = [{sets: packRows.map(r=>{try{return {pack: parse(r.json)};}catch{return null;}}).filter(Boolean)}];
+    return this.computeDailyRiddle(fakeWeeks, studentId, targetClassId, missionRows, nowIso);
+  }
+  async answerDailyRiddle(auth, input, nowIso = now()){
+    role(auth, 'student');
+    shape(input, ['chosenIndex']);
+    const chosenIndex = integer(input.chosenIndex, 'Đáp án lựa chọn', 0, 10);
+    return this.mutate(auth, async client=>{
+      const student = await this.student(auth, auth.studentId, client);
+      const riddle = await this.studentDailyRiddle(auth, student.id, student.class_id, nowIso, client);
+      if(!riddle) fail(404, 'Hôm nay chưa có câu đố ngày.');
+      const correct = chosenIndex === riddle.correctIndex;
+      if(correct){
+        await this.updateDailyMissionProgress(auth, student.id, 'daily_riddle', 1, nowIso, client);
+        await this.recordDailyActivity(auth, student.id, true, nowIso, client);
+        await this.evaluateAndAwardBadges(auth, student.id, client, nowIso);
+      }
+      return {
+        correct,
+        alreadySolved: correct || riddle.alreadySolved,
+        streak: await this.studentStreak(auth, student.id, client, nowIso),
+        missions: await this.studentDailyMissions(auth, student.id, nowIso, client)
+      };
+    });
+  }
+  async awardBadge(auth, studentId, badgeId, metadata = {}, nowIso = now(), client = this.pool){
+    const exists = await this.one('SELECT 1 FROM bao_an.badge_awards WHERE workspace_id=$1 AND student_id=$2 AND badge_id=$3', [auth.workspaceId, studentId, badgeId], client);
+    if(exists) return false;
+    await this.exec('INSERT INTO bao_an.badge_awards(workspace_id, student_id, badge_id, unlocked_at, json) VALUES($1,$2,$3,$4,$5::jsonb) ON CONFLICT(workspace_id, student_id, badge_id) DO NOTHING', [
+      auth.workspaceId, studentId, badgeId, nowIso, json(metadata)
+    ], client);
+    await this.audit(auth, 'student.badge.award', json({studentId, badgeId}), client);
+    return true;
+  }
+  async studentBadges(auth, studentId = auth.studentId, nowIso = now(), client = this.pool){
+    const earnedRows = await this.rows('SELECT badge_id, unlocked_at, json FROM bao_an.badge_awards WHERE workspace_id=$1 AND student_id=$2', [auth.workspaceId, studentId], client);
+    const earnedBadges = earnedRows.map(r=>({badgeId: r.badge_id, unlockedAt: r.unlocked_at, json: r.json}));
+    const metrics = await this.computeStudentMetrics(auth, studentId, nowIso, client);
+    const evaluated = buildStudentBadgeStatuses(earnedBadges, metrics);
+    for(const b of evaluated){
+      if(b.currentProgress >= b.targetCount && !earnedBadges.some(e=>e.badgeId === b.id)){
+        await this.awardBadge(auth, studentId, b.id, {progress: b.currentProgress}, nowIso, client);
+        b.unlocked = true;
+        b.unlockedAt = nowIso;
+        b.missingRequirement = 'Đã mở khóa huy hiệu!';
+      }
+    }
+    return evaluated;
+  }
+  async computeStudentMetrics(auth, studentId, nowIso = now(), client = this.pool){
+    const streak = await this.studentStreak(auth, studentId, client, nowIso);
+    const attemptRows = await this.rows(`
+      SELECT a.json AS json FROM bao_an.attempts a
+      JOIN bao_an.plays p ON p.workspace_id=a.workspace_id AND p.id=a.play_id
+      WHERE p.workspace_id=$1 AND p.student_id=$2
+      ORDER BY a.sequence ASC
+    `, [auth.workspaceId, studentId], client);
+    const attempts = attemptRows.map(r=>{try{return parse(r.json);}catch{return null;}}).filter(Boolean);
+    const totalQuestionsAttempted = attempts.length;
+
+    const wrongItems = new Set();
+    const fixedItems = new Set();
+    for(const a of attempts){
+      if(!a.correct){
+        wrongItems.add(a.itemId);
+      } else if(wrongItems.has(a.itemId)){
+        fixedItems.add(a.itemId);
+      }
+    }
+    const retryFixedCount = fixedItems.size;
+
+    let maxConsecutive = 0;
+    let currConsecutive = 0;
+    for(const a of attempts){
+      if(a.correct){
+        currConsecutive++;
+        if(currConsecutive > maxConsecutive) maxConsecutive = currConsecutive;
+      } else {
+        currConsecutive = 0;
+      }
+    }
+
+    const playRows = await this.rows('SELECT id, json FROM bao_an.plays WHERE workspace_id=$1 AND student_id=$2', [auth.workspaceId, studentId], client);
+    const completedPlays = playRows.map(r=>{try{return {id: r.id, ...parse(r.json)};}catch{return null;}}).filter(p=>p && p.status==='completed');
+    const completedPacksCount = completedPlays.length;
+    const distinctGamesPlayed = new Set(completedPlays.map(p=>p.moduleId)).size;
+
+    let perfectMemoryCount = 0;
+    for(const p of completedPlays){
+      if(p.moduleId === 'memory-match' && p.id){
+        const pEvents = (await this.rows('SELECT json FROM bao_an.attempts WHERE workspace_id=$1 AND play_id=$2', [auth.workspaceId, p.id], client)).map(r=>{try{return parse(r.json);}catch{return null;}}).filter(Boolean);
+        const wrongMoves = pEvents.filter(e=>!e.correct);
+        if(wrongMoves.length === 0 && pEvents.length > 0){
+          perfectMemoryCount++;
+        }
+      }
+    }
+
+    const awardRows = await this.rows('SELECT pack_id, tier, json FROM bao_an.awards WHERE workspace_id=$1 AND student_id=$2', [auth.workspaceId, studentId], client);
+    let mathPacks3Star = 0;
+    let vietnamesePacks3Star = 0;
+    let englishPacks3Star = 0;
+
+    const packRows = await this.rows('SELECT pack_id, json FROM bao_an.packs WHERE workspace_id=$1', [auth.workspaceId], client);
+    const packSubjects = new Map();
+    for(const pr of packRows){
+      try{
+        const p = parse(pr.json);
+        packSubjects.set(p.id, (p.subject || '').toLowerCase());
+      }catch{}
+    }
+
+    for(const ar of awardRows){
+      if(ar.tier === 3){
+        const subj = packSubjects.get(ar.pack_id) || '';
+        if(subj.includes('toan') || subj.includes('math')) mathPacks3Star++;
+        else if(subj.includes('viet') || subj.includes('tieng-viet')) vietnamesePacks3Star++;
+        else if(subj.includes('anh') || subj.includes('english')) englishPacks3Star++;
+      }
+    }
+
+    const student = await this.student(auth, studentId, client);
+    const weekRows = await this.rows('SELECT id FROM bao_an.weeks WHERE workspace_id=$1 AND class_id=$2', [auth.workspaceId, student.class_id], client);
+    const weekSetRows = await this.rows('SELECT week_id, pack_id FROM bao_an.week_sets WHERE workspace_id=$1', [auth.workspaceId], client);
+    const weekSetsByWeek = new Map();
+    for(const ws of weekSetRows){
+      let list = weekSetsByWeek.get(ws.week_id);
+      if(!list){ list = []; weekSetsByWeek.set(ws.week_id, list); }
+      list.push(ws.pack_id);
+    }
+    let perfectWeekCount = 0;
+    for(const w of weekRows){
+      const packIds = weekSetsByWeek.get(w.id);
+      if(packIds && packIds.length > 0 && packIds.every(pid=>{
+        const aw = awardRows.find(a=>a.pack_id === pid);
+        return aw && aw.tier === 3;
+      })){
+        perfectWeekCount++;
+      }
+    }
+
+    return {
+      streak,
+      retryFixedCount,
+      perfectMemoryCount,
+      perfectWeekCount,
+      distinctGamesPlayed,
+      consecutiveFirstTryCount: maxConsecutive,
+      completedPacksCount,
+      totalQuestionsAttempted,
+      mathPacks3Star,
+      vietnamesePacks3Star,
+      englishPacks3Star
+    };
+  }
+  async onAttemptRecorded(auth, session, event, pack, client, streakRow = null){
+    const studentId = session.profileId || auth.studentId;
+    await this.recordDailyActivity(auth, studentId, !!event.correct, event.occurredAt, client, streakRow);
+  }
+  async onPlayCompleted(auth, session, pack, events, completedAt = now(), client = this.pool){
+    const studentId = session.profileId || auth.studentId;
+    await this.updateDailyMissionProgress(auth, studentId, 'new_lesson', 1, completedAt, client);
+    if(session.moduleId === 'memory-match'){
+      const wrongMoves = events.filter(e=>!e.correct);
+      if(wrongMoves.length === 0 && events.length > 0){
+        await this.awardBadge(auth, studentId, 'perfect_memory', {earnedAt: completedAt}, completedAt, client);
+      }
+    }
+    await this.evaluateAndAwardBadges(auth, studentId, client, completedAt);
+  }
+  async evaluateAndAwardBadges(auth, studentId, client = this.pool, nowIso = now()){
+    await this.studentBadges(auth, studentId, nowIso, client);
+  }
+  async assertStudentScreenTimeAllowed(auth, studentId, client = this.pool, existingControls = null){
+    const controls = existingControls !== null ? existingControls : await this.parentControls(auth, studentId, client);
+    if (!controls) return;
+    const curfew = checkCurfewHours(controls.allowedStartHour, controls.allowedEndHour);
+    if (!curfew.allowed) fail(403, curfew.reason);
+    if (controls.maxMinutesPerDay > 0) {
+      const todayMinutes = await this.todayStudentStudyMinutes(auth, studentId, client);
+      const limit = checkDailyScreenTime(todayMinutes, controls.maxMinutesPerDay);
+      if (!limit.allowed) fail(403, limit.reason);
+    }
+  }
+  async todayStudentStudyMinutes(auth, studentId, client = this.pool){
+    const { dateStr } = getVietnamTimeParts();
+    const rows = await this.rows('SELECT a.json FROM bao_an.attempts a JOIN bao_an.plays p ON p.workspace_id=a.workspace_id AND p.id=a.play_id WHERE a.workspace_id=$1 AND p.student_id=$2', [auth.workspaceId, studentId], client);
+    let totalMs = 0;
+    for (const r of rows) {
+      try {
+        const ev = parse(r.json);
+        if (ev?.occurredAt && Number.isFinite(ev.elapsedMs) && ev.elapsedMs > 0) {
+          const evDate = new Date(ev.occurredAt).toLocaleDateString('en-CA', { timeZone: 'Asia/Ho_Chi_Minh' });
+          if (evDate === dateStr) totalMs += ev.elapsedMs;
+        }
+      } catch {}
+    }
+    return msToMinutes(totalMs);
+  }
+  async parentControls(auth, studentId, client = this.pool){
+    text(studentId, 'Mã học sinh', 100);
+    const row = await this.one('SELECT * FROM bao_an.parent_controls WHERE workspace_id=$1 AND student_id=$2', [auth.workspaceId, studentId], client);
+    if (!row) {
+      return {
+        workspaceId: auth.workspaceId,
+        studentId,
+        pinHash: null,
+        pinSalt: null,
+        pinFailedCount: 0,
+        pinLockedUntil: null,
+        maxMinutesPerDay: 0,
+        allowedStartHour: 0,
+        allowedEndHour: 24,
+        updatedAt: now()
+      };
+    }
+    return {
+      workspaceId: row.workspace_id,
+      studentId: row.student_id,
+      pinHash: row.pin_hash,
+      pinSalt: row.pin_salt,
+      pinFailedCount: row.pin_failed_count,
+      pinLockedUntil: row.pin_locked_until,
+      maxMinutesPerDay: row.max_minutes_per_day,
+      allowedStartHour: row.allowed_start_hour,
+      allowedEndHour: row.allowed_end_hour,
+      updatedAt: row.updated_at
+    };
+  }
+  async setupParentPin(auth, studentId, input){
+    shape(input, ['pin', 'oldPin', 'studentId']);
+    const pin = text(input.pin, 'Mã PIN mới', 10);
+    if (!/^\d{4,6}$/.test(pin)) fail(400, 'Mã PIN phụ huynh phải gồm từ 4 đến 6 chữ số.');
+    const current = await this.parentControls(auth, studentId);
+    if (current.pinHash && auth.role !== 'admin') {
+      const oldPin = text(input.oldPin, 'Mã PIN hiện tại', 10);
+      if (!verifyParentPin(oldPin, current.pinHash, current.pinSalt)) {
+        fail(403, 'Mã PIN cũ không chính xác.');
+      }
+    }
+    const { pinHash, pinSalt } = hashParentPin(pin);
+    const updatedAt = now();
+    await this.exec(`
+      INSERT INTO bao_an.parent_controls(workspace_id, student_id, pin_hash, pin_salt, pin_failed_count, pin_locked_until, max_minutes_per_day, allowed_start_hour, allowed_end_hour, updated_at)
+      VALUES($1,$2,$3,$4,0,NULL,$5,$6,$7,$8)
+      ON CONFLICT(workspace_id, student_id) DO UPDATE SET
+        pin_hash=EXCLUDED.pin_hash,
+        pin_salt=EXCLUDED.pin_salt,
+        pin_failed_count=0,
+        pin_locked_until=NULL,
+        updated_at=EXCLUDED.updated_at
+    `, [auth.workspaceId, studentId, pinHash, pinSalt, current.maxMinutesPerDay, current.allowedStartHour, current.allowedEndHour, updatedAt]);
+    return { success: true };
+  }
+  async verifyParentPin(auth, studentId, pin){
+    const controls = await this.parentControls(auth, studentId);
+    if (!controls.pinHash) fail(400, 'Chưa thiết lập mã PIN cho học sinh này.');
+    if (controls.pinLockedUntil && new Date(controls.pinLockedUntil).getTime() > Date.now()) {
+      const remainingMinutes = Math.ceil((new Date(controls.pinLockedUntil).getTime() - Date.now()) / 60000);
+      fail(429, `Mã PIN đang bị tạm khóa do nhập sai nhiều lần. Vui lòng thử lại sau ${remainingMinutes} phút.`);
+    }
+    const isCorrect = verifyParentPin(pin, controls.pinHash, controls.pinSalt);
+    if (!isCorrect) {
+      const newFailed = controls.pinFailedCount + 1;
+      let lockedUntil = null;
+      if (newFailed >= MAX_PIN_FAILURES) {
+        lockedUntil = new Date(Date.now() + PIN_LOCKOUT_MS).toISOString();
+      }
+      await this.exec('UPDATE bao_an.parent_controls SET pin_failed_count=$3, pin_locked_until=$4 WHERE workspace_id=$1 AND student_id=$2',
+        [auth.workspaceId, studentId, newFailed, lockedUntil]);
+      if (lockedUntil) {
+        fail(429, 'Bạn đã nhập sai PIN 5 lần. Mã PIN bị tạm khóa 15 phút để bảo vệ tài khoản.');
+      }
+      fail(403, `Sai mã PIN phụ huynh. Bạn còn ${MAX_PIN_FAILURES - newFailed} lần thử.`);
+    }
+    await this.exec('UPDATE bao_an.parent_controls SET pin_failed_count=0, pin_locked_until=NULL WHERE workspace_id=$1 AND student_id=$2',
+      [auth.workspaceId, studentId]);
+    const parentToken = createHash('sha256').update(`${auth.id}:${studentId}:${controls.pinHash}:${now()}`).digest('hex');
+    return { success: true, parentToken, studentId };
+  }
+  async updateParentSettings(auth, studentId, input){
+    shape(input, ['maxMinutesPerDay', 'allowedStartHour', 'allowedEndHour', 'studentId']);
+    const maxMinutes = input.maxMinutesPerDay !== undefined ? integer(input.maxMinutesPerDay, 'Thời gian học', 0, 480) : 0;
+    const startHour = input.allowedStartHour !== undefined ? integer(input.allowedStartHour, 'Giờ bắt đầu', 0, 23) : 0;
+    const endHour = input.allowedEndHour !== undefined ? integer(input.allowedEndHour, 'Giờ kết thúc', 1, 24) : 24;
+    if (endHour <= startHour && endHour !== 24 && startHour !== 0) {
+      fail(400, 'Giờ kết thúc phải sau giờ bắt đầu.');
+    }
+    const current = await this.parentControls(auth, studentId);
+    const updatedAt = now();
+    await this.exec(`
+      INSERT INTO bao_an.parent_controls(workspace_id, student_id, pin_hash, pin_salt, pin_failed_count, pin_locked_until, max_minutes_per_day, allowed_start_hour, allowed_end_hour, updated_at)
+      VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
+      ON CONFLICT(workspace_id, student_id) DO UPDATE SET
+        max_minutes_per_day=EXCLUDED.max_minutes_per_day,
+        allowed_start_hour=EXCLUDED.allowed_start_hour,
+        allowed_end_hour=EXCLUDED.allowed_end_hour,
+        updated_at=EXCLUDED.updated_at
+    `, [auth.workspaceId, studentId, current.pinHash, current.pinSalt, current.pinFailedCount, current.pinLockedUntil, maxMinutes, startHour, endHour, updatedAt]);
+    return this.parentControls(auth, studentId);
+  }
+  async createParent(auth, input, passwordHash, username){
+    shape(input, ['name', 'username', 'password', 'studentIds']);
+    const name = text(input.name, 'Tên phụ huynh', 100);
+    const studentIds = input.studentIds;
+    if (!Array.isArray(studentIds) || studentIds.length < 1 || studentIds.length > 3) {
+      fail(400, 'Tài khoản phụ huynh cần gắn với từ 1 đến 3 học sinh.');
+    }
+    return this.mutate(auth, async client => {
+      const userId = id(), createdAt = now();
+      await this.exec('INSERT INTO bao_an.users(id,workspace_id,username,password_hash,role,created_at) VALUES($1,$2,$3,$4,$5,$6)',
+        [userId, auth.workspaceId, username, passwordHash, 'parent', createdAt], client);
+      for (const sId of studentIds) {
+        const student = await this.student(auth, sId, client);
+        await this.exec('INSERT INTO bao_an.parent_students(workspace_id, parent_user_id, student_id, created_at) VALUES($1,$2,$3,$4)',
+          [auth.workspaceId, userId, student.id, createdAt], client);
+      }
+      return { id: userId, username, name, studentIds };
+    });
+  }
+  async parentStudents(auth, client = this.pool){
+    if (auth.role !== 'parent') fail(403, 'Chỉ phụ huynh mới dùng hàm này.');
+    const rows = await this.rows('SELECT s.*, c.name AS class_name FROM bao_an.parent_students ps JOIN bao_an.students s ON s.workspace_id=ps.workspace_id AND s.id=ps.student_id JOIN bao_an.classes c ON c.workspace_id=s.workspace_id AND c.id=s.class_id WHERE ps.workspace_id=$1 AND ps.parent_user_id=$2', [auth.workspaceId, auth.id], client);
+    return rows.map(r => ({
+      id: r.id,
+      name: r.name,
+      className: r.class_name,
+      grade: r.grade,
+      active: !!r.active
+    }));
+  }
+  async parentDashboard(auth, studentId, weekId){
+    text(studentId, 'Mã học sinh', 100);
+    if (auth.role === 'parent') {
+      const linked = await this.one('SELECT 1 FROM bao_an.parent_students WHERE workspace_id=$1 AND parent_user_id=$2 AND student_id=$3', [auth.workspaceId, auth.id, studentId]);
+      if (!linked) fail(403, 'Phụ huynh không có quyền xem thông tin học sinh này.');
+    } else if (auth.role === 'student' && auth.studentId !== studentId) {
+      fail(403, 'Không có quyền truy cập.');
+    }
+    const student = await this.student(auth, studentId);
+    const cls = await this.class(auth, student.class_id);
+    const controls = await this.parentControls(auth, studentId);
+    const todayMinutes = await this.todayStudentStudyMinutes(auth, studentId);
+
+    let week;
+    if (weekId) {
+      week = await this.one('SELECT * FROM bao_an.weeks WHERE workspace_id=$1 AND id=$2', [auth.workspaceId, weekId]);
+    }
+    if (!week) {
+      const marker = (await this.journeyMarker(auth, student)) ?? (await this.pinJourney(auth, student));
+      if (marker) {
+        week = await this.one('SELECT * FROM bao_an.weeks WHERE workspace_id=$1 AND id=$2', [auth.workspaceId, marker.weekId]);
+      }
+    }
+    if (!week) {
+      week = await this.one('SELECT * FROM bao_an.weeks WHERE workspace_id=$1 AND class_id=$2 ORDER BY position DESC LIMIT 1', [auth.workspaceId, student.class_id]);
+    }
+
+    let weekSets = [];
+    if (week) {
+      const setRows = await this.rows('SELECT s.position, p.* FROM bao_an.week_sets s JOIN bao_an.packs p ON p.workspace_id=s.workspace_id AND p.pack_id=s.pack_id AND p.version=s.version WHERE s.workspace_id=$1 AND s.week_id=$2 ORDER BY s.position', [auth.workspaceId, week.id]);
+      weekSets = setRows.map(r => ({
+        subjectLabel: r.subject_label,
+        pack: parse(r.json)
+      }));
+    }
+
+    const nowD = new Date();
+    const dayOfWeek = (nowD.getDay() + 6) % 7;
+    const monday = new Date(nowD.getTime() - dayOfWeek * 86400000);
+    monday.setHours(0, 0, 0, 0);
+    const sunday = new Date(monday.getTime() + 6 * 86400000 + 86399999);
+    const startDateIso = monday.toISOString();
+    const endDateIso = sunday.toISOString();
+
+    const attemptRows = await this.rows(`
+      SELECT a.json FROM bao_an.attempts a
+      JOIN bao_an.plays p ON p.workspace_id=a.workspace_id AND p.id=a.play_id
+      WHERE a.workspace_id=$1 AND p.student_id=$2
+    `, [auth.workspaceId, studentId]);
+    const events = attemptRows.map(r => {
+      try { return parse(r.json); } catch { return null; }
+    }).filter(Boolean);
+
+    const badgeRows = await this.rows('SELECT * FROM bao_an.badge_awards WHERE workspace_id=$1 AND student_id=$2', [auth.workspaceId, studentId]);
+    const redRows = await this.rows('SELECT * FROM bao_an.redemptions WHERE workspace_id=$1 AND student_id=$2', [auth.workspaceId, studentId]);
+
+    const report = buildParentWeeklyReport({
+      student,
+      className: cls.name,
+      week: week ? { id: week.id, title: week.title, sets: weekSets } : null,
+      events,
+      badges: badgeRows,
+      redemptions: redRows,
+      startDateIso,
+      endDateIso
+    });
+
+    let children = [];
+    if (auth.role === 'parent') {
+      children = await this.parentStudents(auth);
+    }
+
+    return {
+      student: { id: student.id, name: student.name, className: cls.name },
+      controls: {
+        hasPin: !!controls.pinHash,
+        maxMinutesPerDay: controls.maxMinutesPerDay,
+        allowedStartHour: controls.allowedStartHour,
+        allowedEndHour: controls.allowedEndHour,
+        pinLocked: !!(controls.pinLockedUntil && new Date(controls.pinLockedUntil).getTime() > Date.now())
+      },
+      todayMinutes,
+      report,
+      children
+    };
+  }
+
+  contestPresets(auth){
+    return Object.values(CONTEST_PRESETS);
+  }
+
+  async startContest(auth, input){
+    role(auth, 'student');
+    shape(input, ['presetId', 'requestId']);
+    const presetId = text(input.presetId, 'Mã ma trận đề', 80);
+    const requestId = input.requestId ? text(input.requestId, 'Mã yêu cầu', 100) : null;
+    const preset = CONTEST_PRESETS[presetId];
+    if (!preset) fail(404, 'Không tìm thấy ma trận đề thi này.');
+
+    await this.assertStudentScreenTimeAllowed(auth, auth.studentId);
+
+    return this.mutate(auth, async client => {
+      if (requestId) {
+        const prior = await this.one('SELECT * FROM bao_an.contest_sessions WHERE workspace_id=$1 AND student_id=$2 AND request_id=$3', [auth.workspaceId, auth.studentId, requestId], client);
+        if (prior) {
+          const remainingSeconds = Math.max(0, Math.floor((Date.parse(prior.deadline_at) - Date.now()) / 1000));
+          const items = parse(prior.items_json);
+          return {
+            sessionId: prior.session_id,
+            preset,
+            startedAt: prior.started_at,
+            deadlineAt: prior.deadline_at,
+            remainingSeconds,
+            status: prior.status,
+            items: items.map(sanitizeContestItem),
+            answers: parse(prior.answers_json || '{}'),
+            skippedKeys: parse(prior.skipped_keys || '[]')
+          };
+        }
+      }
+
+      const active = await this.one("SELECT * FROM bao_an.contest_sessions WHERE workspace_id=$1 AND student_id=$2 AND preset_id=$3 AND status='active' ORDER BY created_at DESC LIMIT 1", [auth.workspaceId, auth.studentId, presetId], client);
+      if (active) {
+        const remainingSeconds = Math.max(0, Math.floor((Date.parse(active.deadline_at) - Date.now()) / 1000));
+        if (remainingSeconds > 0) {
+          const items = parse(active.items_json);
+          return {
+            sessionId: active.session_id,
+            preset,
+            startedAt: active.started_at,
+            deadlineAt: active.deadline_at,
+            remainingSeconds,
+            status: 'active',
+            items: items.map(sanitizeContestItem),
+            answers: parse(active.answers_json || '{}'),
+            skippedKeys: parse(active.skipped_keys || '[]')
+          };
+        } else {
+          await this.submitContest(auth, active.session_id, { answers: parse(active.answers_json || '{}') }, client);
+        }
+      }
+
+      const sessionId = id();
+      const startedAt = now();
+      const deadlineAt = new Date(Date.now() + preset.durationSeconds * 1000).toISOString();
+
+      const student = await this.student(auth, auth.studentId, client);
+      const weekRows = await this.rows('SELECT ws.pack_id, ws.version, p.json FROM bao_an.week_sets ws JOIN bao_an.weeks w ON w.workspace_id=ws.workspace_id AND w.id=ws.week_id JOIN bao_an.packs p ON p.workspace_id=ws.workspace_id AND p.pack_id=ws.pack_id AND p.version=ws.version WHERE ws.workspace_id=$1 AND w.class_id=$2', [auth.workspaceId, student.class_id], client);
+      const assignedPacks = weekRows.map(r => {
+        try { return parse(r.json); } catch { return null; }
+      }).filter(Boolean);
+
+      const items = generateContestQuestions(preset, auth.studentId, sessionId, assignedPacks);
+
+      await this.exec('INSERT INTO bao_an.contest_sessions(workspace_id, student_id, session_id, request_id, preset_id, title, subject, grade, duration_seconds, started_at, deadline_at, status, items_json, created_at) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13::jsonb,$14)',
+        [auth.workspaceId, auth.studentId, sessionId, requestId, presetId, preset.title, preset.subject, preset.grade, preset.durationSeconds, startedAt, deadlineAt, 'active', json(items), startedAt], client);
+
+      await this.audit(auth, 'contest.start', json({ sessionId, presetId }), client);
+
+      return {
+        sessionId,
+        preset,
+        startedAt,
+        deadlineAt,
+        remainingSeconds: preset.durationSeconds,
+        status: 'active',
+        items: items.map(sanitizeContestItem),
+        answers: {},
+        skippedKeys: []
+      };
+    });
+  }
+
+  async activeContest(auth, client = this.pool){
+    role(auth, 'student');
+    const row = await this.one("SELECT * FROM bao_an.contest_sessions WHERE workspace_id=$1 AND student_id=$2 AND status='active' ORDER BY created_at DESC LIMIT 1", [auth.workspaceId, auth.studentId], client);
+    if (!row) return { active: false };
+
+    const remainingSeconds = Math.max(0, Math.floor((Date.parse(row.deadline_at) - Date.now()) / 1000));
+    if (remainingSeconds <= 0) {
+      const res = await this.submitContest(auth, row.session_id, { answers: parse(row.answers_json || '{}') }, client);
+      return { active: false, lastResult: res };
+    }
+
+    const preset = CONTEST_PRESETS[row.preset_id];
+    const items = parse(row.items_json);
+    return {
+      active: true,
+      session: {
+        sessionId: row.session_id,
+        preset,
+        startedAt: row.started_at,
+        deadlineAt: row.deadline_at,
+        remainingSeconds,
+        status: 'active',
+        items: items.map(sanitizeContestItem),
+        answers: parse(row.answers_json || '{}'),
+        skippedKeys: parse(row.skipped_keys || '[]')
+      }
+    };
+  }
+
+  async saveContestProgress(auth, sessionId, input){
+    role(auth, 'student');
+    text(sessionId, 'Mã lượt thi', 100);
+    shape(input, ['answers', 'skippedKeys']);
+    return this.mutate(auth, async client => {
+      const row = await this.one("SELECT * FROM bao_an.contest_sessions WHERE workspace_id=$1 AND student_id=$2 AND session_id=$3 AND status='active'", [auth.workspaceId, auth.studentId, sessionId], client);
+      if (!row) fail(404, 'Không tìm thấy lượt thi đang làm.');
+
+      const remainingSeconds = Math.max(0, Math.floor((Date.parse(row.deadline_at) - Date.now()) / 1000));
+      if (remainingSeconds <= 0) {
+        return this.submitContest(auth, sessionId, { answers: input.answers ?? parse(row.answers_json || '{}') }, client);
+      }
+
+      const answers = input.answers !== undefined ? json(input.answers) : row.answers_json;
+      const skipped = input.skippedKeys !== undefined ? json(input.skippedKeys) : row.skipped_keys;
+      await this.exec('UPDATE bao_an.contest_sessions SET answers_json=$3::jsonb, skipped_keys=$4::jsonb WHERE workspace_id=$1 AND session_id=$2',
+        [auth.workspaceId, sessionId, answers, skipped], client);
+      return { success: true, remainingSeconds };
+    });
+  }
+
+  async submitContest(auth, sessionId, input = {}, client = null){
+    role(auth, 'student');
+    text(sessionId, 'Mã lượt thi', 100);
+    if (!client) {
+      return this.mutate(auth, c => this.submitContest(auth, sessionId, input, c));
+    }
+
+    const row = await this.one('SELECT * FROM bao_an.contest_sessions WHERE workspace_id=$1 AND student_id=$2 AND session_id=$3', [auth.workspaceId, auth.studentId, sessionId], client);
+    if (!row) fail(404, 'Không tìm thấy lượt thi.');
+
+    const preset = CONTEST_PRESETS[row.preset_id];
+    const items = parse(row.items_json);
+
+    if (row.status !== 'active') {
+      const historyRows = await this.rows("SELECT score, max_score, status FROM bao_an.contest_sessions WHERE workspace_id=$1 AND student_id=$2 AND preset_id=$3 AND status IN ('submitted', 'timeout') ORDER BY created_at DESC", [auth.workspaceId, auth.studentId, row.preset_id], client);
+      const readiness = checkReadinessForExam(historyRows.map(r => ({ percent: r.max_score > 0 ? Math.round((r.score / r.max_score) * 100) : 0, passed: (r.max_score > 0 ? Math.round((r.score / r.max_score) * 100) : 0) >= preset.passPercent })));
+      const evaluation = evaluateContestSubmission(items, parse(row.answers_json || '{}'), preset, Math.min(preset.durationSeconds * 1000, Math.max(0, Date.parse(row.submitted_at || row.deadline_at) - Date.parse(row.started_at))), row.status);
+      return {
+        sessionId,
+        ...evaluation,
+        readyForExam: readiness.readyForExam,
+        consecutivePasses: readiness.consecutiveCount
+      };
+    }
+
+    const nowMs = Date.now();
+    const deadlineMs = Date.parse(row.deadline_at);
+    const isTimeout = nowMs > deadlineMs + 3000;
+    const finishReason = isTimeout ? 'timeout' : 'submitted';
+    const submittedAt = now();
+    const answers = input.answers !== undefined ? input.answers : parse(row.answers_json || '{}');
+    const elapsedMs = Math.min(preset.durationSeconds * 1000, Math.max(0, nowMs - Date.parse(row.started_at)));
+
+    const evaluation = evaluateContestSubmission(items, answers, preset, elapsedMs, finishReason);
+
+    await this.exec(`
+      UPDATE bao_an.contest_sessions SET
+        status=$3,
+        submitted_at=$4,
+        score=$5,
+        max_score=$6,
+        correct_count=$7,
+        total_items=$8,
+        answers_json=$9::jsonb
+      WHERE workspace_id=$1 AND session_id=$2
+    `, [auth.workspaceId, sessionId, finishReason, submittedAt, evaluation.score, evaluation.maxScore, evaluation.correctCount, evaluation.totalItems, json(answers)], client);
+
+    let badgeAwarded = false;
+    const existingBadge = await this.one('SELECT 1 FROM bao_an.badge_awards WHERE workspace_id=$1 AND student_id=$2 AND badge_id=$3', [auth.workspaceId, auth.studentId, CONTESTANT_BADGE.id], client);
+    if (!existingBadge) {
+      await this.awardBadge(auth, auth.studentId, CONTESTANT_BADGE.id, { title: CONTESTANT_BADGE.title, unlockedAt: submittedAt }, submittedAt, client);
+      badgeAwarded = true;
+    }
+
+    await this.audit(auth, 'contest.submit', json({ sessionId, score: evaluation.score, maxScore: evaluation.maxScore, finishReason }), client);
+
+    const historyRows = await this.rows("SELECT score, max_score, status FROM bao_an.contest_sessions WHERE workspace_id=$1 AND student_id=$2 AND preset_id=$3 AND status IN ('submitted', 'timeout') ORDER BY created_at DESC", [auth.workspaceId, auth.studentId, row.preset_id], client);
+    const readiness = checkReadinessForExam(historyRows.map(r => ({ percent: r.max_score > 0 ? Math.round((r.score / r.max_score) * 100) : 0, passed: (r.max_score > 0 ? Math.round((r.score / r.max_score) * 100) : 0) >= preset.passPercent })));
+
+    return {
+      sessionId,
+      ...evaluation,
+      readyForExam: readiness.readyForExam,
+      consecutivePasses: readiness.consecutiveCount,
+      badgeAwarded
+    };
+  }
+
+  async contestHistory(auth, studentId = auth.studentId, presetId = null, client = this.pool){
+    if (auth.role === 'student' && auth.studentId !== studentId) fail(403, 'Không có quyền truy cập.');
+    text(studentId, 'Mã học sinh', 100);
+    const sql = presetId
+      ? "SELECT * FROM bao_an.contest_sessions WHERE workspace_id=$1 AND student_id=$2 AND preset_id=$3 AND status IN ('submitted', 'timeout') ORDER BY created_at DESC"
+      : "SELECT * FROM bao_an.contest_sessions WHERE workspace_id=$1 AND student_id=$2 AND status IN ('submitted', 'timeout') ORDER BY created_at DESC";
+    const params = presetId ? [auth.workspaceId, studentId, presetId] : [auth.workspaceId, studentId];
+    const rows = await this.rows(sql, params, client);
+
+    const attempts = rows.map(r => {
+      const preset = CONTEST_PRESETS[r.preset_id];
+      const percent = r.max_score > 0 ? Math.round((r.score / r.max_score) * 100) : 0;
+      const elapsedMs = r.submitted_at ? Math.max(0, Date.parse(r.submitted_at) - Date.parse(r.started_at)) : r.duration_seconds * 1000;
+      return {
+        sessionId: r.session_id,
+        presetId: r.preset_id,
+        presetTitle: preset?.title || r.title,
+        contest: preset?.contest || 'violympic',
+        subject: r.subject,
+        grade: r.grade,
+        startedAt: r.started_at,
+        submittedAt: r.submitted_at,
+        score: r.score,
+        maxScore: r.max_score,
+        percent,
+        passed: percent >= (preset?.passPercent || 80),
+        finishReason: r.status,
+        elapsedMs
+      };
+    });
+
+    const readiness = checkReadinessForExam(attempts);
+
+    return {
+      attempts,
+      readyForExam: readiness.readyForExam,
+      consecutiveCount: readiness.consecutiveCount
+    };
+  }
+
+  async contestReviewPack(auth, sessionId, client = this.pool){
+    role(auth, 'student');
+    text(sessionId, 'Mã lượt thi', 100);
+    const row = await this.one('SELECT * FROM bao_an.contest_sessions WHERE workspace_id=$1 AND student_id=$2 AND session_id=$3', [auth.workspaceId, auth.studentId, sessionId], client);
+    if (!row) fail(404, 'Không tìm thấy lượt thi.');
+    const items = parse(row.items_json);
+    const answers = parse(row.answers_json || '{}');
+    const preset = CONTEST_PRESETS[row.preset_id];
+    const evaluation = evaluateContestSubmission(items, answers, preset, 0, row.status);
+    return buildReviewMistakesPack({ sessionId: row.session_id, title: row.title, subject: row.subject, grade: row.grade }, evaluation.mistakes);
+  }
+
+  async resolvePackSubject(auth, packId, client = this.pool) {
+    const row = await this.one('SELECT subject_label, json FROM bao_an.packs WHERE workspace_id=$1 AND pack_id=$2 ORDER BY version DESC LIMIT 1', [auth.workspaceId, packId], client);
+    if (!row) return 'math';
+    try {
+      const p = parse(row.json);
+      return resolveTownSubject(p.subject || row.subject_label);
+    } catch {
+      return resolveTownSubject(row.subject_label);
+    }
+  }
+
+  async syncAwardMaterial(auth, studentId, packId, stars, client = this.pool) {
+    if (!stars || stars <= 0) return;
+    try {
+      const subject = await this.resolvePackSubject(auth, packId, client);
+      const material = getMaterialForSubject(subject);
+      const existingRow = await this.one("SELECT coalesce(sum(delta), 0) as total FROM bao_an.materials_ledger WHERE workspace_id=$1 AND student_id=$2 AND pack_id=$3 AND delta > 0", [auth.workspaceId, studentId, packId], client);
+      const existingEarned = Number(existingRow?.total || 0);
+      const gained = stars - existingEarned;
+      if (gained > 0) {
+        await this.exec('INSERT INTO bao_an.materials_ledger(workspace_id, student_id, id, pack_id, material_type, delta, reason, request_id, created_at) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9)', [
+          auth.workspaceId, studentId, id(), packId, material, gained, 'award', `award:${packId}:${stars}`, now()
+        ], client);
+      }
+    } catch (e) {
+      // Ignore background sync errors
+    }
+  }
+
+  async townState(auth, studentId, client = this.pool, { allowClassmate = false } = {}) {
+    if (auth.role === 'student' && auth.studentId !== studentId && !allowClassmate) fail(404, 'Không tìm thấy học sinh.');
+    let row = await this.one('SELECT * FROM bao_an.town_states WHERE workspace_id=$1 AND student_id=$2', [auth.workspaceId, studentId], client);
+    if (!row) {
+      const initial = defaultTownState(studentId, now());
+      await this.exec('INSERT INTO bao_an.town_states(workspace_id, student_id, grid_width, grid_height, revision, buildings_json, updated_at) VALUES($1,$2,$3,$4,$5,$6::jsonb,$7)', [
+        auth.workspaceId, studentId, initial.gridWidth, initial.gridHeight, initial.revision, json(initial.buildings), initial.updatedAt
+      ], client);
+      return initial;
+    }
+    return {
+      gridWidth: row.grid_width,
+      gridHeight: row.grid_height,
+      revision: row.revision,
+      buildings: parse(row.buildings_json || '[]'),
+      updatedAt: row.updated_at,
+    };
+  }
+
+  async materials(auth, studentId, client = this.pool) {
+    if (auth.role === 'student' && auth.studentId !== studentId) fail(404, 'Không tìm thấy học sinh.');
+    const countRow = await this.one('SELECT count(*) as c FROM bao_an.materials_ledger WHERE workspace_id=$1 AND student_id=$2', [auth.workspaceId, studentId], client);
+    if (Number(countRow?.c || 0) === 0) {
+      return this.recalculateMaterials(auth, studentId, client);
+    }
+    const rows = await this.rows('SELECT material_type, coalesce(sum(delta), 0) as balance FROM bao_an.materials_ledger WHERE workspace_id=$1 AND student_id=$2 GROUP BY material_type', [auth.workspaceId, studentId], client);
+    const balances = { stone: 0, wood: 0, fish: 0, component: 0 };
+    for (const r of rows) {
+      if (r.material_type in balances) {
+        balances[r.material_type] = Math.max(0, Number(r.balance));
+      }
+    }
+    return balances;
+  }
+
+  async recalculateMaterials(auth, studentId, client = this.pool) {
+    if (auth.role === 'student' && auth.studentId !== studentId) fail(404, 'Không tìm thấy học sinh.');
+    return this.mutate(auth, async (tx) => {
+      await this.exec('DELETE FROM bao_an.materials_ledger WHERE workspace_id=$1 AND student_id=$2', [auth.workspaceId, studentId], tx);
+
+      const awardRows = await this.rows('SELECT pack_id, tier, json FROM bao_an.awards WHERE workspace_id=$1 AND student_id=$2', [auth.workspaceId, studentId], tx);
+      const awards = awardRows.map(r => ({
+        packId: r.pack_id,
+        tier: r.tier,
+        ...parse(r.json)
+      }));
+
+      const packRows = await this.rows('SELECT pack_id, subject_label, json FROM bao_an.packs WHERE workspace_id=$1', [auth.workspaceId], tx);
+      const subjectMap = new Map();
+      for (const pr of packRows) {
+        try {
+          const p = parse(pr.json);
+          subjectMap.set(pr.pack_id, resolveTownSubject(p.subject || pr.subject_label));
+        } catch {
+          subjectMap.set(pr.pack_id, resolveTownSubject(pr.subject_label));
+        }
+      }
+
+      const earned = calculateEarnedMaterialsFromAwards(awards, (id) => subjectMap.get(id) || 'math');
+      const currentTime = now();
+
+      for (const [mat, amount] of Object.entries(earned)) {
+        if (amount > 0) {
+          await this.exec('INSERT INTO bao_an.materials_ledger(workspace_id, student_id, id, pack_id, material_type, delta, reason, request_id, created_at) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9)', [
+            auth.workspaceId, studentId, id(), null, mat, amount, 'award', `recalc:${studentId}:${mat}:${amount}`, currentTime
+          ], tx);
+        }
+      }
+
+      const town = await this.townState(auth, studentId, tx);
+      for (const placed of town.buildings) {
+        const item = TOWN_BUILDING_MAP.get(placed.buildingId);
+        if (!item) continue;
+        for (const [mat, cost] of Object.entries(item.cost)) {
+          if (cost && cost > 0) {
+            await this.exec('INSERT INTO bao_an.materials_ledger(workspace_id, student_id, id, pack_id, material_type, delta, reason, request_id, created_at) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9)', [
+              auth.workspaceId, studentId, id(), null, mat, -cost, 'build', `spend:${placed.id}:${mat}`, currentTime
+            ], tx);
+          }
+        }
+      }
+
+      const spent = calculateTotalSpentMaterials(town.buildings);
+      return calculateAvailableMaterials(earned, spent);
+    });
+  }
+
+  async placeBuilding(auth, studentId, input, client = this.pool) {
+    if (auth.role === 'student' && auth.studentId !== studentId) fail(404, 'Không tìm thấy học sinh.');
+    shape(input, ['buildingId', 'x', 'y', 'expectedRevision', 'requestId', 'studentId']);
+    text(input.buildingId, 'Mã công trình', 64);
+    let requestId = input.requestId || id();
+
+    return this.mutate(auth, async (tx) => {
+      const existingTx = await this.one("SELECT 1 FROM bao_an.materials_ledger WHERE workspace_id=$1 AND student_id=$2 AND request_id=$3 AND reason='build' LIMIT 1", [auth.workspaceId, studentId, requestId], tx);
+      if (existingTx) {
+        const currentTown = await this.townState(auth, studentId, tx);
+        const currentMaterials = await this.materials(auth, studentId, tx);
+        return { ok: true, town: currentTown, materials: currentMaterials, duplicate: true };
+      }
+
+      const currentTown = await this.townState(auth, studentId, tx);
+      const currentMaterials = await this.materials(auth, studentId, tx);
+      const placementId = id();
+      const currentTime = now();
+
+      const { updatedTownState, placedBuilding, cost } = evaluateBuildingPlacement({
+        currentTownState: currentTown,
+        buildingId: input.buildingId,
+        x: input.x,
+        y: input.y,
+        expectedRevision: input.expectedRevision,
+        availableMaterials: currentMaterials,
+        nowIso: currentTime,
+        placementId,
+      });
+
+      for (const [mat, amount] of Object.entries(cost)) {
+        if (amount && amount > 0) {
+          await this.exec('INSERT INTO bao_an.materials_ledger(workspace_id, student_id, id, pack_id, material_type, delta, reason, request_id, created_at) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9)', [
+            auth.workspaceId, studentId, id(), null, mat, -amount, 'build', requestId, currentTime
+          ], tx);
+        }
+      }
+
+      await this.exec('UPDATE bao_an.town_states SET revision=$3, buildings_json=$4::jsonb, updated_at=$5 WHERE workspace_id=$1 AND student_id=$2', [
+        auth.workspaceId, studentId, updatedTownState.revision, json(updatedTownState.buildings), updatedTownState.updatedAt
+      ], tx);
+
+      const updatedMaterials = calculateAvailableMaterials(
+        currentMaterials,
+        calculateTotalSpentMaterials([placedBuilding])
+      );
+
+      try {
+        const student = await this.one('SELECT class_id, name FROM bao_an.students WHERE workspace_id=$1 AND id=$2', [auth.workspaceId, studentId], tx);
+        if (student) {
+          await this.publishClassFeedEvent(auth, student.class_id, studentId, student.name, 'building_built', {
+            buildingId: placedBuilding.buildingId,
+            buildingName: placedBuilding.name,
+            buildingIcon: placedBuilding.icon,
+          }, tx);
+        }
+      } catch {}
+
+      return {
+        ok: true,
+        town: updatedTownState,
+        materials: updatedMaterials,
+        placedBuilding
+      };
+    });
+  }
+
+  async townSummary(auth, studentId, client = this.pool) {
+    const town = await this.townState(auth, studentId, client);
+    const materials = await this.materials(auth, studentId, client);
+    const catalog = TOWN_BUILDING_CATALOG;
+    let walletAvailableStars = 0;
+    try {
+      const rewards = await this.rewards(auth, studentId, client);
+      const requests = await this.requests(auth, studentId, client);
+      const balance = rewardBalance(earnedQuestionRewardStars(rewards), { requests });
+      walletAvailableStars = balance.available;
+    } catch {}
+    return { town, materials, catalog, walletAvailableStars };
+  }
+
+  async townAnimals(auth, studentId, client = this.pool, { allowClassmate = false } = {}) {
+    if (auth.role === 'student' && auth.studentId !== studentId && !allowClassmate) fail(404, 'Không tìm thấy học sinh.');
+    const student = await this.one('SELECT * FROM bao_an.students WHERE workspace_id=$1 AND id=$2', [auth.workspaceId, studentId], client);
+    if (!student) fail(404, 'Không tìm thấy học sinh.');
+    const awardsRows = await this.rows('SELECT json FROM bao_an.awards WHERE workspace_id=$1 AND student_id=$2 ORDER BY pack_id', [auth.workspaceId, studentId], client);
+    const awards = awardsRows.map(row => parse(row.json));
+    const prog = await this.summaryProgress(auth, student, client, awards);
+    const completedWeeksCount = prog.weeks.filter(w => w.done || w.closed).length;
+    const unlockedDefs = getUnlockedAnimals(completedWeeksCount);
+    const rows = await this.rows('SELECT animal_id, name, arrived_at_week, created_at FROM bao_an.town_animals WHERE workspace_id=$1 AND student_id=$2', [auth.workspaceId, studentId], client);
+    const animals = unlockedDefs.map(def => {
+      const saved = rows.find(r => r.animal_id === def.id);
+      return {
+        animalId: def.id,
+        species: def.species,
+        defaultName: def.defaultName,
+        name: saved ? saved.name : def.defaultName,
+        hasCustomName: !!saved,
+        icon: def.icon,
+        requiredWeeks: def.requiredWeeks,
+        description: def.description,
+        arrivedAtWeek: saved ? saved.arrived_at_week : def.requiredWeeks,
+      };
+    });
+    return { animals, completedWeeksCount };
+  }
+
+  async nameTownAnimal(auth, studentId, input, client = this.pool) {
+    shape(input, ['animalId', 'name']);
+    if (auth.role === 'student' && auth.studentId !== studentId) fail(404, 'Không tìm thấy học sinh.');
+    const student = await this.one('SELECT * FROM bao_an.students WHERE workspace_id=$1 AND id=$2', [auth.workspaceId, studentId], client);
+    if (!student) fail(404, 'Không tìm thấy học sinh.');
+
+    const validation = validateAnimalName(input.name);
+    if (!validation.valid) fail(400, validation.error || 'Tên bạn nhỏ không hợp lệ.');
+
+    const prog = await this.summaryProgress(auth, student, client);
+    const completedWeeksCount = prog.weeks.filter(w => w.done || w.closed).length;
+    const unlockedDefs = getUnlockedAnimals(completedWeeksCount);
+    const def = unlockedDefs.find(d => d.id === input.animalId);
+    if (!def) fail(400, 'Bạn động vật này chưa chuyển đến thị trấn.');
+
+    const cleanName = validation.cleanName;
+    await this.exec(`
+      INSERT INTO bao_an.town_animals(workspace_id, student_id, animal_id, name, arrived_at_week, created_at)
+      VALUES($1,$2,$3,$4,$5,$6)
+      ON CONFLICT(workspace_id, student_id, animal_id) DO UPDATE SET name=EXCLUDED.name
+    `, [auth.workspaceId, studentId, def.id, cleanName, def.requiredWeeks, now()], client);
+
+    return {
+      ok: true,
+      animal: {
+        animalId: def.id,
+        species: def.species,
+        name: cleanName,
+        arrivedAtWeek: def.requiredWeeks,
+        icon: def.icon,
+      }
+    };
+  }
+
+  async classmatesTowns(auth, studentId, client = this.pool) {
+    const student = await this.one('SELECT * FROM bao_an.students WHERE workspace_id=$1 AND id=$2', [auth.workspaceId, studentId], client);
+    if (!student) fail(404, 'Không tìm thấy học sinh.');
+    const classmates = await this.rows('SELECT id, name FROM bao_an.students WHERE workspace_id=$1 AND class_id=$2 AND active=true', [auth.workspaceId, student.class_id], client);
+
+    const results = [];
+    for (const c of classmates) {
+      const townRow = await this.one('SELECT buildings_json FROM bao_an.town_states WHERE workspace_id=$1 AND student_id=$2', [auth.workspaceId, c.id], client);
+      const buildings = townRow ? parse(townRow.buildings_json || '[]') : [];
+      const cheersRow = await this.one('SELECT count(*) as count FROM bao_an.town_cheers WHERE workspace_id=$1 AND to_student_id=$2', [auth.workspaceId, c.id], client);
+      const animalsRow = await this.one('SELECT count(*) as count FROM bao_an.town_animals WHERE workspace_id=$1 AND student_id=$2', [auth.workspaceId, c.id], client);
+
+      results.push({
+        studentId: c.id,
+        name: c.name, // Display name only, NEVER username
+        buildingsCount: buildings.length,
+        cheersCount: Number(cheersRow?.count || 0),
+        animalsCount: Number(animalsRow?.count || 0),
+        isSelf: c.id === studentId,
+      });
+    }
+    return results;
+  }
+
+  async visitTown(auth, callerStudentId, targetStudentId, client = this.pool) {
+    const caller = await this.one('SELECT * FROM bao_an.students WHERE workspace_id=$1 AND id=$2', [auth.workspaceId, callerStudentId], client);
+    const target = await this.one('SELECT * FROM bao_an.students WHERE workspace_id=$1 AND id=$2', [auth.workspaceId, targetStudentId], client);
+    if (!caller || !target) fail(404, 'Không tìm thấy học sinh.');
+
+    if (caller.class_id !== target.class_id) {
+      fail(403, 'Bạn chỉ có thể ghé thăm thị trấn của bạn cùng lớp!');
+    }
+
+    const town = await this.townState(auth, targetStudentId, client, { allowClassmate: true });
+    const animalsData = await this.townAnimals(auth, targetStudentId, client, { allowClassmate: true });
+    const cheersRow = await this.one('SELECT count(*) as count FROM bao_an.town_cheers WHERE workspace_id=$1 AND to_student_id=$2', [auth.workspaceId, targetStudentId], client);
+
+    return {
+      studentName: target.name, // Display name only
+      town,
+      animals: animalsData.animals,
+      cheersCount: Number(cheersRow?.count || 0),
+      isSelf: callerStudentId === targetStudentId,
+    };
+  }
+
+  async cheerClassmate(auth, fromStudentId, targetStudentId, client = this.pool) {
+    if (fromStudentId === targetStudentId) {
+      fail(400, 'Không thể tự cổ vũ thị trấn của chính mình!');
+    }
+
+    const caller = await this.one('SELECT * FROM bao_an.students WHERE workspace_id=$1 AND id=$2', [auth.workspaceId, fromStudentId], client);
+    const target = await this.one('SELECT * FROM bao_an.students WHERE workspace_id=$1 AND id=$2', [auth.workspaceId, targetStudentId], client);
+    if (!caller || !target) fail(404, 'Không tìm thấy học sinh.');
+
+    if (caller.class_id !== target.class_id) {
+      fail(403, 'Chỉ có thể cổ vũ bạn cùng lớp!');
+    }
+
+    const dayKey = new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Ho_Chi_Minh' });
+    const existing = await this.one('SELECT 1 FROM bao_an.town_cheers WHERE workspace_id=$1 AND from_student_id=$2 AND to_student_id=$3 AND day_key=$4', [auth.workspaceId, fromStudentId, targetStudentId, dayKey], client);
+
+    if (!existing) {
+      await this.exec('INSERT INTO bao_an.town_cheers(workspace_id, from_student_id, to_student_id, day_key, created_at) VALUES($1,$2,$3,$4,$5)', [
+        auth.workspaceId, fromStudentId, targetStudentId, dayKey, now()
+      ], client);
+      const totalCheersRow = await this.one('SELECT count(*) as count FROM bao_an.town_cheers WHERE workspace_id=$1 AND to_student_id=$2', [auth.workspaceId, targetStudentId], client);
+      const totalCheers = Number(totalCheersRow?.count || 1);
+      await this.publishClassFeedEvent(auth, target.class_id, targetStudentId, target.name, 'cheer_received', {
+        cheerCount: totalCheers,
+      }, client);
+    }
+
+    const countRow = await this.one('SELECT count(*) as count FROM bao_an.town_cheers WHERE workspace_id=$1 AND to_student_id=$2', [auth.workspaceId, targetStudentId], client);
+    return {
+      ok: true,
+      alreadyCheeredToday: !!existing,
+      cheersCount: Number(countRow?.count || 0),
+    };
+  }
+
+  async publishClassFeedEvent(auth, classId, studentId, studentName, eventType, details, client = this.pool) {
+    try {
+      const cls = await this.one('SELECT feed_enabled FROM bao_an.classes WHERE workspace_id=$1 AND id=$2', [auth.workspaceId, classId], client);
+      if (!cls || cls.feed_enabled === false) return;
+
+      const event = sanitizeClassFeedEvent({
+        id: id(),
+        classId,
+        studentId,
+        studentName,
+        eventType,
+        details,
+        createdAt: now(),
+      });
+
+      if (!verifyPrivacyCompliance(event)) return;
+
+      await this.exec('INSERT INTO bao_an.class_feed_events(workspace_id, class_id, id, student_id, student_name, event_type, details_json, created_at) VALUES($1,$2,$3,$4,$5,$6,$7::jsonb,$8)', [
+        auth.workspaceId, classId, event.id, event.studentId, event.studentName, event.eventType, json(event.details), event.createdAt
+      ], client);
+    } catch {}
+  }
+
+  async classFeed(auth, classId, limit = 50, client = this.pool) {
+    const cls = await this.class(auth, classId, client);
+    const feedEnabled = cls.feed_enabled === undefined || cls.feed_enabled === null || cls.feed_enabled === true;
+    if (!feedEnabled) {
+      return { enabled: false, events: [] };
+    }
+
+    const rows = await this.rows('SELECT * FROM bao_an.class_feed_events WHERE workspace_id=$1 AND class_id=$2 ORDER BY created_at DESC LIMIT $3', [auth.workspaceId, classId, limit], client);
+    const events = rows.map(r => sanitizeClassFeedEvent({
+      id: r.id,
+      classId: r.class_id,
+      studentId: r.student_id,
+      studentName: r.student_name,
+      eventType: r.event_type,
+      details: parse(r.details_json || '{}'),
+      createdAt: r.created_at,
+    })).filter(verifyPrivacyCompliance);
+
+    return { enabled: true, events };
+  }
 }

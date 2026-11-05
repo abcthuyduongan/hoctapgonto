@@ -38,12 +38,14 @@ export function questionRewardThresholds(item:ContentPack['items'][number]):Ques
   if(item.kind==='listening-choice'||item.kind==='listening-gap')return{threeStarMs:30_000,twoStarMs:60_000,clockStartsAfterAudio:true};
   if(item.kind==='reading-choice')return{threeStarMs:90_000,twoStarMs:180_000,clockStartsAfterAudio:false};
   if(item.kind==='numeric-answer'||item.kind==='fill-blank')return{threeStarMs:45_000,twoStarMs:90_000,clockStartsAfterAudio:false};
+  if(item.kind==='compare')return{threeStarMs:30_000,twoStarMs:60_000,clockStartsAfterAudio:false};
+  if(item.kind==='categorize')return{threeStarMs:60_000,twoStarMs:120_000,clockStartsAfterAudio:false};
   return{threeStarMs:30_000,twoStarMs:60_000,clockStartsAfterAudio:false};
 }
 
 export function questionRewardRule(moduleId:ModuleId):QuestionRewardRule {
   if(moduleId==='memory-match'||moduleId==='word-connect')return'pair-mistakes';
-  if(moduleId==='sentence-builder'||moduleId==='sequence-trail')return'order-mistakes';
+  if(moduleId==='sentence-builder'||moduleId==='sequence-trail'||moduleId==='basket-sort')return'order-mistakes';
   return'speed';
 }
 

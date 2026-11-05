@@ -3,7 +3,9 @@ import {gameAllowedByAuthor} from './game-policy.ts';
 
 const nativeKinds: Record<ModuleId, ContentPack['kind']> = {
   'math-quest':'quiz', 'memory-match':'pairs', 'word-connect':'pairs',
-  'sentence-builder':'sentences', 'sequence-trail':'sentences'
+  'sentence-builder':'sentences', 'sequence-trail':'sentences',
+  'balance-scale':'compare', 'basket-sort':'categorize',
+  'treasure-flip':'pairs', 'fox-kitchen':'sentences', 'boat-race':'quiz'
 };
 const normalize = (text:string) => text.normalize('NFC').trim().replace(/\s+/g,' ').toLocaleLowerCase('vi');
 
@@ -34,6 +36,30 @@ export function gamePresentation(moduleId:ModuleId, source:ContentPack):ContentP
     // Repeated answers make matching ambiguous, even if the question IDs differ.
     if(faces.some(face=>face.length>120)||new Set(faces.map(normalize)).size!==faces.length)return;
     const pack:PairsPack={...source,kind:'pairs',items};return pack;
+  }
+  if (source.kind==='compare' && kind==='quiz') {
+    const pack:QuizPack={...source,kind:'quiz',items:source.items.map(item=>({
+      kind:'multiple-choice',id:item.id,objectiveId:item.objectiveId,...(item.metadata?{metadata:item.metadata}:{}),...(item.media?{media:item.media}:{}),
+      prompt:item.prompt?`${item.prompt}: ${item.left} [ ? ] ${item.right}`:`Điền dấu thích hợp: ${item.left} [ ? ] ${item.right}`,
+      options:['>','<','=','Không xác định'] as [string,string,string,string],
+      correctIndex:(item.operator==='>'?0:item.operator==='<'?1:2) as 0|1|2|3,
+      explanation:item.explanation
+    }))};
+    return pack;
+  }
+  if (source.kind==='pairs' && kind==='categorize') {
+    const categories=[...new Set(source.items.map(item=>item.right))];
+    if(categories.length>=2 && categories.length<=6){
+      const pack:import('./contracts.ts').CategorizePack={
+        ...source,kind:'categorize',items:[{
+          id:source.items[0].id,objectiveId:source.items[0].objectiveId,kind:'categorize',
+          prompt:`Phân loại các thẻ vào đúng nhóm (${source.title})`,categories,
+          elements:source.items.map(item=>({id:item.id,text:item.left,category:item.right})),
+          explanation:`Các thẻ đã được phân loại vào ${categories.length} nhóm.`
+        }]
+      };
+      return pack;
+    }
   }
 }
 

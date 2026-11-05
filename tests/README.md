@@ -1,9 +1,9 @@
-# Phạm vi kiểm thử
+# Kiểm thử hiện hành
 
-npm test chạy các nhóm hiện hành: renderer/model, phát hành ZIP, nhập/giao học liệu, tài khoản/API/SQLite/phục hồi và cloud cục bộ.
+`npm test` chạy syntax, release/build identity, học liệu, auth/API/SQLite/khôi phục, media, sao/ví, PostgreSQL fixture và cloud adapter local.
 
-npm run test:online:browser chạy Chrome/Edge qua API thật, gồm đủ năm game, tám dạng câu, tư liệu, sao, đổi thưởng và khôi phục.
+`npm run test:online:browser` chạy các tệp `online*.spec.ts` trên Chrome và Edge, gồm năm game/tám dạng câu, ảnh/audio, tải lỗi/chậm, retry, sao, đổi thưởng, cập nhật và phục hồi.
 
-Các tệp kiểm thử giao diện App/IndexedDB trước đây được GIỮ theo yêu cầu chủ dự án để tham chiếu lịch sử. Chúng không nằm trong lệnh npm/CI hiện hành vì giao diện và kho trình duyệt cũ đã được gỡ. Không dùng kết quả cũ để chứng nhận bản hiện hành.
+`npm run test:assets` kiểm tra artifact web không có 3D/tệp riêng và không vượt ngân sách dung lượng. `npm run verify:local` chạy toàn bộ các cổng hiện hành theo đúng thứ tự build trước khi kiểm tra artifact.
 
-Danh sách đã giữ: [OLD_BROWSER_TESTS_KEPT.md](../docs/OLD_BROWSER_TESTS_KEPT.md).
+Các test và helper chỉ dành cho 3D, IndexedDB/ứng dụng cũ hoặc import module đã được gỡ đã được dọn theo yêu cầu chủ dự án. Không tắt các kiểm tra nghiệp vụ hiện hành để làm bộ test đạt. Kiểm thử cần tệp gốc của người dùng vẫn ghi rõ skip nếu chưa có đầu vào, không tính là PASS.

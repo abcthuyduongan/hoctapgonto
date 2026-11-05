@@ -52,7 +52,7 @@ class Client{
   constructor(origin){this.origin=origin;this.cookie='';this.csrf='';}
   async call(route,{method='GET',body,csrf=this.csrf,binary=false}={}){
     const mutable=method!=='GET',response=await fetch(`${this.origin}/api/online${route}`,{method,headers:{'X-Bao-An-Question-Protocol':'1',...(this.cookie?{Cookie:this.cookie}:{}),...(mutable?{Origin:this.origin,'Content-Type':'application/json',...(csrf?{'X-CSRF-Token':csrf}:{})}:{})},...(mutable?{body:JSON.stringify(body??{})}:{})});
-    assert.match(response.headers.get('cache-control')??'',/no-store/);const cookies=response.headers.getSetCookie();if(cookies.length)this.cookie=cookies.map(value=>value.split(';',1)[0]).join('; ');
+    if(response.ok&&/^image\//.test(response.headers.get('content-type')??''))assert.equal(response.headers.get('cache-control'),'private, max-age=31536000, immutable');else assert.match(response.headers.get('cache-control')??'',/no-store/);const cookies=response.headers.getSetCookie();if(cookies.length)this.cookie=cookies.map(value=>value.split(';',1)[0]).join('; ');
     const data=binary&&response.ok?Buffer.from(await response.arrayBuffer()):await response.json();if(data.csrfToken)this.csrf=data.csrfToken;return{status:response.status,headers:response.headers,data};
   }
   async ok(route,options){const result=await this.call(route,options);assert.ok(result.status>=200&&result.status<300,`${route}: ${result.status} ${JSON.stringify(result.data)}`);return result.data;}

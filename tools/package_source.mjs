@@ -6,7 +6,8 @@ import {zipSync} from 'fflate';
 
 const root=resolve('.'),version=JSON.parse(await readFile(join(root,'package.json'),'utf8')).version;
 const tracked=execFileSync('git',['ls-files','--cached','-z'],{cwd:root,maxBuffer:8*1024*1024}).toString('utf8').split('\0').filter(Boolean);
-const pending=execFileSync('git',['ls-files','--others','--exclude-standard','-z','--','src','server','tools','tests','docs','public/models/optimized'],{cwd:root,maxBuffer:8*1024*1024}).toString('utf8').split('\0').filter(Boolean);
+const pending=execFileSync('git',['ls-files','--others','--exclude-standard','-z','--','src','server','tools','tests','docs','public'],{cwd:root,maxBuffer:8*1024*1024}).toString('utf8').split('\0').filter(Boolean);
+const deletedPaths=execFileSync('git',['diff','--name-only','--diff-filter=D','-z','HEAD'],{cwd:root,maxBuffer:8*1024*1024}).toString('utf8').split('\0').filter(Boolean);
 const names=[...new Set([...tracked,...pending])].sort(),prefix=`bao-an-learning-${version}-source/`,files={},manifest=[];
 let total=0;
 for(const name of names){
@@ -22,7 +23,7 @@ for(const name of names){
  if(bytes.length>64*1024*1024||total>256*1024*1024||manifest.length>=3000)throw new Error('Source package exceeds its bounded size');
  files[prefix+portable]=bytes;manifest.push({path:portable,bytes:bytes.length,sha256:createHash('sha256').update(bytes).digest('hex')});
 }
-files[prefix+'SOURCE_MANIFEST.json']=Buffer.from(JSON.stringify({version,createdAt:new Date().toISOString(),baseCommit:execFileSync('git',['rev-parse','HEAD'],{cwd:root}).toString().trim(),workingTreeSnapshot:true,files:manifest},null,2)+'\n');
+files[prefix+'SOURCE_MANIFEST.json']=Buffer.from(JSON.stringify({version,createdAt:new Date().toISOString(),baseCommit:execFileSync('git',['rev-parse','HEAD'],{cwd:root}).toString().trim(),workingTreeSnapshot:true,deletedPaths,files:manifest},null,2)+'\n');
 const folder=join(root,'releases');await mkdir(folder,{recursive:true});const output=join(folder,`bao-an-learning-${version}-source.zip`),archive=zipSync(files,{level:6});
 await writeFile(output,archive,{flag:'wx'});
 console.log(JSON.stringify({output,files:manifest.length,uncompressedBytes:total,bytes:archive.length,sha256:createHash('sha256').update(archive).digest('hex')}));

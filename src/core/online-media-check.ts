@@ -36,3 +36,29 @@ export async function validateQuestionMediaFile(file:File,signal?:AbortSignal):P
     audio.onerror=()=>finish(new Error(`Không phát được âm thanh “${file.name}”. Hãy xuất lại MP3, WAV hoặc OGG.`));audio.src=url;audio.load();
   });}finally{audio.pause();audio.removeAttribute('src');audio.load();URL.revokeObjectURL(url);}
 }
+
+export const IMAGE_OPTIMIZE_MAX_SIDE=1024;
+export const IMAGE_OPTIMIZE_MIN_BYTES=250*1024;
+type ImageEncoder=(bitmap:ImageBitmap,width:number,height:number,type:string,quality:number)=>Promise<Blob|null>;
+const canvasEncoder:ImageEncoder=async(bitmap,width,height,type,quality)=>{
+  if(typeof OffscreenCanvas!=='undefined'){const canvas=new OffscreenCanvas(width,height),context=canvas.getContext('2d');if(!context)return null;context.drawImage(bitmap,0,0,width,height);return canvas.convertToBlob({type,quality});}
+  const canvas=document.createElement('canvas');canvas.width=width;canvas.height=height;const context=canvas.getContext('2d');if(!context)return null;context.drawImage(bitmap,0,0,width,height);
+  return new Promise(resolve=>canvas.toBlob(blob=>resolve(blob),type,quality));
+};
+/**
+ * Shrink a large photo before it is uploaded so students do not download megabytes per question.
+ * Small images (already ≤ 1024 px and ≤ 250 KB, such as files exported back out of the app) are kept byte for byte,
+ * so re-importing them never changes their hash. Returns null when the original should be used.
+ */
+export async function optimizeQuestionImage(file:Blob&{name:string},{maxSide=IMAGE_OPTIMIZE_MAX_SIDE,minBytes=IMAGE_OPTIMIZE_MIN_BYTES,quality=0.82,decode=(blob:Blob)=>createImageBitmap(blob),encode=canvasEncoder}:{maxSide?:number;minBytes?:number;quality?:number;decode?:(blob:Blob)=>Promise<ImageBitmap>;encode?:ImageEncoder}={}):Promise<Blob|null>{
+  if(!/\.(png|jpe?g|webp)$/i.test(file.name))return null;
+  let bitmap:ImageBitmap;try{bitmap=await decode(file);}catch{return null;}
+  try{
+    const side=Math.max(bitmap.width,bitmap.height);if(side<1||side<=maxSide&&file.size<=minBytes)return null;
+    const scale=Math.min(1,maxSide/side),width=Math.max(1,Math.round(bitmap.width*scale)),height=Math.max(1,Math.round(bitmap.height*scale));
+    // WebP keeps transparency; browsers that cannot encode it fall back to PNG, which we reject below.
+    const encoded=await encode(bitmap,width,height,'image/webp',quality).catch(()=>null);
+    if(!encoded||encoded.type!=='image/webp'||encoded.size<12||encoded.size>=file.size)return null;
+    return encoded;
+  }finally{bitmap.close?.();}
+}

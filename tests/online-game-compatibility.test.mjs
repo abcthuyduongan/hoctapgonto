@@ -26,7 +26,7 @@ test('Question two can limit the whole source to two games without dropping or c
   const pack=quiz();pack.items[1].metadata.allowedGameIds=['memory-match','word-connect'];const before=structuredClone(pack);
   const result=onlineGameCompatibility(pack);
   assert.deepEqual(validatePack(pack),[]);assert.deepEqual(allowed(result),['memory-match','word-connect']);
-  assert.deepEqual(allowed(result.items[0]),['math-quest','memory-match','word-connect']);assert.deepEqual(allowed(result.items[1]),['memory-match','word-connect']);
+  assert.deepEqual(allowed(result.items[0]),['math-quest','memory-match','word-connect','treasure-flip','boat-race']);assert.deepEqual(allowed(result.items[1]),['memory-match','word-connect']);
   assert.match(result.games.find(game=>game.id==='math-quest').reason,/Câu 2.*Người soạn/);
   assert.equal(onlinePresentation('math-quest',pack),undefined);assert.equal(gamePresentation('math-quest',pack),undefined);
   for(const gameId of allowed(result)){const view=onlinePresentation(gameId,pack);assert.equal(view.items.length,pack.items.length);assert.deepEqual(view.items.map(item=>item.id),pack.items.map(item=>item.id));}
@@ -34,17 +34,17 @@ test('Question two can limit the whole source to two games without dropping or c
 });
 
 test('Compatibility explains matching limits and ambiguous faces in the actual group',()=>{
-  const pack=quiz();pack.items[1].prompt='x'.repeat(120);assert.deepEqual(allowed(onlineGameCompatibility(pack)),['math-quest','memory-match','word-connect']);
-  pack.items[1].prompt+='x';let result=onlineGameCompatibility(pack);assert.deepEqual(allowed(result),['math-quest']);
+  const pack=quiz();pack.items[1].prompt='x'.repeat(120);assert.deepEqual(allowed(onlineGameCompatibility(pack)),['math-quest','memory-match','word-connect','treasure-flip','boat-race']);
+  pack.items[1].prompt+='x';let result=onlineGameCompatibility(pack);assert.deepEqual(allowed(result),['math-quest','boat-race']);
   assert.equal(result.items[0].games.find(game=>game.id==='memory-match').allowed,true);assert.match(result.items[1].games.find(game=>game.id==='memory-match').reason,/120 ký tự/);
   pack.items[1].prompt='Câu hỏi hai?';pack.items[1].options[1]=' NẮNG ';result=onlineGameCompatibility(pack);
-  assert.deepEqual(allowed(result),['math-quest']);assert.match(result.items[0].games.find(game=>game.id==='word-connect').reason,/trùng câu 2/);assert.match(result.items[1].games.find(game=>game.id==='word-connect').reason,/trùng câu 1/);
+  assert.deepEqual(allowed(result),['math-quest','boat-race']);assert.match(result.items[0].games.find(game=>game.id==='word-connect').reason,/trùng câu 2/);assert.match(result.items[1].games.find(game=>game.id==='word-connect').reason,/trùng câu 1/);
 });
 
 test('Pair conversion explains the group minimum and author restrictions cannot force unsupported games',()=>{
   const pack={...quiz(),kind:'pairs',items:[1,2,3].map(i=>({kind:'pair',id:`pair-${i}`,objectiveId:'AUTHOR.TEST',left:`Trước ${i}`,right:`Sau ${i}`,metadata:metadata()}))};
-  let result=onlineGameCompatibility(pack);assert.deepEqual(allowed(result),['memory-match','word-connect']);assert.match(result.items[1].games.find(game=>game.id==='math-quest').reason,/ít nhất 4 cặp/);
-  pack.items.push({kind:'pair',id:'pair-4',objectiveId:'AUTHOR.TEST',left:'Trước 4',right:'Sau 4',metadata:metadata()});assert.deepEqual(allowed(onlineGameCompatibility(pack)),['math-quest','memory-match','word-connect']);
+  let result=onlineGameCompatibility(pack);assert.deepEqual(allowed(result),['memory-match','word-connect','treasure-flip']);assert.match(result.items[1].games.find(game=>game.id==='math-quest').reason,/ít nhất 4 cặp/);
+  pack.items.push({kind:'pair',id:'pair-4',objectiveId:'AUTHOR.TEST',left:'Trước 4',right:'Sau 4',metadata:metadata()});assert.deepEqual(allowed(onlineGameCompatibility(pack)),['math-quest','memory-match','word-connect','treasure-flip','boat-race']);
   pack.items[1].metadata.allowedGameIds=['sentence-builder'];result=onlineGameCompatibility(pack);assert.deepEqual(allowed(result),[]);assert.equal(onlinePresentation('sentence-builder',pack),undefined);
 });
 
