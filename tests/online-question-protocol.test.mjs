@@ -40,7 +40,7 @@ async function fixture(t,engine){
  const sets=[{subjectLabel:'Toán',pack:quiz},{subjectLabel:'Tiếng Anh',pack:learning},{subjectLabel:'Tiếng Việt',pack:viet}],week=await manager.ok('/weeks',{requestId:'week',classId:cls.id,title:'Tuần 01',sets});
  const child=new Client(send,origin);await child.ok('/login',{username:'protocol.child',password});await child.ok('/student/journey',{});
  const start=(pack=quiz,requestId='play',legacy=false)=>child.ok(legacy?'/play':'/play/compact',{requestId,moduleId:'math-quest',packId:pack.id,contentVersion:pack.version});
- const answer=(p,itemId,choiceIndex=0,hintsUsed=0,key=itemId)=>child.ok(`/play/${p.session.sessionId}/attempt`,{attemptKey:key,itemId,response:{kind:'choice',choiceIndex},hintsUsed,elapsedMs:0});
+ const answer=(p,itemId,choiceIndex=0,hintsUsed=0,key=itemId,presentationId)=>child.ok(`/play/${p.session.sessionId}/attempt`,{attemptKey:key,itemId,response:{kind:'choice',choiceIndex},hintsUsed,elapsedMs:0,...(presentationId?{presentationId}:{})});
  return{store,manager,admin:identity.user,child,sets,week,cls,quiz,learning,audio,start,answer,directory,objects};
 }
 
@@ -78,13 +78,22 @@ for(const engine of ['SQLite','PostgreSQL']){
   await f.child.denied(base+'/question-open',{itemId:'q2'});await f.child.denied(base+'/question-hint',{itemId:'q1'});
   const opened=await f.child.ok(base+'/question-open',{itemId:'q1'});assert.equal(opened.item.prompt,f.quiz.items[0].prompt);assert.equal(opened.item.correctIndex,undefined);assert.equal(opened.item.explanation,undefined);assert.equal(opened.item.hint,undefined);
   assert.equal((await f.child.ok(base+'/question-open',{itemId:'q1'})).openedAt,opened.openedAt);
-  const wrong=await f.answer(p,'q1',1,0,'wrong');assert.equal(wrong.event.correct,false);assert.equal(wrong.feedback,undefined);
+  const correctIdx=opened.item.options.indexOf('3');
+  const wrongIdx=(correctIdx+1)%4;
+  const wrong=await f.answer(p,'q1',wrongIdx,0,'wrong',opened.item.presentationId);assert.equal(wrong.event.correct,false);assert.equal(wrong.feedback,undefined);
   const hint=await f.child.ok(base+'/question-hint',{itemId:'q1'});assert.equal(hint.hintsUsed,1);assert.deepEqual(await f.child.ok(base+'/question-hint',{itemId:'q1'}),hint);
-  const right=await f.answer(p,'q1',0,0,'right');assert.equal(right.event.hintsUsed,1);assert.equal(right.event.correct,true);assert.equal(right.feedback.correctIndex,0);assert.equal(right.feedback.explanation,f.quiz.items[0].explanation);assert.equal(right.questionRewards.questions[0].tier,2);
-  const retry=await f.answer(p,'q1',0,0,'right');assert.equal(retry.duplicate,true);assert.equal(retry.questionRewards.gained,0);assert.deepEqual(retry.feedback,right.feedback);await f.child.denied(base+'/question-hint',{itemId:'q1'});
-  await f.child.ok(base+'/question-open',{itemId:'q2'});assert.equal((await f.answer(p,'q2',0,20)).event.hintsUsed,0,'unused client hints cannot replace server receipts');
+  const openedRetry=await f.child.ok(base+'/question-open',{itemId:'q1'});
+  const rightIdx=openedRetry.item.options.indexOf('3');
+  const right=await f.answer(p,'q1',rightIdx,0,'right',openedRetry.item.presentationId);assert.equal(right.event.hintsUsed,1);assert.equal(right.event.correct,true);assert.equal(right.feedback.correctIndex,rightIdx);assert.equal(right.feedback.explanation,f.quiz.items[0].explanation);assert.equal(right.questionRewards.questions[0].tier,2);
+  const retry=await f.answer(p,'q1',rightIdx,0,'right',openedRetry.item.presentationId);assert.equal(retry.duplicate,true);assert.equal(retry.questionRewards.gained,0);assert.deepEqual(retry.feedback,right.feedback);await f.child.denied(base+'/question-hint',{itemId:'q1'});
+  const openedQ2=await f.child.ok(base+'/question-open',{itemId:'q2'});
+  const q2CorrectIdx=openedQ2.item.options.indexOf('4');
+  assert.equal((await f.answer(p,'q2',q2CorrectIdx,20,undefined,openedQ2.item.presentationId)).event.hintsUsed,0,'unused client hints cannot replace server receipts');
   if(engine==='SQLite'){const file=path.join(f.directory,'backup.sqlite');await snapshotOnlineDatabase(f.store.db,file);assert.equal(inspectOnlineBackup(file).sha256.length,64);const db=new DatabaseSync(file);try{const row=db.prepare('SELECT json FROM plays WHERE id=?').get(p.session.sessionId),session=JSON.parse(row.json);session.questionHints.q1.used=0;db.prepare('UPDATE plays SET json=? WHERE id=?').run(JSON.stringify(session),p.session.sessionId);}finally{db.close();}assert.throws(()=>inspectOnlineBackup(file),e=>e.status===400);}
-  const legacy=await f.start(f.quiz,'legacy-path',true);assert.equal(legacy.session.questionProtocolVersion,1);assert.equal(legacy.pack.items,undefined);assert.equal(JSON.stringify(legacy).includes('correctIndex'),false);await f.child.ok(`/play/${legacy.session.sessionId}/question-open`,{itemId:'q1'});assert.equal((await f.answer(legacy,'q1')).event.correct,true);
+  const legacy=await f.start(f.quiz,'legacy-path',true);assert.equal(legacy.session.questionProtocolVersion,1);assert.equal(legacy.pack.items,undefined);assert.equal(JSON.stringify(legacy).includes('correctIndex'),false);
+  const legacyOpen=await f.child.ok(`/play/${legacy.session.sessionId}/question-open`,{itemId:'q1'});
+  const legacyCorrectIdx=legacyOpen.item.options.indexOf('3');
+  assert.equal((await f.answer(legacy,'q1',legacyCorrectIdx,0,undefined,legacyOpen.item.presentationId)).event.correct,true);
  });
  test(`${engine}: a listening answer needs the assigned audio download and its verified minimum duration`,async t=>{
   const f=await fixture(t,engine),p=await f.start(f.learning),base='/play/'+p.session.sessionId,itemId='listen1',media='/media/'+f.audio.id,context='?playId='+p.session.sessionId+'&itemId='+itemId;
@@ -92,17 +101,64 @@ for(const engine of ['SQLite','PostgreSQL']){
   const head=await f.child.send(new Request(f.child.origin+'/api/online'+media+context,{method:'HEAD',headers:{Cookie:f.child.cookie}}));assert.equal(head.status,200);await f.child.denied(base+'/question-open',{itemId});
   await f.child.ok(media+context,undefined,{binary:true,headers:{Range:'bytes=0-15'}});await f.child.denied(base+'/question-open',{itemId});
   await f.child.ok(media+context,undefined,{binary:true});await f.child.denied(base+'/question-open',{itemId});await delay(2050);
-  const clock=await f.child.ok(base+'/question-open',{itemId});assert.equal(clock.item.prompt,f.learning.items[0].prompt);assert.equal(JSON.stringify(clock).includes('TRANSCRIPT_PRIVATE_2026'),false);const receipt=await f.answer(p,itemId);assert.equal(receipt.questionRewards.questions[0].tier,3);assert.equal(receipt.feedback.audioTranscript,'TRANSCRIPT_PRIVATE_2026');
+  const clock=await f.child.ok(base+'/question-open',{itemId});assert.equal(clock.item.prompt,f.learning.items[0].prompt);assert.equal(JSON.stringify(clock).includes('TRANSCRIPT_PRIVATE_2026'),false);
+  const listenCorrectIdx=clock.item.options.indexOf('Lucy');
+  const receipt=await f.answer(p,itemId,listenCorrectIdx,0,undefined,clock.item.presentationId);assert.equal(receipt.questionRewards.questions[0].tier,3);assert.equal(receipt.feedback.audioTranscript,'TRANSCRIPT_PRIVATE_2026');
   await f.child.denied(base+'/question-open',{itemId:'listen2'}); // The shared audio must be downloaded for this question as well.
  });
  test(`${engine}: changed meaning cannot retain an old ID; a new question starts without mastery and keeps the old wallet`,async t=>{
-  const f=await fixture(t,engine),p=await f.start();await f.child.ok(`/play/${p.session.sessionId}/question-open`,{itemId:'q1'});await f.answer(p,'q1');
+  const f=await fixture(t,engine),p=await f.start();
+  const openedRev=await f.child.ok(`/play/${p.session.sessionId}/question-open`,{itemId:'q1'});
+  const revCorrectIdx=openedRev.item.options.indexOf('3');
+  await f.answer(p,'q1',revCorrectIdx,0,undefined,openedRev.item.presentationId);
   const revised=structuredClone(f.sets);revised.forEach(s=>s.pack.version=2);revised[0].pack.items[0].prompt='5 + 7 bằng bao nhiêu?';revised[0].pack.items[0].options=['12','13','14','15'];
   const input={requestId:'revision',replaceWeekId:f.week.id,title:f.week.title,classId:f.cls.id,sets:revised};
   const {requestId,...checkInput}=input;void requestId;const check=await f.manager.ok('/admin/week-check',checkInput);assert.match(check.revisionError,/q1.*itemId mới/);await f.manager.denied('/weeks',input);
   assert.equal((await f.child.ok('/student/summary')).balance.earned,3);
   revised[0].pack.items[0].id='q-new';await f.manager.ok('/weeks',input);const state=await f.child.ok('/student/summary'),progress=state.weeks[0].sets.find(s=>s.pack.id===f.quiz.id).questionProgress;
   assert.equal(progress.questions.find(q=>q.itemId==='q-new').tier,0);assert.equal(state.balance.earned,3);assert.equal(state.currentWeekSummary.ready,false);
+  });
+  test(`${engine}: R201-R203 DTO allowlist protects session secrets, stripped fake fields and preserves scoring`,async t=>{
+   const f=await fixture(t,engine),p=await f.start(f.quiz,'r201-play');
+   const base='/play/'+p.session.sessionId;
+   const opened=await f.child.ok(base+'/question-open',{itemId:'q1'});
+   assert.ok(opened.item.presentationId);
+
+   // R201: Check summary and reopened play do not disclose private presentation map or correct indices
+   const summary=await f.child.ok('/student/summary?cursor=current');
+   const reopened=await f.child.ok('/play/compact',{requestId:'r201-play',moduleId:'math-quest',packId:f.quiz.id,contentVersion:f.quiz.version});
+   const sStr=JSON.stringify(summary),rStr=JSON.stringify(reopened);
+   for(const leaked of ['presentationsById','questionPresentations','displayedCorrectIndex','permutation']){
+     assert.equal(sStr.includes(leaked),false,`summary leaked ${leaked}`);
+     assert.equal(rStr.includes(leaked),false,`reopened play leaked ${leaked}`);
+   }
+   assert.equal(reopened.session.presentationsById,undefined);
+   assert.equal(reopened.session.questionPresentations,undefined);
+
+   // R202: Add synthetic private field directly to DB session; verify allowlist filters it out
+   if(engine==='SQLite'){
+     const row=f.store.db.prepare('SELECT json FROM plays WHERE id=?').get(p.session.sessionId);
+     const sObj=JSON.parse(row.json);
+     sObj.secretInternalAuditField='AUDIT_SECRET_DTO_ALLOWLIST_2026';
+     f.store.db.prepare('UPDATE plays SET json=? WHERE id=?').run(JSON.stringify(sObj),p.session.sessionId);
+   }else{
+     await f.store.exec("UPDATE bao_an.plays SET json = json || jsonb_build_object('secretInternalAuditField','AUDIT_SECRET_DTO_ALLOWLIST_2026') WHERE id=$1",[p.session.sessionId]);
+   }
+   const reopenedWithSecret=await f.child.ok('/play/compact',{requestId:'r201-play',moduleId:'math-quest',packId:f.quiz.id,contentVersion:f.quiz.version});
+   assert.equal(JSON.stringify(reopenedWithSecret).includes('AUDIT_SECRET_DTO_ALLOWLIST_2026'),false,'secretInternalAuditField must not leak');
+   assert.equal(reopenedWithSecret.session.secretInternalAuditField,undefined);
+
+   // R203: Normal gameplay, scoring, hints and completion proceed correctly
+   const correctIdx=opened.item.options.indexOf('3');
+   const ans=await f.answer(p,'q1',correctIdx,0,'r203-ans',opened.item.presentationId);
+   assert.equal(ans.event.correct,true);
+   assert.equal(ans.questionRewards.questions[0].tier,3);
+   const opened2=await f.child.ok(base+'/question-open',{itemId:'q2'});
+   const correctIdx2=opened2.item.options.indexOf('4');
+   const ans2=await f.answer(p,'q2',correctIdx2,0,'r203-ans-2',opened2.item.presentationId);
+   assert.equal(ans2.event.correct,true);
+   const complete=await f.child.ok(base+'/complete-compact',{});
+   assert.ok(complete.state);
  });
 }
 test('server audio duration is taken from bounded bytes, not a filename or client duration',async()=>{assert.equal(await audioDurationMs(waveFixture(2),'audio/wav'),2000);await assert.rejects(()=>audioDurationMs(Buffer.from('RIFFinvalid file'),'audio/wav'),e=>e.status===422);const localLarge=waveFixture(200);assert.ok(localLarge.length>2*1024*1024);await assert.rejects(()=>audioDurationMs(localLarge,'audio/wav'),e=>e.status===422);assert.equal(await audioDurationMs(localLarge,'audio/wav',8*1024*1024),200000);});

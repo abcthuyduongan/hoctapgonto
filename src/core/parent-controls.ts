@@ -1,10 +1,8 @@
 export interface ParentControls {
   workspaceId: string;
   studentId: string;
-  pinHash?: string | null;
-  pinSalt?: string | null;
-  pinFailedCount: number;
-  pinLockedUntil?: string | null;
+  hasPin: boolean;
+  pinLocked: boolean;
   maxMinutesPerDay: number;
   allowedStartHour: number;
   allowedEndHour: number;

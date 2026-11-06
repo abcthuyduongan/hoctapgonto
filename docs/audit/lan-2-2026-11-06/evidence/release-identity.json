@@ -1,0 +1,23 @@
+{
+  "dist": {
+    "version": "4.0.1",
+    "commit": "f7c93337669379d768419ae1ab43cbde69f2aabe",
+    "sourceId": "5d9b56a43e18706af1f541af5ef12477c679a8d2fa0c0b1e667f45f1b48261a8",
+    "displayMode": "2d",
+    "questionProtocolVersion": 1
+  },
+  "packagedBuild": {
+    "version": "4.0.1",
+    "commit": "f7c93337669379d768419ae1ab43cbde69f2aabe",
+    "sourceId": "59d67c93a8c3dd8839db1091c8760329f8d11c63984761ee5fe8342833bdff77",
+    "displayMode": "2d",
+    "questionProtocolVersion": 1
+  },
+  "manifest": {
+    "version": "4.0.1",
+    "buildId": "59d67c93a8c3dd88",
+    "pilot": true,
+    "releaseReady": false,
+    "humanPilotStatus": "UNVERIFIED"
+  }
+}

@@ -1108,9 +1108,11 @@ export function generateSemester2Curriculum() {
     curriculumGrade: 3,
     semester: 2,
     academicYear: '2026-2027',
-    approvedBy: 'Hội đồng Chuyên môn Tiểu học Bảo An Learning',
+    approvedBy: 'Hội đồng Kỹ thuật Bảo An Learning (Technical Validation)',
     status: 'approved_ready',
-    approvedDate: '2027-01-15',
+    technicalValidationOnly: true,
+    realTeacherApprovalRequired: true,
+    note: 'Bộ khung 8 tuần đã qua kiểm tra kỹ thuật (validatePack 0 lỗi, tương thích xáo đáp án R03). Nội dung và số lượng câu hỏi 4 môn x 12 câu cần giáo viên duyệt và bổ sung theo thực tế (CT01/CT02).',
     totalWeeks: weeks.length,
     totalPacks,
     weeks

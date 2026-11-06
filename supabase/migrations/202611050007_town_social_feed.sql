@@ -52,3 +52,4 @@ CREATE INDEX IF NOT EXISTS class_feed_lookup ON bao_an.class_feed_events(workspa
 ALTER TABLE bao_an.town_animals ENABLE ROW LEVEL SECURITY;
 ALTER TABLE bao_an.town_cheers ENABLE ROW LEVEL SECURITY;
 ALTER TABLE bao_an.class_feed_events ENABLE ROW LEVEL SECURITY;
+INSERT INTO bao_an.schema_version VALUES(7) ON CONFLICT DO NOTHING;

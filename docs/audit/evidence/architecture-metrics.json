@@ -1,0 +1,560 @@
+{
+  "kind": "Static architecture and saved evidence inventory; not field performance",
+  "moduleCount": 155,
+  "totalSourceBytes": 1959583,
+  "largestModules": [
+    {
+      "file": "src/styles/game-base.css",
+      "lines": 4292,
+      "bytes": 294960
+    },
+    {
+      "file": "server/postgres-store.mjs",
+      "lines": 2045,
+      "bytes": 158966
+    },
+    {
+      "file": "server/online-store.mjs",
+      "lines": 1848,
+      "bytes": 141695
+    },
+    {
+      "file": "tools/generate-semester-2-curriculum.mjs",
+      "lines": 1130,
+      "bytes": 42392
+    },
+    {
+      "file": "src/styles/parent-portal.css",
+      "lines": 1046,
+      "bytes": 17147
+    },
+    {
+      "file": "src/screens/TownScreen.tsx",
+      "lines": 933,
+      "bytes": 36425
+    },
+    {
+      "file": "src/core/curriculum.ts",
+      "lines": 886,
+      "bytes": 78035
+    },
+    {
+      "file": "src/styles/world-map.css",
+      "lines": 852,
+      "bytes": 16931
+    },
+    {
+      "file": "src/styles/contest-mock.css",
+      "lines": 785,
+      "bytes": 15234
+    },
+    {
+      "file": "src/screens/ParentPortalScreen.tsx",
+      "lines": 748,
+      "bytes": 30302
+    },
+    {
+      "file": "src/screens/ContestMockScreen.tsx",
+      "lines": 608,
+      "bytes": 24991
+    },
+    {
+      "file": "src/core/badges.ts",
+      "lines": 563,
+      "bytes": 19061
+    },
+    {
+      "file": "src/core/contest-matrix.ts",
+      "lines": 543,
+      "bytes": 17839
+    },
+    {
+      "file": "src/styles/town.css",
+      "lines": 512,
+      "bytes": 9158
+    },
+    {
+      "file": "src/core/online-document-import.ts",
+      "lines": 459,
+      "bytes": 38813
+    }
+  ],
+  "bundle": [
+    {
+      "file": "GameCompletion-DfX71KsR.css",
+      "bytes": 268623,
+      "gzipLocalBytes": 52022
+    },
+    {
+      "file": "index-BZ5IhaHK.js",
+      "bytes": 226351,
+      "gzipLocalBytes": 71239
+    },
+    {
+      "file": "OnlineAdminDashboard-B4ZLRUVe.js",
+      "bytes": 141971,
+      "gzipLocalBytes": 46913
+    },
+    {
+      "file": "OnlineStudentWorld-Bgq9Xrlw.js",
+      "bytes": 79190,
+      "gzipLocalBytes": 23875
+    },
+    {
+      "file": "OnlineStudentWorld-CD5gnIEh.css",
+      "bytes": 50937,
+      "gzipLocalBytes": 10579
+    },
+    {
+      "file": "OnlineScreen-UNKotzGV.css",
+      "bytes": 29371,
+      "gzipLocalBytes": 6633
+    },
+    {
+      "file": "TownScreen-BKzikygA.js",
+      "bytes": 28664,
+      "gzipLocalBytes": 8788
+    },
+    {
+      "file": "OnlineScreen-3eHwZklE.js",
+      "bytes": 18651,
+      "gzipLocalBytes": 7170
+    },
+    {
+      "file": "ParentPortalScreen-DcAZxQVj.js",
+      "bytes": 18621,
+      "gzipLocalBytes": 5387
+    },
+    {
+      "file": "ContestMockScreen-Be791AGC.js",
+      "bytes": 13828,
+      "gzipLocalBytes": 4704
+    },
+    {
+      "file": "ParentPortalScreen-BwwNxQjV.css",
+      "bytes": 13297,
+      "gzipLocalBytes": 3061
+    },
+    {
+      "file": "question-export-download-CdfPhEIw.js",
+      "bytes": 12285,
+      "gzipLocalBytes": 5193
+    },
+    {
+      "file": "ContestMockScreen-BZObUcAF.css",
+      "bytes": 11428,
+      "gzipLocalBytes": 2735
+    },
+    {
+      "file": "SentenceBuilder-DnOskjUx.js",
+      "bytes": 9677,
+      "gzipLocalBytes": 3754
+    },
+    {
+      "file": "WordConnect-C2iFcM63.js",
+      "bytes": 9519,
+      "gzipLocalBytes": 3747
+    },
+    {
+      "file": "MathQuest-KGi6irNq.js",
+      "bytes": 9221,
+      "gzipLocalBytes": 3732
+    },
+    {
+      "file": "SequenceTrail-CvswtX5I.js",
+      "bytes": 8880,
+      "gzipLocalBytes": 3513
+    },
+    {
+      "file": "OnlineExerciseRunner-DOK1nU5b.js",
+      "bytes": 8523,
+      "gzipLocalBytes": 3489
+    },
+    {
+      "file": "MemoryMatch-eXl_2pqN.js",
+      "bytes": 8229,
+      "gzipLocalBytes": 3338
+    },
+    {
+      "file": "useQuestionLayout-Dt2S6Dtn.css",
+      "bytes": 7584,
+      "gzipLocalBytes": 1420
+    },
+    {
+      "file": "TownScreen-DVkD32gE.css",
+      "bytes": 7101,
+      "gzipLocalBytes": 2050
+    },
+    {
+      "file": "online-format-DjXNNefe.js",
+      "bytes": 5988,
+      "gzipLocalBytes": 2887
+    },
+    {
+      "file": "FoxKitchen-D79MQ2ub.js",
+      "bytes": 5933,
+      "gzipLocalBytes": 2595
+    },
+    {
+      "file": "BalanceScale-DnvZ4fK6.js",
+      "bytes": 5700,
+      "gzipLocalBytes": 2507
+    },
+    {
+      "file": "TreasureFlip-Zc9nDPjH.js",
+      "bytes": 5622,
+      "gzipLocalBytes": 2605
+    },
+    {
+      "file": "BoatRace-Cx6yXK6I.js",
+      "bytes": 5394,
+      "gzipLocalBytes": 2549
+    },
+    {
+      "file": "BasketSort-C3WFw-Lk.js",
+      "bytes": 4445,
+      "gzipLocalBytes": 2184
+    },
+    {
+      "file": "BalanceScale-C6rXM2GZ.css",
+      "bytes": 3996,
+      "gzipLocalBytes": 1319
+    },
+    {
+      "file": "ParentPinModal-R7MytOfs.js",
+      "bytes": 3935,
+      "gzipLocalBytes": 1735
+    },
+    {
+      "file": "GameCompletion-DqiS5xv6.js",
+      "bytes": 3907,
+      "gzipLocalBytes": 1364
+    },
+    {
+      "file": "rich-content-Cgbt1fh2.js",
+      "bytes": 3591,
+      "gzipLocalBytes": 1640
+    },
+    {
+      "file": "game-context-themes-DE65RjN-.css",
+      "bytes": 3514,
+      "gzipLocalBytes": 1237
+    },
+    {
+      "file": "OnlinePasswordDialog-jywiERka.js",
+      "bytes": 2985,
+      "gzipLocalBytes": 1262
+    },
+    {
+      "file": "OnlineAdminDashboard-BlYGVA2x.css",
+      "bytes": 2912,
+      "gzipLocalBytes": 985
+    },
+    {
+      "file": "BasketSort-DRiJq8v3.css",
+      "bytes": 2798,
+      "gzipLocalBytes": 1066
+    },
+    {
+      "file": "useQuestionClock-C9iNiucY.js",
+      "bytes": 1733,
+      "gzipLocalBytes": 912
+    },
+    {
+      "file": "OnlineWeekAdvanceDialog-Bl-4Hr3r.js",
+      "bytes": 1701,
+      "gzipLocalBytes": 930
+    },
+    {
+      "file": "useQuestionLayout-BOpJizKP.js",
+      "bytes": 1594,
+      "gzipLocalBytes": 816
+    },
+    {
+      "file": "index-DaRcpkAD.css",
+      "bytes": 778,
+      "gzipLocalBytes": 460
+    },
+    {
+      "file": "GameMascot-UlUFBhoj.js",
+      "bytes": 555,
+      "gzipLocalBytes": 426
+    },
+    {
+      "file": "pair-rounds-ocU5XXD6.js",
+      "bytes": 413,
+      "gzipLocalBytes": 308
+    },
+    {
+      "file": "useQuestionSpeech-BnMwZV78.js",
+      "bytes": 365,
+      "gzipLocalBytes": 310
+    },
+    {
+      "file": "FeedbackEffects-B3TilfBr.js",
+      "bytes": 357,
+      "gzipLocalBytes": 251
+    },
+    {
+      "file": "sdk-BLNjduv7.js",
+      "bytes": 295,
+      "gzipLocalBytes": 232
+    }
+  ],
+  "acceptanceEvidence": {
+    "claimedPass": 53,
+    "passRowsWithMissingEvidence": 38,
+    "missing": [
+      {
+        "id": "AU01",
+        "paths": [
+          "test-results/parent-auth-matrix-log.txt"
+        ]
+      },
+      {
+        "id": "AU02",
+        "paths": [
+          "test-results/parent-auth-matrix-log.txt"
+        ]
+      },
+      {
+        "id": "AU03",
+        "paths": [
+          "test-results/parent-auth-matrix-log.txt"
+        ]
+      },
+      {
+        "id": "AU04",
+        "paths": [
+          "test-results/parent-auth-matrix-log.txt"
+        ]
+      },
+      {
+        "id": "AU05",
+        "paths": [
+          "test-results/parent-auth-matrix-log.txt"
+        ]
+      },
+      {
+        "id": "AU06",
+        "paths": [
+          "test-results/parent-auth-matrix-log.txt"
+        ]
+      },
+      {
+        "id": "AU07",
+        "paths": [
+          "test-results/parent-auth-matrix-log.txt"
+        ]
+      },
+      {
+        "id": "AU08",
+        "paths": [
+          "test-results/parent-auth-matrix-log.txt"
+        ]
+      },
+      {
+        "id": "AU09",
+        "paths": [
+          "test-results/parent-auth-matrix-log.txt"
+        ]
+      },
+      {
+        "id": "AN01",
+        "paths": [
+          "test-results/question-shuffling-log.txt"
+        ]
+      },
+      {
+        "id": "AN02",
+        "paths": [
+          "test-results/question-shuffling-log.txt"
+        ]
+      },
+      {
+        "id": "AN03",
+        "paths": [
+          "test-results/question-shuffling-log.txt"
+        ]
+      },
+      {
+        "id": "AN04",
+        "paths": [
+          "test-results/question-shuffling-log.txt"
+        ]
+      },
+      {
+        "id": "AN05",
+        "paths": [
+          "test-results/question-shuffling-log.txt"
+        ]
+      },
+      {
+        "id": "AN06",
+        "paths": [
+          "test-results/question-shuffling-log.txt"
+        ]
+      },
+      {
+        "id": "AN07",
+        "paths": [
+          "test-results/question-shuffling-log.txt"
+        ]
+      },
+      {
+        "id": "AN08",
+        "paths": [
+          "test-results/question-shuffling-log.txt"
+        ]
+      },
+      {
+        "id": "AN09",
+        "paths": [
+          "test-results/question-shuffling-log.txt"
+        ]
+      },
+      {
+        "id": "AN10",
+        "paths": [
+          "test-results/question-shuffling-log.txt"
+        ]
+      },
+      {
+        "id": "AN11",
+        "paths": [
+          "test-results/question-shuffling-log.txt"
+        ]
+      },
+      {
+        "id": "AN12",
+        "paths": [
+          "test-results/question-shuffling-log.txt"
+        ]
+      },
+      {
+        "id": "BK01",
+        "paths": [
+          "test-results/cloud-backup-log.txt"
+        ]
+      },
+      {
+        "id": "BK02",
+        "paths": [
+          "test-results/cloud-backup-log.txt"
+        ]
+      },
+      {
+        "id": "BK03",
+        "paths": [
+          "test-results/cloud-backup-log.txt"
+        ]
+      },
+      {
+        "id": "BK04",
+        "paths": [
+          "test-results/cloud-backup-log.txt"
+        ]
+      },
+      {
+        "id": "BK05",
+        "paths": [
+          "test-results/cloud-backup-log.txt"
+        ]
+      },
+      {
+        "id": "BK06",
+        "paths": [
+          "test-results/cloud-backup-log.txt"
+        ]
+      },
+      {
+        "id": "BK07",
+        "paths": [
+          "test-results/cloud-backup-log.txt"
+        ]
+      },
+      {
+        "id": "BK08",
+        "paths": [
+          "test-results/cloud-backup-log.txt"
+        ]
+      },
+      {
+        "id": "MG01",
+        "paths": [
+          "test-results/cloud-deployment-log.txt"
+        ]
+      },
+      {
+        "id": "MG02",
+        "paths": [
+          "test-results/cloud-deployment-log.txt"
+        ]
+      },
+      {
+        "id": "MG03",
+        "paths": [
+          "test-results/cloud-deployment-log.txt"
+        ]
+      },
+      {
+        "id": "MG04",
+        "paths": [
+          "test-results/sqlite-migration-log.txt"
+        ]
+      },
+      {
+        "id": "MG05",
+        "paths": [
+          "test-results/cloud-deployment-log.txt"
+        ]
+      },
+      {
+        "id": "MG06",
+        "paths": [
+          "test-results/staging-rollback-log.txt"
+        ]
+      },
+      {
+        "id": "PF03",
+        "paths": [
+          "test-results/load-staging-output.txt"
+        ]
+      },
+      {
+        "id": "CT03",
+        "paths": [
+          "test-results/question-shuffling-log.txt"
+        ]
+      },
+      {
+        "id": "RL04",
+        "paths": [
+          "test-results/staging-rollback-log.txt"
+        ]
+      }
+    ]
+  },
+  "savedBrowserReport": {
+    "stats": {
+      "startTime": "2026-11-06T02:25:02.111Z",
+      "duration": 129751.256,
+      "expected": 28,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "files": [
+      "online-a11y.spec.ts",
+      "online-contest.spec.ts",
+      "online-discovery.spec.ts",
+      "online-journey.spec.ts",
+      "online-parent-portal.spec.ts",
+      "online-quiz.spec.ts",
+      "online-routing.spec.ts",
+      "online-scrolling.spec.ts",
+      "online-summary.spec.ts",
+      "online-town.spec.ts"
+    ]
+  }
+}

@@ -1,5 +1,8 @@
-import '../styles/game-base.css';
-import '../styles/game-context-themes.css';
+import '../styles/games/primitives.css';
+import '../styles/games/stage.css';
+import '../styles/games/feedback.css';
+import '../styles/games/math-quest.css';
+import '../styles/themes/fishing.css';
 import {useQuestionSpeech} from './useQuestionSpeech';
 import {saveFailureMessage} from './save-failure-message';
 import QuestionMedia,{useNextQuestionImage} from '../components/QuestionMedia';
@@ -49,7 +52,12 @@ export default function MathQuest({pack,onAttempt,onComplete,onExit,questionMode
     if (answerLock.current || busy || hintBusy || selected !== null || status === 'done' || !clock.ready) return;
     answerLock.current=true;
     setError('');setBusy(true);
-    const input:AttemptInput=questionMode&&pendingRef.current?pendingRef.current:{attemptKey:questionMode?`${question.id}:answer:${attemptNumber.current}`:question.id,itemId:question.id,objectiveId:question.objectiveId,correct:!serverScored&&choice===legacyQuestion.correctIndex,hintsUsed:hints,elapsedMs:Math.max(0,Math.round(performance.now()-started)),response:{kind:'choice',choiceIndex:choice}};
+    const presId = ('presentationId' in question && typeof question.presentationId === 'string')
+      ? question.presentationId
+      : (clock.item && 'presentationId' in clock.item && typeof clock.item.presentationId === 'string')
+      ? clock.item.presentationId
+      : undefined;
+    const input:AttemptInput=questionMode&&pendingRef.current?pendingRef.current:{attemptKey:questionMode?`${question.id}:answer:${attemptNumber.current}`:question.id,itemId:question.id,objectiveId:question.objectiveId,correct:!serverScored&&choice===legacyQuestion.correctIndex,hintsUsed:hints,elapsedMs:Math.max(0,Math.round(performance.now()-started)),response:{kind:'choice',choiceIndex:choice},...(presId ? {presentationId: presId} : {})};
     if(questionMode){pendingRef.current=input;setPending(input);}
     try {
       const receipt=await onAttempt(input);if(serverScored&&!receipt)throw new Error('Chưa nhận được kết quả chấm từ máy chủ. Con thử gửi lại nhé.');
@@ -118,7 +126,7 @@ export default function MathQuest({pack,onAttempt,onComplete,onExit,questionMode
           <h2 className="quiz-question">{question.prompt}</h2>
           <QuestionMedia key={question.id} media={correctSelected&&outcome?.feedback?.audioTranscript?{...question.media,audioTranscript:outcome.feedback.audioTranscript}:question.media} showTranscript={selected!==null&&(!questionMode||correctSelected)} onImageReady={questionMode?()=>setImageReadyQuestion(question.id):undefined}/>
         </div>
-        {error && <div className="notice error" role="alert">{error} {questionMode&&pending?<button type="button" disabled={busy} onClick={()=>void answer(pending.response?.kind==='choice'?pending.response.choiceIndex:0)}>Thử gửi lại đáp án</button>:<button onClick={()=>setError('')}>Đóng</button>}</div>}
+        {error && <div className="notice error" role="alert">{error} {questionMode&&pending?<button type="button" disabled={busy} onClick={()=>void answer(pending.response?.kind==='choice'?pending.response.choiceIndex:0)}>Thử gửi lại đáp án</button>:null}{(error.includes('mở lại câu hỏi')||error.includes('hết hạn'))?<button type="button" disabled={busy} onClick={()=>{pendingRef.current=null;setPending(null);setSelected(null);setOutcome(null);setError('');clock.retry();}}>Tải lại câu hỏi</button>:<button onClick={()=>setError('')}>Đóng</button>}</div>}
         <div className="answer-grid">
           {question.options.map((optionText,i) => <button key={i} className={`answer-option ${selected !== null && (!questionMode||correctSelected) && i === correctIndex ? 'correct':''} ${selected === i && !correctSelected?'incorrect':''}`} onClick={() => void answer(i)} disabled={selected !== null || busy || hintBusy || !!error || !!pending || !clock.ready}>
             <span className="answer-index">{String.fromCharCode(65+i)}</span><span>{optionText}</span>
@@ -129,7 +137,7 @@ export default function MathQuest({pack,onAttempt,onComplete,onExit,questionMode
           <div className="stable-response-body">
             {selected !== null ? <div className={`answer-feedback ${correctSelected?'feedback-win':'feedback-retry'}`}>
               <div className="result-copy"><strong>{correctSelected ? '🌟 Chính xác! Thật xuất sắc!':'💡 Cùng học từ câu này nhé!'}</strong><p>{questionMode&&!correctSelected?'Con chọn lại đáp án nhé. Đồng hồ của câu này vẫn tiếp tục.':explanation}</p></div>
-              {questionMode&&!correctSelected?<button type="button" className="button primary result-next" onClick={()=>{setSelected(null);setError('');}} disabled={busy}>Trả lời lại</button>:<button className="button primary result-next" onClick={() => void next()} disabled={busy}>{busy?'Đang lưu…':index === content.items.length-1?(questionMode?'Hoàn thành bộ câu hỏi':'Nhận phần thưởng ⭐'):'Đến trạm kế tiếp ➜'}</button>}
+              {questionMode&&!correctSelected?<button type="button" className="button primary result-next" onClick={()=>{setSelected(null);setOutcome(null);setError('');clock.retry();}} disabled={busy}>Trả lời lại</button>:<button className="button primary result-next" onClick={() => void next()} disabled={busy}>{busy?'Đang lưu…':index === content.items.length-1?(questionMode?'Hoàn thành bộ câu hỏi':'Nhận phần thưởng ⭐'):'Đến trạm kế tiếp ➜'}</button>}
             </div> : <div className="game-help">
               <button className="button text-button" onClick={()=>void requestHint()} disabled={hintBusy||hints>0||!!error||!!pending||!clock.ready}>💡 {hintBusy?'Đang tải gợi ý…':hints>0?'Đã xem gợi ý':'Cần một gợi ý?'}</button>
               <p className="hint-text">{hints > 0 ? hintText : questionMode?'Con trả lời đúng và nhanh để nâng sao của câu này.':'Con có thể suy nghĩ thoải mái trước khi chọn đáp án.'}</p>

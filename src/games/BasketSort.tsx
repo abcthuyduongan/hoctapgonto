@@ -1,4 +1,6 @@
-import '../styles/game-base.css';
+import '../styles/games/primitives.css';
+import '../styles/games/stage.css';
+import '../styles/games/feedback.css';
 import '../styles/basket-sort.css';
 import { useEffect, useRef, useState } from 'react';
 import type { AttemptInput, CategorizeElement, CategorizeItem, CategorizePack, GameHostProps } from '../core/contracts';

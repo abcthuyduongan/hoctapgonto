@@ -1,0 +1,156 @@
+/* Bao An Learning - Online Exercise Runner Styles */
+
+.online-exercise {
+  box-sizing: border-box;
+}
+
+.online-exercise-card {
+  position: relative;
+  background: rgba(255, 255, 255, 0.96);
+  border: 4px solid #c7d2fe;
+  box-shadow: 0 10px 0 #4f46e5, 0 20px 36px rgba(79, 70, 229, 0.25);
+  border-radius: 25px;
+  padding: 24px 28px;
+  max-width: 960px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.online-reading {
+  background: #f8fafc;
+  border: 2px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 16px 20px;
+  margin: 12px 0 16px;
+  line-height: 1.65;
+  color: #1e293b;
+}
+
+.online-reading h3 {
+  margin: 0 0 8px;
+  color: #0f172a;
+}
+
+.online-reading p {
+  margin: 0;
+  font-size: 15px;
+}
+
+.online-audio-guide {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 12px;
+  padding: 10px 14px;
+  color: #1d4ed8;
+  font-size: 13px;
+  font-weight: 700;
+  margin: 12px 0;
+}
+
+.online-form {
+  margin-top: 16px;
+}
+
+.online-form fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+
+.online-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-weight: 800;
+  font-size: 16px;
+  color: #1e293b;
+}
+
+.online-form input {
+  padding: 12px 16px;
+  border: 2px solid #cbd5e1;
+  border-radius: 12px;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.online-form input:focus {
+  border-color: #6366f1;
+  outline: none;
+}
+
+.online-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.online-actions button,
+.online-primary {
+  padding: 11px 20px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all 0.15s;
+}
+
+.online-primary {
+  background: linear-gradient(180deg, #4f46e5 0%, #4338ca 100%);
+  color: white;
+  border-color: #818cf8;
+  box-shadow: 0 4px 0 #312e81;
+}
+
+.online-primary:hover:not(:disabled) {
+  filter: brightness(1.08);
+  transform: translateY(-2px);
+}
+
+.online-exercise-feedback {
+  margin-top: 16px;
+  padding: 16px 20px;
+  border-radius: 16px;
+  border: 2px solid #cbd5e1;
+  background: #f8fafc;
+}
+
+.online-exercise-feedback.is-correct {
+  background: #ecfdf5;
+  border-color: #10b981;
+  color: #065f46;
+}
+
+.online-exercise-feedback.is-incorrect {
+  background: #fff1f2;
+  border-color: #f43f5e;
+  color: #881337;
+}
+
+.online-hint {
+  background: #fefce8;
+  border: 1px solid #fef08a;
+  border-radius: 12px;
+  padding: 12px 16px;
+  color: #854d0e;
+  font-size: 14px;
+  margin-top: 12px;
+}
+
+.online-notice.online-error {
+  background: #fff1f2;
+  border: 1px solid #fecdd3;
+  color: #be123c;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  margin-top: 10px;
+}
+
+@media (max-width: 760px) {
+  .online-exercise-card { padding: 16px 14px; }
+  .online-actions { flex-direction: column; }
+  .online-actions button { width: 100%; }
+}

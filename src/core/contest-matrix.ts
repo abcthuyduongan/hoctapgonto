@@ -40,6 +40,7 @@ export interface ContestMistake {
   studentAnswer: string | number | null;
   correctAnswer: string | number;
   explanation: string;
+  options?: string[];
 }
 
 export interface ContestResult {
@@ -468,7 +469,8 @@ export function evaluateContestSubmission(
         prompt: item.prompt,
         studentAnswer: rawAnswer !== undefined ? rawAnswer : null,
         correctAnswer: item.correctAnswer,
-        explanation: item.explanation
+        explanation: item.explanation,
+        ...(Array.isArray(item.options) ? { options: item.options } : {})
       });
     }
   }

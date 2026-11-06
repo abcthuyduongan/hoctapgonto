@@ -1,0 +1,39 @@
+/* Bao An Learning - Fox Kitchen Game Styles */
+
+.fox-kitchen-board {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.kitchen-stage {
+  padding: 16px 0;
+  text-align: center;
+}
+
+.recipe-prompt {
+  font-size: 18px;
+  font-weight: 600;
+  color: #9a3412;
+  margin-bottom: 16px;
+}
+
+.soup-pot {
+  min-height: 120px;
+  padding: 16px;
+  border-radius: 24px;
+  background: linear-gradient(180deg, #ffedd5, #fed7aa);
+  border: 3px dashed #ea580c;
+  margin-bottom: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+}
+
+.pantry-shelf {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+}

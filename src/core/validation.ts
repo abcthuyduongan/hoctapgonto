@@ -107,9 +107,43 @@ export function validatePack(pack: ContentPack): string[] {
       if (contentSet.has(key)) errors.push(`Câu ${n}: đề bài bị trùng.`);
       contentSet.add(key);
       if (quiz.options && new Set(quiz.options.map(norm)).size !== 4) errors.push(`Câu ${n}: có phương án giống nhau.`);
+      if (quiz.options && Array.isArray(quiz.options)) {
+        for (const opt of quiz.options) {
+          if (typeof opt === 'string' && /(?:^|[^\p{L}\p{N}])(?:cả|tất cả)\s+(?:[A-D](?![a-zA-Z\p{L}])\s*(?:và|hoặc|,)\s*)+[A-D](?![a-zA-Z\p{L}])|(?:đáp án|phương án)\s+[A-D](?![a-zA-Z\p{L}])|\bcả\s+[A-D](?![a-zA-Z\p{L}])|[A-D]\s+và\s+[A-D](?![a-zA-Z\p{L}])/iu.test(opt)) {
+            errors.push(`Câu ${n}: phương án chứa tham chiếu vị trí ("${opt}"). Người soạn cần viết nội dung độc lập để hỗ trợ xáo trộn đáp án.`);
+          }
+        }
+      }
     }
   }
   return errors;
+}
+
+export interface OptionDistributionAnalysis {
+  totalChoiceQuestions: number;
+  distribution: Record<number, number>;
+  allSamePosition: boolean;
+  warning?: string;
+}
+
+export function analyzeOptionDistribution(pack: ContentPack): OptionDistributionAnalysis {
+  const distribution: Record<number, number> = { 0: 0, 1: 0, 2: 0, 3: 0 };
+  let total = 0;
+  for (const item of pack.items) {
+    if ('options' in item && Array.isArray((item as any).options) && Number.isInteger((item as any).correctIndex)) {
+      const idx = (item as any).correctIndex;
+      distribution[idx] = (distribution[idx] ?? 0) + 1;
+      total++;
+    }
+  }
+  const allSamePosition = total > 0 && Object.values(distribution).some(count => count === total);
+  let warning: string | undefined;
+  if (allSamePosition) {
+    const pos = Object.entries(distribution).find(([, count]) => count === total)?.[0] ?? '0';
+    const label = ['A', 'B', 'C', 'D'][Number(pos)] ?? pos;
+    warning = `Cảnh báo: 100% (${total}/${total}) câu hỏi có đáp án tại vị trí ${label}. Hệ thống sẽ tự động xáo trộn vị trí khi học sinh làm bài.`;
+  }
+  return { totalChoiceQuestions: total, distribution, allSamePosition, warning };
 }
 
 export function compatible(moduleId: ModuleId, pack: ContentPack): boolean {

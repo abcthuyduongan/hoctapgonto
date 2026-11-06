@@ -1,0 +1,11 @@
+{
+  "kind": "Actual built app and SQLiteHTTP fixture; click mistake practice after submitting an empty contest",
+  "reviewHttpStatus": 200,
+  "returnedPackKind": "quiz",
+  "returnedItems": 15,
+  "contestDialogCount": 0,
+  "learningDialogCount": 1,
+  "playsBefore": 1,
+  "playsAfter": 2,
+  "reproduced": false
+}

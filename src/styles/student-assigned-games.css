@@ -3,7 +3,7 @@
 .student-welcome{display:flex;align-items:center;justify-content:space-between;gap:24px;margin-bottom:26px}
 .student-welcome h1{font-size:clamp(25px,3vw,36px);letter-spacing:-.04em;margin-bottom:8px}
 .student-welcome h1>span{font-size:.75em;color:#c27b25}
-.student-welcome p:last-child{margin:0;color:#647267}
+.student-welcome p:last-child{margin:0;color:#2c4033}
 .student-quick-nav{display:flex;align-items:center;gap:8px;flex-shrink:0;padding:5px;border:1px solid #d6ddce;border-radius:16px;background:#fffdf8}
 .student-quick-nav a{padding:10px 14px;min-height:44px;display:flex;align-items:center;border-radius:11px;text-decoration:none;font-size:13px;font-weight:700;color:#596a5e}
 .student-quick-nav a[aria-current]{background:#e2edde;color:#355d40}
@@ -11,7 +11,7 @@
 .student-explorer-main{min-width:0;display:grid;gap:28px}
 .student-map{position:relative;padding:28px;border:2px solid #93a88a;border-radius:26px;background:#f6f7e9;box-shadow:0 5px 0 #dce2d0;scroll-margin-top:24px}
 .student-map-heading,.student-games-heading{display:flex;align-items:center;justify-content:space-between;gap:14px}
-.student-kicker{display:block;font-size:10px;font-weight:800;letter-spacing:.13em;color:#61745d;margin-bottom:8px}
+.student-kicker{display:block;font-size:10px;font-weight:800;letter-spacing:.13em;color:#1b4a20;margin-bottom:8px}
 .student-map-heading h2{font-size:25px;margin:0;color:#334d42;overflow-wrap:anywhere}
 .student-map-stamp{font-size:11px;font-weight:700;white-space:nowrap;padding:7px 10px;border:1px solid #b5c2a5;border-radius:9px;background:#fffdf3;color:#556b4a;transform:rotate(2deg)}
 .student-map-guide{font-size:13px;color:#62715d;margin:12px 0 22px!important}
@@ -45,7 +45,7 @@
 .student-light-games{padding:2px 0 0;min-width:0}
 .student-games-heading h2{font-size:21px;margin:0;overflow-wrap:anywhere}
 .student-question-count{font-size:11px;color:#616f60;white-space:nowrap;padding:6px 10px;border-radius:8px;border:1px solid #dfe3d4;background:#fffdf7}
-.student-games-guide{font-size:13px;color:#718070;margin:10px 0 18px!important}
+.student-games-guide{font-size:13px;color:#1b4a20;margin:10px 0 18px!important}
 .student-game-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
 .online-student button.student-game-card{display:flex;align-items:flex-start;gap:14px;width:100%;padding:20px 17px;border:1px solid #d3deca;border-radius:19px;background:#fffdf8;text-align:left;box-shadow:0 3px 0 #e6e8dc;transition:border-color .15s,transform .15s}
 .online-student button.student-game-card:hover:not(:disabled){border-color:#799277;background:#fff;transform:translateY(-2px)}
@@ -67,8 +67,8 @@
 .student-week-card h2{font-size:17px;margin-bottom:20px}
 .student-progress-count{display:grid;gap:3px;margin-bottom:15px}
 .student-progress-count>strong{font-size:33px;line-height:1.1;color:#496e41}
-.student-progress-count>strong>span{font-size:19px;font-weight:500;color:#839078}
-.student-progress-count>span{font-size:11px;color:#6d7964}
+.student-progress-count>strong>span{font-size:19px;font-weight:500;color:#355732}
+.student-progress-count>span{font-size:11px;color:#2c402a}
 .student-week-meter{display:block;width:100%;height:10px;border:none;border-radius:6px;overflow:hidden;accent-color:#739460;background:#e8eddf}
 .student-week-meter::-webkit-progress-bar{background:#e8eddf;border-radius:6px}
 .student-week-meter::-webkit-progress-value{background:#739460;border-radius:6px}
@@ -76,11 +76,11 @@
 .student-week-card>p{font-size:12px;color:#6d7964;margin:12px 0 16px}
 .student-text-link{display:flex;justify-content:space-between;align-items:center;gap:10px;min-height:44px;font-size:11px;text-decoration:none;font-weight:750;color:#496e41!important;border-top:1px solid #e3e9da;padding-top:8px}
 .student-star-card{position:relative;padding:24px 22px 20px;border:1px solid #dfc593;border-radius:21px;background:#fff0cc;box-shadow:0 3px 0 #eddfbd}
-.student-star-card .student-kicker{color:#8c6b32;margin-top:25px}
+.student-star-card .student-kicker{color:#6a4816;margin-top:25px}
 .student-star-symbol{position:absolute;top:13px;right:20px;color:#bc8a32;font-size:31px;transform:rotate(12deg)}
 .student-star-card h2{font-size:30px;color:#795623;margin-bottom:8px}
 .student-star-card h2>span{display:block;margin-top:4px;font-size:12px;letter-spacing:0;font-weight:550}
-.student-star-card p{font-size:11px;color:#897346;margin-bottom:18px}
+.student-star-card p{font-size:11px;color:#5c4718;margin-bottom:18px}
 .online-student .student-star-card .game-wallet-button{display:flex;justify-content:space-between;align-items:center;width:100%;min-height:44px;padding:11px 13px;border:1px solid #ae8143;border-radius:11px;background:#fff9e9;color:#795623;font-size:12px}
 .student-gentle-note{text-align:center;font-size:11px;line-height:1.8;color:#7a816d;padding:0 12px}
 @media(min-width:1080px){.student-game-grid:has(>.student-game-card:only-child){grid-template-columns:1fr}.student-game-grid>.student-game-card:only-child .student-game-copy{grid-template-columns:1fr auto}.student-game-grid>.student-game-card:only-child .student-game-copy>span{grid-column:1}.student-game-grid>.student-game-card:only-child .student-game-copy>small{grid-column:2;grid-row:1/3;align-items:center;align-self:center;gap:18px}}

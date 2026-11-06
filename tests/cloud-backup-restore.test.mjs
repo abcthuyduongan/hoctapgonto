@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {scryptSync, createHash, randomUUID} from 'node:crypto';
 import {createPostgresFixture, authFor} from './helpers/postgres-fixture.mjs';
 import {seedLegacyWeek} from './helpers/legacy-weeks.mjs';
-import {exportCloudBackup, restoreCloudBackup} from '../server/cloud-backup-restore.mjs';
+import {exportCloudBackup, restoreCloudBackup, BACKUP_TABLES} from '../server/cloud-backup-restore.mjs';
 
 const password = 'Rehearsal-Password-123!', salt = 'rehearsal-salt';
 const passwordHash = `${salt}:${scryptSync(password, salt, 64, {N: 32768, r: 8, p: 1, maxmem: 64*1024*1024}).toString('hex')}`;
@@ -119,4 +119,58 @@ test('Cloud Backup and Restore Drill: PostgreSQL + Storage to empty instance wit
   assert.equal(animals[0].name, 'Thỏ Bông Nhỏ');
 
   console.log('Rehearsal PASS: RTO << 2 hours (restored in < 1s), RPO <= 24 hours (0 data loss), 100% parity.');
+});
+
+test('R222 & R223: Media inventory validation rejects missing, duplicate, or mismatched assets before write', async t => {
+  const target = await createPostgresFixture(t, {bootstrap: false});
+  const storage = {
+    download: async () => Buffer.alloc(0),
+    upload: async () => {}
+  };
+
+  function makeMockEnvelope(tables, mediaAssets) {
+    const fullTables = {};
+    for (const t of BACKUP_TABLES) {
+      fullTables[t] = tables[t] || [];
+    }
+    const payload = JSON.stringify({ tables: fullTables, mediaAssets, workspaceId: 'w1' });
+    return {
+      version: '4.0.1',
+      schemaVersion: 8,
+      checksum: sha256(payload),
+      payload
+    };
+  }
+
+  // 1. Missing media asset when media table has a record
+  const badBackupMissingAsset = makeMockEnvelope(
+    {
+      workspaces: [{ id: 'w1', name: 'W1', created_at: new Date().toISOString() }],
+      media: [{ id: 'm1', workspace_id: 'w1', object_path: 'w1/m1', size: 10, sha256: 'a'.repeat(64) }]
+    },
+    [] // MISSING!
+  );
+  await assert.rejects(
+    async () => await restoreCloudBackup(target.store, storage, badBackupMissingAsset, {dryRun: true}),
+    /không khớp metadata bảng media/
+  );
+
+  // 2. Hash mismatch in mediaAsset vs media table record
+  const badBackupHashMismatch = makeMockEnvelope(
+    {
+      workspaces: [{ id: 'w1', name: 'W1', created_at: new Date().toISOString() }],
+      media: [{ id: 'm1', workspace_id: 'w1', object_path: 'w1/m1', size: 4, sha256: 'a'.repeat(64) }]
+    },
+    [{
+      id: 'm1',
+      objectPath: 'w1/m1',
+      size: 4,
+      sha256: 'b'.repeat(64), // Mismatched hash!
+      dataBase64: Buffer.from('test').toString('base64')
+    }]
+  );
+  await assert.rejects(
+    async () => await restoreCloudBackup(target.store, storage, badBackupHashMismatch, {dryRun: true}),
+    /Mã SHA-256.*không khớp/
+  );
 });

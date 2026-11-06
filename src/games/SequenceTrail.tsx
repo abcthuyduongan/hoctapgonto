@@ -1,4 +1,7 @@
-import '../styles/game-base.css';
+import '../styles/games/primitives.css';
+import '../styles/games/stage.css';
+import '../styles/games/feedback.css';
+import '../styles/games/sequence-trail.css';
 import {useQuestionSpeech} from './useQuestionSpeech';
 import {saveFailureMessage} from './save-failure-message';
 import QuestionMedia from '../components/QuestionMedia';

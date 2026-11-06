@@ -39,13 +39,13 @@ test('quiz fits its question, image and four readable answers on desktop and all
       for(const answer of await stage.locator('.answer-option').all()){expect(await answer.evaluate(element=>parseFloat(getComputedStyle(element).fontSize))).toBeGreaterThanOrEqual(16);expect((await answer.boundingBox())!.height).toBeGreaterThanOrEqual(44);}
       await page.screenshot({path:testInfo.outputPath(`quiz-fitted-${viewport.width}-${viewport.height}.png`)});
     }
-    await page.setViewportSize({width:390,height:740});await stage.getByRole('button',{name:'A Chiếc ti vi',exact:true}).click();await page.getByRole('button',{name:'Đến trạm kế tiếp ➜',exact:true}).click();
+    await page.setViewportSize({width:390,height:740});await stage.getByRole('button',{name:/Chiếc ti vi/}).click();await page.getByRole('button',{name:'Đến trạm kế tiếp ➜',exact:true}).click();
     await expect(stage.locator('.quiz-question')).toHaveText(f.quiz.items[1].prompt);await expect.poll(()=>stage.evaluate(element=>element.scrollTop)).toBe(0);
     const prompt=stage.locator('.quiz-question');expect(await prompt.evaluate(element=>element.scrollHeight<=element.clientHeight+1&&element.scrollWidth<=element.clientWidth+1)).toBe(true);
     for(const answer of await stage.locator('.answer-option').all()){await answer.scrollIntoViewIfNeeded();await expect(answer).toBeInViewport();expect(await answer.evaluate(element=>element.scrollHeight<=element.clientHeight+1&&element.scrollWidth<=element.clientWidth+1)).toBe(true);}
     expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
     expect(Number(f.server.onlineStore.db.prepare('SELECT count(*) AS n FROM attempts').get().n)).toBe(1);
-    await stage.getByRole('button',{name:'A '+f.quiz.items[1].options[0],exact:true}).click();await page.getByRole('button',{name:'Hoàn thành bộ câu hỏi',exact:true}).click();await expect(page.locator('.game-star-receipt')).toBeVisible();
+    await stage.getByRole('button',{name:new RegExp(f.quiz.items[1].options[0])}).click();await page.getByRole('button',{name:'Hoàn thành bộ câu hỏi',exact:true}).click();await expect(page.locator('.game-star-receipt')).toBeVisible();
     expect(Number(f.server.onlineStore.db.prepare('SELECT count(*) AS n FROM attempts').get().n)).toBe(2);expect(errors).toEqual([]);
   }finally{await f.close();}
 });
@@ -60,10 +60,13 @@ test('reading exercise keeps its complete passage, prompt and controls reachable
     const stage=page.locator('.online-exercise');await expect(stage).toHaveAttribute('data-question-layout','reading-choice');await page.setViewportSize({width:390,height:740});
     await expect(stage.getByLabel('Đoạn đọc')).toContainText(body);expect(await stage.locator('.online-reading p').evaluate(element=>element.scrollHeight<=element.clientHeight+1)).toBe(true);
     await expect(stage.locator('.answer-option.correct')).toHaveCount(0);
-    await stage.getByRole('button',{name:'A Tưới cây và quan sát',exact:true}).click();const beforeSubmit=await stage.evaluate(element=>element.scrollTop);expect(beforeSubmit).toBeGreaterThan(0);
-    await stage.getByRole('button',{name:'Kiểm tra đáp án',exact:true}).click();await expect(stage.locator('.online-exercise-feedback')).toBeVisible();await expect(stage.locator('.answer-option.correct')).toHaveCount(1);await expect(stage.getByRole('button',{name:'A Tưới cây và quan sát',exact:true})).toHaveClass(/\bcorrect\b/);expect(await stage.evaluate(element=>element.scrollTop)).toBeGreaterThan(0);
+    const opt1=stage.getByRole('button',{name:/Tưới cây và quan sát/});
+    await opt1.click();const beforeSubmit=await stage.evaluate(element=>element.scrollTop);expect(beforeSubmit).toBeGreaterThan(0);
+    await stage.getByRole('button',{name:'Kiểm tra đáp án',exact:true}).click();await expect(stage.locator('.online-exercise-feedback')).toBeVisible();await expect(stage.locator('.answer-option.correct')).toHaveCount(1);await expect(opt1).toHaveClass(/\bcorrect\b/);expect(await stage.evaluate(element=>element.scrollTop)).toBeGreaterThan(0);
     await stage.getByRole('button',{name:'Câu tiếp theo →',exact:true}).click();await expect(stage.locator('.online-exercise-card>h2')).toHaveText('Lan ghi chép vào đâu?');await expect.poll(()=>stage.evaluate(element=>element.scrollTop)).toBe(0);
-    await expect(stage.locator('.answer-option.correct')).toHaveCount(0);await stage.getByRole('button',{name:'A Một cuốn sổ nhỏ',exact:true}).click();await stage.getByRole('button',{name:'Kiểm tra đáp án',exact:true}).click();await expect(stage.getByRole('button',{name:'A Một cuốn sổ nhỏ',exact:true})).toHaveClass(/\bcorrect\b/);await stage.getByRole('button',{name:'Hoàn thành & lưu thành tích',exact:true}).click();await expect(page.locator('.game-star-receipt')).toBeVisible();
+    await expect(stage.locator('.answer-option.correct')).toHaveCount(0);
+    const opt2=stage.getByRole('button',{name:/Một cuốn sổ nhỏ/});
+    await opt2.click();await stage.getByRole('button',{name:'Kiểm tra đáp án',exact:true}).click();await expect(opt2).toHaveClass(/\bcorrect\b/);await stage.getByRole('button',{name:'Hoàn thành & lưu thành tích',exact:true}).click();await expect(page.locator('.game-star-receipt')).toBeVisible();
     expect(Number(f.server.onlineStore.db.prepare('SELECT count(*) AS n FROM attempts').get().n)).toBe(2);expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);await page.screenshot({path:testInfo.outputPath('reading-complete-mobile.png')});
   }finally{await f.close();}
 });

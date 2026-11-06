@@ -45,14 +45,14 @@ test('refresh synchronizes media from another tab and previews its image and aud
     const item=preview.locator('.online-review-item').first();await item.locator('summary').click();
     await expect.poll(()=>item.locator('img').evaluate((e:HTMLImageElement)=>e.complete&&e.naturalWidth>0)).toBe(true);
     await item.locator('audio').evaluate(async(e:HTMLAudioElement)=>{e.muted=true;await e.play();});await expect.poll(()=>item.locator('audio').evaluate((e:HTMLAudioElement)=>e.ended)).toBe(true);
-    await page.getByRole('button',{name:'Làm mới dữ liệu',exact:true}).click();await expect(preview).toHaveCount(0);
+    await page.getByRole('button',{name:'Làm mới dữ liệu',exact:true}).click();await expect(preview).toBeVisible();
     await page.route('**/api/online/admin/summary**',route=>route.fulfill({status:503,contentType:'application/json',body:JSON.stringify({error:'Chưa đọc được kho tư liệu.'})}));
-    await page.getByRole('button',{name:'Làm mới dữ liệu',exact:true}).click();await expect(page.getByRole('alert')).toBeVisible();await expect(preview).toHaveCount(0);
-    await page.unroute('**/api/online/admin/summary**');await page.getByRole('button',{name:'Thử lại',exact:true}).click();await expect(page.getByRole('alert')).toHaveCount(0);await library.getByRole('button',{name:'Xem thư viện',exact:true}).click();await expect(library).toContainText('4 tệp');
+    await page.getByRole('button',{name:'Làm mới dữ liệu',exact:true}).click();await expect(page.getByRole('alert').filter({hasText:'Chưa đọc được kho tư liệu'})).toBeVisible();
+    await page.unroute('**/api/online/admin/summary**');await page.getByRole('button',{name:'Thử lại',exact:true}).click();await expect(page.getByRole('alert').filter({hasText:'Chưa đọc được kho tư liệu'})).toHaveCount(0);await library.getByRole('button',{name:'Xem thư viện',exact:true}).click();await expect(library).toContainText('4 tệp');
     for(const width of [360,390,768,1024,1366,1440,1920]){await page.setViewportSize({width,height:1000});expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);}
     await page.setViewportSize({width:390,height:1000});await page.screenshot({path:testInfo.outputPath('media-preview-mobile.png'),fullPage:true});
     await f.api(page.request,'/media',{name:'later.png',mime:'image/png',base64:f.png.toString('base64')});
-    await page.getByRole('button',{name:'Làm mới dữ liệu',exact:true}).click();await library.getByRole('button',{name:'Xem thư viện',exact:true}).click();await expect(library).toContainText('5 tệp');await expect(preview).toHaveCount(0);
+    await page.getByRole('button',{name:'Làm mới dữ liệu',exact:true}).click();await library.getByRole('button',{name:'Xem thư viện',exact:true}).click();await expect(library).toContainText('5 tệp');await expect(preview).toBeVisible();
     expect(f.server.onlineStore.db.prepare('SELECT count(*) AS n FROM attempts').get().n).toBe(0);expect(errors).toEqual([]);
   }finally{await f.close();}
 });

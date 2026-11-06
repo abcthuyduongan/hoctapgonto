@@ -1,0 +1,32 @@
+/* Bao An Learning - Treasure Flip Game Styles */
+
+.treasure-flip-board {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.treasure-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 14px;
+  margin: 20px 0;
+}
+
+.treasure-chest {
+  min-height: 110px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  border: 3px solid #f59e0b;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 6px 0 #d97706;
+  transition: all 0.15s;
+}
+
+.treasure-chest:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 0 #d97706;
+}

@@ -1,0 +1,96 @@
+TAP version 13
+# (node:2540) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: AUDIT lane 2: public session answer disclosure SQLite HTTP
+ok 1 - AUDIT lane 2: public session answer disclosure SQLite HTTP
+  ---
+  duration_ms: 535.3972
+  type: 'test'
+  ...
+# Subtest: AUDIT lane 2: autosave same-question edits still arrive out of order SQLite HTTP
+ok 2 - AUDIT lane 2: autosave same-question edits still arrive out of order SQLite HTTP
+  ---
+  duration_ms: 482.164
+  type: 'test'
+  ...
+# Subtest: AUDIT lane 2: review prefix bypasses assignment for another student SQLite HTTP
+ok 3 - AUDIT lane 2: review prefix bypasses assignment for another student SQLite HTTP
+  ---
+  duration_ms: 478.6684
+  type: 'test'
+  ...
+# Subtest: CONTROL lane 2: PIN lockout now also blocks setup-pin SQLite HTTP
+ok 4 - CONTROL lane 2: PIN lockout now also blocks setup-pin SQLite HTTP
+  ---
+  duration_ms: 485.7276
+  type: 'test'
+  ...
+# Subtest: AUDIT lane 2: public session answer disclosure PostgreSQL API
+ok 5 - AUDIT lane 2: public session answer disclosure PostgreSQL API
+  ---
+  duration_ms: 2189.9686
+  type: 'test'
+  ...
+# Subtest: AUDIT lane 2: autosave same-question edits still arrive out of order PostgreSQL API
+ok 6 - AUDIT lane 2: autosave same-question edits still arrive out of order PostgreSQL API
+  ---
+  duration_ms: 1820.7503
+  type: 'test'
+  ...
+# Subtest: AUDIT lane 2: review prefix bypasses assignment for another student PostgreSQL API
+ok 7 - AUDIT lane 2: review prefix bypasses assignment for another student PostgreSQL API
+  ---
+  duration_ms: 1790.0989
+  type: 'test'
+  ...
+# Subtest: CONTROL lane 2: PIN lockout now also blocks setup-pin PostgreSQL API
+ok 8 - CONTROL lane 2: PIN lockout now also blocks setup-pin PostgreSQL API
+  ---
+  duration_ms: 1937.9451
+  type: 'test'
+  ...
+# Subtest: AUDIT lane 2: SQLite history lookup loses authored IDs containing dots
+ok 9 - AUDIT lane 2: SQLite history lookup loses authored IDs containing dots
+  ---
+  duration_ms: 576.0569
+  type: 'test'
+  ...
+# Subtest: AUDIT lane 2: SQLite migration recovery after-create
+ok 10 - AUDIT lane 2: SQLite migration recovery after-create
+  ---
+  duration_ms: 56.523
+  type: 'test'
+  ...
+# Subtest: AUDIT lane 2: SQLite migration recovery after-drop
+ok 11 - AUDIT lane 2: SQLite migration recovery after-drop
+  ---
+  duration_ms: 45.0821
+  type: 'test'
+  ...
+# Subtest: AUDIT lane 2: restoring media first can corrupt live media when SQL later fails
+ok 12 - AUDIT lane 2: restoring media first can corrupt live media when SQL later fails
+  ---
+  duration_ms: 2429.8951
+  type: 'test'
+  ...
+# Subtest: AUDIT lane 2: media metadata without media assets is accepted by preview
+ok 13 - AUDIT lane 2: media metadata without media assets is accepted by preview
+  ---
+  duration_ms: 1188.2847
+  type: 'test'
+  ...
+# Subtest: AUDIT lane 2: export consistency check misses concurrent new student/user relation
+ok 14 - AUDIT lane 2: export consistency check misses concurrent new student/user relation
+  ---
+  duration_ms: 2617.0442
+  type: 'test'
+  ...
+1..14
+# tests 14
+# suites 0
+# pass 14
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 17140.4885

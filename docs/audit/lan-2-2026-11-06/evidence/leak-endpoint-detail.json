@@ -1,0 +1,39 @@
+{
+  "note": "Reproduction assertions confirm unwanted behavior. CONTROL/outcome FIX_VERIFIED entries verify only the tested repaired path; not blanket acceptance.",
+  "observations": [
+    {
+      "case": "public-session-answer-disclosure",
+      "engine": "SQLite HTTP",
+      "summaryHttpStatus": 200,
+      "reopenHttpStatus": 201,
+      "summaryExposesMap": false,
+      "reopenExposesMap": true,
+      "privatePresentationFields": [
+        "presentationId",
+        "itemId",
+        "permutation",
+        "displayedCorrectIndex",
+        "openedAt"
+      ],
+      "answerSubmittedBeforeUsingAuthoredKey": true,
+      "serverMarkedCorrect": true
+    },
+    {
+      "case": "public-session-answer-disclosure",
+      "engine": "PostgreSQL API",
+      "summaryHttpStatus": 200,
+      "reopenHttpStatus": 201,
+      "summaryExposesMap": false,
+      "reopenExposesMap": true,
+      "privatePresentationFields": [
+        "itemId",
+        "openedAt",
+        "permutation",
+        "presentationId",
+        "displayedCorrectIndex"
+      ],
+      "answerSubmittedBeforeUsingAuthoredKey": true,
+      "serverMarkedCorrect": true
+    }
+  ]
+}

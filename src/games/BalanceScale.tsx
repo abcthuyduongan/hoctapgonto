@@ -1,4 +1,6 @@
-import '../styles/game-base.css';
+import '../styles/games/primitives.css';
+import '../styles/games/stage.css';
+import '../styles/games/feedback.css';
 import '../styles/balance-scale.css';
 import { useEffect, useRef, useState } from 'react';
 import type { AttemptInput, AttemptOutcome, CompareItem, CompareOperator, ComparePack, GameHostProps } from '../core/contracts';

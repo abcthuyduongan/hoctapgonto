@@ -1,0 +1,146 @@
+{
+  "kind": "Chrome desktop mobile viewport390x844, actual built app, axe default rules including color-contrast; not physical device or real200percentzoom",
+  "map": [
+    {
+      "id": "color-contrast",
+      "impact": "serious",
+      "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+      "help": "Elements must meet minimum color contrast ratio thresholds",
+      "nodeCount": 12,
+      "examples": [
+        {
+          "target": [
+            ".online-brand > span"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.75 (foreground color: #7c866f, background color: #fffdf7, font size: 8.4pt (11.2px), font weight: bold). Expected contrast ratio of 4.5:1"
+        },
+        {
+          "target": [
+            "header > div:nth-child(2) > span"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.88 (foreground color: #7b836f, background color: #fffdf7, font size: 8.3pt (11px), font weight: normal). Expected contrast ratio of 4.5:1"
+        },
+        {
+          "target": [
+            ".online-eyebrow"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 2.33 (foreground color: #63805d, background color: #75c7ed, font size: 8.6pt (11.52px), font weight: bold). Expected contrast ratio of 4.5:1"
+        },
+        {
+          "target": [
+            ".student-welcome > div > p:nth-child(3)"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 2.68 (foreground color: #647267, background color: #75c7ed, font size: 9.8pt (13px), font weight: normal). Expected contrast ratio of 4.5:1"
+        }
+      ]
+    },
+    {
+      "id": "label-content-name-mismatch",
+      "impact": "serious",
+      "description": "Ensure that elements labelled through their content must have their visible text as part of their accessible name",
+      "help": "Elements must have their visible text as part of their accessible name",
+      "nodeCount": 9,
+      "examples": [
+        {
+          "target": [
+            "button[aria-label=\"📋 Thu gọn bản đồ\"]"
+          ],
+          "failureSummary": "Fix any of the following:\n  Text inside the element is not included in the accessible name"
+        },
+        {
+          "target": [
+            ".map-nav-btn"
+          ],
+          "failureSummary": "Fix any of the following:\n  Text inside the element is not included in the accessible name"
+        },
+        {
+          "target": [
+            ".region-math"
+          ],
+          "failureSummary": "Fix any of the following:\n  Text inside the element is not included in the accessible name"
+        },
+        {
+          "target": [
+            ".region-vietnamese"
+          ],
+          "failureSummary": "Fix any of the following:\n  Text inside the element is not included in the accessible name"
+        }
+      ]
+    }
+  ],
+  "town": [
+    {
+      "id": "aria-required-children",
+      "impact": "critical",
+      "description": "Ensure elements with an ARIA role that require child roles contain them",
+      "help": "Certain ARIA roles must contain particular children",
+      "nodeCount": 1,
+      "examples": [
+        {
+          "target": [
+            ".town-grid-10"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element has children which are not allowed: button[aria-label]"
+        }
+      ]
+    },
+    {
+      "id": "color-contrast",
+      "impact": "serious",
+      "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+      "help": "Elements must meet minimum color contrast ratio thresholds",
+      "nodeCount": 71,
+      "examples": [
+        {
+          "target": [
+            ".town-star-pill"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.21 (foreground color: #b78103, background color: #fff8e1, font size: 10.2pt (13.6px), font weight: bold). Expected contrast ratio of 4.5:1"
+        },
+        {
+          "target": [
+            "button[title=\"Ô đất trống (0, 0)\"] > .empty-cell-hint"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 2.07 (foreground color: #97be99, background color: #ffffff, font size: 7.8pt (10.4px), font weight: bold). Expected contrast ratio of 4.5:1"
+        },
+        {
+          "target": [
+            "button[title=\"Ô đất trống (1, 0)\"] > .empty-cell-hint"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 2.07 (foreground color: #97be99, background color: #ffffff, font size: 7.8pt (10.4px), font weight: bold). Expected contrast ratio of 4.5:1"
+        },
+        {
+          "target": [
+            "button[title=\"Ô đất trống (2, 0)\"] > .empty-cell-hint"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 2.07 (foreground color: #97be99, background color: #ffffff, font size: 7.8pt (10.4px), font weight: bold). Expected contrast ratio of 4.5:1"
+        }
+      ]
+    },
+    {
+      "id": "scrollable-region-focusable",
+      "impact": "serious",
+      "description": "Ensure elements that have scrollable content are accessible by keyboard in Safari",
+      "help": "Scrollable region must have keyboard access",
+      "nodeCount": 1,
+      "examples": [
+        {
+          "target": [
+            ".building-list"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element should have focusable content\n  Element should be focusable"
+        }
+      ]
+    }
+  ],
+  "townCell": {
+    "x": 50,
+    "y": 610.90625,
+    "width": 34,
+    "height": 44
+  },
+  "scroll": {
+    "viewport": 390,
+    "documentWidth": 375
+  }
+}

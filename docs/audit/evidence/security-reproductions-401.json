@@ -1,0 +1,60 @@
+{
+  "note": "Passing audit assertions confirm unwanted behavior, not acceptance.",
+  "observations": [
+    {
+      "case": "pin-lock-bypass-via-oldPin",
+      "engine": "SQLite",
+      "verifyCorrectPinWhileLockedStatus": 429,
+      "setupWrongOldPinAttempts": 20,
+      "wrongOldPinDenied": 20,
+      "setupRateLimits": 0,
+      "setupCorrectOldPinDuringLockSucceeded": true
+    },
+    {
+      "case": "pin-lock-bypass-via-oldPin",
+      "engine": "PostgreSQL adapter",
+      "verifyCorrectPinWhileLockedStatus": 429,
+      "setupWrongOldPinAttempts": 20,
+      "wrongOldPinDenied": 20,
+      "setupRateLimits": 0,
+      "setupCorrectOldPinDuringLockSucceeded": true
+    },
+    {
+      "case": "restore-nonatomic-storage-failure",
+      "error": "AUDIT injected storage outage",
+      "targetWorkspaceNameBefore": "TARGET NEWER DATA",
+      "targetWorkspaceNameAfter": "Đơn vị thử nghiệm",
+      "sqlChangedDespiteFailure": true
+    },
+    {
+      "case": "restore-false-success-without-storage",
+      "dryRunValid": true,
+      "storageUploaderPresent": false,
+      "reportedSuccess": true,
+      "reportedMediaRestored": 1,
+      "reportedMediaHashMatch": true
+    },
+    {
+      "case": "restore-dry-run-incomplete-validation",
+      "missingRequiredTables": true,
+      "corruptMedia": true,
+      "reportedValid": true
+    },
+    {
+      "case": "sqlite-interrupted-migration-silent-failure",
+      "simulatedInterruption": "After users_upgrade_v4 CREATE and before INSERT/DROP",
+      "startupAccepted": true,
+      "legacyRoleConstraintRemains": true,
+      "createParentError": "CHECK constraint failed: role IN ('admin','student')"
+    },
+    {
+      "case": "backup-read-snapshot-race",
+      "committedSourceWrite": true,
+      "exportedPlays": 0,
+      "exportedAttempts": 1,
+      "exportReportedChecksumValid": true,
+      "restoreFailed": true,
+      "errorMessage": "Dữ liệu tham chiếu không hợp lệ."
+    }
+  ]
+}

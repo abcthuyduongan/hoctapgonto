@@ -1,0 +1,171 @@
+/* Bao An Learning - Math Quest (Quiz) Game Styles */
+
+.world-math .stage-backdrop {
+  background-image: url('/art/original-math.webp');
+}
+
+.world-math .stage-overlay {
+  background: linear-gradient(115deg, rgba(0, 103, 177, 0.12), rgba(0, 52, 105, 0.15)),
+              linear-gradient(0deg, rgba(11, 60, 109, 0.42), transparent 45%);
+}
+
+.math-adventure-layout {
+  display: grid;
+  grid-template-columns: minmax(125px, 0.35fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 20px;
+  max-width: 1010px;
+  margin: 0 auto;
+}
+
+.challenge-card {
+  position: relative;
+  background: linear-gradient(145deg, rgba(255, 253, 244, 0.97), rgba(255, 247, 223, 0.94));
+  border: 4px solid #fff8e5;
+  box-shadow: 0 10px 0 #b98647, 0 20px 36px rgba(23, 42, 57, 0.38);
+  color: #283d5a;
+  border-radius: 25px;
+  padding: 22px 26px;
+  box-sizing: border-box;
+}
+
+.quest-scroll {
+  border-radius: 18px;
+  background: linear-gradient(160deg, #fff9e4, #ffe9bc);
+  border: 2px solid #e9c888;
+  box-shadow: inset 0 3px 8px rgba(239, 205, 144, 0.4);
+  padding: 14px 16px;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.quest-prompt-kicker {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  letter-spacing: 0.13em;
+  font-weight: 950;
+  color: #ad7c32;
+  margin-bottom: 6px;
+}
+
+.quiz-question {
+  font-size: clamp(24px, 3.5vw, 38px);
+  margin: 6px 0 2px;
+  color: #533817;
+  font-weight: 950;
+  line-height: 1.3;
+}
+
+.answer-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.answer-option {
+  background: linear-gradient(180deg, #fff 0%, #edf7ff 100%);
+  border: 3px solid #c0dffc;
+  border-radius: 17px;
+  min-height: 72px;
+  font-size: clamp(17px, 2.2vw, 24px);
+  color: #194d8e;
+  font-weight: 950;
+  box-shadow: 0 5px 0 #8ab0d1;
+  transition: transform 0.15s, background 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.answer-option:hover:not(:disabled) {
+  background: #e5f6ff;
+  transform: translateY(-2px);
+}
+
+.answer-option:active:not(:disabled) {
+  transform: translateY(3px);
+  box-shadow: 0 2px 0 #8ab0d1;
+}
+
+.answer-index {
+  background: #d8edff;
+  color: #225c9f;
+  border: 1px solid #c0ddf6;
+  border-radius: 11px;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  font-size: 16px;
+  font-weight: 900;
+}
+
+.answer-option.correct {
+  background: linear-gradient(#e2ffe4, #9de6b1);
+  border-color: #51bd79;
+  color: #1c8042;
+  box-shadow: 0 5px 0 #43a15e;
+  animation: gw-correct 0.35s ease-out;
+}
+
+.answer-option.incorrect {
+  background: #fff0ed;
+  border-color: #f7a3a5;
+  color: #bd4b57;
+}
+
+/* Steady response zone */
+.stable-response-zone {
+  margin-top: 16px;
+  min-height: 140px;
+  border-radius: 18px;
+  background: rgba(255, 248, 233, 0.93);
+  border: 2px solid #f4daa5;
+  box-shadow: inset 0 3px 12px rgba(205, 168, 98, 0.13);
+  padding: 8px 12px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.stable-response-body {
+  width: 100%;
+}
+
+.game-help {
+  text-align: center;
+}
+
+.game-help .hint-text {
+  margin: 8px 0 0;
+  font-size: 13px;
+  color: #795c39;
+  line-height: 1.5;
+}
+
+.question-clock {
+  font-size: 13px;
+  color: #78350f;
+  margin-bottom: 8px;
+  font-weight: 700;
+}
+
+@media (max-width: 760px) {
+  .math-adventure-layout { display: block; }
+  .challenge-card { padding: 16px 14px; border-radius: 20px; }
+  .quiz-question { font-size: clamp(20px, 6vw, 30px); }
+  .answer-option { min-height: 60px; font-size: 17px; padding: 8px 10px; }
+  .answer-index { width: 30px; height: 30px; font-size: 13px; }
+}
+
+@media (max-width: 390px) {
+  .answer-grid { grid-template-columns: 1fr; }
+  .answer-option { min-height: 54px; }
+}

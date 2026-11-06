@@ -1,4 +1,7 @@
-import '../styles/game-base.css';
+import '../styles/games/primitives.css';
+import '../styles/games/stage.css';
+import '../styles/games/feedback.css';
+import '../styles/games/memory-match.css';
 import {saveFailureMessage} from './save-failure-message';
 import QuestionMedia,{QuestionImageRecovery} from '../components/QuestionMedia';
 import GameMascot from './GameMascot';

@@ -1,0 +1,1020 @@
+{
+  "environment": {
+    "node": "v22.22.2",
+    "platform": "win32",
+    "cpuModel": "Intel(R) Core(TM) Ultra 5 125H",
+    "logicalCPUs": 18,
+    "totalMemoryGiB": 31.4
+  },
+  "method": {
+    "repetitions": 3,
+    "browserChannel": "chrome",
+    "mobileViewport": "390x844",
+    "desktopViewport": "1440x900",
+    "mobileCpuSlowdown": 4,
+    "network": "CDP 150ms latency, 1.6Mib/s down, 750Kib/s up; no packet loss",
+    "lcp": "Observed until 650ms after the ready locator; not a field percentile",
+    "cls": "Max observed session window; no field claims",
+    "inp": "CHUA_KIEM_CHUNG; EventTiming maximum retained only as laboratory interaction sample",
+    "concurrency": "Run after full Playwright and unit suites finish"
+  },
+  "dataset": {
+    "classes": 23,
+    "students": 1000,
+    "weeksPerClass": 8,
+    "questionsPerPack": 12
+  },
+  "errors": [],
+  "groups": [
+    {
+      "profile": "desktop-local",
+      "scenario": "auth-cold",
+      "n": 3,
+      "usableMs": [
+        957.7,
+        966.4,
+        940.1
+      ],
+      "fcp": [
+        112,
+        84,
+        80
+      ],
+      "lcp": [
+        464,
+        436,
+        432
+      ],
+      "cls": [
+        0.0278,
+        0.0278,
+        0.0278
+      ],
+      "ttfb": [
+        4.3,
+        2.3,
+        2
+      ],
+      "requests": [
+        8,
+        8,
+        8
+      ],
+      "jsBytes": [
+        245002,
+        245002,
+        245002
+      ],
+      "cssBytes": [
+        30149,
+        30149,
+        30149
+      ],
+      "bytes": [
+        345322,
+        345322,
+        345322
+      ],
+      "eventMax": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "profile": "desktop-local",
+      "scenario": "auth-warm",
+      "n": 3,
+      "usableMs": [
+        382.8,
+        382.3,
+        382.2
+      ],
+      "fcp": [
+        40,
+        40,
+        40
+      ],
+      "lcp": [
+        360,
+        340,
+        340
+      ],
+      "cls": [
+        0.0278,
+        0.0278,
+        0.0278
+      ],
+      "ttfb": [
+        2,
+        2.3,
+        1.8
+      ],
+      "requests": [
+        8,
+        8,
+        8
+      ],
+      "jsBytes": [
+        245002,
+        245002,
+        245002
+      ],
+      "cssBytes": [
+        30149,
+        30149,
+        30149
+      ],
+      "bytes": [
+        345322,
+        345322,
+        345322
+      ],
+      "eventMax": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "profile": "desktop-local",
+      "scenario": "admin-login-action",
+      "n": 3,
+      "usableMs": [
+        898.5,
+        887.8,
+        900.4
+      ],
+      "fcp": [
+        40,
+        40,
+        40
+      ],
+      "lcp": [
+        360,
+        340,
+        340
+      ],
+      "cls": [
+        0.0278,
+        0.0278,
+        0.0278
+      ],
+      "ttfb": [
+        2,
+        2.3,
+        1.8
+      ],
+      "requests": [
+        14,
+        14,
+        14
+      ],
+      "jsBytes": [
+        396552,
+        396552,
+        396552
+      ],
+      "cssBytes": [
+        33061,
+        33061,
+        33061
+      ],
+      "bytes": [
+        508928,
+        508928,
+        508928
+      ],
+      "eventMax": [
+        32,
+        32,
+        24
+      ]
+    },
+    {
+      "profile": "desktop-local",
+      "scenario": "admin-session-cold",
+      "n": 3,
+      "usableMs": [
+        951.2,
+        911.8,
+        933.1
+      ],
+      "fcp": [
+        60,
+        56,
+        56
+      ],
+      "lcp": [
+        676,
+        688,
+        688
+      ],
+      "cls": [
+        0.1233,
+        0.1233,
+        0.05
+      ],
+      "ttfb": [
+        2.2,
+        1.7,
+        3.2
+      ],
+      "requests": [
+        13,
+        13,
+        13
+      ],
+      "jsBytes": [
+        396552,
+        396552,
+        396552
+      ],
+      "cssBytes": [
+        33061,
+        33061,
+        33061
+      ],
+      "bytes": [
+        508878,
+        508878,
+        508878
+      ],
+      "eventMax": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "profile": "desktop-local",
+      "scenario": "admin-to-week-material",
+      "n": 3,
+      "usableMs": [
+        65.8,
+        86.5,
+        83.1
+      ],
+      "fcp": [
+        60,
+        56,
+        56
+      ],
+      "lcp": [
+        676,
+        688,
+        688
+      ],
+      "cls": [
+        0.1233,
+        0.1233,
+        0.05
+      ],
+      "ttfb": [
+        2.2,
+        1.7,
+        3.2
+      ],
+      "requests": [
+        14,
+        14,
+        14
+      ],
+      "jsBytes": [
+        396552,
+        396552,
+        396552
+      ],
+      "cssBytes": [
+        33061,
+        33061,
+        33061
+      ],
+      "bytes": [
+        515420,
+        515420,
+        515420
+      ],
+      "eventMax": [
+        48,
+        48,
+        48
+      ]
+    },
+    {
+      "profile": "desktop-local",
+      "scenario": "student-session-cold",
+      "n": 3,
+      "usableMs": [
+        972.7,
+        946.2,
+        887.6
+      ],
+      "fcp": [
+        48,
+        56,
+        44
+      ],
+      "lcp": [
+        1132,
+        940,
+        864
+      ],
+      "cls": [
+        0.4558,
+        0.4558,
+        0.4558
+      ],
+      "ttfb": [
+        1.7,
+        1.8,
+        1.9
+      ],
+      "requests": [
+        18,
+        18,
+        18
+      ],
+      "jsBytes": [
+        330180,
+        330180,
+        330180
+      ],
+      "cssBytes": [
+        81086,
+        81086,
+        81086
+      ],
+      "bytes": [
+        831305,
+        832113,
+        832113
+      ],
+      "eventMax": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "profile": "desktop-local",
+      "scenario": "student-to-game",
+      "n": 3,
+      "usableMs": [
+        964.2,
+        973,
+        1014.2
+      ],
+      "fcp": [
+        48,
+        56,
+        44
+      ],
+      "lcp": [
+        1132,
+        940,
+        864
+      ],
+      "cls": [
+        0.4558,
+        0.4558,
+        0.4558
+      ],
+      "ttfb": [
+        1.7,
+        1.8,
+        1.9
+      ],
+      "requests": [
+        32,
+        32,
+        32
+      ],
+      "jsBytes": [
+        347912,
+        347912,
+        347912
+      ],
+      "cssBytes": [
+        360807,
+        360807,
+        360807
+      ],
+      "bytes": [
+        1380544,
+        1381352,
+        1381352
+      ],
+      "eventMax": [
+        48,
+        64,
+        64
+      ]
+    },
+    {
+      "profile": "desktop-local",
+      "scenario": "answer-save-ack",
+      "n": 3,
+      "usableMs": [
+        89.7,
+        95.6,
+        82.6
+      ],
+      "fcp": [
+        48,
+        56,
+        44
+      ],
+      "lcp": [
+        1132,
+        940,
+        864
+      ],
+      "cls": [
+        0.4558,
+        0.4558,
+        0.4558
+      ],
+      "ttfb": [
+        1.7,
+        1.8,
+        1.9
+      ],
+      "requests": [
+        33,
+        33,
+        33
+      ],
+      "jsBytes": [
+        347912,
+        347912,
+        347912
+      ],
+      "cssBytes": [
+        360807,
+        360807,
+        360807
+      ],
+      "bytes": [
+        1381207,
+        1382015,
+        1382015
+      ],
+      "eventMax": [
+        48,
+        64,
+        64
+      ]
+    },
+    {
+      "profile": "desktop-local",
+      "scenario": "game-exit",
+      "n": 3,
+      "usableMs": [
+        66,
+        98.8,
+        66.7
+      ],
+      "fcp": [
+        48,
+        56,
+        44
+      ],
+      "lcp": [
+        1132,
+        940,
+        864
+      ],
+      "cls": [
+        0.4558,
+        0.4558,
+        0.4558
+      ],
+      "ttfb": [
+        1.7,
+        1.8,
+        1.9
+      ],
+      "requests": [
+        37,
+        37,
+        37
+      ],
+      "jsBytes": [
+        347912,
+        347912,
+        347912
+      ],
+      "cssBytes": [
+        360807,
+        360807,
+        360807
+      ],
+      "bytes": [
+        1401270,
+        1402078,
+        1402080
+      ],
+      "eventMax": [
+        64,
+        64,
+        64
+      ]
+    },
+    {
+      "profile": "mobile-limited-4g",
+      "scenario": "auth-cold",
+      "n": 3,
+      "usableMs": [
+        2590,
+        2580.5,
+        2531.8
+      ],
+      "fcp": [
+        1652,
+        1652,
+        1656
+      ],
+      "lcp": [
+        2172,
+        2120,
+        2156
+      ],
+      "cls": [
+        0.2798,
+        0.2798,
+        0.2798
+      ],
+      "ttfb": [
+        3,
+        2.4,
+        2.2
+      ],
+      "requests": [
+        8,
+        8,
+        8
+      ],
+      "jsBytes": [
+        245002,
+        245002,
+        245002
+      ],
+      "cssBytes": [
+        30149,
+        30149,
+        30149
+      ],
+      "bytes": [
+        345322,
+        345322,
+        345322
+      ],
+      "eventMax": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "profile": "mobile-limited-4g",
+      "scenario": "auth-warm",
+      "n": 3,
+      "usableMs": [
+        1379.1,
+        1450,
+        1251.9
+      ],
+      "fcp": [
+        408,
+        452,
+        324
+      ],
+      "lcp": [
+        692,
+        736,
+        640
+      ],
+      "cls": [
+        0.2324,
+        0.2324,
+        0.2324
+      ],
+      "ttfb": [
+        9,
+        2.9,
+        1.8
+      ],
+      "requests": [
+        8,
+        8,
+        8
+      ],
+      "jsBytes": [
+        245002,
+        245002,
+        245002
+      ],
+      "cssBytes": [
+        30149,
+        30149,
+        30149
+      ],
+      "bytes": [
+        345322,
+        345322,
+        345322
+      ],
+      "eventMax": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "profile": "mobile-limited-4g",
+      "scenario": "admin-login-action",
+      "n": 3,
+      "usableMs": [
+        1486.3,
+        1493.7,
+        1481.2
+      ],
+      "fcp": [
+        408,
+        452,
+        324
+      ],
+      "lcp": [
+        692,
+        736,
+        640
+      ],
+      "cls": [
+        0.2324,
+        0.2324,
+        0.2324
+      ],
+      "ttfb": [
+        9,
+        2.9,
+        1.8
+      ],
+      "requests": [
+        14,
+        14,
+        14
+      ],
+      "jsBytes": [
+        396552,
+        396552,
+        396552
+      ],
+      "cssBytes": [
+        33061,
+        33061,
+        33061
+      ],
+      "bytes": [
+        508928,
+        508928,
+        508928
+      ],
+      "eventMax": [
+        40,
+        32,
+        40
+      ]
+    },
+    {
+      "profile": "mobile-limited-4g",
+      "scenario": "admin-session-cold",
+      "n": 3,
+      "usableMs": [
+        4046.1,
+        3985.7,
+        4045.2
+      ],
+      "fcp": [
+        1556,
+        1540,
+        1568
+      ],
+      "lcp": [
+        3256,
+        3224,
+        3252
+      ],
+      "cls": [
+        0.096,
+        0.096,
+        0.096
+      ],
+      "ttfb": [
+        2,
+        3.3,
+        2.1
+      ],
+      "requests": [
+        13,
+        13,
+        13
+      ],
+      "jsBytes": [
+        396552,
+        396552,
+        396552
+      ],
+      "cssBytes": [
+        33061,
+        33061,
+        33061
+      ],
+      "bytes": [
+        508878,
+        508878,
+        508878
+      ],
+      "eventMax": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "profile": "mobile-limited-4g",
+      "scenario": "admin-to-week-material",
+      "n": 3,
+      "usableMs": [
+        395.6,
+        303.6,
+        313.8
+      ],
+      "fcp": [
+        1556,
+        1540,
+        1568
+      ],
+      "lcp": [
+        3256,
+        3224,
+        3252
+      ],
+      "cls": [
+        0.096,
+        0.096,
+        0.096
+      ],
+      "ttfb": [
+        2,
+        3.3,
+        2.1
+      ],
+      "requests": [
+        14,
+        14,
+        14
+      ],
+      "jsBytes": [
+        396552,
+        396552,
+        396552
+      ],
+      "cssBytes": [
+        33061,
+        33061,
+        33061
+      ],
+      "bytes": [
+        515420,
+        515420,
+        515420
+      ],
+      "eventMax": [
+        248,
+        192,
+        208
+      ]
+    },
+    {
+      "profile": "mobile-limited-4g",
+      "scenario": "student-session-cold",
+      "n": 3,
+      "usableMs": [
+        4668.7,
+        4712.2,
+        4478.6
+      ],
+      "fcp": [
+        1532,
+        1564,
+        1532
+      ],
+      "lcp": [
+        4684,
+        4716,
+        4500
+      ],
+      "cls": [
+        0.1119,
+        0.1119,
+        0.1119
+      ],
+      "ttfb": [
+        2.2,
+        1.6,
+        1.9
+      ],
+      "requests": [
+        18,
+        17,
+        15
+      ],
+      "jsBytes": [
+        330180,
+        330180,
+        330180
+      ],
+      "cssBytes": [
+        81086,
+        81086,
+        81086
+      ],
+      "bytes": [
+        819321,
+        755079,
+        633488
+      ],
+      "eventMax": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "profile": "mobile-limited-4g",
+      "scenario": "student-to-game",
+      "n": 3,
+      "usableMs": [
+        3851.4,
+        3581.5,
+        3498.4
+      ],
+      "fcp": [
+        1532,
+        1564,
+        1532
+      ],
+      "lcp": [
+        4684,
+        4716,
+        4500
+      ],
+      "cls": [
+        0.197,
+        0.197,
+        0.197
+      ],
+      "ttfb": [
+        2.2,
+        1.6,
+        1.9
+      ],
+      "requests": [
+        32,
+        32,
+        32
+      ],
+      "jsBytes": [
+        347912,
+        347912,
+        347912
+      ],
+      "cssBytes": [
+        360807,
+        360807,
+        360807
+      ],
+      "bytes": [
+        1368560,
+        1368560,
+        1368595
+      ],
+      "eventMax": [
+        160,
+        88,
+        88
+      ]
+    },
+    {
+      "profile": "mobile-limited-4g",
+      "scenario": "answer-save-ack",
+      "n": 3,
+      "usableMs": [
+        417.8,
+        434.1,
+        454.8
+      ],
+      "fcp": [
+        1532,
+        1564,
+        1532
+      ],
+      "lcp": [
+        4684,
+        4716,
+        4500
+      ],
+      "cls": [
+        0.197,
+        0.197,
+        0.197
+      ],
+      "ttfb": [
+        2.2,
+        1.6,
+        1.9
+      ],
+      "requests": [
+        33,
+        33,
+        33
+      ],
+      "jsBytes": [
+        347912,
+        347912,
+        347912
+      ],
+      "cssBytes": [
+        360807,
+        360807,
+        360807
+      ],
+      "bytes": [
+        1369223,
+        1369222,
+        1369258
+      ],
+      "eventMax": [
+        160,
+        88,
+        88
+      ]
+    },
+    {
+      "profile": "mobile-limited-4g",
+      "scenario": "game-exit",
+      "n": 3,
+      "usableMs": [
+        461.4,
+        388.6,
+        362.4
+      ],
+      "fcp": [
+        1532,
+        1564,
+        1532
+      ],
+      "lcp": [
+        4684,
+        4716,
+        4500
+      ],
+      "cls": [
+        0.197,
+        0.197,
+        0.197
+      ],
+      "ttfb": [
+        2.2,
+        1.6,
+        1.9
+      ],
+      "requests": [
+        37,
+        37,
+        37
+      ],
+      "jsBytes": [
+        347912,
+        347912,
+        347912
+      ],
+      "cssBytes": [
+        360807,
+        360807,
+        360807
+      ],
+      "bytes": [
+        1389288,
+        1389322,
+        1389358
+      ],
+      "eventMax": [
+        160,
+        88,
+        88
+      ]
+    }
+  ]
+}

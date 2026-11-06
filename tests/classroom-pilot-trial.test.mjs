@@ -4,13 +4,13 @@ import { randomUUID } from 'node:crypto';
 import { OnlineStore } from '../server/online-store.mjs';
 import { generateSemester2Curriculum } from '../tools/generate-semester-2-curriculum.mjs';
 
-test('C11 Pilot Classroom Trial: 10 students over 5 days with full telemetry and zero star discrepancy', async () => {
+test('C11 Pilot Simulation Contract: 10 synthetic student profiles over 5 simulated days with full telemetry and zero star discrepancy', async () => {
   const store = new OnlineStore(':memory:');
-  const now = '2027-01-18T07:30:00.000Z';
+  const now = '2026-11-06T07:30:00.000Z';
 
   // 1. Initialize workspace and school class
   const workspaceId = randomUUID(), adminId = randomUUID();
-  store.db.prepare('INSERT INTO workspaces(id,name,created_at) VALUES(?,?,?)').run(workspaceId, 'Chu Văn An Elementary', now);
+  store.db.prepare('INSERT INTO workspaces(id,name,created_at) VALUES(?,?,?)').run(workspaceId, 'Chu Văn An Elementary (Simulation)', now);
   store.db.prepare('INSERT INTO users(id,workspace_id,username,password_hash,role,created_at) VALUES(?,?,?,?,?,?)').run(
     adminId, workspaceId, 'admin_huong', 'fixture-hash', 'admin', now
   );
@@ -26,7 +26,7 @@ test('C11 Pilot Classroom Trial: 10 students over 5 days with full telemetry and
     grade: 3
   });
 
-  // 2. Register 10 real students
+  // 2. Register 10 synthetic student profiles for logic simulation
   const studentProfiles = [
     { name: 'Trần Bảo An', username: 'baoan.3a1' },
     { name: 'Nguyễn Minh Quân', username: 'minhquan.3a1' },

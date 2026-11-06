@@ -33,6 +33,10 @@ export const ContestMockScreen: React.FC<ContestMockScreenProps> = ({
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [answers, setAnswers] = useState<Record<string, any>>({});
   const [skippedKeys, setSkippedKeys] = useState<string[]>([]);
+  const [saveStatus, setSaveStatus] = useState<'saved' | 'saving' | 'error'>('saved');
+  const revisionRef = useRef<number>(0);
+  const answersRef = useRef<Record<string, any>>({});
+  const skippedKeysRef = useRef<string[]>([]);
   const [showSubmitConfirm, setShowSubmitConfirm] = useState<boolean>(false);
 
   // Exam result state
@@ -64,7 +68,9 @@ export const ContestMockScreen: React.FC<ContestMockScreenProps> = ({
           setActiveSession(sess);
           setRemainingSeconds(sess.remainingSeconds);
           setAnswers(sess.answers || {});
+          answersRef.current = sess.answers || {};
           setSkippedKeys(sess.skippedKeys || []);
+          skippedKeysRef.current = sess.skippedKeys || [];
           setViewMode('exam');
         } else if (act.lastResult) {
           setContestResult(act.lastResult);
@@ -107,7 +113,7 @@ export const ContestMockScreen: React.FC<ContestMockScreenProps> = ({
     if (!activeSession || submitting) return;
     try {
       setSubmitting(true);
-      const res = await onlineApi.submitContest(activeSession.sessionId, { answers });
+      const res = await onlineApi.submitContest(activeSession.sessionId, { answers: answersRef.current });
       setContestResult(res);
       setViewMode('result');
     } catch (err: any) {
@@ -125,7 +131,9 @@ export const ContestMockScreen: React.FC<ContestMockScreenProps> = ({
       setActiveSession(sess);
       setRemainingSeconds(sess.remainingSeconds);
       setAnswers(sess.answers || {});
+      answersRef.current = sess.answers || {};
       setSkippedKeys(sess.skippedKeys || []);
+      skippedKeysRef.current = sess.skippedKeys || [];
       setCurrentIndex(0);
       setViewMode('exam');
     } catch (err: any) {
@@ -136,29 +144,49 @@ export const ContestMockScreen: React.FC<ContestMockScreenProps> = ({
   };
 
   const handleSelectAnswer = (itemId: string, val: any) => {
-    const nextAnswers = { ...answers, [itemId]: val };
+    const nextAnswers = { ...answersRef.current, [itemId]: val };
+    answersRef.current = nextAnswers;
     setAnswers(nextAnswers);
-    // Bỏ khỏi danh sách skipped nếu vừa trả lời
-    if (skippedKeys.includes(itemId)) {
-      setSkippedKeys(skippedKeys.filter(k => k !== itemId));
-    }
-    // Lưu tiến độ định kỳ
+    const nextSkipped = skippedKeysRef.current.filter(k => k !== itemId);
+    skippedKeysRef.current = nextSkipped;
+    setSkippedKeys(nextSkipped);
     if (activeSession) {
+      revisionRef.current += 1;
+      const currentRev = revisionRef.current;
+      setSaveStatus('saving');
       onlineApi.saveContestProgress(activeSession.sessionId, {
         answers: nextAnswers,
-        skippedKeys: skippedKeys.filter(k => k !== itemId)
-      }).catch(() => {});
+        skippedKeys: nextSkipped,
+        revision: currentRev,
+        seq: currentRev
+      }).then(() => {
+        if (revisionRef.current === currentRev) setSaveStatus('saved');
+      }).catch((err: any) => {
+        setSaveStatus('error');
+        setErrorMsg('Lỗi lưu bài tự động: ' + (err?.message || 'vui lòng kiểm tra mạng.'));
+      });
     }
   };
 
   const handleSkipQuestion = (itemId: string) => {
-    const nextSkipped = Array.from(new Set([...skippedKeys, itemId]));
+    const nextSkipped = Array.from(new Set([...skippedKeysRef.current, itemId]));
+    skippedKeysRef.current = nextSkipped;
     setSkippedKeys(nextSkipped);
     if (activeSession) {
+      revisionRef.current += 1;
+      const currentRev = revisionRef.current;
+      setSaveStatus('saving');
       onlineApi.saveContestProgress(activeSession.sessionId, {
-        answers,
-        skippedKeys: nextSkipped
-      }).catch(() => {});
+        answers: answersRef.current,
+        skippedKeys: nextSkipped,
+        revision: currentRev,
+        seq: currentRev
+      }).then(() => {
+        if (revisionRef.current === currentRev) setSaveStatus('saved');
+      }).catch((err: any) => {
+        setSaveStatus('error');
+        setErrorMsg('Lỗi lưu bài tự động: ' + (err?.message || 'vui lòng kiểm tra mạng.'));
+      });
     }
     if (activeSession && currentIndex < activeSession.items.length - 1) {
       setCurrentIndex(currentIndex + 1);
@@ -170,7 +198,7 @@ export const ContestMockScreen: React.FC<ContestMockScreenProps> = ({
     try {
       setSubmitting(true);
       setShowSubmitConfirm(false);
-      const res = await onlineApi.submitContest(activeSession.sessionId, { answers });
+      const res = await onlineApi.submitContest(activeSession.sessionId, { answers: answersRef.current });
       setContestResult(res);
       setViewMode('result');
 
@@ -243,6 +271,11 @@ export const ContestMockScreen: React.FC<ContestMockScreenProps> = ({
           <div className="contest-header-right">
             <div className={`contest-timer-pill ${remainingSeconds < 180 ? 'urgent' : ''}`} data-testid="contest-timer-pill">
               ⏱ {formatTimer(remainingSeconds)}
+            </div>
+            <div className={`autosave-status-badge autosave-${saveStatus}`} role="status" aria-live="polite">
+              {saveStatus === 'saving' && '⏳ Đang lưu…'}
+              {saveStatus === 'saved' && '✓ Đã lưu'}
+              {saveStatus === 'error' && '⚠️ Chưa lưu được'}
             </div>
             <button
               className="action-btn submit"

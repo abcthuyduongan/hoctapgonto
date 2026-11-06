@@ -268,7 +268,7 @@ export const TownScreen: React.FC<TownScreenProps> = ({ onBack, studentId }) => 
 
   if (loading && !data && !visiting) {
     return (
-      <div className="town-screen-loading">
+      <div className="town-screen town-screen-loading" role="dialog" aria-label="Thị trấn của con">
         <div className="town-spinner" />
         <p>Đang chuẩn bị thị trấn của con...</p>
       </div>
@@ -277,7 +277,7 @@ export const TownScreen: React.FC<TownScreenProps> = ({ onBack, studentId }) => 
 
   if (error && !data && !visiting) {
     return (
-      <div className="town-screen-error">
+      <div className="town-screen town-screen-error" role="dialog" aria-label="Thị trấn của con">
         <h2>Không thể mở Thị trấn</h2>
         <p>{error}</p>
         <button onClick={fetchTown}>Thử lại</button>
@@ -302,7 +302,7 @@ export const TownScreen: React.FC<TownScreenProps> = ({ onBack, studentId }) => 
   }
 
   return (
-    <div className="town-container">
+    <div className="town-screen town-container" role="dialog" aria-label={visiting ? `Thị trấn của bạn ${visiting.studentName}` : "Thị trấn của con"}>
       {/* Header bar */}
       <header className="town-header">
         <div className="town-header-left">
@@ -437,7 +437,7 @@ export const TownScreen: React.FC<TownScreenProps> = ({ onBack, studentId }) => 
           </div>
 
           <div className="grid-wrapper">
-            <div className="town-grid-10" role="grid" aria-label="Bản đồ thị trấn 10x10">
+            <div className="town-grid-10" role="region" aria-label="Bản đồ thị trấn 10x10">
               {Array.from({ length: 10 }, (_, y) =>
                 Array.from({ length: 10 }, (_, x) => {
                   const key = `${x},${y}`;
@@ -494,7 +494,7 @@ export const TownScreen: React.FC<TownScreenProps> = ({ onBack, studentId }) => 
               Học đều các môn để kiếm đủ vật liệu xây công trình mơ ước!
             </p>
 
-            <div className="building-list">
+            <div className="building-list" tabIndex={0} role="region" aria-label="Danh sách công trình">
               {catalog.map((b) => {
                 const affordable = canAffordBuilding(materials, b.cost);
                 const isSelected = selectedBuilding?.id === b.id;

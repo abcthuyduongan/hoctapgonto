@@ -1,0 +1,3 @@
+[STAGING LOAD] Starting load against https://audit-invalid-staging.example.test
+[STAGING LOAD] Concurrency: 2, Duration: 0.35s
+{"calls":18,"httpFailures":18,"totalOperations":6,"totalErrors":0,"errorRatePercent":"0.00","reportedQuestionSamples":6}

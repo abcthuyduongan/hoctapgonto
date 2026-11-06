@@ -1,0 +1,152 @@
+{
+  "kind": "Local SQLite in-memory data-access benchmark, not Supabase/network/browser speed",
+  "dataset": {
+    "classes": 23,
+    "students": 1000,
+    "packs": 32,
+    "questions": 384,
+    "weeks": 184,
+    "awards": 32000
+  },
+  "environment": {
+    "node": "v22.22.2",
+    "platform": "win32"
+  },
+  "results": [
+    {
+      "section": "students",
+      "run": 1,
+      "elapsedMs": 1.906,
+      "queries": 7,
+      "responseBytes": 6530,
+      "visibleStudents": 20,
+      "visibleWeeks": 0,
+      "stats": {
+        "students": 1000,
+        "classes": 23,
+        "questions": 384,
+        "pendingRequests": 0
+      }
+    },
+    {
+      "section": "students",
+      "run": 2,
+      "elapsedMs": 1.174,
+      "queries": 7,
+      "responseBytes": 6530,
+      "visibleStudents": 20,
+      "visibleWeeks": 0,
+      "stats": {
+        "students": 1000,
+        "classes": 23,
+        "questions": 384,
+        "pendingRequests": 0
+      }
+    },
+    {
+      "section": "students",
+      "run": 3,
+      "elapsedMs": 0.901,
+      "queries": 7,
+      "responseBytes": 6530,
+      "visibleStudents": 20,
+      "visibleWeeks": 0,
+      "stats": {
+        "students": 1000,
+        "classes": 23,
+        "questions": 384,
+        "pendingRequests": 0
+      }
+    },
+    {
+      "section": "weeks",
+      "run": 1,
+      "elapsedMs": 0.835,
+      "queries": 8,
+      "responseBytes": 8100,
+      "visibleStudents": 0,
+      "visibleWeeks": 8,
+      "stats": {
+        "students": 1000,
+        "classes": 23,
+        "questions": 384,
+        "pendingRequests": 0
+      }
+    },
+    {
+      "section": "weeks",
+      "run": 2,
+      "elapsedMs": 0.612,
+      "queries": 8,
+      "responseBytes": 8100,
+      "visibleStudents": 0,
+      "visibleWeeks": 8,
+      "stats": {
+        "students": 1000,
+        "classes": 23,
+        "questions": 384,
+        "pendingRequests": 0
+      }
+    },
+    {
+      "section": "weeks",
+      "run": 3,
+      "elapsedMs": 0.485,
+      "queries": 8,
+      "responseBytes": 8100,
+      "visibleStudents": 0,
+      "visibleWeeks": 8,
+      "stats": {
+        "students": 1000,
+        "classes": 23,
+        "questions": 384,
+        "pendingRequests": 0
+      }
+    },
+    {
+      "section": "wallet",
+      "run": 1,
+      "elapsedMs": 0.361,
+      "queries": 5,
+      "responseBytes": 2522,
+      "visibleStudents": 0,
+      "visibleWeeks": 0,
+      "stats": {
+        "students": 1000,
+        "classes": 23,
+        "questions": 384,
+        "pendingRequests": 0
+      }
+    },
+    {
+      "section": "wallet",
+      "run": 2,
+      "elapsedMs": 0.258,
+      "queries": 5,
+      "responseBytes": 2522,
+      "visibleStudents": 0,
+      "visibleWeeks": 0,
+      "stats": {
+        "students": 1000,
+        "classes": 23,
+        "questions": 384,
+        "pendingRequests": 0
+      }
+    },
+    {
+      "section": "wallet",
+      "run": 3,
+      "elapsedMs": 0.226,
+      "queries": 5,
+      "responseBytes": 2522,
+      "visibleStudents": 0,
+      "visibleWeeks": 0,
+      "stats": {
+        "students": 1000,
+        "classes": 23,
+        "questions": 384,
+        "pendingRequests": 0
+      }
+    }
+  ]
+}

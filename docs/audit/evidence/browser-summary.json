@@ -1,0 +1,2926 @@
+{
+  "stats": {
+    "startTime": "2026-11-06T04:14:03.960Z",
+    "duration": 792066.2420000001,
+    "expected": 180,
+    "skipped": 2,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "configured": 182,
+  "globalErrors": [],
+  "cases": [
+    {
+      "file": "tests/visual/online-a11y.spec.ts",
+      "line": 5,
+      "title": "Tuần 10 Cổng C10: Kiểm Thử Truy Cập Dễ Dàng (A11y) & Quét Tự Động axe-core",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 4993,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-a11y.spec.ts",
+      "line": 5,
+      "title": "Tuần 10 Cổng C10: Kiểm Thử Truy Cập Dễ Dàng (A11y) & Quét Tự Động axe-core",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 5623,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-badges.spec.ts",
+      "line": 5,
+      "title": "Tuần 4 Cổng C4: Chuỗi ngày học, Nhiệm vụ ngày và Sổ huy hiệu",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 4241,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-badges.spec.ts",
+      "line": 5,
+      "title": "Tuần 4 Cổng C4: Chuỗi ngày học, Nhiệm vụ ngày và Sổ huy hiệu",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 4210,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-compatibility.spec.ts",
+      "line": 18,
+      "title": "preview explains question two limiting the source to two games and blocks publishing a conflicting group",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 3354,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-compatibility.spec.ts",
+      "line": 18,
+      "title": "preview explains question two limiting the source to two games and blocks publishing a conflicting group",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 3207,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-contest.spec.ts",
+      "line": 5,
+      "title": "Tuần 7 Cổng C7: Chế Độ Thi Thử Violympic & IOE, Đồng Hồ Server, Không Lộ Đáp Án, Ôn Câu Sai",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 4061,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-contest.spec.ts",
+      "line": 5,
+      "title": "Tuần 7 Cổng C7: Chế Độ Thi Thử Violympic & IOE, Đồng Hồ Server, Không Lộ Đáp Án, Ôn Câu Sai",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 3999,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-discovery.spec.ts",
+      "line": 5,
+      "title": "Tuần 2 Cổng C2: Màn chơi tranh vùng, địa danh góc, chặng hoàn thành, sương mù khóa và thẻ khám phá",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 6098,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-discovery.spec.ts",
+      "line": 5,
+      "title": "Tuần 2 Cổng C2: Màn chơi tranh vùng, địa danh góc, chặng hoàn thành, sương mù khóa và thẻ khám phá",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 6259,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-games.spec.ts",
+      "line": 9,
+      "title": "completed questions can be replayed for only each missing star while future weeks remain locked",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 6197,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-games.spec.ts",
+      "line": 49,
+      "title": "assigned memory, sentence and sequence games complete through server-scored account history",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 7593,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-games.spec.ts",
+      "line": 9,
+      "title": "completed questions can be replayed for only each missing star while future weeks remain locked",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 5767,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-games.spec.ts",
+      "line": 49,
+      "title": "assigned memory, sentence and sequence games complete through server-scored account history",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 7491,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-gifts.spec.ts",
+      "line": 5,
+      "title": "Tuần 3 Cổng C3: Quản trị Kệ quà, Thanh mục tiêu, Ghim quà, Đổi quà và Tủ kỷ niệm",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 4963,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-gifts.spec.ts",
+      "line": 5,
+      "title": "Tuần 3 Cổng C3: Quản trị Kệ quà, Thanh mục tiêu, Ghim quà, Đổi quà và Tủ kỷ niệm",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 4920,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-hints.spec.ts",
+      "line": 4,
+      "title": "sentence-builder waits for the server hint receipt and charges one star",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 4888,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-hints.spec.ts",
+      "line": 4,
+      "title": "sequence-trail waits for the server hint receipt and charges one star",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 5047,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-hints.spec.ts",
+      "line": 4,
+      "title": "sentence-builder waits for the server hint receipt and charges one star",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 3976,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-hints.spec.ts",
+      "line": 4,
+      "title": "sequence-trail waits for the server hint receipt and charges one star",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 4169,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-imageclock.spec.ts",
+      "line": 24,
+      "title": "quiz: failed and delayed question images do not consume the server clock",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 643,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-imageclock.spec.ts",
+      "line": 24,
+      "title": "numeric: failed and delayed question images do not consume the server clock",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 1030,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-imageclock.spec.ts",
+      "line": 38,
+      "title": "the next image warms after a correct answer without opening its clock early",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 549,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-imageclock.spec.ts",
+      "line": 24,
+      "title": "quiz: failed and delayed question images do not consume the server clock",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 563,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-imageclock.spec.ts",
+      "line": 24,
+      "title": "numeric: failed and delayed question images do not consume the server clock",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 561,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-imageclock.spec.ts",
+      "line": 38,
+      "title": "the next image warms after a correct answer without opening its clock early",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 488,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-import.spec.ts",
+      "line": 21,
+      "title": "a legacy 140-question file previews valid rows lazily and requires a compliant new weekly plan",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 5899,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-import.spec.ts",
+      "line": 45,
+      "title": "a corrupt selected audio file excludes its dependent questions while unrelated questions can be published",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 2993,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-import.spec.ts",
+      "line": 58,
+      "title": "a server-rejected audio batch isolates its bad file and preserves good media and questions",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 3250,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-import.spec.ts",
+      "line": 73,
+      "title": "a server failure during media batch upload does not retry every file or label good media as corrupt",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 2818,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-import.spec.ts",
+      "line": 85,
+      "title": "the downloadable full sample imports all eight question types with images and playable audio in one selection",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 4276,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-import.spec.ts",
+      "line": 21,
+      "title": "a legacy 140-question file previews valid rows lazily and requires a compliant new weekly plan",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 3904,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-import.spec.ts",
+      "line": 45,
+      "title": "a corrupt selected audio file excludes its dependent questions while unrelated questions can be published",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 2939,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-import.spec.ts",
+      "line": 58,
+      "title": "a server-rejected audio batch isolates its bad file and preserves good media and questions",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 2952,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-import.spec.ts",
+      "line": 73,
+      "title": "a server failure during media batch upload does not retry every file or label good media as corrupt",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 2769,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-import.spec.ts",
+      "line": 85,
+      "title": "the downloadable full sample imports all eight question types with images and playable audio in one selection",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 3608,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-importbudget.spec.ts",
+      "line": 4,
+      "title": "oversized file selections are rejected before media reads or uploads and preserve earlier pending files",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 2692,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-importbudget.spec.ts",
+      "line": 4,
+      "title": "oversized file selections are rejected before media reads or uploads and preserve earlier pending files",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 3059,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-importfile.spec.ts",
+      "line": 7,
+      "title": "the supplied Excel 140-question file and sixteen WAV files preview without publishing invalid rows",
+      "project": "online-chrome",
+      "status": "skipped",
+      "annotations": [
+        {
+          "type": "skip",
+          "description": "Requires the author-supplied local file; no authored content is committed to tests.",
+          "location": {
+            "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-importfile.spec.ts",
+            "line": 8,
+            "column": 58
+          }
+        }
+      ],
+      "results": [
+        {
+          "status": "skipped",
+          "durationMs": 159,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-importfile.spec.ts",
+      "line": 7,
+      "title": "the supplied Excel 140-question file and sixteen WAV files preview without publishing invalid rows",
+      "project": "online-msedge",
+      "status": "skipped",
+      "annotations": [
+        {
+          "type": "skip",
+          "description": "Requires the author-supplied local file; no authored content is committed to tests.",
+          "location": {
+            "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-importfile.spec.ts",
+            "line": 8,
+            "column": 58
+          }
+        }
+      ],
+      "results": [
+        {
+          "status": "skipped",
+          "durationMs": 177,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-journey.spec.ts",
+      "line": 8,
+      "title": "each question keeps its highest stars across games, then the student explicitly closes a mastered week",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 7337,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-journey.spec.ts",
+      "line": 8,
+      "title": "each question keeps its highest stars across games, then the student explicitly closes a mastered week",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 7132,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-loading.spec.ts",
+      "line": 24,
+      "title": "a student with an old 3D preference starts directly in 2D, warms the game and safely retries a failed answer",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 3974,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-loading.spec.ts",
+      "line": 60,
+      "title": "unavailable legacy models never block the 2D lesson",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 4071,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-loading.spec.ts",
+      "line": 71,
+      "title": "an interrupted game chunk displays recovery controls and reload can start a new working session",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 5360,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-loading.spec.ts",
+      "line": 85,
+      "title": "the first image downloads while the game chunk is held and does not start its clock early",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 3924,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-loading.spec.ts",
+      "line": 24,
+      "title": "a student with an old 3D preference starts directly in 2D, warms the game and safely retries a failed answer",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 4096,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-loading.spec.ts",
+      "line": 60,
+      "title": "unavailable legacy models never block the 2D lesson",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 3988,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-loading.spec.ts",
+      "line": 71,
+      "title": "an interrupted game chunk displays recovery controls and reload can start a new working session",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 5351,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-loading.spec.ts",
+      "line": 85,
+      "title": "the first image downloads while the game chunk is held and does not start its clock early",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 3453,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-management.spec.ts",
+      "line": 52,
+      "title": "M2: a fresh child starts empty; Word and Excel preview every question in eight types and reject unusable media",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [
+        {
+          "type": "serial",
+          "location": {
+            "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-management.spec.ts",
+            "line": 0,
+            "column": 0
+          }
+        }
+      ],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 15253,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-management.spec.ts",
+      "line": 77,
+      "title": "M2 M3: an explicit same-source revision preserves stars and history; backup preview is read-only and restore requires reauthentication",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [
+        {
+          "type": "serial",
+          "location": {
+            "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-management.spec.ts",
+            "line": 0,
+            "column": 0
+          }
+        }
+      ],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 13014,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-management.spec.ts",
+      "line": 103,
+      "title": "import safety: all-invalid questions cannot publish, multiple documents clear selection, and incomplete revisions cannot replace a week",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [
+        {
+          "type": "serial",
+          "location": {
+            "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-management.spec.ts",
+            "line": 0,
+            "column": 0
+          }
+        }
+      ],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 3764,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-management.spec.ts",
+      "line": 52,
+      "title": "M2: a fresh child starts empty; Word and Excel preview every question in eight types and reject unusable media",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [
+        {
+          "type": "serial",
+          "location": {
+            "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-management.spec.ts",
+            "line": 0,
+            "column": 0
+          }
+        }
+      ],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 11624,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-management.spec.ts",
+      "line": 77,
+      "title": "M2 M3: an explicit same-source revision preserves stars and history; backup preview is read-only and restore requires reauthentication",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [
+        {
+          "type": "serial",
+          "location": {
+            "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-management.spec.ts",
+            "line": 0,
+            "column": 0
+          }
+        }
+      ],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 11228,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-management.spec.ts",
+      "line": 103,
+      "title": "import safety: all-invalid questions cannot publish, multiple documents clear selection, and incomplete revisions cannot replace a week",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [
+        {
+          "type": "serial",
+          "location": {
+            "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-management.spec.ts",
+            "line": 0,
+            "column": 0
+          }
+        }
+      ],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 3778,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-mapflow.spec.ts",
+      "line": 5,
+      "title": "UI01-UI04: student map flow renders world map, switches regions, views stage panel, and returns",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 3214,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-mapflow.spec.ts",
+      "line": 5,
+      "title": "UI01-UI04: student map flow renders world map, switches regions, views stage panel, and returns",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 3413,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-mapgeometry.spec.ts",
+      "line": 123,
+      "title": "world and region map geometry at 390×844 (phone-390)",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 1670,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-mapgeometry.spec.ts",
+      "line": 123,
+      "title": "world and region map geometry at 768×1024 (tablet-768)",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 1706,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-mapgeometry.spec.ts",
+      "line": 123,
+      "title": "world and region map geometry at 1440×900 (desktop-1440)",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 1623,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-mapgeometry.spec.ts",
+      "line": 123,
+      "title": "world and region map geometry at 390×844 (phone-390)",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 1616,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-mapgeometry.spec.ts",
+      "line": 123,
+      "title": "world and region map geometry at 768×1024 (tablet-768)",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 1522,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-mapgeometry.spec.ts",
+      "line": 123,
+      "title": "world and region map geometry at 1440×900 (desktop-1440)",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 1619,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-mapperformance.spec.ts",
+      "line": 5,
+      "title": "PF02, PF07: rapid map navigation world <-> region <-> chapter cleans up in-flight requests and avoids layout thrashing",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 3222,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-mapperformance.spec.ts",
+      "line": 5,
+      "title": "PF02, PF07: rapid map navigation world <-> region <-> chapter cleans up in-flight requests and avoids layout thrashing",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 3287,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-media.spec.ts",
+      "line": 34,
+      "title": "refresh synchronizes media from another tab and previews its image and audio without a reload",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 6162,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-media.spec.ts",
+      "line": 60,
+      "title": "matching cards keep their question text visible alongside images at mobile, tablet and desktop sizes",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 5064,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-media.spec.ts",
+      "line": 74,
+      "title": "memory cards contain long labels and images without clipping at short, mobile and desktop viewports",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 7587,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-media.spec.ts",
+      "line": 122,
+      "title": "Đảo Nối Từ: failed card images can retry outside answer buttons without recording an attempt",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 3505,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-media.spec.ts",
+      "line": 122,
+      "title": "Khu Rừng Trí Nhớ: failed card images can retry outside answer buttons without recording an attempt",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 3758,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-media.spec.ts",
+      "line": 34,
+      "title": "refresh synchronizes media from another tab and previews its image and audio without a reload",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 5892,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-media.spec.ts",
+      "line": 60,
+      "title": "matching cards keep their question text visible alongside images at mobile, tablet and desktop sizes",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 4086,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-media.spec.ts",
+      "line": 74,
+      "title": "memory cards contain long labels and images without clipping at short, mobile and desktop viewports",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 6485,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-media.spec.ts",
+      "line": 122,
+      "title": "Đảo Nối Từ: failed card images can retry outside answer buttons without recording an attempt",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 3386,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-media.spec.ts",
+      "line": 122,
+      "title": "Khu Rừng Trí Nhớ: failed card images can retry outside answer buttons without recording an attempt",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 3387,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-minigames.spec.ts",
+      "line": 8,
+      "title": "Tuần 5 (Cổng C5): balance-scale and basket-sort games run smoothly, contextual themes render, and motion toggle works",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 3792,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-minigames.spec.ts",
+      "line": 8,
+      "title": "Tuần 5 (Cổng C5): balance-scale and basket-sort games run smoothly, contextual themes render, and motion toggle works",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 3457,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-parent-portal.spec.ts",
+      "line": 5,
+      "title": "Tuần 6 Cổng C6: Khu Phụ Huynh, Báo Cáo Tuần, Bảo Vệ PIN, Giới Hạn Giờ Học & Duyệt Đổi Quà",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 4958,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-parent-portal.spec.ts",
+      "line": 5,
+      "title": "Tuần 6 Cổng C6: Khu Phụ Huynh, Báo Cáo Tuần, Bảo Vệ PIN, Giới Hạn Giờ Học & Duyệt Đổi Quà",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 5564,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-password.spec.ts",
+      "line": 19,
+      "title": "opening password change cancels a pending journey read and closing resumes it",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 3185,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-password.spec.ts",
+      "line": 29,
+      "title": "student changes their password in a lazy accessible dialog at 1440px",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 5023,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-password.spec.ts",
+      "line": 29,
+      "title": "student changes their password in a lazy accessible dialog at 390px",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 4604,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-password.spec.ts",
+      "line": 19,
+      "title": "opening password change cancels a pending journey read and closing resumes it",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 3262,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-password.spec.ts",
+      "line": 29,
+      "title": "student changes their password in a lazy accessible dialog at 1440px",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 4495,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-password.spec.ts",
+      "line": 29,
+      "title": "student changes their password in a lazy accessible dialog at 390px",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 4486,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-performance.spec.ts",
+      "line": 18,
+      "title": "login has a bounded role-free bundle and the default lesson creates no 3D requests or contexts",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 5017,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-performance.spec.ts",
+      "line": 38,
+      "title": "memory overlaps mismatch reveal with slow ACK without unlocking before receipt",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 4242,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-performance.spec.ts",
+      "line": 38,
+      "title": "connect overlaps mismatch reveal with slow ACK without unlocking before receipt",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 4343,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-performance.spec.ts",
+      "line": 54,
+      "title": "the 2D release ignores saved 3D preferences and frees resources over fifty lesson visits",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 13403,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-performance.spec.ts",
+      "line": 18,
+      "title": "login has a bounded role-free bundle and the default lesson creates no 3D requests or contexts",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 5618,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-performance.spec.ts",
+      "line": 38,
+      "title": "memory overlaps mismatch reveal with slow ACK without unlocking before receipt",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 4317,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-performance.spec.ts",
+      "line": 38,
+      "title": "connect overlaps mismatch reveal with slow ACK without unlocking before receipt",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 4604,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-performance.spec.ts",
+      "line": 54,
+      "title": "the 2D release ignores saved 3D preferences and frees resources over fifty lesson visits",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 13771,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-questionclock.spec.ts",
+      "line": 51,
+      "title": "quiz waits for the clock ACK and only advances after a saved correct answer",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 885,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-questionclock.spec.ts",
+      "line": 62,
+      "title": "quiz retries the exact saved attempt after a failed response and can retry opening the clock",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 875,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-questionclock.spec.ts",
+      "line": 71,
+      "title": "rich exercise keeps its clock and hints across wrong answers and freezes a failed save for exact retry",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 630,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-questionclock.spec.ts",
+      "line": 80,
+      "title": "listening opens its clock after audio ends and requires the clock ACK before answering",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 510,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-questionclock.spec.ts",
+      "line": 87,
+      "title": "legacy quiz keeps its original attempt key and may advance after a wrong answer",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 742,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-questionclock.spec.ts",
+      "line": 92,
+      "title": "sentence preserves pending order submissions and only advances committed attempt keys",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 1558,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-questionclock.spec.ts",
+      "line": 92,
+      "title": "sequence preserves pending order submissions and only advances committed attempt keys",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 1546,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-questionclock.spec.ts",
+      "line": 104,
+      "title": "memory freezes a failed pair save and retries the exact pair without minting a move",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 1887,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-questionclock.spec.ts",
+      "line": 104,
+      "title": "connect freezes a failed pair save and retries the exact pair without minting a move",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 2023,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-questionclock.spec.ts",
+      "line": 51,
+      "title": "quiz waits for the clock ACK and only advances after a saved correct answer",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 1141,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-questionclock.spec.ts",
+      "line": 62,
+      "title": "quiz retries the exact saved attempt after a failed response and can retry opening the clock",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 1083,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-questionclock.spec.ts",
+      "line": 71,
+      "title": "rich exercise keeps its clock and hints across wrong answers and freezes a failed save for exact retry",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 775,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-questionclock.spec.ts",
+      "line": 80,
+      "title": "listening opens its clock after audio ends and requires the clock ACK before answering",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 642,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-questionclock.spec.ts",
+      "line": 87,
+      "title": "legacy quiz keeps its original attempt key and may advance after a wrong answer",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 869,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-questionclock.spec.ts",
+      "line": 92,
+      "title": "sentence preserves pending order submissions and only advances committed attempt keys",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 1468,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-questionclock.spec.ts",
+      "line": 92,
+      "title": "sequence preserves pending order submissions and only advances committed attempt keys",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 2066,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-questionclock.spec.ts",
+      "line": 104,
+      "title": "memory freezes a failed pair save and retries the exact pair without minting a move",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 2033,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-questionclock.spec.ts",
+      "line": 104,
+      "title": "connect freezes a failed pair save and retries the exact pair without minting a move",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 2271,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-quiz.spec.ts",
+      "line": 25,
+      "title": "quiz fits its question, image and four readable answers on desktop and allows complete mobile scrolling",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 3608,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-quiz.spec.ts",
+      "line": 53,
+      "title": "reading exercise keeps its complete passage, prompt and controls reachable and resets only for the next question",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 2877,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-quiz.spec.ts",
+      "line": 25,
+      "title": "quiz fits its question, image and four readable answers on desktop and allows complete mobile scrolling",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 3679,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-quiz.spec.ts",
+      "line": 53,
+      "title": "reading exercise keeps its complete passage, prompt and controls reachable and resets only for the next question",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 2729,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-regionmap.spec.ts",
+      "line": 5,
+      "title": "UI04, UI05, UI06: region map renders 7-slot chapter layout, landmark stages, and chapter tabs",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 3262,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-regionmap.spec.ts",
+      "line": 5,
+      "title": "UI04, UI05, UI06: region map renders 7-slot chapter layout, landmark stages, and chapter tabs",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 4127,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-rounds.spec.ts",
+      "line": 28,
+      "title": "Khu Rừng Trí Nhớ: balanced rounds wait for saved answers, release media and complete the whole source once",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 5381,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-rounds.spec.ts",
+      "line": 28,
+      "title": "Đảo Nối Từ: balanced rounds wait for saved answers, release media and complete the whole source once",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 4923,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-rounds.spec.ts",
+      "line": 71,
+      "title": "mobile sessions cap a 30-pair source at four pairs and keep that partition after resize",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 2521,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-rounds.spec.ts",
+      "line": 28,
+      "title": "Khu Rừng Trí Nhớ: balanced rounds wait for saved answers, release media and complete the whole source once",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 4388,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-rounds.spec.ts",
+      "line": 28,
+      "title": "Đảo Nối Từ: balanced rounds wait for saved answers, release media and complete the whole source once",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 4714,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-rounds.spec.ts",
+      "line": 71,
+      "title": "mobile sessions cap a 30-pair source at four pairs and keep that partition after resize",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 2251,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-routing.spec.ts",
+      "line": 21,
+      "title": "M1: canonical local entry and auth brand keep a fresh account workspace free of browser profiles",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [
+        {
+          "type": "serial",
+          "location": {
+            "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-routing.spec.ts",
+            "line": 0,
+            "column": 0
+          }
+        }
+      ],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 1795,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-routing.spec.ts",
+      "line": 26,
+      "title": "retired links open the account UI without reading or changing browser records",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [
+        {
+          "type": "serial",
+          "location": {
+            "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-routing.spec.ts",
+            "line": 0,
+            "column": 0
+          }
+        }
+      ],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 2776,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-routing.spec.ts",
+      "line": 34,
+      "title": "M1: graphics fallback exposes every allowed assigned game and no built-in lesson, retaining retries and server stars",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [
+        {
+          "type": "serial",
+          "location": {
+            "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-routing.spec.ts",
+            "line": 0,
+            "column": 0
+          }
+        }
+      ],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 4035,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-routing.spec.ts",
+      "line": 21,
+      "title": "M1: canonical local entry and auth brand keep a fresh account workspace free of browser profiles",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [
+        {
+          "type": "serial",
+          "location": {
+            "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-routing.spec.ts",
+            "line": 0,
+            "column": 0
+          }
+        }
+      ],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 1275,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-routing.spec.ts",
+      "line": 26,
+      "title": "retired links open the account UI without reading or changing browser records",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [
+        {
+          "type": "serial",
+          "location": {
+            "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-routing.spec.ts",
+            "line": 0,
+            "column": 0
+          }
+        }
+      ],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 2063,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-routing.spec.ts",
+      "line": 34,
+      "title": "M1: graphics fallback exposes every allowed assigned game and no built-in lesson, retaining retries and server stars",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [
+        {
+          "type": "serial",
+          "location": {
+            "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-routing.spec.ts",
+            "line": 0,
+            "column": 0
+          }
+        }
+      ],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 3439,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-scrolling.spec.ts",
+      "line": 12,
+      "title": "reaches the weekly material and restores scrolling after leaving a game",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 2450,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-scrolling.spec.ts",
+      "line": 12,
+      "title": "reaches the weekly material and restores scrolling after leaving a game",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 2484,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-scrolling.spec.ts",
+      "line": 12,
+      "title": "reaches the weekly material and restores scrolling after leaving a game",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 7204,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-scrolling.spec.ts",
+      "line": 12,
+      "title": "reaches the weekly material and restores scrolling after leaving a game",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 6033,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-soak.spec.ts",
+      "line": 4,
+      "title": "thirty complete games across five hosts keep the shared question cap and release browser resources",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 37391,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-soak.spec.ts",
+      "line": 4,
+      "title": "thirty complete games across five hosts keep the shared question cap and release browser resources",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 37263,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-social.spec.ts",
+      "line": 4,
+      "title": "Tuần 9 Cổng C9: Hàng Xóm Động Vật, Thăm Thị Trấn Bạn, Nút Cổ Vũ, và Bảng Tin Lớp",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 3968,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-social.spec.ts",
+      "line": 4,
+      "title": "Tuần 9 Cổng C9: Hàng Xóm Động Vật, Thăm Thị Trấn Bạn, Nút Cổ Vũ, và Bảng Tin Lớp",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 4178,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-speech.spec.ts",
+      "line": 5,
+      "title": "Vietnamese speech waits for the right voice, explains missing voices and cancels when leaving",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 5315,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-speech.spec.ts",
+      "line": 5,
+      "title": "Vietnamese speech waits for the right voice, explains missing voices and cancels when leaving",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 5431,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-startup.spec.ts",
+      "line": 16,
+      "title": "startup overlaps status and identity without an incorrect auth screen (logged out)",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 2616,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-startup.spec.ts",
+      "line": 16,
+      "title": "startup overlaps status and identity without an incorrect auth screen (existing session)",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 2811,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-startup.spec.ts",
+      "line": 43,
+      "title": "an unconfigured server opens setup without waiting for the speculative identity check",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 2498,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-startup.spec.ts",
+      "line": 56,
+      "title": "startup preserves status failures and a retry can recover",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 2832,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-startup.spec.ts",
+      "line": 56,
+      "title": "startup preserves identity failures and a retry can recover",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 2838,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-startup.spec.ts",
+      "line": 69,
+      "title": "admin coalesces focus reads but fetches fresh data after a write instead of reusing an older response",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 3502,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-startup.spec.ts",
+      "line": 16,
+      "title": "startup overlaps status and identity without an incorrect auth screen (logged out)",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 2203,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-startup.spec.ts",
+      "line": 16,
+      "title": "startup overlaps status and identity without an incorrect auth screen (existing session)",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 2582,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-startup.spec.ts",
+      "line": 43,
+      "title": "an unconfigured server opens setup without waiting for the speculative identity check",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 2665,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-startup.spec.ts",
+      "line": 56,
+      "title": "startup preserves status failures and a retry can recover",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 2968,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-startup.spec.ts",
+      "line": 56,
+      "title": "startup preserves identity failures and a retry can recover",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 3539,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-startup.spec.ts",
+      "line": 69,
+      "title": "admin coalesces focus reads but fetches fresh data after a write instead of reusing an older response",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 3273,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-studentflow.spec.ts",
+      "line": 34,
+      "title": "the lightweight exploration map and wallet remain usable on phone and desktop",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 2534,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-studentflow.spec.ts",
+      "line": 53,
+      "title": "choosing a map destination opens its own assigned questions without awarding stars",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 2917,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-studentflow.spec.ts",
+      "line": 73,
+      "title": "slow start and exit show feedback, block duplicate exits and restore the original control focus",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 2789,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-studentflow.spec.ts",
+      "line": 94,
+      "title": "saving an answer and completing a lesson keep the exit disabled until server confirmation",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 2879,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-studentflow.spec.ts",
+      "line": 119,
+      "title": "a refresh snapshot requested before play cannot replace newly saved stars",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 3187,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-studentflow.spec.ts",
+      "line": 140,
+      "title": "a failed answer or exit clears the busy state and allows a safe retry",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 2833,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-studentflow.spec.ts",
+      "line": 34,
+      "title": "the lightweight exploration map and wallet remain usable on phone and desktop",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 2665,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-studentflow.spec.ts",
+      "line": 53,
+      "title": "choosing a map destination opens its own assigned questions without awarding stars",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 2353,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-studentflow.spec.ts",
+      "line": 73,
+      "title": "slow start and exit show feedback, block duplicate exits and restore the original control focus",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 2978,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-studentflow.spec.ts",
+      "line": 94,
+      "title": "saving an answer and completing a lesson keep the exit disabled until server confirmation",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 2389,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-studentflow.spec.ts",
+      "line": 119,
+      "title": "a refresh snapshot requested before play cannot replace newly saved stars",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 2964,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-studentflow.spec.ts",
+      "line": 140,
+      "title": "a failed answer or exit clears the busy state and allows a safe retry",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 2987,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-summary.spec.ts",
+      "line": 4,
+      "title": "student journey pages only metadata and sends one selected presentation, keeping legacy aliases metadata-only",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 3970,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-summary.spec.ts",
+      "line": 4,
+      "title": "student journey pages only metadata and sends one selected presentation, keeping legacy aliases metadata-only",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 4547,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-town.spec.ts",
+      "line": 4,
+      "title": "Tuần 8 Cổng C8: Thị Trấn Của Con, Lưới 10x10, Vật Liệu Theo Môn, An Toàn Ví Sao, 12 Công Trình",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 3753,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-town.spec.ts",
+      "line": 4,
+      "title": "Tuần 8 Cổng C8: Thị Trấn Của Con, Lưới 10x10, Vật Liệu Theo Môn, An Toàn Ví Sao, 12 Công Trình",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 3927,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-weekplan.spec.ts",
+      "line": 12,
+      "title": "Excel-only samples and null diagnostics publish only valid questions across three subjects",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 3330,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-weekplan.spec.ts",
+      "line": 33,
+      "title": "complete Excel archive imports all 36 questions with image and audio in one selection",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 2972,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-weekplan.spec.ts",
+      "line": 44,
+      "title": "continue selects only unfinished questions and twenty enter/exit cycles release game UI resources",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 7277,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-weekplan.spec.ts",
+      "line": 12,
+      "title": "Excel-only samples and null diagnostics publish only valid questions across three subjects",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 3701,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-weekplan.spec.ts",
+      "line": 33,
+      "title": "complete Excel archive imports all 36 questions with image and audio in one selection",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 3055,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-weekplan.spec.ts",
+      "line": 44,
+      "title": "continue selects only unfinished questions and twenty enter/exit cycles release game UI resources",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 8881,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-worldmap.spec.ts",
+      "line": 5,
+      "title": "UI01, UI13, UI14: world map displays 4 region anchors with real progress badges and keyboard navigation",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 2927,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-worldmap.spec.ts",
+      "line": 5,
+      "title": "UI01, UI13, UI14: world map displays 4 region anchors with real progress badges and keyboard navigation",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 3200,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online.spec.ts",
+      "line": 45,
+      "title": "online: existing Word/Excel week previews, authenticated media, raw game answers, listening gate, cross-device wallet and admin handover",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [
+        {
+          "type": "serial",
+          "location": {
+            "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online.spec.ts",
+            "line": 0,
+            "column": 0
+          }
+        }
+      ],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 14509,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online.spec.ts",
+      "line": 71,
+      "title": "online privacy: current worker retires without caching and an old controlling worker cannot replay a private account",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [
+        {
+          "type": "serial",
+          "location": {
+            "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online.spec.ts",
+            "line": 0,
+            "column": 0
+          }
+        }
+      ],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 1633,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online.spec.ts",
+      "line": 92,
+      "title": "retired links use the 2D account UI with real CSP, keyboard controls and no horizontal overflow",
+      "project": "online-chrome",
+      "status": "expected",
+      "annotations": [
+        {
+          "type": "serial",
+          "location": {
+            "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online.spec.ts",
+            "line": 0,
+            "column": 0
+          }
+        }
+      ],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 4251,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online.spec.ts",
+      "line": 45,
+      "title": "online: existing Word/Excel week previews, authenticated media, raw game answers, listening gate, cross-device wallet and admin handover",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [
+        {
+          "type": "serial",
+          "location": {
+            "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online.spec.ts",
+            "line": 0,
+            "column": 0
+          }
+        }
+      ],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 14712,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online.spec.ts",
+      "line": 71,
+      "title": "online privacy: current worker retires without caching and an old controlling worker cannot replay a private account",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [
+        {
+          "type": "serial",
+          "location": {
+            "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online.spec.ts",
+            "line": 0,
+            "column": 0
+          }
+        }
+      ],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 1220,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online.spec.ts",
+      "line": 92,
+      "title": "retired links use the 2D account UI with real CSP, keyboard controls and no horizontal overflow",
+      "project": "online-msedge",
+      "status": "expected",
+      "annotations": [
+        {
+          "type": "serial",
+          "location": {
+            "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online.spec.ts",
+            "line": 0,
+            "column": 0
+          }
+        }
+      ],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 4036,
+          "errors": []
+        }
+      ]
+    }
+  ]
+}

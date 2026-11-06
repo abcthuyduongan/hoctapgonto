@@ -1,5 +1,5 @@
 import {execFileSync} from 'node:child_process';
-import {readFile,writeFile,mkdir,lstat} from 'node:fs/promises';
+import {readFile,writeFile,mkdir,lstat,unlink} from 'node:fs/promises';
 import {resolve,relative,join,sep,isAbsolute} from 'node:path';
 import {createHash} from 'node:crypto';
 import {zipSync} from 'fflate';
@@ -25,5 +25,6 @@ for(const name of names){
 }
 files[prefix+'SOURCE_MANIFEST.json']=Buffer.from(JSON.stringify({version,createdAt:new Date().toISOString(),baseCommit:execFileSync('git',['rev-parse','HEAD'],{cwd:root}).toString().trim(),workingTreeSnapshot:true,deletedPaths,files:manifest},null,2)+'\n');
 const folder=join(root,'releases');await mkdir(folder,{recursive:true});const output=join(folder,`bao-an-learning-${version}-source.zip`),archive=zipSync(files,{level:6});
+try{await unlink(output);}catch(e){if(e.code!=='ENOENT')throw e;}
 await writeFile(output,archive,{flag:'wx'});
 console.log(JSON.stringify({output,files:manifest.length,uncompressedBytes:total,bytes:archive.length,sha256:createHash('sha256').update(archive).digest('hex')}));

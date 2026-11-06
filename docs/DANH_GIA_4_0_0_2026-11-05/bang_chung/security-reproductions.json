@@ -1,0 +1,66 @@
+{
+  "note": "Passing audit assertions confirm unintended behavior; these are not positive product acceptance tests.",
+  "observations": [
+    {
+      "case": "parent-control-authorization",
+      "engine": "SQLite HTTP",
+      "noPinVerificationPerformed": true,
+      "studentDashboardStatus": 200,
+      "studentSettingsStatus": 200,
+      "newStudentLimit": 0,
+      "responseExposesPinHash": true,
+      "responseExposesPinSalt": true,
+      "unlinkedParentDashboardStatus": 403,
+      "unlinkedParentSettingsStatus": 200,
+      "unlinkedParentChangedLimit": 99
+    },
+    {
+      "case": "parent-control-authorization",
+      "engine": "PostgreSQL cloud adapter",
+      "noPinVerificationPerformed": true,
+      "studentDashboardStatus": 200,
+      "studentSettingsStatus": 200,
+      "newStudentLimit": 0,
+      "responseExposesPinHash": true,
+      "responseExposesPinSalt": true,
+      "unlinkedParentDashboardStatus": 403,
+      "unlinkedParentSettingsStatus": 200,
+      "unlinkedParentChangedLimit": 99
+    },
+    {
+      "case": "backup-parent-links",
+      "before": 1,
+      "after": 0,
+      "parentStudentsTableExported": false
+    },
+    {
+      "case": "backup-swallowed-storage-failure",
+      "exportReturnedSuccess": true,
+      "tableDeclaredSize": 3808,
+      "exportedBytes": 0,
+      "checksumMatches": true
+    },
+    {
+      "case": "missing-migrations-not-detected",
+      "readyAccepted": true,
+      "summaryFailed": true,
+      "errorMessage": "relation \"bao_an.student_goals\" does not exist"
+    },
+    {
+      "case": "sqlite-upgrade-parent-role",
+      "oldCommit": "a6d0af1",
+      "startupAccepted": true,
+      "createParentFailed": true,
+      "errorMessage": "CHECK constraint failed: role IN ('admin','student')"
+    },
+    {
+      "case": "answer-option-order",
+      "newPresentations": 12,
+      "distinctOptionOrders": 1,
+      "curriculumChoiceCount": 28,
+      "correctIndexCounts": {
+        "0": 28
+      }
+    }
+  ]
+}

@@ -1,0 +1,139 @@
+{
+  "note": "Reproduction assertions confirm unwanted behavior. CONTROL/outcome FIX_VERIFIED entries verify only the tested repaired path; not blanket acceptance.",
+  "observations": [
+    {
+      "case": "public-session-answer-disclosure",
+      "engine": "SQLite HTTP",
+      "summaryHttpStatus": 200,
+      "reopenHttpStatus": 201,
+      "privatePresentationFields": [
+        "presentationId",
+        "itemId",
+        "permutation",
+        "displayedCorrectIndex",
+        "openedAt"
+      ],
+      "answerSubmittedBeforeUsingAuthoredKey": true,
+      "serverMarkedCorrect": true
+    },
+    {
+      "case": "autosave-same-question-stale-overwrite",
+      "engine": "SQLite HTTP",
+      "newerRevision": 2,
+      "olderRevisionDeliveredLast": 1,
+      "expectedNewestAnswer": "6 quả",
+      "actualPersistedAnswer": "5 quả",
+      "staleValueWon": true
+    },
+    {
+      "case": "review-pack-other-child-access",
+      "engine": "SQLite HTTP",
+      "reviewBelongsToStudentA": true,
+      "studentBStartStatus": 201,
+      "studentBQuestionOpenStatus": 200,
+      "studentBReceivedReviewQuestion": true
+    },
+    {
+      "case": "pin-lockout-old-bypass-fixed",
+      "engine": "SQLite HTTP",
+      "outcome": "FIX_VERIFIED_FOR_TESTED_PATH",
+      "setupStatuses": [
+        429,
+        429,
+        429,
+        429,
+        429,
+        429
+      ],
+      "correctOldPinDuringLock": 429
+    },
+    {
+      "case": "public-session-answer-disclosure",
+      "engine": "PostgreSQL API",
+      "summaryHttpStatus": 200,
+      "reopenHttpStatus": 201,
+      "privatePresentationFields": [
+        "itemId",
+        "openedAt",
+        "permutation",
+        "presentationId",
+        "displayedCorrectIndex"
+      ],
+      "answerSubmittedBeforeUsingAuthoredKey": true,
+      "serverMarkedCorrect": true
+    },
+    {
+      "case": "autosave-same-question-stale-overwrite",
+      "engine": "PostgreSQL API",
+      "newerRevision": 2,
+      "olderRevisionDeliveredLast": 1,
+      "expectedNewestAnswer": "835",
+      "actualPersistedAnswer": "583",
+      "staleValueWon": true
+    },
+    {
+      "case": "review-pack-other-child-access",
+      "engine": "PostgreSQL API",
+      "reviewBelongsToStudentA": true,
+      "studentBStartStatus": 201,
+      "studentBQuestionOpenStatus": 200,
+      "studentBReceivedReviewQuestion": true
+    },
+    {
+      "case": "pin-lockout-old-bypass-fixed",
+      "engine": "PostgreSQL API",
+      "outcome": "FIX_VERIFIED_FOR_TESTED_PATH",
+      "setupStatuses": [
+        429,
+        429,
+        429,
+        429,
+        429,
+        429
+      ],
+      "correctOldPinDuringLock": 429
+    },
+    {
+      "case": "sqlite-dotted-question-history",
+      "authoredItemId": "curriculum.q.1",
+      "positionStoredInSession": 1,
+      "historyLookup": null,
+      "forgotPosition": true
+    },
+    {
+      "case": "sqlite-migration-after-create-fixed",
+      "outcome": "FIX_VERIFIED_FOR_TESTED_PATH",
+      "adminCount": 1
+    },
+    {
+      "case": "sqlite-migration-after-drop-account-loss",
+      "startupAccepted": true,
+      "currentUsers": 0,
+      "originalAdminOnlyInTemporaryTable": true,
+      "configured": false,
+      "recoveryIncomplete": true
+    },
+    {
+      "case": "restore-storage-overwritten-before-sql-failure",
+      "sqlTransactionRolledBack": true,
+      "targetDatabasePreserved": true,
+      "existingStorageBytesChanged": true,
+      "storageMatchesPreservedDatabase": false
+    },
+    {
+      "case": "backup-missing-media-assets-accepted",
+      "mediaRows": 1,
+      "mediaAssets": 0,
+      "previewValid": true,
+      "mediaCountReported": 0
+    },
+    {
+      "case": "backup-torn-student-user-snapshot",
+      "exportReportedSuccess": true,
+      "studentRows": 1,
+      "parentUserMissingInBackup": true,
+      "checksumValid": true,
+      "restoreFailed": true
+    }
+  ]
+}

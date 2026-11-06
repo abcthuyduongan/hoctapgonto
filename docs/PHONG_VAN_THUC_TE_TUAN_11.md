@@ -1,7 +1,12 @@
 # BIÊN BẢN PHỎNG VẤN THỰC TẾ NGƯỜI DÙNG — TUẦN 11
-**Đợt chạy thử nghiệm trên lớp học thật (Pilot Class Trial — Lớp 3A1)**  
+> [!IMPORTANT]
+> **PHÂN LOẠI TÀI LIỆU (THEO ĐÁNH GIÁ 05/11/2026 — R06 / EV01 / L10):**  
+> Tài liệu này là **Kịch bản phỏng vấn thử nghiệm giả định (Simulation Scenario / Pilot Interview Template)** dùng cho định hình yêu cầu và thiết kế tính năng, **không phải là biên bản quan sát người dùng thực tế đã diễn ra**.  
+> Ngày ghi 23/01/2027 – 24/01/2027 là mốc kế hoạch tương lai (plannedAt). Kết quả nghiệm thu thực tế với học sinh và phụ huynh (HP01–HP03) đang ở trạng thái `CHO_NGUOI_DUNG_THAT`, sẽ do chủ dự án và giáo viên trực tiếp tổ chức khi bàn giao bản thử nghiệm.
+
+**Đợt chạy thử nghiệm trên lớp học thật (Pilot Class Trial — Kế hoạch giả định Lớp 3A1)**  
 *Dự án: Bảo An Learning — Bản đồ học tập & Trò chơi thông minh*  
-*Thời gian thực hiện phỏng vấn:* 23/01/2027 – 24/01/2027  
+*Thời gian kế hoạch (plannedAt):* 23/01/2027 – 24/01/2027 (Kế hoạch dự kiến)  
 *Địa điểm:* Trường Tiểu học Chu Văn An (kết hợp phỏng vấn trực tiếp và trao đổi trực tuyến)  
 
 ---

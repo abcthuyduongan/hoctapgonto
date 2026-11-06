@@ -192,6 +192,12 @@ export default function OnlineStudentWorld({identity,onLogout,onPasswordChanged}
   async function chooseReplay(pack:OnlinePackSummary){if(startingGuard.current)return;cancelJourneyReads();startingGuard.current=true;setSelectingPack(pack.id);setStarting(true);const nextGeneration=generation.current,controller=new AbortController();requests.current.add(controller);try{const result=await onlineApi.packGames(pack.id,pack.version,controller.signal);if(mounted.current&&nextGeneration===generation.current)setState(previous=>previous?{...previous,weeks:previous.weeks.map(week=>({...week,sets:week.sets.map(set=>set.pack.id===pack.id&&set.pack.version===pack.version?{...set,games:result.games}:set)}))}:previous);}catch(error){if(mounted.current&&error instanceof Error&&error.name!=='AbortError')setError(messageOf(error));}finally{requests.current.delete(controller);startingGuard.current=false;if(mounted.current){setStarting(false);setSelectingPack(null);}}}
   useEffect(()=>{document.documentElement.dataset.sound=soundOn?'on':'off';document.documentElement.dataset.motion=motionOn?'on':'off';return()=>{delete document.documentElement.dataset.sound;delete document.documentElement.dataset.motion;};},[soundOn,motionOn]);
   useEffect(()=>{
+    return ()=>{
+      document.body.style.overflow='';
+      document.documentElement.style.scrollbarGutter='';
+    };
+  },[]);
+  useEffect(()=>{
     if(!active)return;
     const previousOverflow=document.body.style.overflow,previousGutter=document.documentElement.style.scrollbarGutter;
     document.body.style.overflow='hidden';document.documentElement.style.scrollbarGutter='auto';
@@ -291,7 +297,7 @@ export default function OnlineStudentWorld({identity,onLogout,onPasswordChanged}
   const selectedNode=mapData?.regionView?.nodes.find(n=>n.weekId===selectedWeekId)??null;
   const matchedWeek=selectedWeekId?state?.weeks.find(w=>w.id===selectedWeekId)??null:null;
   return <div className="app-shell focused-games-app ba-frame-shell online-app online-student" data-motion={motionOn?'on':'off'}>
-    <header className="online-header" inert={!!active||walletOpen||giftShelfOpen||passwordOpen||advanceOpen||streakOpen||missionsOpen||badgesOpen||parentPinOpen||parentPortalOpen||contestOpen||townOpen}><a href="?online=1" className="online-brand">✦ BẢO AN <span>LEARNING</span></a><div><strong>{identity.workspace.name}</strong><span>{state?.student.name??identity.user.username}{state?` · ${state.className}`:''}</span></div><div className="online-header-actions">{state?.todayStudyMinutes!==undefined&&<span className="study-timer-pill" title="Thời gian con đã học hôm nay">⏱️ {state.todayStudyMinutes} phút hôm nay</span>}<button type="button" className="contest-pill-btn" onClick={()=>setTownOpen(true)} title="Thị trấn của con" aria-label="Mở thị trấn của con">🏡 Thị trấn</button><button type="button" className="contest-pill-btn" onClick={()=>setContestOpen(true)} title="Phòng luyện thi thử Violympic & IOE" aria-label="Mở phòng thi thử">🏆 Thi thử</button>{state?.streak&&<button type="button" className="streak-pill-btn" onClick={()=>setStreakOpen(true)} title="Xem chuỗi ngày học tập"><span className="streak-flame-icon">🔥</span> {state.streak.currentStreak} Ngày</button>}{state?.dailyMissions&&<button type="button" className="missions-pill-btn" onClick={()=>setMissionsOpen(true)} title="Xem nhiệm vụ ngày"><span>📋</span> Nhiệm vụ ({state.dailyMissions.filter(m=>m.completed).length}/3)</button>}{state?.badges&&<button type="button" className="online-notebook-btn" onClick={()=>setBadgesOpen(true)} title="Xem sổ huy hiệu">🎖️ Huy hiệu ({state.badges.filter(b=>b.unlocked).length}/{state.badges.length})</button>}<button type="button" className="online-notebook-btn" onClick={()=>setNotebookOpen(true)} title="Mở Sổ khám phá" aria-label="Mở Sổ khám phá">📖 Sổ khám phá {unlockedDiscoveryCards.length>0?`(${unlockedDiscoveryCards.length})`:''}</button><button type="button" className="parent-portal-pill-btn" onClick={()=>setParentPinOpen(true)} title="Khu vực dành cho Phụ huynh" aria-label="Mở khu phụ huynh">👨‍👩‍👧 Phụ huynh</button><button aria-pressed={soundOn} onClick={()=>setSoundOn(value=>!value)}>{soundOn?'🔊':'🔇'} Âm thanh</button><button aria-pressed={motionOn} onClick={()=>setMotionOn(value=>!value)}>Hiệu ứng {motionOn?'bật':'tắt'}</button><button disabled={starting} onClick={openPassword}>Đổi mật khẩu</button><button disabled={starting} onClick={()=>void onLogout().catch(error=>setError(messageOf(error)))}>Đăng xuất</button></div></header>
+    <header className="online-header" inert={!!active||walletOpen||giftShelfOpen||passwordOpen||advanceOpen||streakOpen||missionsOpen||badgesOpen||parentPinOpen||parentPortalOpen||contestOpen||townOpen}><a href="?online=1" className="online-brand">✦ BẢO AN <span>LEARNING</span></a><div><strong>{identity.workspace.name}</strong><span>{state?.student.name??identity.user.username}{state?` · ${state.className}`:''}</span></div><div className="online-header-actions">{state?.todayStudyMinutes!==undefined&&<span className="study-timer-pill" title="Thời gian con đã học hôm nay">⏱️ {state.todayStudyMinutes} phút hôm nay</span>}<button type="button" className="town-pill-btn" onClick={()=>setTownOpen(true)} title="Thị trấn của con" aria-label="Mở thị trấn của con">🏡 Thị trấn</button><button type="button" className="contest-pill-btn" onClick={()=>setContestOpen(true)} title="Phòng luyện thi thử Violympic & IOE" aria-label="Mở phòng thi thử">🏆 Thi thử</button>{state?.streak&&<button type="button" className="streak-pill-btn" onClick={()=>setStreakOpen(true)} title="Xem chuỗi ngày học tập"><span className="streak-flame-icon">🔥</span> {state.streak.currentStreak} Ngày</button>}{state?.dailyMissions&&<button type="button" className="missions-pill-btn" onClick={()=>setMissionsOpen(true)} title="Xem nhiệm vụ ngày"><span>📋</span> Nhiệm vụ ({state.dailyMissions.filter(m=>m.completed).length}/3)</button>}{state?.badges&&<button type="button" className="badges-pill-btn" onClick={()=>setBadgesOpen(true)} title="Xem sổ huy hiệu">🎖️ Huy hiệu ({state.badges.filter(b=>b.unlocked).length}/{state.badges.length})</button>}<button type="button" className="online-notebook-btn" onClick={()=>setNotebookOpen(true)} title="Mở Sổ khám phá" aria-label="Mở Sổ khám phá">📖 Sổ khám phá {unlockedDiscoveryCards.length>0?`(${unlockedDiscoveryCards.length})`:''}</button><button type="button" className="parent-portal-pill-btn" onClick={()=>setParentPinOpen(true)} title="Khu vực dành cho Phụ huynh" aria-label="Mở khu phụ huynh">👨‍👩‍👧 Phụ huynh</button><button aria-pressed={soundOn} onClick={()=>setSoundOn(value=>!value)}>{soundOn?'🔊':'🔇'} Âm thanh</button><button aria-pressed={motionOn} onClick={()=>setMotionOn(value=>!value)}>Hiệu ứng {motionOn?'bật':'tắt'}</button><button disabled={starting} onClick={openPassword}>Đổi mật khẩu</button><button disabled={starting} onClick={()=>void onLogout().catch(error=>setError(messageOf(error)))}>Đăng xuất</button></div></header>
     <main ref={studentMain} tabIndex={-1} className="site-main site-main-gameworld" aria-busy={starting||refreshing||loadingMore} inert={!!active||walletOpen||giftShelfOpen||passwordOpen||advanceOpen||streakOpen||missionsOpen||badgesOpen||parentPinOpen||parentPortalOpen||contestOpen||townOpen}>
       {error&&!active&&<div className="online-notice online-error" role="alert">{error}<button onClick={()=>void refresh().catch(error=>setError(messageOf(error)))}>Thử kết nối lại</button></div>}
       {loading?<p className="online-loading" role="status">Đang mở hành trình của con…</p>:state?<>
@@ -340,11 +346,18 @@ export default function OnlineStudentWorld({identity,onLogout,onPasswordChanged}
       const activeRegionId=resolveRegionId(activeSubjectLabel);
       const activeSlot=activeWeek?getSlotFromPosition(activeWeek.position):1;
       const activeLandmarkUrl=getLandmark(activeRegionId,activeSlot);
-      const activeRegionBg=`/art/maps/map-${activeRegionId==='discovery'?'world':activeRegionId}-wide.webp`;
+      const activeRegionKey=activeRegionId==='discovery'?'world':activeRegionId;
+      const activeRegionBgWide=`/art/maps/map-${activeRegionKey}-wide.webp`;
+      const activeRegionBgTall=`/art/maps/map-${activeRegionKey}-tall.webp`;
       return (
         <div className="overlay immersive-overlay" role="presentation">
           <div className={`game-dialog adventure-dialog immersive-dialog premium-game dialog-${active.session.moduleId} dialog-region-${activeRegionId}`} data-scene-engine="html" data-scene-state="ready" ref={gameDialog} tabIndex={-1} role="dialog" aria-modal="true" aria-busy={gameAction!==null} aria-label={`Đang chơi ${active.pack.title}`}>
-            <div className="game-region-backdrop" style={{ backgroundImage: `url('${activeRegionBg}')` }} aria-hidden="true" />
+            <div className="game-region-backdrop" aria-hidden="true">
+              <picture>
+                <source media="(max-width: 768px), (orientation: portrait)" srcSet={activeRegionBgTall} type="image/webp" />
+                <img src={activeRegionBgWide} alt="" className="game-region-backdrop-img" loading="eager" />
+              </picture>
+            </div>
             <div className="game-dialog-head">
               <div className="game-dialog-head-info">
                 <img src={activeLandmarkUrl} alt="" className="game-stage-corner-landmark" aria-hidden="true" />
@@ -410,9 +423,9 @@ export default function OnlineStudentWorld({identity,onLogout,onPasswordChanged}
               setContestOpen(false);
               void refresh();
             }}
-            onStartPracticeWithPack={_pack=>{
+            onStartPracticeWithPack={async (reviewPack)=>{
               setContestOpen(false);
-              void refresh();
+              await startGame('math-quest', reviewPack as any);
             }}
           />
         </Suspense>

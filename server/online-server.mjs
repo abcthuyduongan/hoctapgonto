@@ -11,6 +11,7 @@ import {randomBytes,randomUUID,createHash,scrypt as scryptCallback,scryptSync,ti
 import {promisify} from 'node:util';
 import {OnlineStore,OnlineError,fail,shape,text,integer} from './online-store.mjs';
 import {MAX_RECOVERY_UPLOAD_BYTES,acquireOnlineDatabaseLock,recoverInterruptedOnlineRestore,inspectOnlineBackup,snapshotOnlineDatabase,restoreOnlineDatabase,createRecoveryTemporary,createRecoveryUpload} from './online-recovery.mjs';
+import {revokeParentElevationToken} from './parent-data.mjs';
 
 const scrypt=promisify(scryptCallback),scryptOptions={N:32768,r:8,p:1,maxmem:64*1024*1024};
 const COOKIE='baoan_online_session',MAX_BODY=2*1024*1024;
@@ -142,14 +143,14 @@ export function createOnlineServer({databasePath,staticRoot=resolve('dist'),publ
           }finally{recoveryBusy=false;preview.temporary.remove();}
         }
         if(method==='GET'&&route==='/me')return json(res,200,identity(auth));
-        if(method==='POST'&&route==='/logout'){const{input,auth:current}=await authenticatedBody(req);shape(input,[]);db.prepare('DELETE FROM auth_sessions WHERE token_hash=?').run(current.tokenHash);cookie(res,'',origin,true);return json(res,200,{ok:true});}
+        if(method==='POST'&&route==='/logout'){const{input,auth:current}=await authenticatedBody(req);shape(input,[]);db.prepare('DELETE FROM auth_sessions WHERE token_hash=?').run(current.tokenHash);revokeParentElevationToken(current.id);cookie(res,'',origin,true);return json(res,200,{ok:true});}
         if(method==='POST'&&route==='/account/password'){
           role(auth,'student');const{input:raw,auth:current}=await authenticatedBody(req,'student'),input=shape(raw,['currentPassword','newPassword']);rateLimit(req,current.id,true);
           for(const value of [input.currentPassword,input.newPassword])if(typeof value!=='string'||value.length<10||value.length>128)fail(400,'Mật khẩu cần từ 10–128 ký tự.');
           if(sameSecret(input.currentPassword,input.newPassword))fail(400,'Mật khẩu mới cần khác mật khẩu hiện tại.');
           const user=db.prepare('SELECT password_hash FROM users WHERE workspace_id=? AND id=?').get(current.workspaceId,current.id);
           if(!await verifyPassword(input.currentPassword,user?.password_hash))fail(400,'Mật khẩu hiện tại chưa đúng.');
-          const nextHash=await passwordHash(input.newPassword),result=store.changeOwnPassword(current,user.password_hash,nextHash);cookie(res,'',origin,true);return json(res,200,result);
+          const nextHash=await passwordHash(input.newPassword),result=store.changeOwnPassword(current,user.password_hash,nextHash);revokeParentElevationToken(current.id);cookie(res,'',origin,true);return json(res,200,result);
         }
         if(method==='GET'&&route==='/admin/summary')return json(res,200,await adminSummary(store,auth,Object.fromEntries(url.searchParams)));
         const adminWeekMatch=route.match(/^\/admin\/weeks\/([^/]+)$/);
@@ -219,24 +220,28 @@ export function createOnlineServer({databasePath,staticRoot=resolve('dist'),publ
           role(auth,['student','admin','parent']);
           const{input,auth:current}=await authenticatedBody(req,auth.role);
           const studentId=auth.role==='student'?auth.studentId:input.studentId;
-          return json(res,200,store.setupParentPin(current,studentId,input));
+          const parentToken=req.headers['x-parent-token']||input.parentToken||null;
+          return json(res,200,store.setupParentPin(current,studentId,input,parentToken));
         }
         if(method==='POST'&&route==='/parent/verify-pin'){
-          role(auth,'student');
-          const{input,auth:current}=await authenticatedBody(req,'student');
-          return json(res,200,store.verifyParentPin(current,current.studentId,input.pin));
+          role(auth,['student','parent','admin']);
+          const{input,auth:current}=await authenticatedBody(req,auth.role);
+          const targetStudentId=auth.role==='student'?current.studentId:input.studentId;
+          return json(res,200,store.verifyParentPin(current,targetStudentId,input.pin));
         }
         if(method==='GET'&&route==='/parent/dashboard'){
           role(auth,['student','admin','parent']);
           const studentId=auth.role==='student'?auth.studentId:(url.searchParams.get('studentId')||auth.studentId);
           const weekId=url.searchParams.get('weekId')||undefined;
-          return json(res,200,store.parentDashboard(auth,studentId,weekId));
+          const parentToken=req.headers['x-parent-token']||url.searchParams.get('parentToken')||null;
+          return json(res,200,store.parentDashboard(auth,studentId,weekId,parentToken));
         }
         if(method==='POST'&&route==='/parent/settings'){
           role(auth,['student','admin','parent']);
           const{input,auth:current}=await authenticatedBody(req,auth.role);
           const studentId=auth.role==='student'?auth.studentId:input.studentId;
-          return json(res,200,store.updateParentSettings(current,studentId,input));
+          const parentToken=req.headers['x-parent-token']||input.parentToken||null;
+          return json(res,200,store.updateParentSettings(current,studentId,input,parentToken));
         }
         if(method==='GET'&&route==='/parent/students'){
           role(auth,'parent');

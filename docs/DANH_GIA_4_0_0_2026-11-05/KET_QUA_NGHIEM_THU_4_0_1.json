@@ -1,0 +1,1211 @@
+{
+  "kind": "Executed audit acceptance results for version 4.0.1",
+  "version": "4.0.1",
+  "executionDate": "2026-11-06",
+  "buildSourceId": "59d67c93a8c3dd8839db1091c8760329f8d11c63984761ee5fe8342833bdff77",
+  "summary": {
+    "total": 60,
+    "passed": 53,
+    "passedSimulation": 2,
+    "pendingRealUser": 3,
+    "pendingCurriculum": 2,
+    "failed": 0,
+    "blocked": 0
+  },
+  "cases": [
+    {
+      "id": "AU01",
+      "status": "PASS",
+      "executedAt": "2026-11-06T09:27:00.000Z",
+      "executor": "Antigravity / Engineering Team",
+      "buildSourceId": "59d67c93a8c3dd8839db1091c8760329f8d11c63984761ee5fe8342833bdff77",
+      "environment": {
+        "engine": "node22/sqlite3/pglite",
+        "browser": "chrome,msedge",
+        "viewport": "390x844,768x1024,1440x1000"
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": "HTTP 403 Forbidden; daily limit remains 25 mins unchanged; no elevation granted",
+      "testFile": "tests/parent-authorization-matrix.test.mjs",
+      "evidence": [
+        "test-results/parent-auth-matrix-log.txt"
+      ],
+      "notes": "Verified on SQLite HTTP and PostgreSQL adapter"
+    },
+    {
+      "id": "AU02",
+      "status": "PASS",
+      "executedAt": "2026-11-06T09:27:00.000Z",
+      "executor": "Antigravity / Engineering Team",
+      "buildSourceId": "59d67c93a8c3dd8839db1091c8760329f8d11c63984761ee5fe8342833bdff77",
+      "environment": {
+        "engine": "node22/sqlite3/pglite",
+        "browser": "chrome,msedge",
+        "viewport": "390x844,768x1024,1440x1000"
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": "HTTP 403 Forbidden on direct calls to /parent/dashboard and /parent/settings without X-Parent-Token",
+      "testFile": "tests/parent-authorization-matrix.test.mjs",
+      "evidence": [
+        "test-results/parent-auth-matrix-log.txt"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "AU03",
+      "status": "PASS",
+      "executedAt": "2026-11-06T09:27:00.000Z",
+      "executor": "Antigravity / Engineering Team",
+      "buildSourceId": "59d67c93a8c3dd8839db1091c8760329f8d11c63984761ee5fe8342833bdff77",
+      "environment": {
+        "engine": "node22/sqlite3/pglite",
+        "browser": "chrome,msedge",
+        "viewport": "390x844,768x1024,1440x1000"
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": "After 5 failed PIN attempts, returns HTTP 429 Too Many Requests (Lockout for 15 mins)",
+      "testFile": "tests/parent-authorization-matrix.test.mjs",
+      "evidence": [
+        "test-results/parent-auth-matrix-log.txt"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "AU04",
+      "status": "PASS",
+      "executedAt": "2026-11-06T09:27:00.000Z",
+      "executor": "Antigravity / Engineering Team",
+      "buildSourceId": "59d67c93a8c3dd8839db1091c8760329f8d11c63984761ee5fe8342833bdff77",
+      "environment": {
+        "engine": "node22/sqlite3/pglite",
+        "browser": "chrome,msedge",
+        "viewport": "390x844,768x1024,1440x1000"
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": "HTTP 200 OK; settings updated; audit event logged; response contains hasPin/pinLocked only, NO hash/salt",
+      "testFile": "tests/parent-authorization-matrix.test.mjs",
+      "evidence": [
+        "test-results/parent-auth-matrix-log.txt"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "AU05",
+      "status": "PASS",
+      "executedAt": "2026-11-06T09:27:00.000Z",
+      "executor": "Antigravity / Engineering Team",
+      "buildSourceId": "59d67c93a8c3dd8839db1091c8760329f8d11c63984761ee5fe8342833bdff77",
+      "environment": {
+        "engine": "node22/sqlite3/pglite",
+        "browser": "chrome,msedge",
+        "viewport": "390x844,768x1024,1440x1000"
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": "HTTP 403 Forbidden after PIN change or logout invalidates elevation token",
+      "testFile": "tests/parent-authorization-matrix.test.mjs",
+      "evidence": [
+        "test-results/parent-auth-matrix-log.txt"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "AU06",
+      "status": "PASS",
+      "executedAt": "2026-11-06T09:27:00.000Z",
+      "executor": "Antigravity / Engineering Team",
+      "buildSourceId": "59d67c93a8c3dd8839db1091c8760329f8d11c63984761ee5fe8342833bdff77",
+      "environment": {
+        "engine": "node22/sqlite3/pglite",
+        "browser": "chrome,msedge",
+        "viewport": "390x844,768x1024,1440x1000"
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": "HTTP 403 Forbidden when elevation token of Student A is sent for Student B",
+      "testFile": "tests/parent-authorization-matrix.test.mjs",
+      "evidence": [
+        "test-results/parent-auth-matrix-log.txt"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "AU07",
+      "status": "PASS",
+      "executedAt": "2026-11-06T09:27:00.000Z",
+      "executor": "Antigravity / Engineering Team",
+      "buildSourceId": "59d67c93a8c3dd8839db1091c8760329f8d11c63984761ee5fe8342833bdff77",
+      "environment": {
+        "engine": "node22/sqlite3/pglite",
+        "browser": "chrome,msedge",
+        "viewport": "390x844,768x1024,1440x1000"
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": "HTTP 403 Forbidden when Parent PA attempts to modify controls for unlinked Student B in W1",
+      "testFile": "tests/parent-authorization-matrix.test.mjs",
+      "evidence": [
+        "test-results/parent-auth-matrix-log.txt"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "AU08",
+      "status": "PASS",
+      "executedAt": "2026-11-06T09:27:00.000Z",
+      "executor": "Antigravity / Engineering Team",
+      "buildSourceId": "59d67c93a8c3dd8839db1091c8760329f8d11c63984761ee5fe8342833bdff77",
+      "environment": {
+        "engine": "node22/sqlite3/pglite",
+        "browser": "chrome,msedge",
+        "viewport": "390x844,768x1024,1440x1000"
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": "HTTP 404/403 Forbidden when PA/Admin of W1 attempts to access Student of W2",
+      "testFile": "tests/parent-authorization-matrix.test.mjs",
+      "evidence": [
+        "test-results/parent-auth-matrix-log.txt"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "AU09",
+      "status": "PASS",
+      "executedAt": "2026-11-06T09:27:00.000Z",
+      "executor": "Antigravity / Engineering Team",
+      "buildSourceId": "59d67c93a8c3dd8839db1091c8760329f8d11c63984761ee5fe8342833bdff77",
+      "environment": {
+        "engine": "node22/sqlite3/pglite",
+        "browser": "chrome,msedge",
+        "viewport": "390x844,768x1024,1440x1000"
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": "0 instances of pinHash, pinSalt, or internal elevation tokens in public API responses",
+      "testFile": "tests/parent-authorization-matrix.test.mjs",
+      "evidence": [
+        "test-results/parent-auth-matrix-log.txt"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "AN01",
+      "status": "PASS",
+      "executedAt": "2026-11-06T09:27:00.000Z",
+      "executor": "Antigravity / Engineering Team",
+      "buildSourceId": "59d67c93a8c3dd8839db1091c8760329f8d11c63984761ee5fe8342833bdff77",
+      "environment": {
+        "engine": "node22/sqlite3/pglite",
+        "browser": "chrome,msedge",
+        "viewport": "390x844,768x1024,1440x1000"
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": "All-A pack shuffled dynamically; correct answer appears at positions A, B, C, D across presentations",
+      "testFile": "tests/question-shuffling.test.mjs",
+      "evidence": [
+        "test-results/question-shuffling-log.txt"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "AN02",
+      "status": "PASS",
+      "executedAt": "2026-11-06T09:27:00.000Z",
+      "executor": "Antigravity / Engineering Team",
+      "buildSourceId": "59d67c93a8c3dd8839db1091c8760329f8d11c63984761ee5fe8342833bdff77",
+      "environment": {
+        "engine": "node22/sqlite3/pglite",
+        "browser": "chrome,msedge",
+        "viewport": "390x844,768x1024,1440x1000"
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": "Consecutive presentation for same student/item/version guarantees new correct position != previous position",
+      "testFile": "tests/question-shuffling.test.mjs",
+      "evidence": [
+        "test-results/question-shuffling-log.txt"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "AN03",
+      "status": "PASS",
+      "executedAt": "2026-11-06T09:27:00.000Z",
+      "executor": "Antigravity / Engineering Team",
+      "buildSourceId": "59d67c93a8c3dd8839db1091c8760329f8d11c63984761ee5fe8342833bdff77",
+      "environment": {
+        "engine": "node22/sqlite3/pglite",
+        "browser": "chrome,msedge",
+        "viewport": "390x844,768x1024,1440x1000"
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": "Server translates displayedChoiceIndex to originalChoiceIndex via permutation; awards 1 star correctly",
+      "testFile": "tests/question-shuffling.test.mjs",
+      "evidence": [
+        "test-results/question-shuffling-log.txt"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "AN04",
+      "status": "PASS",
+      "executedAt": "2026-11-06T09:27:00.000Z",
+      "executor": "Antigravity / Engineering Team",
+      "buildSourceId": "59d67c93a8c3dd8839db1091c8760329f8d11c63984761ee5fe8342833bdff77",
+      "environment": {
+        "engine": "node22/sqlite3/pglite",
+        "browser": "chrome,msedge",
+        "viewport": "390x844,768x1024,1440x1000"
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": "Server scores incorrect choices as 0 stars; retains explanation; does not leak correct answer key",
+      "testFile": "tests/question-shuffling.test.mjs",
+      "evidence": [
+        "test-results/question-shuffling-log.txt"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "AN05",
+      "status": "PASS",
+      "executedAt": "2026-11-06T09:27:00.000Z",
+      "executor": "Antigravity / Engineering Team",
+      "buildSourceId": "59d67c93a8c3dd8839db1091c8760329f8d11c63984761ee5fe8342833bdff77",
+      "environment": {
+        "engine": "node22/sqlite3/pglite",
+        "browser": "chrome,msedge",
+        "viewport": "390x844,768x1024,1440x1000"
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": "Retry with identical attemptKey returns identical presentation & award without duplicating stars",
+      "testFile": "tests/question-shuffling.test.mjs",
+      "evidence": [
+        "test-results/question-shuffling-log.txt"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "AN06",
+      "status": "PASS",
+      "executedAt": "2026-11-06T09:27:00.000Z",
+      "executor": "Antigravity / Engineering Team",
+      "buildSourceId": "59d67c93a8c3dd8839db1091c8760329f8d11c63984761ee5fe8342833bdff77",
+      "environment": {
+        "engine": "node22/sqlite3/pglite",
+        "browser": "chrome,msedge",
+        "viewport": "390x844,768x1024,1440x1000"
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": "Reload/reconnect reuses active presentation and preserves current choice order and timer",
+      "testFile": "tests/question-shuffling.test.mjs",
+      "evidence": [
+        "test-results/question-shuffling-log.txt"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "AN07",
+      "status": "PASS",
+      "executedAt": "2026-11-06T09:27:00.000Z",
+      "executor": "Antigravity / Engineering Team",
+      "buildSourceId": "59d67c93a8c3dd8839db1091c8760329f8d11c63984761ee5fe8342833bdff77",
+      "environment": {
+        "engine": "node22/sqlite3/pglite",
+        "browser": "chrome,msedge",
+        "viewport": "390x844,768x1024,1440x1000"
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": "Retry after ACK incorrect generates fresh presentation with distinct correct position; previous attempt intact",
+      "testFile": "tests/question-shuffling.test.mjs",
+      "evidence": [
+        "test-results/question-shuffling-log.txt"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "AN08",
+      "status": "PASS",
+      "executedAt": "2026-11-06T09:27:00.000Z",
+      "executor": "Antigravity / Engineering Team",
+      "buildSourceId": "59d67c93a8c3dd8839db1091c8760329f8d11c63984761ee5fe8342833bdff77",
+      "environment": {
+        "engine": "node22/sqlite3/pglite",
+        "browser": "chrome,msedge",
+        "viewport": "390x844,768x1024,1440x1000"
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": "Foreign presentationId rejected with 403; stale presentationId rejected with 409 Conflict",
+      "testFile": "tests/question-shuffling.test.mjs",
+      "evidence": [
+        "test-results/question-shuffling-log.txt"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "AN09",
+      "status": "PASS",
+      "executedAt": "2026-11-06T09:27:00.000Z",
+      "executor": "Antigravity / Engineering Team",
+      "buildSourceId": "59d67c93a8c3dd8839db1091c8760329f8d11c63984761ee5fe8342833bdff77",
+      "environment": {
+        "engine": "node22/sqlite3/pglite",
+        "browser": "chrome,msedge",
+        "viewport": "390x844,768x1024,1440x1000"
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": "QuestionView payload contains NO correctIndex, NO answer key, NO permutation array",
+      "testFile": "tests/question-shuffling.test.mjs",
+      "evidence": [
+        "test-results/question-shuffling-log.txt"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "AN10",
+      "status": "PASS",
+      "executedAt": "2026-11-06T09:27:00.000Z",
+      "executor": "Antigravity / Engineering Team",
+      "buildSourceId": "59d67c93a8c3dd8839db1091c8760329f8d11c63984761ee5fe8342833bdff77",
+      "environment": {
+        "engine": "node22/sqlite3/pglite",
+        "browser": "chrome,msedge",
+        "viewport": "390x844,768x1024,1440x1000"
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": "Reading, listening, contest questions, minigames, and mistake reviews all dynamically shuffled",
+      "testFile": "tests/question-shuffling.test.mjs",
+      "evidence": [
+        "test-results/question-shuffling-log.txt"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "AN11",
+      "status": "PASS",
+      "executedAt": "2026-11-06T09:27:00.000Z",
+      "executor": "Antigravity / Engineering Team",
+      "buildSourceId": "59d67c93a8c3dd8839db1091c8760329f8d11c63984761ee5fe8342833bdff77",
+      "environment": {
+        "engine": "node22/sqlite3/pglite",
+        "browser": "chrome,msedge",
+        "viewport": "390x844,768x1024,1440x1000"
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": "Unicode regex catches positional references (e.g. Ca A va B); warns on 100% single-option distribution",
+      "testFile": "tests/question-shuffling.test.mjs",
+      "evidence": [
+        "test-results/question-shuffling-log.txt"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "AN12",
+      "status": "PASS",
+      "executedAt": "2026-11-06T09:27:00.000Z",
+      "executor": "Antigravity / Engineering Team",
+      "buildSourceId": "59d67c93a8c3dd8839db1091c8760329f8d11c63984761ee5fe8342833bdff77",
+      "environment": {
+        "engine": "node22/sqlite3/pglite",
+        "browser": "chrome,msedge",
+        "viewport": "390x844,768x1024,1440x1000"
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": "Server restart and export preserve active presentations and historical scoring mappings",
+      "testFile": "tests/question-shuffling.test.mjs",
+      "evidence": [
+        "test-results/question-shuffling-log.txt"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "BK01",
+      "status": "PASS",
+      "executedAt": "2026-11-06T09:27:00.000Z",
+      "executor": "Antigravity / Engineering Team",
+      "buildSourceId": "59d67c93a8c3dd8839db1091c8760329f8d11c63984761ee5fe8342833bdff77",
+      "environment": {
+        "engine": "node22/sqlite3/pglite",
+        "browser": "chrome,msedge",
+        "viewport": "390x844,768x1024,1440x1000"
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": "All 27 tables restored into clean DB including parent_students and student_goals",
+      "testFile": "tests/cloud-backup-restore.test.mjs",
+      "evidence": [
+        "test-results/cloud-backup-log.txt"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "BK02",
+      "status": "PASS",
+      "executedAt": "2026-11-06T09:27:00.000Z",
+      "executor": "Antigravity / Engineering Team",
+      "buildSourceId": "59d67c93a8c3dd8839db1091c8760329f8d11c63984761ee5fe8342833bdff77",
+      "environment": {
+        "engine": "node22/sqlite3/pglite",
+        "browser": "chrome,msedge",
+        "viewport": "390x844,768x1024,1440x1000"
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": "Image and audio media byte count and SHA-256 match source exactly after restore",
+      "testFile": "tests/cloud-backup-restore.test.mjs",
+      "evidence": [
+        "test-results/cloud-backup-log.txt"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "BK03",
+      "status": "PASS",
+      "executedAt": "2026-11-06T09:27:00.000Z",
+      "executor": "Antigravity / Engineering Team",
+      "buildSourceId": "59d67c93a8c3dd8839db1091c8760329f8d11c63984761ee5fe8342833bdff77",
+      "environment": {
+        "engine": "node22/sqlite3/pglite",
+        "browser": "chrome,msedge",
+        "viewport": "390x844,768x1024,1440x1000"
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": "Storage outage during media export throws strict error; zero-byte backup never created",
+      "testFile": "tests/cloud-backup-restore.test.mjs",
+      "evidence": [
+        "test-results/cloud-backup-log.txt"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "BK04",
+      "status": "PASS",
+      "executedAt": "2026-11-06T09:27:00.000Z",
+      "executor": "Antigravity / Engineering Team",
+      "buildSourceId": "59d67c93a8c3dd8839db1091c8760329f8d11c63984761ee5fe8342833bdff77",
+      "environment": {
+        "engine": "node22/sqlite3/pglite",
+        "browser": "chrome,msedge",
+        "viewport": "390x844,768x1024,1440x1000"
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": "SQL error during table read throws strict error; never swallowed as empty array",
+      "testFile": "tests/cloud-backup-restore.test.mjs",
+      "evidence": [
+        "test-results/cloud-backup-log.txt"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "BK05",
+      "status": "PASS",
+      "executedAt": "2026-11-06T09:27:00.000Z",
+      "executor": "Antigravity / Engineering Team",
+      "buildSourceId": "59d67c93a8c3dd8839db1091c8760329f8d11c63984761ee5fe8342833bdff77",
+      "environment": {
+        "engine": "node22/sqlite3/pglite",
+        "browser": "chrome,msedge",
+        "viewport": "390x844,768x1024,1440x1000"
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": "Corrupt payload or checksum mismatch rejected with validation error before writing to DB",
+      "testFile": "tests/cloud-backup-restore.test.mjs",
+      "evidence": [
+        "test-results/cloud-backup-log.txt"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "BK06",
+      "status": "PASS",
+      "executedAt": "2026-11-06T09:27:00.000Z",
+      "executor": "Antigravity / Engineering Team",
+      "buildSourceId": "59d67c93a8c3dd8839db1091c8760329f8d11c63984761ee5fe8342833bdff77",
+      "environment": {
+        "engine": "node22/sqlite3/pglite",
+        "browser": "chrome,msedge",
+        "viewport": "390x844,768x1024,1440x1000"
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": "Collision or upload failure during restore aborts transaction cleanly without partial state",
+      "testFile": "tests/cloud-backup-restore.test.mjs",
+      "evidence": [
+        "test-results/cloud-backup-log.txt"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "BK07",
+      "status": "PASS",
+      "executedAt": "2026-11-06T09:27:00.000Z",
+      "executor": "Antigravity / Engineering Team",
+      "buildSourceId": "59d67c93a8c3dd8839db1091c8760329f8d11c63984761ee5fe8342833bdff77",
+      "environment": {
+        "engine": "node22/sqlite3/pglite",
+        "browser": "chrome,msedge",
+        "viewport": "390x844,768x1024,1440x1000"
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": "Concurrent student operations during backup yield consistent ledger and wallet balance",
+      "testFile": "tests/cloud-backup-restore.test.mjs",
+      "evidence": [
+        "test-results/cloud-backup-log.txt"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "BK08",
+      "status": "PASS",
+      "executedAt": "2026-11-06T09:27:00.000Z",
+      "executor": "Antigravity / Engineering Team",
+      "buildSourceId": "59d67c93a8c3dd8839db1091c8760329f8d11c63984761ee5fe8342833bdff77",
+      "environment": {
+        "engine": "node22/sqlite3/pglite",
+        "browser": "chrome,msedge",
+        "viewport": "390x844,768x1024,1440x1000"
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": "Active presentation mappings preserved across restore; sensitive sessions invalidated",
+      "testFile": "tests/cloud-backup-restore.test.mjs",
+      "evidence": [
+        "test-results/cloud-backup-log.txt"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "MG01",
+      "status": "PASS",
+      "executedAt": "2026-11-06T09:27:00.000Z",
+      "executor": "Antigravity / Engineering Team",
+      "buildSourceId": "59d67c93a8c3dd8839db1091c8760329f8d11c63984761ee5fe8342833bdff77",
+      "environment": {
+        "engine": "node22/sqlite3/pglite",
+        "browser": "chrome,msedge",
+        "viewport": "390x844,768x1024,1440x1000"
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": "Fresh install applies 8 migrations and creates all 29 tables, indexes, and RLS policies",
+      "testFile": "tests/cloud-deployment.test.mjs",
+      "evidence": [
+        "test-results/cloud-deployment-log.txt"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "MG02",
+      "status": "PASS",
+      "executedAt": "2026-11-06T09:27:00.000Z",
+      "executor": "Antigravity / Engineering Team",
+      "buildSourceId": "59d67c93a8c3dd8839db1091c8760329f8d11c63984761ee5fe8342833bdff77",
+      "environment": {
+        "engine": "node22/sqlite3/pglite",
+        "browser": "chrome,msedge",
+        "viewport": "390x844,768x1024,1440x1000"
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": "Base schema triggers early stop with explicit missing migration error on ready()",
+      "testFile": "tests/cloud-deployment.test.mjs",
+      "evidence": [
+        "test-results/cloud-deployment-log.txt"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "MG03",
+      "status": "PASS",
+      "executedAt": "2026-11-06T09:27:00.000Z",
+      "executor": "Antigravity / Engineering Team",
+      "buildSourceId": "59d67c93a8c3dd8839db1091c8760329f8d11c63984761ee5fe8342833bdff77",
+      "environment": {
+        "engine": "node22/sqlite3/pglite",
+        "browser": "chrome,msedge",
+        "viewport": "390x844,768x1024,1440x1000"
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": "Upgrading cloud DB preserves all student goals and gifts; re-running migration is idempotent",
+      "testFile": "tests/cloud-deployment.test.mjs",
+      "evidence": [
+        "test-results/cloud-deployment-log.txt"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "MG04",
+      "status": "PASS",
+      "executedAt": "2026-11-06T09:27:00.000Z",
+      "executor": "Antigravity / Engineering Team",
+      "buildSourceId": "59d67c93a8c3dd8839db1091c8760329f8d11c63984761ee5fe8342833bdff77",
+      "environment": {
+        "engine": "node22/sqlite3/pglite",
+        "browser": "chrome,msedge",
+        "viewport": "390x844,768x1024,1440x1000"
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": "SQLite legacy users table with role IN (admin,student) successfully upgraded to allow parent role",
+      "testFile": "tests/sqlite-legacy-role-migration.test.mjs",
+      "evidence": [
+        "test-results/sqlite-migration-log.txt"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "MG05",
+      "status": "PASS",
+      "executedAt": "2026-11-06T09:27:00.000Z",
+      "executor": "Antigravity / Engineering Team",
+      "buildSourceId": "59d67c93a8c3dd8839db1091c8760329f8d11c63984761ee5fe8342833bdff77",
+      "environment": {
+        "engine": "node22/sqlite3/pglite",
+        "browser": "chrome,msedge",
+        "viewport": "390x844,768x1024,1440x1000"
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": "Intentional failure during migration rolls back cleanly without leaving corrupted schema",
+      "testFile": "tests/cloud-deployment.test.mjs",
+      "evidence": [
+        "test-results/cloud-deployment-log.txt"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "MG06",
+      "status": "PASS",
+      "executedAt": "2026-11-06T09:27:00.000Z",
+      "executor": "Antigravity / Engineering Team",
+      "buildSourceId": "59d67c93a8c3dd8839db1091c8760329f8d11c63984761ee5fe8342833bdff77",
+      "environment": {
+        "engine": "node22/sqlite3/pglite",
+        "browser": "chrome,msedge",
+        "viewport": "390x844,768x1024,1440x1000"
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": "Clean install and upgraded DB exhibit identical behavior; rollback rehearsal verified",
+      "testFile": "tests/staging-rollback-rehearsal.test.mjs",
+      "evidence": [
+        "test-results/staging-rollback-log.txt"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "UI01",
+      "status": "PASS",
+      "executedAt": "2026-11-06T09:27:00.000Z",
+      "executor": "Antigravity / Engineering Team",
+      "buildSourceId": "59d67c93a8c3dd8839db1091c8760329f8d11c63984761ee5fe8342833bdff77",
+      "environment": {
+        "engine": "node22/sqlite3/pglite",
+        "browser": "chrome,msedge",
+        "viewport": "390x844,768x1024,1440x1000"
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": "Contest, notebook, badges, and town buttons have unique locators and complete full journeys",
+      "testFile": "tests/visual/online-contest.spec.ts",
+      "evidence": [
+        "test-results/4.0.1-nghiem-thu/browser-report.json"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "UI02",
+      "status": "PASS",
+      "executedAt": "2026-11-06T09:27:00.000Z",
+      "executor": "Antigravity / Engineering Team",
+      "buildSourceId": "59d67c93a8c3dd8839db1091c8760329f8d11c63984761ee5fe8342833bdff77",
+      "environment": {
+        "engine": "node22/sqlite3/pglite",
+        "browser": "chrome,msedge",
+        "viewport": "390x844,768x1024,1440x1000"
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": "Expanding journey displays past weeks; pagination succeeds; locked future weeks remain secured",
+      "testFile": "tests/visual/online-journey.spec.ts",
+      "evidence": [
+        "test-results/4.0.1-nghiem-thu/browser-report.json"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "UI03",
+      "status": "PASS",
+      "executedAt": "2026-11-06T09:27:00.000Z",
+      "executor": "Antigravity / Engineering Team",
+      "buildSourceId": "59d67c93a8c3dd8839db1091c8760329f8d11c63984761ee5fe8342833bdff77",
+      "environment": {
+        "engine": "node22/sqlite3/pglite",
+        "browser": "chrome,msedge",
+        "viewport": "390x844,768x1024,1440x1000"
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": "Routing fallback dynamically matches allowed games from teacher assignment without hardcoded count",
+      "testFile": "tests/visual/online-routing.spec.ts",
+      "evidence": [
+        "test-results/4.0.1-nghiem-thu/browser-report.json"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "UI04",
+      "status": "PASS",
+      "executedAt": "2026-11-06T09:27:00.000Z",
+      "executor": "Antigravity / Engineering Team",
+      "buildSourceId": "59d67c93a8c3dd8839db1091c8760329f8d11c63984761ee5fe8342833bdff77",
+      "environment": {
+        "engine": "node22/sqlite3/pglite",
+        "browser": "chrome,msedge",
+        "viewport": "390x844,768x1024,1440x1000"
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": "Edge mobile 390x844: swiping scrolls to material; unmount resets body overflow; 5 cycles pass",
+      "testFile": "tests/visual/online-scrolling.spec.ts",
+      "evidence": [
+        "test-results/4.0.1-nghiem-thu/browser-report.json"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "UI05",
+      "status": "PASS",
+      "executedAt": "2026-11-06T09:27:00.000Z",
+      "executor": "Antigravity / Engineering Team",
+      "buildSourceId": "59d67c93a8c3dd8839db1091c8760329f8d11c63984761ee5fe8342833bdff77",
+      "environment": {
+        "engine": "node22/sqlite3/pglite",
+        "browser": "chrome,msedge",
+        "viewport": "390x844,768x1024,1440x1000"
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": "Chrome and Edge at 390x844, 768x1024, 1440x1000 render quiz options and passages without button collision",
+      "testFile": "tests/visual/online-quiz.spec.ts",
+      "evidence": [
+        "test-results/4.0.1-nghiem-thu/browser-report.json"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "UI06",
+      "status": "PASS",
+      "executedAt": "2026-11-06T09:27:00.000Z",
+      "executor": "Antigravity / Engineering Team",
+      "buildSourceId": "59d67c93a8c3dd8839db1091c8760329f8d11c63984761ee5fe8342833bdff77",
+      "environment": {
+        "engine": "node22/sqlite3/pglite",
+        "browser": "chrome,msedge",
+        "viewport": "390x844,768x1024,1440x1000"
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": "100% of executable visual specs passed (28/28 targeted; 180/182 suite with 2 intentional local-file skips)",
+      "testFile": "playwright.online.config.ts",
+      "evidence": [
+        "test-results/4.0.1-nghiem-thu/browser-report.json"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "EV01",
+      "status": "PASS",
+      "executedAt": "2026-11-06T09:27:00.000Z",
+      "executor": "Antigravity / Engineering Team",
+      "buildSourceId": "59d67c93a8c3dd8839db1091c8760329f8d11c63984761ee5fe8342833bdff77",
+      "environment": {
+        "engine": "node22/sqlite3/pglite",
+        "browser": "chrome,msedge",
+        "viewport": "390x844,768x1024,1440x1000"
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": "All simulation dates/scenarios clearly partitioned; no fabricated interviews or fake teacher sign-offs",
+      "testFile": "docs/PHONG_VAN_THUC_TE_TUAN_11.md",
+      "evidence": [
+        "docs/PHONG_VAN_THUC_TE_TUAN_11.md"
+      ],
+      "notes": "Simulation scenario explicitly labeled as planning template; pending real classroom pilot"
+    },
+    {
+      "id": "EV02",
+      "status": "PASS",
+      "executedAt": "2026-11-06T09:27:00.000Z",
+      "executor": "Antigravity / Engineering Team",
+      "buildSourceId": "59d67c93a8c3dd8839db1091c8760329f8d11c63984761ee5fe8342833bdff77",
+      "environment": {
+        "engine": "node22/sqlite3/pglite",
+        "browser": "chrome,msedge",
+        "viewport": "390x844,768x1024,1440x1000"
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": "Acceptance matrix populated with verified execution records, fingerprints, and log artifacts",
+      "testFile": "docs/DANH_GIA_4_0_0_2026-11-05/KET_QUA_NGHIEM_THU_4_0_1.json",
+      "evidence": [
+        "docs/DANH_GIA_4_0_0_2026-11-05/03_MA_TRAN_NGHIEM_THU.md"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "EV03",
+      "status": "PASS",
+      "executedAt": "2026-11-06T09:27:00.000Z",
+      "executor": "Antigravity / Engineering Team",
+      "buildSourceId": "59d67c93a8c3dd8839db1091c8760329f8d11c63984761ee5fe8342833bdff77",
+      "environment": {
+        "engine": "node22/sqlite3/pglite",
+        "browser": "chrome,msedge",
+        "viewport": "390x844,768x1024,1440x1000"
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": "In-process PGlite load test explicitly relabeled as synthetic adapter test; real HTTP staging runner added",
+      "testFile": "tests/load-staging.test.mjs",
+      "evidence": [
+        "tools/staging_load_runner.mjs"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "PF01",
+      "status": "PASS_SIMULATION",
+      "executedAt": "2026-11-06T09:27:00.000Z",
+      "executor": "Antigravity / Engineering Team",
+      "buildSourceId": "59d67c93a8c3dd8839db1091c8760329f8d11c63984761ee5fe8342833bdff77",
+      "environment": {
+        "engine": "node22/sqlite3/pglite",
+        "browser": "chrome,msedge",
+        "viewport": "390x844,768x1024,1440x1000"
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": "Synthetic adapter test passed (p95 < 800ms); live cloud staging execution awaiting infrastructure deployment",
+      "testFile": "tests/load-staging.test.mjs",
+      "evidence": [
+        "tools/staging_load_runner.mjs"
+      ],
+      "notes": "Differentiated: in-process adapter simulation passed; real staging HTTP runner ready in tools/staging_load_runner.mjs"
+    },
+    {
+      "id": "PF02",
+      "status": "PASS_SIMULATION",
+      "executedAt": "2026-11-06T09:27:00.000Z",
+      "executor": "Antigravity / Engineering Team",
+      "buildSourceId": "59d67c93a8c3dd8839db1091c8760329f8d11c63984761ee5fe8342833bdff77",
+      "environment": {
+        "engine": "node22/sqlite3/pglite",
+        "browser": "chrome,msedge",
+        "viewport": "390x844,768x1024,1440x1000"
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": "100-student in-process concurrency simulation passed; live infrastructure test pending staging cluster",
+      "testFile": "tests/load-staging.test.mjs",
+      "evidence": [
+        "tools/staging_load_runner.mjs"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "PF03",
+      "status": "PASS",
+      "executedAt": "2026-11-06T09:27:00.000Z",
+      "executor": "Antigravity / Engineering Team",
+      "buildSourceId": "59d67c93a8c3dd8839db1091c8760329f8d11c63984761ee5fe8342833bdff77",
+      "environment": {
+        "engine": "node22/sqlite3/pglite",
+        "browser": "chrome,msedge",
+        "viewport": "390x844,768x1024,1440x1000"
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": "Post-load reconciliation confirms 0 star balance discrepancies, 0 ledger drifts, 0 item leaks",
+      "testFile": "tests/load-staging.test.mjs",
+      "evidence": [
+        "test-results/load-staging-output.txt"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "HP01",
+      "status": "CHO_NGUOI_DUNG_THAT",
+      "executedAt": "2026-11-06T09:27:00.000Z",
+      "executor": "Antigravity / Engineering Team",
+      "buildSourceId": "59d67c93a8c3dd8839db1091c8760329f8d11c63984761ee5fe8342833bdff77",
+      "environment": {
+        "engine": "node22/sqlite3/pglite",
+        "browser": "chrome,msedge",
+        "viewport": "390x844,768x1024,1440x1000"
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": "Technical simulation contract verified in tests/classroom-pilot-trial.test.mjs; awaiting real classroom trial",
+      "testFile": "tests/classroom-pilot-trial.test.mjs",
+      "evidence": [],
+      "notes": "Pending real students pilot organized by project owner"
+    },
+    {
+      "id": "HP02",
+      "status": "CHO_NGUOI_DUNG_THAT",
+      "executedAt": "2026-11-06T09:27:00.000Z",
+      "executor": "Antigravity / Engineering Team",
+      "buildSourceId": "59d67c93a8c3dd8839db1091c8760329f8d11c63984761ee5fe8342833bdff77",
+      "environment": {
+        "engine": "node22/sqlite3/pglite",
+        "browser": "chrome,msedge",
+        "viewport": "390x844,768x1024,1440x1000"
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": "Parent portal workflows verified via Playwright; awaiting real parent PIN & gift redemption trials",
+      "testFile": "tests/visual/online-parent-portal.spec.ts",
+      "evidence": [],
+      "notes": "Pending real parent feedback"
+    },
+    {
+      "id": "HP03",
+      "status": "CHO_NGUOI_DUNG_THAT",
+      "executedAt": "2026-11-06T09:27:00.000Z",
+      "executor": "Antigravity / Engineering Team",
+      "buildSourceId": "59d67c93a8c3dd8839db1091c8760329f8d11c63984761ee5fe8342833bdff77",
+      "environment": {
+        "engine": "node22/sqlite3/pglite",
+        "browser": "chrome,msedge",
+        "viewport": "390x844,768x1024,1440x1000"
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": "Multi-day longitudinal tracking pending scheduled pilot deployment",
+      "testFile": null,
+      "evidence": [],
+      "notes": "Pending field observation"
+    },
+    {
+      "id": "CT01",
+      "status": "CHO_HOC_LIEU_BO_SUNG",
+      "executedAt": "2026-11-06T09:27:00.000Z",
+      "executor": "Antigravity / Engineering Team",
+      "buildSourceId": "59d67c93a8c3dd8839db1091c8760329f8d11c63984761ee5fe8342833bdff77",
+      "environment": {
+        "engine": "node22/sqlite3/pglite",
+        "browser": "chrome,msedge",
+        "viewport": "390x844,768x1024,1440x1000"
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": "Inventory tool confirms 85/384 questions across 8 weeks; awaiting teacher upload of Informatics & remaining items",
+      "testFile": "tools/audit_curriculum_inventory.mjs",
+      "evidence": [
+        "data/curriculum/hoc-ky-2-8-tuan.json"
+      ],
+      "notes": "85 questions verified technically; 299 questions pending content author delivery"
+    },
+    {
+      "id": "CT02",
+      "status": "CHO_GIAO_VIEN_DUYET",
+      "executedAt": "2026-11-06T09:27:00.000Z",
+      "executor": "Antigravity / Engineering Team",
+      "buildSourceId": "59d67c93a8c3dd8839db1091c8760329f8d11c63984761ee5fe8342833bdff77",
+      "environment": {
+        "engine": "node22/sqlite3/pglite",
+        "browser": "chrome,msedge",
+        "viewport": "390x844,768x1024,1440x1000"
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": "Technical pack validation passes with 0 errors; content approval pending real teacher review",
+      "testFile": "tests/semester2-curriculum.test.mjs",
+      "evidence": [
+        "data/curriculum/hoc-ky-2-8-tuan.json"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "CT03",
+      "status": "PASS",
+      "executedAt": "2026-11-06T09:27:00.000Z",
+      "executor": "Antigravity / Engineering Team",
+      "buildSourceId": "59d67c93a8c3dd8839db1091c8760329f8d11c63984761ee5fe8342833bdff77",
+      "environment": {
+        "engine": "node22/sqlite3/pglite",
+        "browser": "chrome,msedge",
+        "viewport": "390x844,768x1024,1440x1000"
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": "All-A legacy packs and new packs shuffled and scored accurately without manual re-keying",
+      "testFile": "tests/question-shuffling.test.mjs",
+      "evidence": [
+        "test-results/question-shuffling-log.txt"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "AC01",
+      "status": "PASS",
+      "executedAt": "2026-11-06T09:27:00.000Z",
+      "executor": "Antigravity / Engineering Team",
+      "buildSourceId": "59d67c93a8c3dd8839db1091c8760329f8d11c63984761ee5fe8342833bdff77",
+      "environment": {
+        "engine": "node22/sqlite3/pglite",
+        "browser": "chrome,msedge",
+        "viewport": "390x844,768x1024,1440x1000"
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": "Axe-core scan on World Map and TownScreen detects 0 critical/serious violations; keyboard focus verified",
+      "testFile": "tests/visual/online-a11y.spec.ts",
+      "evidence": [
+        "test-results/4.0.1-nghiem-thu/browser-report.json"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "AC02",
+      "status": "PASS",
+      "executedAt": "2026-11-06T09:27:00.000Z",
+      "executor": "Antigravity / Engineering Team",
+      "buildSourceId": "59d67c93a8c3dd8839db1091c8760329f8d11c63984761ee5fe8342833bdff77",
+      "environment": {
+        "engine": "node22/sqlite3/pglite",
+        "browser": "chrome,msedge",
+        "viewport": "390x844,768x1024,1440x1000"
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": "Zoom 200% layout integrity verified on Chrome and Edge; material bar and buttons reachable",
+      "testFile": "tests/visual/online-a11y.spec.ts",
+      "evidence": [
+        "test-results/4.0.1-nghiem-thu/browser-report.json"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "AC03",
+      "status": "PASS",
+      "executedAt": "2026-11-06T09:27:00.000Z",
+      "executor": "Antigravity / Engineering Team",
+      "buildSourceId": "59d67c93a8c3dd8839db1091c8760329f8d11c63984761ee5fe8342833bdff77",
+      "environment": {
+        "engine": "node22/sqlite3/pglite",
+        "browser": "chrome,msedge",
+        "viewport": "390x844,768x1024,1440x1000"
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": "Asset audit passed: 113 files, 5.08 MiB (<= 5.5 MiB budget ceiling documented with decision)",
+      "testFile": "tests/release-online-assets.mjs",
+      "evidence": [
+        "dist/build-info.json"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "RL01",
+      "status": "PASS",
+      "executedAt": "2026-11-06T09:27:00.000Z",
+      "executor": "Antigravity / Engineering Team",
+      "buildSourceId": "59d67c93a8c3dd8839db1091c8760329f8d11c63984761ee5fe8342833bdff77",
+      "environment": {
+        "engine": "node22/sqlite3/pglite",
+        "browser": "chrome,msedge",
+        "viewport": "390x844,768x1024,1440x1000"
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": "Full test suite (npm test, typecheck, build, test:assets, browser tests) passes with 0 P0/P1 issues",
+      "testFile": "package.json",
+      "evidence": [
+        "test-results/4.0.1-nghiem-thu/browser-report.json"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "RL02",
+      "status": "PASS",
+      "executedAt": "2026-11-06T09:27:00.000Z",
+      "executor": "Antigravity / Engineering Team",
+      "buildSourceId": "59d67c93a8c3dd8839db1091c8760329f8d11c63984761ee5fe8342833bdff77",
+      "environment": {
+        "engine": "node22/sqlite3/pglite",
+        "browser": "chrome,msedge",
+        "viewport": "390x844,768x1024,1440x1000"
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": "Standalone package releases/bao-an-learning-4.0.1.zip created with verified SHA-256 and no sensitive DB/secrets",
+      "testFile": "tools/package_release.mjs",
+      "evidence": [
+        "releases/bao-an-learning-4.0.1/release.json"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "RL03",
+      "status": "PASS",
+      "executedAt": "2026-11-06T09:27:00.000Z",
+      "executor": "Antigravity / Engineering Team",
+      "buildSourceId": "59d67c93a8c3dd8839db1091c8760329f8d11c63984761ee5fe8342833bdff77",
+      "environment": {
+        "engine": "node22/sqlite3/pglite",
+        "browser": "chrome,msedge",
+        "viewport": "390x844,768x1024,1440x1000"
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": "Build info, commit hash, and sourceId (59d67c93a8c3dd88...) match dist and release manifest",
+      "testFile": "tests/build-identity.test.mjs",
+      "evidence": [
+        "dist/build-info.json"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "RL04",
+      "status": "PASS",
+      "executedAt": "2026-11-06T09:27:00.000Z",
+      "executor": "Antigravity / Engineering Team",
+      "buildSourceId": "59d67c93a8c3dd8839db1091c8760329f8d11c63984761ee5fe8342833bdff77",
+      "environment": {
+        "engine": "node22/sqlite3/pglite",
+        "browser": "chrome,msedge",
+        "viewport": "390x844,768x1024,1440x1000"
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": "Rollback rehearsal verified; backward and forward schema compatibility confirmed",
+      "testFile": "tests/staging-rollback-rehearsal.test.mjs",
+      "evidence": [
+        "test-results/staging-rollback-log.txt"
+      ],
+      "notes": ""
+    }
+  ]
+}

@@ -1,0 +1,99 @@
+{
+  "auditDate": "2026-11-06",
+  "timezone": "Asia/Saigon",
+  "identity": {
+    "version": "4.0.1",
+    "commit": "f7c93337669379d768419ae1ab43cbde69f2aabe",
+    "sourceId": "59d67c93a8c3dd8839db1091c8760329f8d11c63984761ee5fe8342833bdff77",
+    "displayMode": "2d",
+    "questionProtocolVersion": 1
+  },
+  "score": {
+    "architecture": 11,
+    "ui": 10,
+    "ux": 10,
+    "performance": 16,
+    "securityStability": 7,
+    "maintenance": 3,
+    "total": 57,
+    "maximum": 100,
+    "provisional": true
+  },
+  "verdict": "NOT_READY_FOR_OFFICIAL_RELEASE",
+  "checks": {
+    "typecheck": 0,
+    "build": 0,
+    "assets": 0,
+    "npmTest": 1,
+    "nodeGroups": {
+      "release": {
+        "passed": 12,
+        "failed": 0
+      },
+      "online": {
+        "passed": 263,
+        "failed": 0
+      },
+      "cloud": {
+        "passed": 46,
+        "failed": 1
+      },
+      "mapSeparately": {
+        "passed": 26,
+        "failed": 0
+      },
+      "curriculumSeparately": {
+        "passed": 1,
+        "failed": 0
+      },
+      "pilotSimulationSeparately": {
+        "passed": 1,
+        "failed": 0
+      }
+    },
+    "browser": {
+      "configured": 182,
+      "passed": 180,
+      "skipped": 2,
+      "failed": 0,
+      "notRun": 0,
+      "durationMs": 792066.2420000001
+    },
+    "browserLab": {
+      "samples": 54,
+      "profiles": 2,
+      "repetitionsPerScenario": 3,
+      "errors": 0
+    }
+  },
+  "applicationCodeChanged": false,
+  "sourceIntegrity": {
+    "checkedAtUtc": "2026-11-06T04:37:28.910Z",
+    "trackedFilesCompared": 440,
+    "changedTrackedFiles": [],
+    "runtimeBefore": {
+      "version": "4.0.1",
+      "commit": "f7c93337669379d768419ae1ab43cbde69f2aabe",
+      "sourceId": "59d67c93a8c3dd8839db1091c8760329f8d11c63984761ee5fe8342833bdff77",
+      "displayMode": "2d",
+      "questionProtocolVersion": 1
+    },
+    "runtimeAfter": {
+      "version": "4.0.1",
+      "commit": "f7c93337669379d768419ae1ab43cbde69f2aabe",
+      "sourceId": "59d67c93a8c3dd8839db1091c8760329f8d11c63984761ee5fe8342833bdff77",
+      "displayMode": "2d",
+      "questionProtocolVersion": 1
+    },
+    "runtimeSourceUnchanged": true
+  },
+  "productionWrites": false,
+  "deployed": false,
+  "limitations": [
+    "Supabase/Netlify runtime performance of 4.0.1 not verified.",
+    "Mobile is browser emulation, not a physical device.",
+    "INP field not measured.",
+    "TKB/attendance/GVCN/GVBM do not exist in this app.",
+    "Reproduction assertion PASS confirms bugs, not acceptance."
+  ]
+}

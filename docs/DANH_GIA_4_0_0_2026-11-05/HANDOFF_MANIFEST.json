@@ -1,0 +1,108 @@
+{
+  "kind": "Audit and repair-plan handoff, not a release artifact",
+  "date": "2026-11-05",
+  "root": "docs/DANH_GIA_4_0_0_2026-11-05",
+  "baselineCommit": "f7c93337669379d768419ae1ab43cbde69f2aabe",
+  "files": [
+    {
+      "path": "00_DOC_TRUOC.md",
+      "bytes": 3365,
+      "sha256": "2b6ecf753782ed67f3c2e806ebaa82847e0cf820a24b2b2e321f9a80756ae691"
+    },
+    {
+      "path": "01_BAO_CAO_LOI_VA_DANH_GIA.md",
+      "bytes": 19912,
+      "sha256": "ffa57507fa15328caacd0a468a47afa32f58d95bb8905f8a7bc299c35def79d8"
+    },
+    {
+      "path": "02_KE_HOACH_SUA_LOI_VA_NANG_CAP.md",
+      "bytes": 31731,
+      "sha256": "93e22cab63011a58a20eacfc7484000dea66cfdd0a84e4c2a91bb74399bb691c"
+    },
+    {
+      "path": "03_MA_TRAN_NGHIEM_THU.md",
+      "bytes": 15477,
+      "sha256": "e796a1222468eb0198ee3d58eaf5f68144499f142f48d92ebe83060e9981ab8e"
+    },
+    {
+      "path": "04_PROMPT_GIAO_CHO_AI.md",
+      "bytes": 5343,
+      "sha256": "ae7952242b024d34cf00fd043a54b840fb4c437a78c82d2e366e9e47b8ff8669"
+    },
+    {
+      "path": "bang_chung/assets-log.txt",
+      "bytes": 163,
+      "sha256": "e2c31b09e13f98c8b72261e8bb35dc3aa232ff7a436048fa8a6f86d3c4ec060d"
+    },
+    {
+      "path": "bang_chung/browser-summary.json",
+      "bytes": 108879,
+      "sha256": "6ea6be91673342c54991980efd9b049d082234e5e033ba2c6cfb362d2eaf61d3"
+    },
+    {
+      "path": "bang_chung/build-info.json",
+      "bytes": 218,
+      "sha256": "102a3eb9fd3f90b461f0dcee964e828b38bdbe26f08a89916572b66befe6eb12"
+    },
+    {
+      "path": "bang_chung/build-log.txt",
+      "bytes": 8864,
+      "sha256": "f6c302c8aa99bedb8772704fe60bd5243bdafc5dfb993f0cd9de06320e1197e5"
+    },
+    {
+      "path": "bang_chung/curriculum-summary.json",
+      "bytes": 4562,
+      "sha256": "6ead6a44c34681a60ba66ab16d0811df21c5a4fe2eba14b7743a7a40ed3c0648"
+    },
+    {
+      "path": "bang_chung/edge-mobile-after-exit.png",
+      "bytes": 54587,
+      "sha256": "38b4bc9406caa5b0965c08b4feafe5471901815eaab11fb4460074036ba62ab0"
+    },
+    {
+      "path": "bang_chung/handoff-reproduction-check.txt",
+      "bytes": 2069,
+      "sha256": "b9a569054e7db3889470ba9104b85ae3d04b4e53851cc0b54b546e8c389bf369"
+    },
+    {
+      "path": "bang_chung/public-website.json",
+      "bytes": 902,
+      "sha256": "fd67ee6fc90edcb0266b9a47182c62cb76f096c8beaa8489ad482904240d183d"
+    },
+    {
+      "path": "bang_chung/release-manifest.json",
+      "bytes": 21538,
+      "sha256": "63ba2492b61427c252fbab8c81b240dc50adcd07640e17827958e7aacc0cfc1e"
+    },
+    {
+      "path": "bang_chung/reproduction-log.txt",
+      "bytes": 2068,
+      "sha256": "3b7496d8ec0d9f255665bf8f1112d81f23b431809c77b7f6c5a1d54b0cab6c8b"
+    },
+    {
+      "path": "bang_chung/scrolling-edge-recheck-summary.json",
+      "bytes": 3250,
+      "sha256": "22184fa33b94ebdf02ed00d2e885de2c4580d2cd734624dfe66fd4314e440cf6"
+    },
+    {
+      "path": "bang_chung/security-reproductions.json",
+      "bytes": 1968,
+      "sha256": "4de612b57cdd9b25a13274cbc2fabe01c80bbf5b9f681cea2d490fc7b3fd6938"
+    },
+    {
+      "path": "bang_chung/summary.json",
+      "bytes": 1533,
+      "sha256": "aaf16cfd9c8371b8c8277e7b39e83cb809e1ac543d7bc6f9f876e705b596b970"
+    },
+    {
+      "path": "KET_QUA_NGHIEM_THU_TEMPLATE.json",
+      "bytes": 24469,
+      "sha256": "f795ec31d14e1796a1815192a62419555fc641be86a49fb887c8e0d4f321d8ec"
+    },
+    {
+      "path": "reproduce-audit.test.mjs",
+      "bytes": 12153,
+      "sha256": "acd609d1ae660154fb64eb30d706936c3fa076c92cec714d83861f27ab223ff9"
+    }
+  ]
+}

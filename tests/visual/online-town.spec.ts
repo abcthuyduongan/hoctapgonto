@@ -50,13 +50,13 @@ test('Tuần 8 Cổng C8: Thị Trấn Của Con, Lưới 10x10, Vật Liệu Th
     await expect(page.locator('.online-student')).toBeVisible({ timeout: 15000 });
     await expect(page.locator('.online-header')).toBeVisible({ timeout: 10000 });
 
-    // 4. Header has "🏡 Thị trấn" button
-    const townBtn = page.locator('button.contest-pill-btn', { hasText: '🏡 Thị trấn' });
+    // 4. Header has "🏡 Thị trấn" button (unique role & accessible name)
+    const townBtn = page.getByRole('button', { name: 'Mở thị trấn của con' });
     await expect(townBtn).toBeVisible();
     await townBtn.click();
 
-    // 5. Verify Town Screen opened
-    const townScreen = page.locator('.town-screen');
+    // 5. Verify Town Screen dialog opened with accessible role
+    const townScreen = page.getByRole('dialog', { name: 'Thị trấn của con' });
     await expect(townScreen).toBeVisible();
 
     // Verify Star Protection Pill
@@ -103,7 +103,7 @@ test('Tuần 8 Cổng C8: Thị Trấn Của Con, Lưới 10x10, Vật Liệu Th
     await expect(targetCell.locator('.building-sprite')).toBeVisible({ timeout: 5000 });
 
     // 7. Click recalculate button
-    const syncBtn = page.locator('.sync-materials-btn');
+    const syncBtn = page.getByRole('button', { name: '🔄 Đồng bộ' });
     await syncBtn.click();
 
     // 8. Close Town Screen and return to map

@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "kind": "Plan handoff package integrity manifest",
+  "plannedDate": "2026-11-06",
+  "excludes": [
+    "HANDOFF_MANIFEST.json"
+  ],
+  "files": [
+    {
+      "file": "00_DOC_TRUOC.md",
+      "bytes": 5119,
+      "sha256": "8ccfc6e3545c4fd79e528e19b645d44f050e4324d06d68448661c4a26ab66385"
+    },
+    {
+      "file": "01_TOI_UU_CSS_VA_ANH_BAN_DO.md",
+      "bytes": 17363,
+      "sha256": "237221c9940d91aa92a57d9f9ca85abfd247d6907cb4a22837897a792679868d"
+    },
+    {
+      "file": "02_STAGING_100_VA_USABILITY.md",
+      "bytes": 25244,
+      "sha256": "66c97115b8c166fe68c5a66b33ffd31ec050f02b3541f223440ecea36315ad27"
+    },
+    {
+      "file": "03_MA_TRAN_NGHIEM_THU.md",
+      "bytes": 9452,
+      "sha256": "34c5bca7e1b32b9f686e8bf551d37d356597002639764c0f609d595907f84815"
+    },
+    {
+      "file": "04_BIEU_MAU_VA_NHAT_KY.md",
+      "bytes": 6872,
+      "sha256": "eb626318474e733376e3a5e5aacffef2e3791037ee47c0d72da0c20479aa13ce"
+    },
+    {
+      "file": "05_NOI_DUNG_GIAO_THUC_HIEN.md",
+      "bytes": 2818,
+      "sha256": "b2f5d2e39088dac0f41008a7a35405ed28ae81f0bc50fc76c5540f18c3a2dddb"
+    },
+    {
+      "file": "BASELINE_KE_HOACH.json",
+      "bytes": 2837,
+      "sha256": "a5ec595ab457c69952861c728f6e1167a6a092cc40aeb5f32150c822aee6c58e"
+    },
+    {
+      "file": "KET_QUA_KIEM_THU_TEMPLATE.json",
+      "bytes": 35325,
+      "sha256": "2ca2931ef40d61ed24296fddbfbaffcc63613abbe454959aaf587eb813d62332"
+    },
+    {
+      "file": "KIEM_TRA_BAN_GIAO.json",
+      "bytes": 2556,
+      "sha256": "8f8c158e84f6e32ef688d42bbec97177cf0ed17c14ff396db6770d2b5e37bea6"
+    }
+  ]
+}

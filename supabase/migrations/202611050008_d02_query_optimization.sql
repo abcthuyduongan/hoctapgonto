@@ -7,3 +7,4 @@ CREATE INDEX IF NOT EXISTS idx_materials_student ON bao_an.materials_ledger(work
 CREATE INDEX IF NOT EXISTS idx_town_state_student ON bao_an.town_states(workspace_id, student_id);
 CREATE INDEX IF NOT EXISTS idx_awards_student_tier ON bao_an.awards(workspace_id, student_id, tier);
 CREATE INDEX IF NOT EXISTS idx_weeks_class_position ON bao_an.weeks(workspace_id, class_id, position);
+INSERT INTO bao_an.schema_version VALUES(8) ON CONFLICT DO NOTHING;

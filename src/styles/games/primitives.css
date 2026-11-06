@@ -1,0 +1,228 @@
+/* Bao An Learning - Shared Game Primitives & Tokens */
+
+:root {
+  --gw-navy: #09244e;
+  --gw-blue: #176add;
+  --gw-blue-2: #2799f3;
+  --gw-sky: #daf1ff;
+  --gw-cream: #fff8e8;
+  --gw-gold: #ffcb47;
+  --gw-green: #40c66a;
+  --gw-ink: #243d62;
+  --gw-r-lg: 28px;
+  --gw-r-xl: 36px;
+  --gw-shadow: 0 18px 35px rgba(12, 64, 125, 0.14);
+  --gw-game-shadow: 0 8px 0 #b0c9ec, 0 18px 28px rgba(12, 42, 82, 0.2);
+  --gw-font: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans", sans-serif;
+  scrollbar-gutter: stable;
+}
+
+/* Button & interactive primitives */
+.button {
+  border-radius: 14px;
+  border: 1px solid transparent;
+  padding: 12px 19px;
+  font-weight: 850;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  touch-action: manipulation;
+  font-family: inherit;
+  font-size: 15px;
+  text-decoration: none;
+  transition: transform 0.16s, box-shadow 0.16s, filter 0.16s;
+}
+
+.button:disabled {
+  opacity: 0.56;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.button:focus-visible,
+button:focus-visible,
+select:focus-visible,
+a:focus-visible,
+input:focus-visible {
+  outline: 3px solid #ffcb47;
+  outline-offset: 3px;
+}
+
+.button.primary {
+  color: #fff;
+  background: linear-gradient(180deg, #3fb0ff 0%, #1375e7 63%, #0e57bd 100%);
+  border: 2px solid #c1eaff;
+  box-shadow: 0 5px 0 #0b58aa, 0 11px 16px rgba(11, 87, 170, 0.21);
+  text-shadow: 0 1px 0 #0a5aa5;
+}
+
+.button.primary:not(:disabled):hover {
+  filter: brightness(1.07);
+  transform: translateY(-2px);
+  box-shadow: 0 7px 0 #0b58aa, 0 15px 20px rgba(11, 87, 170, 0.25);
+}
+
+.button.primary:not(:disabled):active {
+  transform: translateY(3px);
+  box-shadow: 0 2px 0 #0b58aa;
+}
+
+.button.outline {
+  border-radius: 14px;
+  border: 2px solid #b8d7f4;
+  background: #f5fbff;
+  color: #175da8;
+  font-weight: 850;
+}
+
+.button.outline:hover:not(:disabled) {
+  background: #e0f4ff;
+  border-color: #6ab9fb;
+}
+
+.button.text-button {
+  border: 0;
+  background: #f4f1ff;
+  color: #6861d2;
+}
+
+.button-primary {
+  background: linear-gradient(180deg, #38bdf8 0%, #0284c7 100%);
+  color: white;
+  border: 2px solid #7dd3fc;
+  border-radius: 12px;
+  padding: 10px 18px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 4px 0 #0369a1;
+  transition: all 0.15s;
+}
+
+.button-primary:hover:not(:disabled) {
+  filter: brightness(1.08);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 0 #0369a1;
+}
+
+.button-secondary {
+  background: #f1f5f9;
+  color: #334155;
+  border: 2px solid #cbd5e1;
+  border-radius: 12px;
+  padding: 8px 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* Meta badges */
+.game-meta {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.meta-badge {
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid #bae6fd;
+  border-radius: 20px;
+  padding: 6px 12px;
+  font-size: 13px;
+  font-weight: 800;
+  color: #0369a1;
+  box-shadow: 0 2px 6px rgba(2, 132, 199, 0.1);
+}
+
+.meta-badge.clickable {
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.meta-badge.clickable:hover {
+  background: #e0f2fe;
+  transform: translateY(-1px);
+}
+
+/* Theme toggle in hud */
+.game-theme-toggle-btn {
+  padding: 0.35rem 0.75rem;
+  border-radius: 12px;
+  border: 1px solid currentColor;
+  background: rgba(255, 255, 255, 0.6);
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: all 0.2s;
+}
+
+.game-theme-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.95);
+  transform: scale(1.04);
+}
+
+/* Progress track */
+.progress-track {
+  height: 9px;
+  border-radius: 100px;
+  background: #eef0fb;
+  overflow: hidden;
+}
+
+.progress-track > div {
+  height: 100%;
+  border-radius: 100px;
+  background: linear-gradient(90deg, #8a80f2, #48c6c3);
+  transition: width 0.3s;
+}
+
+.quest-progress {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-size: 12px;
+  color: #88632e;
+  letter-spacing: 0.035em;
+  font-weight: 950;
+}
+
+/* Base keyframes */
+@keyframes gw-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes gw-pop {
+  0% { transform: scale(0.83); opacity: 0.5; }
+  70% { transform: scale(1.06); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes gw-correct {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.035); }
+}
+
+/* Reduced motion safeguards */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+html[data-motion="off"] *,
+html[data-motion="off"] *::before,
+html[data-motion="off"] *::after {
+  scroll-behavior: auto !important;
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+}

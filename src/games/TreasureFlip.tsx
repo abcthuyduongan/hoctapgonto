@@ -1,4 +1,7 @@
-import '../styles/game-base.css';
+import '../styles/games/primitives.css';
+import '../styles/games/stage.css';
+import '../styles/games/feedback.css';
+import '../styles/games/treasure-flip.css';
 import { saveFailureMessage } from './save-failure-message';
 import GameMascot from './GameMascot';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';

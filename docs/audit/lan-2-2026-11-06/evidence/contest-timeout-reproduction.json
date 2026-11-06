@@ -1,0 +1,29 @@
+{
+  "kind": "Isolated UI reproduction; actual ContestMockScreen and actual SQLite store; network adapter test-only",
+  "mode": "timeout",
+  "displayCountdownSeconds": 3,
+  "saveRequestsStarted": 1,
+  "savedSnapshots": [
+    {
+      "vm3_18": "60"
+    }
+  ],
+  "submitPayloads": [
+    {
+      "answers": {
+        "vm3_18": "60"
+      }
+    }
+  ],
+  "consoleErrors": [],
+  "savedCorrectBeforeTimeout": true,
+  "result": {
+    "score": 10,
+    "correctCount": 1,
+    "totalItems": 15
+  },
+  "finalAnswers": {
+    "vm3_18": "60"
+  },
+  "reproduced": false
+}

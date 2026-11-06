@@ -102,7 +102,7 @@ test('UI04, UI05, UI06: region map renders 7-slot chapter layout, landmark stage
     await expect(page.locator('.map-stage-node')).toHaveCount(7);
 
     // Back to World Map
-    await page.getByRole('button', { name: 'Trở về bản đồ thế giới' }).click();
+    await page.getByRole('button', { name: /bản đồ thế giới/i }).click();
     await expect(page.locator('.world-map-container')).toBeVisible();
   } finally {
     await f.close();

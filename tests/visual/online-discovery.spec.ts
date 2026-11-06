@@ -125,9 +125,9 @@ test('Tuần 2 Cổng C2: Màn chơi tranh vùng, địa danh góc, chặng hoà
     await api('/login', { username: 'tuan2.child', password: f.password });
     await page.goto(f.origin + '/?online=1&controls=1');
 
-    // 1. World map shows regions and Sổ khám phá button
+    // 1. World map shows regions and Sổ khám phá button (accessible name)
     await expect(page.locator('.world-map-container')).toBeVisible({ timeout: 15000 });
-    const notebookBtn = page.locator('.online-notebook-btn');
+    const notebookBtn = page.getByRole('button', { name: 'Mở Sổ khám phá' });
     await expect(notebookBtn).toBeVisible();
 
     // 2. Click region Toán học to open Region Map

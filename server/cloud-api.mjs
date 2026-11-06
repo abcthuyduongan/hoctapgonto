@@ -6,6 +6,7 @@ import {audioDurationMs} from './audio-duration.mjs';
 import {createFailureReporter,createPerformanceReporter,measureApiSpan,measureApiSerialization,ONLINE_RUNTIME_VERSION} from './api-diagnostics.mjs';
 import {readBuildIdentity} from './build-identity.mjs';
 import {parseJsonBody} from './json-body.mjs';
+import {revokeParentElevationToken} from './parent-data.mjs';
 
 const scrypt=promisify(scryptCallback),options={N:32768,r:8,p:1,maxmem:64*1024*1024};
 const COOKIE='baoan_online_session',MAX_MEDIA=2*1024*1024;
@@ -79,14 +80,14 @@ export function createCloudApi({store,storage,publicOrigin,setupToken,performanc
       }
       const auth=await actor(request);if(mutable&&!same(request.headers.get('x-csrf-token'),auth.csrfToken))fail(403,'Phiên xác thực của biểu mẫu đã thay đổi. Hãy tải lại.');
       if(method==='GET'&&route==='/me')return cloudJson(200,await identity(auth));
-      if(method==='POST'&&route==='/logout'){shape(await body(request),[]);await store.revokeSession(auth.tokenHash);return cloudJson(200,{ok:true},{'Set-Cookie':cookie('',true)});}
+      if(method==='POST'&&route==='/logout'){shape(await body(request),[]);await store.revokeSession(auth.tokenHash);revokeParentElevationToken(auth.id);return cloudJson(200,{ok:true},{'Set-Cookie':cookie('',true)});}
       if(method==='POST'&&route==='/account/password'){
         role(auth,'student');const input=shape(await body(request),['currentPassword','newPassword']);
         await store.consumeLoginLimit({addressHash:hash(`password-ip:${context.ip??'unknown'}`),userHash:hash(`password-user:${auth.id}`),now:Date.now(),purpose:'password'});
         for(const value of [input.currentPassword,input.newPassword])if(typeof value!=='string'||value.length<10||value.length>128)fail(400,'Mật khẩu cần từ 10–128 ký tự.');
         if(same(input.currentPassword,input.newPassword))fail(400,'Mật khẩu mới cần khác mật khẩu hiện tại.');
         const user=await store.findUserById(auth.id);if(!await verifyPassword(input.currentPassword,user?.password_hash))fail(400,'Mật khẩu hiện tại chưa đúng.');
-        const result=await store.changeOwnPassword(auth,user.password_hash,await passwordHash(input.newPassword));return cloudJson(200,result,{'Set-Cookie':cookie('',true)});
+        const result=await store.changeOwnPassword(auth,user.password_hash,await passwordHash(input.newPassword));revokeParentElevationToken(auth.id);return cloudJson(200,result,{'Set-Cookie':cookie('',true)});
       }
       if(method==='GET'&&route==='/admin/summary')return cloudJson(200,await adminSummary(store,auth,Object.fromEntries(url.searchParams)));
       const adminWeekMatch=route.match(/^\/admin\/weeks\/([^/]+)$/);
@@ -179,27 +180,31 @@ export function createCloudApi({store,storage,publicOrigin,setupToken,performanc
       if(method==='GET'&&route==='/student/daily-missions'){role(auth,'student');return cloudJson(200,await store.studentDailyMissions(auth));}
       if(method==='POST'&&route==='/student/daily-riddle/answer'){role(auth,'student');return cloudJson(200,await store.answerDailyRiddle(auth,await body(request)));}
       if(method==='POST'&&route==='/parent/setup-pin'){
-        role(auth,['student','admin']);
+        role(auth,['student','admin','parent']);
         const input=await body(request);
         const studentId=auth.role==='student'?auth.studentId:input.studentId;
-        return cloudJson(200,await store.setupParentPin(auth,studentId,input));
+        const parentToken=request.headers.get('x-parent-token')||input.parentToken||null;
+        return cloudJson(200,await store.setupParentPin(auth,studentId,input,parentToken));
       }
       if(method==='POST'&&route==='/parent/verify-pin'){
-        role(auth,'student');
+        role(auth,['student','parent','admin']);
         const input=await body(request);
-        return cloudJson(200,await store.verifyParentPin(auth,auth.studentId,input.pin));
+        const targetStudentId=auth.role==='student'?auth.studentId:input.studentId;
+        return cloudJson(200,await store.verifyParentPin(auth,targetStudentId,input.pin));
       }
       if(method==='GET'&&route==='/parent/dashboard'){
         role(auth,['student','admin','parent']);
         const studentId=auth.role==='student'?auth.studentId:(url.searchParams.get('studentId')||auth.studentId);
         const weekId=url.searchParams.get('weekId')||undefined;
-        return cloudJson(200,await store.parentDashboard(auth,studentId,weekId));
+        const parentToken=request.headers.get('x-parent-token')||url.searchParams.get('parentToken')||null;
+        return cloudJson(200,await store.parentDashboard(auth,studentId,weekId,parentToken));
       }
       if(method==='POST'&&route==='/parent/settings'){
         role(auth,['student','admin','parent']);
         const input=await body(request);
         const studentId=auth.role==='student'?auth.studentId:input.studentId;
-        return cloudJson(200,await store.updateParentSettings(auth,studentId,input));
+        const parentToken=request.headers.get('x-parent-token')||input.parentToken||null;
+        return cloudJson(200,await store.updateParentSettings(auth,studentId,input,parentToken));
       }
       if(method==='GET'&&route==='/parent/students'){
         role(auth,'parent');

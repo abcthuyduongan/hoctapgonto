@@ -9,9 +9,9 @@
 .online-student .online-student-weeks{width:min(1180px,calc(100% - 64px));max-width:none;margin:36px auto 48px;padding:28px;border:1px solid #d5decd;border-radius:22px;background:#fffdf8;scroll-margin-top:24px;box-shadow:0 4px 0 #e7eadf}
 .online-student .online-student-weeks>.online-section-head h2{font-size:21px}
 .online-student .online-student-weeks>.online-section-head button{font-size:12px;background:#f5f7ed;border-color:#d3dec7}
-.online-student .online-student-weeks>p{font-size:12px;color:#708068}
+.online-student .online-student-weeks>p{font-size:12px;color:#3e5434}
 .online-student .online-week-progress{border-color:#b5cba4;background:#eef4e6;padding:21px;border-radius:16px;font-size:13px}
-.online-student .online-week-progress>p{font-size:12px;color:#64765b}
+.online-student .online-week-progress>p{font-size:12px;color:#2d3d28}
 .online-student .online-week-path{gap:16px}
 .online-student .online-week-path>li{background:#f5f5ed;border-color:#dce1d1;border-radius:17px;padding:22px}
 .online-student .online-week-path>li.is-current{background:#f4f8ed;border-color:#a4bd93;border-left:4px solid #7a9865}
@@ -33,7 +33,7 @@
 .online-student .online-student-empty{width:min(650px,calc(100% - 32px));margin:48px auto;padding:36px 24px;text-align:center;border:1px solid #d1dcc4;border-radius:24px;background:#fffdf5}
 .online-student .online-student-empty>span{display:grid;place-items:center;margin:0 auto 22px;width:64px;height:64px;border-radius:22px;background:#fff0d2;font-size:35px}
 .online-student .online-student-empty h1{font-size:26px}
-.online-student .online-student-empty p{font-size:14px;color:#738066}
+.online-student .online-student-empty p{font-size:14px;color:#3e5434}
 /* Simple game surfaces and a static companion keep attention on the authored question. */
 .online-student .immersive-dialog.premium-game .play-panel.world-stage .stage-backdrop{background:none!important;display:none!important}
 .online-student .immersive-dialog.premium-game .play-panel.world-stage .stage-overlay{background:none!important}

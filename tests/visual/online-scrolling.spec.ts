@@ -43,7 +43,12 @@ for(const viewport of [{width:1366,height:768},{width:390,height:844}]){
           else{
             const session=await page.context().newCDPSession(page);
             try{
-              for(let swipe=0;swipe<3;swipe++){
+              for(let swipe=0;swipe<6;swipe++){
+                const inView=await material.evaluate((el:HTMLElement)=>{
+                  const rect=el.getBoundingClientRect();
+                  return rect.top<window.innerHeight&&rect.bottom>0;
+                }).catch(()=>false);
+                if(inView)break;
                 const x=viewport.width/2,startY=viewport.height-100;
                 await session.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x,y:startY}]});
                 for(let step=1;step<=8;step++){
@@ -51,6 +56,7 @@ for(const viewport of [{width:1366,height:768},{width:390,height:844}]){
                   await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(resolve)));
                 }
                 await session.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+                await page.waitForTimeout(100);
               }
             }finally{await session.detach();}
           }
@@ -69,6 +75,7 @@ for(const viewport of [{width:1366,height:768},{width:390,height:844}]){
         expect(await page.evaluate(()=>window.scrollY)).toBe(lockedY);
         await page.getByRole('button',{name:/Thoát trò chơi/}).click();
         await expect(page.locator('.immersive-dialog')).toHaveCount(0);
+        expect(await page.evaluate(()=>getComputedStyle(document.body).overflow)).not.toBe('hidden');
         await page.evaluate(()=>window.scrollTo({top:0,behavior:'instant'}));
         await scrollDown();
       }finally{

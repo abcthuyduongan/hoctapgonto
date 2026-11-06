@@ -42,7 +42,7 @@ test('D02: 40-week cumulative dataset keeps bounded summary query count and sub-
             kind: 'multiple-choice',
             objectiveId: `W${w}.${sub.key}`,
             prompt: `Câu hỏi ${i+1} môn ${sub.label} tuần ${w}?`,
-            options: ['Đáp án A', 'Đáp án B', 'Đáp án C', 'Đáp án D'],
+            options: [`Lựa chọn ${i+1}.1`, `Lựa chọn ${i+1}.2`, `Lựa chọn ${i+1}.3`, `Lựa chọn ${i+1}.4`],
             correctIndex: 0,
             explanation: `Giải thích ${i+1}`
           }))

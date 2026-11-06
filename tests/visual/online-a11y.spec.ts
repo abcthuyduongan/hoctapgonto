@@ -41,9 +41,7 @@ test('Tuần 10 Cổng C10: Kiểm Thử Truy Cập Dễ Dàng (A11y) & Quét T�
 
     // 4. Scan Screen 1: World Map with axe-core
     console.log('Scanning OnlineStudentWorld for A11y violations...');
-    const mapScan = await new AxeBuilder({page})
-      .disableRules(['color-contrast'])
-      .analyze();
+    const mapScan = await new AxeBuilder({page}).analyze();
 
     const mapCritical = mapScan.violations.filter(v => ['critical', 'serious'].includes(v.impact));
     if (mapCritical.length > 0) {
@@ -58,11 +56,9 @@ test('Tuần 10 Cổng C10: Kiểm Thử Truy Cập Dễ Dàng (A11y) & Quét T�
     await page.keyboard.press('Enter');
 
     // 6. Scan Screen 2: Town Screen
-    await expect(page.getByText('Thị trấn của con')).toBeVisible({timeout: 10000});
+    await expect(page.locator('.town-grid-10')).toBeVisible({timeout: 10000});
     console.log('Scanning TownScreen for A11y violations...');
-    const townScan = await new AxeBuilder({page})
-      .disableRules(['color-contrast'])
-      .analyze();
+    const townScan = await new AxeBuilder({page}).analyze();
 
     const townCritical = townScan.violations.filter(v => ['critical', 'serious'].includes(v.impact));
     if (townCritical.length > 0) {
@@ -89,7 +85,21 @@ test('Tuần 10 Cổng C10: Kiểm Thử Truy Cập Dễ Dàng (A11y) & Quét T�
     });
     expect(imagesWithoutAlt).toBe(0);
 
-    console.log('A11y Verification PASS: 0 critical/serious violations, keyboard focus, 200% zoom integrity, valid image alts.');
+    // 10. Scan Screen 3: Admin Dashboard with full contrast verification
+    console.log('Scanning OnlineAdminDashboard for A11y violations (including color-contrast)...');
+    await page.context().clearCookies();
+    await api('/login', {username: 'admin.a11y', password: f.password});
+    await page.goto(f.origin + '/?online=1&controls=1');
+    await expect(page.locator('.online-admin-main')).toBeVisible({timeout: 15000});
+
+    const adminScan = await new AxeBuilder({page}).analyze();
+    const adminCritical = adminScan.violations.filter(v => ['critical', 'serious'].includes(v.impact));
+    if (adminCritical.length > 0) {
+      console.error('Axe critical violations on Admin:', JSON.stringify(adminCritical, null, 2));
+    }
+    expect(adminCritical).toEqual([]);
+
+    console.log('A11y Verification PASS: 0 critical/serious violations across Student, Town, and Admin screens (including color-contrast).');
   } finally {
     await f.close();
   }

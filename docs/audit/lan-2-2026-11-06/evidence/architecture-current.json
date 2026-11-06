@@ -1,0 +1,288 @@
+{
+  "sourceFiles": 155,
+  "totalSourceBytes": 1968321,
+  "largestSourceFiles": [
+    {
+      "file": "src/styles/game-base.css",
+      "bytes": 294960,
+      "lines": 4292
+    },
+    {
+      "file": "server/postgres-store.mjs",
+      "bytes": 161130,
+      "lines": 2069
+    },
+    {
+      "file": "server/online-store.mjs",
+      "bytes": 144160,
+      "lines": 1881
+    },
+    {
+      "file": "src/core/curriculum.ts",
+      "bytes": 78035,
+      "lines": 886
+    },
+    {
+      "file": "src/screens/OnlineAdminDashboard.tsx",
+      "bytes": 60221,
+      "lines": 340
+    },
+    {
+      "file": "src/screens/OnlineStudentWorld.tsx",
+      "bytes": 46083,
+      "lines": 442
+    },
+    {
+      "file": "tools/generate-semester-2-curriculum.mjs",
+      "bytes": 42392,
+      "lines": 1130
+    },
+    {
+      "file": "server/online-server.mjs",
+      "bytes": 40011,
+      "lines": 357
+    },
+    {
+      "file": "src/core/online-document-import.ts",
+      "bytes": 38813,
+      "lines": 459
+    },
+    {
+      "file": "src/screens/TownScreen.tsx",
+      "bytes": 36491,
+      "lines": 933
+    },
+    {
+      "file": "server/cloud-api.mjs",
+      "bytes": 31641,
+      "lines": 317
+    },
+    {
+      "file": "src/screens/ParentPortalScreen.tsx",
+      "bytes": 30302,
+      "lines": 748
+    }
+  ],
+  "assets": [
+    {
+      "file": "GameCompletion-DfX71KsR.css",
+      "bytes": 268623,
+      "gzipBytes": 52022
+    },
+    {
+      "file": "index-CIahrqYG.js",
+      "bytes": 226351,
+      "gzipBytes": 71236
+    },
+    {
+      "file": "OnlineAdminDashboard-HfLHqkh0.js",
+      "bytes": 141954,
+      "gzipBytes": 46913
+    },
+    {
+      "file": "OnlineStudentWorld-DP9Vbfhx.js",
+      "bytes": 79217,
+      "gzipBytes": 23871
+    },
+    {
+      "file": "OnlineStudentWorld-BvWtFMiD.css",
+      "bytes": 50937,
+      "gzipBytes": 10583
+    },
+    {
+      "file": "OnlineScreen-BzJp8PN7.css",
+      "bytes": 29504,
+      "gzipBytes": 6676
+    },
+    {
+      "file": "TownScreen-BwQOdwn0.js",
+      "bytes": 28730,
+      "gzipBytes": 8806
+    },
+    {
+      "file": "OnlineScreen-Cib_r72V.js",
+      "bytes": 18708,
+      "gzipBytes": 7192
+    },
+    {
+      "file": "ParentPortalScreen-CcQjUYgz.js",
+      "bytes": 18621,
+      "gzipBytes": 5387
+    },
+    {
+      "file": "ContestMockScreen-q1ho2nst.js",
+      "bytes": 14026,
+      "gzipBytes": 4743
+    },
+    {
+      "file": "ParentPortalScreen-BwwNxQjV.css",
+      "bytes": 13297,
+      "gzipBytes": 3061
+    },
+    {
+      "file": "question-export-download-Zk7I7nF-.js",
+      "bytes": 12285,
+      "gzipBytes": 5193
+    },
+    {
+      "file": "ContestMockScreen-BZObUcAF.css",
+      "bytes": 11428,
+      "gzipBytes": 2735
+    },
+    {
+      "file": "SentenceBuilder-kFPvEwDI.js",
+      "bytes": 9677,
+      "gzipBytes": 3755
+    },
+    {
+      "file": "WordConnect-BlRBYHGT.js",
+      "bytes": 9519,
+      "gzipBytes": 3750
+    },
+    {
+      "file": "MathQuest-8U4omEqB.js",
+      "bytes": 9428,
+      "gzipBytes": 3802
+    },
+    {
+      "file": "SequenceTrail-DUqCz-ZV.js",
+      "bytes": 8880,
+      "gzipBytes": 3513
+    },
+    {
+      "file": "OnlineExerciseRunner-C6ZpGD8x.js",
+      "bytes": 8730,
+      "gzipBytes": 3555
+    },
+    {
+      "file": "MemoryMatch-CeDK6Nml.js",
+      "bytes": 8229,
+      "gzipBytes": 3337
+    },
+    {
+      "file": "useQuestionLayout-Dt2S6Dtn.css",
+      "bytes": 7584,
+      "gzipBytes": 1420
+    },
+    {
+      "file": "TownScreen-Bsdswrwt.css",
+      "bytes": 7099,
+      "gzipBytes": 2050
+    },
+    {
+      "file": "online-format-D7M9faXf.js",
+      "bytes": 5988,
+      "gzipBytes": 2886
+    },
+    {
+      "file": "FoxKitchen-DaUVk5L1.js",
+      "bytes": 5933,
+      "gzipBytes": 2596
+    },
+    {
+      "file": "BalanceScale-DaUUJVBc.js",
+      "bytes": 5700,
+      "gzipBytes": 2508
+    },
+    {
+      "file": "TreasureFlip-C0o4vLWu.js",
+      "bytes": 5622,
+      "gzipBytes": 2606
+    },
+    {
+      "file": "BoatRace-BY4iU1dg.js",
+      "bytes": 5394,
+      "gzipBytes": 2551
+    },
+    {
+      "file": "BasketSort-DjWfdj_N.js",
+      "bytes": 4445,
+      "gzipBytes": 2185
+    },
+    {
+      "file": "BalanceScale-C6rXM2GZ.css",
+      "bytes": 3996,
+      "gzipBytes": 1319
+    },
+    {
+      "file": "ParentPinModal-DQVLzqKU.js",
+      "bytes": 3935,
+      "gzipBytes": 1735
+    },
+    {
+      "file": "GameCompletion-CFFPuZoN.js",
+      "bytes": 3907,
+      "gzipBytes": 1363
+    },
+    {
+      "file": "rich-content-Cgbt1fh2.js",
+      "bytes": 3591,
+      "gzipBytes": 1640
+    },
+    {
+      "file": "game-context-themes-DE65RjN-.css",
+      "bytes": 3514,
+      "gzipBytes": 1237
+    },
+    {
+      "file": "OnlinePasswordDialog-CA-HjWGd.js",
+      "bytes": 2985,
+      "gzipBytes": 1262
+    },
+    {
+      "file": "OnlineAdminDashboard-BlYGVA2x.css",
+      "bytes": 2912,
+      "gzipBytes": 985
+    },
+    {
+      "file": "BasketSort-DRiJq8v3.css",
+      "bytes": 2798,
+      "gzipBytes": 1066
+    },
+    {
+      "file": "useQuestionClock-ExIvptJE.js",
+      "bytes": 1733,
+      "gzipBytes": 911
+    },
+    {
+      "file": "OnlineWeekAdvanceDialog-gboD3Yir.js",
+      "bytes": 1701,
+      "gzipBytes": 929
+    },
+    {
+      "file": "useQuestionLayout-CBAOylbK.js",
+      "bytes": 1594,
+      "gzipBytes": 816
+    },
+    {
+      "file": "index-DaRcpkAD.css",
+      "bytes": 778,
+      "gzipBytes": 460
+    },
+    {
+      "file": "GameMascot-xDjy0I2q.js",
+      "bytes": 555,
+      "gzipBytes": 425
+    },
+    {
+      "file": "pair-rounds-ocU5XXD6.js",
+      "bytes": 413,
+      "gzipBytes": 308
+    },
+    {
+      "file": "useQuestionSpeech-BTMisNZH.js",
+      "bytes": 365,
+      "gzipBytes": 310
+    },
+    {
+      "file": "FeedbackEffects-DRn9l6ho.js",
+      "bytes": 357,
+      "gzipBytes": 249
+    },
+    {
+      "file": "sdk-BLNjduv7.js",
+      "bytes": 295,
+      "gzipBytes": 232
+    }
+  ]
+}

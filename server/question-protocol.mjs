@@ -1,14 +1,77 @@
+import {randomUUID} from 'node:crypto';
 import {fail} from './online-errors.mjs';
 import {onlinePresentation} from '../src/core/online-exercises.ts';
 import {questionRewardThresholds} from '../src/core/question-rewards.ts';
 
 export const isTimedPresentation=pack=>['quiz','learning'].includes(pack.kind);
 const mediaView=media=>media?{...(media.imageId?{imageId:media.imageId,imageAlt:media.imageAlt??''}:{}),...(media.audioId?{audioId:media.audioId}:{})}:undefined;
+
+/**
+ * Pure shuffling algorithm for multiple choice options.
+ * Guarantees that the new correct position is strictly distinct from lastCorrectPosition (for n >= 2).
+ * Does not use a fixed predictable cycle (e.g. A->B->C->D).
+ * Preserves correct option content and remaining option contents.
+ */
+export function shuffleQuestionOptions(options, correctIndex, lastCorrectPosition = null, rng = Math.random) {
+  const n = options?.length ?? 0;
+  if (!Array.isArray(options) || !Number.isInteger(correctIndex) || correctIndex < 0 || correctIndex >= n || n < 2) {
+    return {
+      shuffledOptions: Array.isArray(options) ? [...options] : [],
+      permutation: Array.isArray(options) ? options.map((_, i) => i) : [],
+      displayedCorrectIndex: correctIndex ?? 0
+    };
+  }
+
+  let allowedPositions = Array.from({length: n}, (_, i) => i);
+  if (lastCorrectPosition !== null && Number.isInteger(lastCorrectPosition) && lastCorrectPosition >= 0 && lastCorrectPosition < n) {
+    const filtered = allowedPositions.filter(p => p !== lastCorrectPosition);
+    if (filtered.length > 0) {
+      allowedPositions = filtered;
+    }
+  }
+
+  const targetIdx = Math.floor(rng() * allowedPositions.length);
+  const displayedCorrectIndex = allowedPositions[targetIdx];
+
+  const otherPositions = Array.from({length: n}, (_, i) => i).filter(p => p !== displayedCorrectIndex);
+  const otherOriginalIndices = Array.from({length: n}, (_, i) => i).filter(i => i !== correctIndex);
+
+  for (let i = otherOriginalIndices.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    const tmp = otherOriginalIndices[i];
+    otherOriginalIndices[i] = otherOriginalIndices[j];
+    otherOriginalIndices[j] = tmp;
+  }
+
+  const permutation = new Array(n);
+  permutation[displayedCorrectIndex] = correctIndex;
+  for (let k = 0; k < otherPositions.length; k++) {
+    permutation[otherPositions[k]] = otherOriginalIndices[k];
+  }
+
+  const shuffledOptions = permutation.map(origIdx => options[origIdx]);
+
+  return {
+    shuffledOptions,
+    permutation,
+    displayedCorrectIndex
+  };
+}
+
 /** Allowlist, rather than deleting known answer keys from authored objects. */
-export function questionView(item,{shell=false}={}){
+export function questionView(item,{shell=false,presentation=null}={}){
  const value={id:item.id,kind:item.kind,objectiveId:item.objectiveId,prompt:shell?'Đang mở câu hỏi…':item.prompt};
  if(item.media)value.media=mediaView(item.media);
- if('options'in item)value.options=shell?[]:[...item.options];
+ if('options'in item){
+   if(shell){
+     value.options=[];
+   }else if(presentation&&Array.isArray(presentation.permutation)){
+     value.options=presentation.permutation.map(i=>item.options[i]);
+     value.presentationId=presentation.presentationId;
+   }else{
+     value.options=[...item.options];
+   }
+ }
  if('audioId'in item)value.audioId=item.audioId;
  if('passageId'in item)value.passageId=item.passageId;
  if(item.kind==='numeric-answer'&&item.unit)value.unit=item.unit;
@@ -20,17 +83,39 @@ export function safePresentation(pack){
  return {id:pack.id,version:pack.version,title:pack.title,kind:pack.kind,subject:pack.subject,grade:pack.grade,source:pack.source,publishedAt:pack.publishedAt,
    items:pack.items.map(item=>questionView(item,{shell:true})),...(pack.kind==='learning'?{contentFormatVersion:2,passages:[],media:[]}:{} )};
 }
-export function publicSession(session){const {questionHints,audioReceipts,...view}=session;void questionHints;void audioReceipts;return view;}
+export function publicSession(session){
+  if(!session||typeof session!=='object')return session;
+  const view={
+    sessionId:session.sessionId,
+    packId:session.packId,
+    contentVersion:session.contentVersion,
+    moduleId:session.moduleId,
+    status:session.status,
+    startedAt:session.startedAt
+  };
+  if(session.studentId!==undefined)view.studentId=session.studentId;
+  if(session.moduleVersion!==undefined)view.moduleVersion=session.moduleVersion;
+  if(session.endedAt!==undefined)view.endedAt=session.endedAt;
+  if(session.rewardPolicyVersion!==undefined)view.rewardPolicyVersion=session.rewardPolicyVersion;
+  if(session.questionProtocolVersion!==undefined)view.questionProtocolVersion=session.questionProtocolVersion;
+  if(session.journeyWeekId!==undefined)view.journeyWeekId=session.journeyWeekId;
+  if(session.currentSequence!==undefined)view.currentSequence=session.currentSequence;
+  if(Array.isArray(session.requiredItemIds))view.requiredItemIds=[...session.requiredItemIds];
+  if(session.questionClocks&&typeof session.questionClocks==='object'){
+    view.questionClocks={...session.questionClocks};
+  }
+  return view;
+}
 function currentProtocolQuestion(session,source,events,itemId){
  const presentation=onlinePresentation(session.moduleId,source);
  if(!presentation||!isTimedPresentation(presentation)&&presentation.kind!=='sentences')fail(400,'Trò chơi này không dùng gợi ý từng câu.');
- const ids=session.requiredItemIds??presentation.items.map(item=>item.id),done=new Set(events.filter(event=>session.rewardPolicyVersion===2?event.correct:true).map(event=>event.itemId));
+ const ids=session.requiredItemIds??presentation.items.map(item=>item.id),done=new Set(events.filter(event=>(session.rewardPolicyVersion===2||session.questionProtocolVersion===1)?event.correct:true).map(event=>event.itemId));
  const current=ids.find(id=>!done.has(id));
  if(current!==itemId)fail(409,'Hãy hoàn thành câu hiện tại trước khi mở câu tiếp theo.');
  const item=presentation.items.find(item=>item.id===itemId);if(!item)fail(400,'Câu hỏi không thuộc lượt chơi.');return{item,presentation};
 }
 export function currentTimedQuestion(session,source,events,itemId){const current=currentProtocolQuestion(session,source,events,itemId);if(!isTimedPresentation(current.presentation))fail(400,'Câu hỏi không dùng bộ đếm thời gian.');return current;}
-export function openProtocolQuestion(session,source,events,itemId,time=Date.now()){
+export function openProtocolQuestion(session,source,events,itemId,time=Date.now(),lastCorrectPos=null,rng=Math.random){
  const{item,presentation}=currentTimedQuestion(session,source,events,itemId);
  if(item.kind==='listening-choice'||item.kind==='listening-gap'){
   const delivery=session.audioReceipts?.[itemId];
@@ -38,8 +123,34 @@ export function openProtocolQuestion(session,source,events,itemId,time=Date.now(
   if(time<Date.parse(delivery.readyAt))fail(409,'Âm thanh chưa đủ thời lượng. Con nghe hết rồi thử mở lại câu hỏi.');
  }
  session.questionClocks??={};if(!Object.hasOwn(session.questionClocks,itemId))Object.defineProperty(session.questionClocks,itemId,{value:new Date(time).toISOString(),enumerable:true,writable:true,configurable:true});
+
+ session.questionPresentations??={};
+ let questionPres = session.questionPresentations[itemId];
+ const priorAttempts = events.filter(e => e.itemId === itemId);
+ const lastAttempt = priorAttempts.at(-1);
+
+ const needsNewPresentation = !questionPres || (lastAttempt && (!questionPres.openedAt || lastAttempt.occurredAt >= questionPres.openedAt));
+
+ if (needsNewPresentation && Array.isArray(item.options) && item.options.length >= 2) {
+   const prevPos = questionPres?.displayedCorrectIndex ?? lastCorrectPos;
+   const { permutation, displayedCorrectIndex } = shuffleQuestionOptions(
+     item.options,
+     item.correctIndex,
+     prevPos,
+     rng
+   );
+   questionPres = {
+     presentationId: randomUUID(),
+     itemId,
+     permutation,
+     displayedCorrectIndex,
+     openedAt: new Date(time).toISOString()
+   };
+   session.questionPresentations[itemId] = questionPres;
+ }
+
  const passage=item.kind==='reading-choice'?presentation.passages.find(row=>row.passageId===item.passageId):undefined;
- return{openedAt:session.questionClocks[itemId],serverNow:new Date(time).toISOString(),...questionRewardThresholds(item),item:questionView(item),...(passage?{passage:{passageId:passage.passageId,title:passage.title,body:passage.body}}:{})};
+ return{openedAt:session.questionClocks[itemId],serverNow:new Date(time).toISOString(),...questionRewardThresholds(item),item:questionView(item,{presentation:questionPres}),...(passage?{passage:{passageId:passage.passageId,title:passage.title,body:passage.body}}:{})};
 }
 export function protocolAudioDelivery(session,source,events,itemId,mediaId,durationMs,time=Date.now()){
  if(Object.hasOwn(session.audioReceipts??{},itemId)&&session.audioReceipts[itemId].mediaId===mediaId)return;
@@ -60,7 +171,9 @@ export function answerFeedback(source,session,event){
  if(!item||!('prompt'in item))return undefined;
  const audio='audioId'in item&&source.kind==='learning'?source.media.find(row=>row.mediaId===item.audioId):undefined;
  const transcript=audio?.transcript??item.media?.audioTranscript;
- return{explanation:item.explanation??'',...('options'in item?{answer:item.options[item.correctIndex],correctIndex:item.correctIndex}:{}),...(item.kind==='numeric-answer'?{answer:`${item.answer}${item.unit?' '+item.unit:''}`}:'acceptedAnswers'in item?{answer:item.acceptedAnswers.join(' / ')}:{}),...(transcript?{audioTranscript:transcript}:{})};
+ const pres=session?.questionPresentations?.[event.itemId];
+ const displayedCorrectIndex=pres?pres.displayedCorrectIndex:item.correctIndex;
+ return{explanation:item.explanation??'',...('options'in item?{answer:item.options[item.correctIndex],correctIndex:displayedCorrectIndex}:{}),...(item.kind==='numeric-answer'?{answer:`${item.answer}${item.unit?' '+item.unit:''}`}:'acceptedAnswers'in item?{answer:item.acceptedAnswers.join(' / ')}:{}),...(transcript?{audioTranscript:transcript}:{})};
 }
 /** Additional backup evidence, independent from the current application's UI. */
 export function protocolEvidenceErrors(session,source,events){

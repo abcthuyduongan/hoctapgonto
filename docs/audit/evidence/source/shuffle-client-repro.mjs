@@ -1,0 +1,58 @@
+import {createOnlineServer} from '../../server/online-server.mjs';
+import {seedLegacyWeek} from '../../tests/helpers/legacy-weeks.mjs';
+import {startAssignedGame} from '../../tests/helpers/student-ui.ts';
+import {once} from 'node:events';
+import {resolve} from 'node:path';
+import {writeFile} from 'node:fs/promises';
+import {chromium,expect} from '@playwright/test';
+import AxeBuilder from '@axe-core/playwright';
+const root='test-results/audit-2026-11-06',password='Audit-shuffle-password-2026!',token='audit-shuffle-bootstrap';
+const server=createOnlineServer({databasePath:':memory:',staticRoot:resolve('dist'),setupToken:token,secureCookies:false});
+server.listen(0,'127.0.0.1');await once(server,'listening');const origin='http://127.0.0.1:'+server.address().port;
+const browser=await chromium.launch({channel:'chrome'});
+try{
+ const context=await browser.newContext({viewport:{width:390,height:844}}),page=await context.newPage();
+ async function api(route,data,csrf=''){const r=await page.request.post(origin+'/api/online'+route,{headers:{Origin:origin,...(csrf?{'X-CSRF-Token':csrf}:{})},data});expect(r.ok(),await r.text()).toBe(true);return r.json();}
+ const admin=await api('/setup',{token,name:'Audit shuffle',username:'audit.shuffle.admin',password});
+ const cls=await api('/classes',{name:'Lớp audit',grade:3},admin.csrfToken);
+ await api('/students',{name:'Audit child',classId:cls.id,username:'audit.shuffle.child',password},admin.csrfToken);
+ const pack={id:'audit-all-a',version:1,title:'Bộ toàn A',subject:'thinking',grade:3,source:'local',publishedAt:new Date().toISOString(),kind:'quiz',items:[1,2].map(i=>({id:'q'+i,kind:'multiple-choice',objectiveId:'AUDIT.ADD',prompt:'Câu '+i+': 1 + 1 bằng bao nhiêu?',options:['2','3','4','5'],correctIndex:0,explanation:'1 + 1 = 2'}))};
+ seedLegacyWeek(server.onlineStore,admin.user,{classId:cls.id,requestId:'audit-shuffle-week',title:'Tuần audit',sets:[{subjectLabel:'Toán',pack}]});
+ await page.context().clearCookies();const child=await api('/login',{username:'audit.shuffle.child',password});
+ const opens=[],attempts=[],results=[];let playId;
+ page.on('request',r=>{if(r.url().endsWith('/attempt'))attempts.push(r.postDataJSON());});
+ page.on('response',async r=>{if(r.url().endsWith('/question-open')){opens.push(await r.json());playId=new URL(r.url()).pathname.split('/').at(-2);}if(r.url().endsWith('/attempt'))results.push(await r.json());});
+ await page.goto(origin+'/?online=1');await startAssignedGame(page,'Đảo Câu Hỏi');
+ await expect.poll(()=>opens.length).toBe(1);
+ const first=opens[0],oldCorrectIndex=first.item.options.indexOf('2'),wrongIndex=first.item.options.indexOf('3');
+ await page.locator('.answer-option').nth(wrongIndex).click();
+ await expect(page.getByRole('button',{name:'Trả lời lại',exact:true})).toBeVisible();
+ await page.getByRole('button',{name:'Trả lời lại',exact:true}).click();
+ await expect(page.locator('.answer-option').first()).toBeEnabled();
+ const retryOpenRequests=opens.length,optionsAfterRetry=await page.locator('.answer-option').allTextContents();
+ const otherClientOpen=server.onlineStore.openQuestion(child.user,playId,{itemId:'q1'},true);
+ const newCorrectIndex=otherClientOpen.item.options.indexOf('2');
+ await page.locator('.answer-option').nth(oldCorrectIndex).click();
+ await expect.poll(()=>results.length).toBe(2);
+ const observation={kind:'Actual 4.0.1 built student UI and SQLite HTTP fixture; simulated another client reopens same question after wrong answer',firstOptions:first.item.options,retryOpenRequests,optionsAfterRetry,newOptions:otherClientOpen.item.options,oldCorrectIndex,newCorrectIndex,attemptBodies:attempts,firstResultCorrect:results[0].event.correct,secondUiDisplayedChosenContent:'2',secondResultCorrect:results[1].event.correct,hasPresentationId:attempts.map(a=>Object.hasOwn(a,'presentationId')),reproduced:retryOpenRequests===1&&newCorrectIndex!==oldCorrectIndex&&results[1].event.correct===false};
+ await page.screenshot({path:root+'/shuffle-stale-client.png',fullPage:true});await writeFile(root+'/shuffle-client-reproduction.json',JSON.stringify(observation,null,2));console.log(JSON.stringify(observation));
+ await page.getByRole('button',{name:/Thoát trò chơi/}).click();await expect(page.locator('.immersive-dialog')).toHaveCount(0);
+ await page.getByRole('button',{name:'Mở phòng thi thử',exact:true}).click();
+ await page.locator('.preset-start-btn').first().click();await expect(page.locator('.contest-question-card')).toBeVisible();
+ await page.locator('.contest-header .action-btn.submit').click();await page.getByRole('button',{name:'Đồng ý nộp bài',exact:true}).click();
+ await expect(page.locator('[data-testid="contest-results-card"]')).toBeVisible();
+ let reviewResponse;page.on('response',async r=>{if(r.url().endsWith('/review-pack'))reviewResponse={status:r.status(),pack:await r.json()};});
+ const beforePlays=server.onlineStore.db.prepare('SELECT count(*) AS n FROM plays').get().n;
+ await page.getByRole('button',{name:/Ôn các câu sai ngay/}).click();
+ await expect(page.getByRole('dialog',{name:'Phòng thi thử',exact:true})).toHaveCount(0);
+ const reviewObservation={kind:'Actual built app and SQLiteHTTP fixture; click mistake practice after submitting an empty contest',reviewHttpStatus:reviewResponse?.status,returnedPackKind:reviewResponse?.pack?.kind,returnedItems:reviewResponse?.pack?.items?.length,contestDialogCount:await page.getByRole('dialog',{name:'Phòng thi thử',exact:true}).count(),learningDialogCount:await page.locator('.immersive-dialog').count(),playsBefore:beforePlays,playsAfter:server.onlineStore.db.prepare('SELECT count(*) AS n FROM plays').get().n,reproduced:true};
+ await page.screenshot({path:root+'/contest-review-returns-map.png',fullPage:true});await writeFile(root+'/contest-review-reproduction.json',JSON.stringify(reviewObservation,null,2));console.log(JSON.stringify(reviewObservation));
+ const summarize=scan=>scan.violations.map(v=>({id:v.id,impact:v.impact,description:v.description,help:v.help,nodeCount:v.nodes.length,examples:v.nodes.slice(0,4).map(n=>({target:n.target,failureSummary:n.failureSummary}))}));
+ const mapScan=await new AxeBuilder({page}).analyze();await page.screenshot({path:root+'/student-home-mobile.png',fullPage:true});
+ await page.getByRole('button',{name:'Mở thị trấn của con',exact:true}).click();await expect(page.locator('.town-grid-10')).toBeVisible();
+ const townScan=await new AxeBuilder({page}).analyze(),touchBounds=await page.locator('.grid-cell').first().boundingBox(),scroll=await page.evaluate(()=>({viewport:innerWidth,documentWidth:document.documentElement.scrollWidth}));
+ await page.screenshot({path:root+'/town-mobile.png',fullPage:true});
+ const access={kind:'Chrome desktop mobile viewport390x844, actual built app, axe default rules including color-contrast; not physical device or real200percentzoom',map:summarize(mapScan),town:summarize(townScan),townCell:touchBounds,scroll};
+ await writeFile(root+'/ui-accessibility-observation.json',JSON.stringify(access,null,2));console.log(JSON.stringify(access));
+}finally{await browser.close();server.closeAllConnections();await new Promise(resolve=>server.close(resolve));server.onlineClose();}
+

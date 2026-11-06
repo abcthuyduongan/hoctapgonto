@@ -253,3 +253,126 @@ test('HTTP Cloud API: Endpoints enforce authentication, role check, and hide ans
   }));
   assert.equal(unauthRes.status, 401);
 });
+
+test('R208-R210: Autosave question-level revision ordering and deadline enforcement on SQLite and PostgreSQL', async t => {
+  // SQLite test
+  const store = new OnlineStore(':memory:');
+  const admin = { workspaceId: 'ws-test-rev', id: 'admin-rev', role: 'admin' };
+  store.db.exec("INSERT INTO workspaces(id,name,wallet_enabled,rate_vnd,created_at) VALUES('ws-test-rev','Trường mẫu Rev',1,1000,'2026-10-01')");
+  store.db.exec("INSERT INTO users(id,workspace_id,username,password_hash,role,created_at) VALUES('u-admin-rev','ws-test-rev','admin.rev','pwd','admin','2026-10-01')");
+  const cls = store.createClass(admin, { name: 'Lớp 3B', grade: 3 });
+  const s = store.createStudent(admin, { classId: cls.id, name: 'Bảo An Rev', username: 'baoan.rev' }, 'salt:pwd', 'baoan.rev');
+  const studentUser = store.student(admin, s.id);
+  const auth = { workspaceId: admin.workspaceId, id: studentUser.user_id, studentId: s.id, role: 'student' };
+
+  const contest = store.startContest(auth, { presetId: 'violympic-math-g3', requestId: 'rev-c1' });
+  const q = contest.items[0];
+
+  // R208: Send revision 2 (answer 'B'), then delayed revision 1 (answer 'A')
+  await store.saveContestProgress(auth, contest.sessionId, { answers: { [q.id]: 'Answer-B' }, revision: 2, seq: 2 });
+  await store.saveContestProgress(auth, contest.sessionId, { answers: { [q.id]: 'Answer-A' }, revision: 1, seq: 1 });
+  const activeAfterStale = store.activeContest(auth);
+  assert.equal(activeAfterStale.session.answers[q.id], 'Answer-B', 'Newer revision 2 must win over delayed revision 1');
+
+  // Next revision 3 (answer 'C') must update
+  await store.saveContestProgress(auth, contest.sessionId, { answers: { [q.id]: 'Answer-C' }, revision: 3, seq: 3 });
+  const activeAfterNewest = store.activeContest(auth);
+  assert.equal(activeAfterNewest.session.answers[q.id], 'Answer-C', 'Revision 3 must update over revision 2');
+
+  // R210: Submit on timeout or deadline
+  store.db.prepare("UPDATE contest_sessions SET deadline_at = '2020-01-01T00:00:00.000Z' WHERE session_id = ?").run(contest.sessionId);
+  const timeoutSave = store.saveContestProgress(auth, contest.sessionId, { answers: { [q.id]: 'Too-Late' }, revision: 4 });
+  assert.equal(timeoutSave.status, 'timeout');
+  const activeClosed = store.activeContest(auth);
+  assert.equal(activeClosed.active, false);
+
+  // PostgreSQL test
+  const f = await createPostgresFixture(t);
+  const pgCls = await f.store.createClass(f.admin, { name: 'Lớp 3C', grade: 3 });
+  const pgS = await f.store.createStudent(f.admin, { classId: pgCls.id, name: 'An PG Rev', username: 'an.pg.rev' }, 'pwd', 'an.pg.rev');
+  const pgSt = await f.store.student(f.admin, pgS.id);
+  const pgAuth = { workspaceId: f.admin.workspaceId, id: pgSt.user_id, studentId: pgS.id, role: 'student' };
+
+  const pgContest = await f.store.startContest(pgAuth, { presetId: 'violympic-math-g3', requestId: 'pg-rev-c1' });
+  const pgQ = pgContest.items[0];
+
+  await f.store.saveContestProgress(pgAuth, pgContest.sessionId, { answers: { [pgQ.id]: 'PG-Answer-B' }, revision: 2, seq: 2 });
+  await f.store.saveContestProgress(pgAuth, pgContest.sessionId, { answers: { [pgQ.id]: 'PG-Answer-A' }, revision: 1, seq: 1 });
+  const pgActive = await f.store.activeContest(pgAuth);
+  assert.equal(pgActive.session.answers[pgQ.id], 'PG-Answer-B', 'PostgreSQL: Newer revision 2 must win over delayed revision 1');
+
+  await f.store.saveContestProgress(pgAuth, pgContest.sessionId, { answers: { [pgQ.id]: 'PG-Answer-C' }, revision: 3, seq: 3 });
+  const pgActive3 = await f.store.activeContest(pgAuth);
+  assert.equal(pgActive3.session.answers[pgQ.id], 'PG-Answer-C', 'PostgreSQL: Revision 3 must update over revision 2');
+});
+
+test('R211-R213: Review pack ownership isolation and prefix authorization checks on SQLite and PostgreSQL', async t => {
+  // SQLite test
+  const store = new OnlineStore(':memory:');
+  const admin = { workspaceId: 'ws-acl', id: 'admin-acl', role: 'admin' };
+  store.db.exec("INSERT INTO workspaces(id,name,wallet_enabled,rate_vnd,created_at) VALUES('ws-acl','Trường ACL',1,1000,'2026-10-01')");
+  store.db.exec("INSERT INTO users(id,workspace_id,username,password_hash,role,created_at) VALUES('u-admin-acl','ws-acl','admin.acl','pwd','admin','2026-10-01')");
+  const cls = store.createClass(admin, { name: 'Lớp 3D', grade: 3 });
+  const sA = store.createStudent(admin, { classId: cls.id, name: 'Học sinh A', username: 'child.a' }, 'salt:pwd', 'child.a');
+  const sB = store.createStudent(admin, { classId: cls.id, name: 'Học sinh B', username: 'child.b' }, 'salt:pwd', 'child.b');
+  const userA = store.student(admin, sA.id), userB = store.student(admin, sB.id);
+  const authA = { workspaceId: admin.workspaceId, id: userA.user_id, studentId: sA.id, role: 'student' };
+  const authB = { workspaceId: admin.workspaceId, id: userB.user_id, studentId: sB.id, role: 'student' };
+
+  // A takes contest, submits with mistakes and creates review pack
+  const contestA = store.startContest(authA, { presetId: 'violympic-math-g3', requestId: 'req-a-c1' });
+  await store.submitContest(authA, contestA.sessionId, { answers: {} });
+  const reviewA = store.contestReviewPack(authA, contestA.sessionId);
+  assert.ok(reviewA.id.startsWith('review-'));
+
+  // R211: A opens review pack -> allowed
+  const playA = store.startPlay(authA, { requestId: 'play-a-rev', moduleId: 'math-quest', packId: reviewA.id, contentVersion: reviewA.version }, true, true);
+  assert.ok(playA.session.sessionId);
+
+  // R212: B opens A's review pack -> 403 Forbidden!
+  assert.throws(() => {
+    store.startPlay(authB, { requestId: 'play-b-rev', moduleId: 'math-quest', packId: reviewA.id, contentVersion: reviewA.version }, true, true);
+  }, /chỉ được học gói ôn tập của chính mình/);
+
+  // R213: Teacher pack starting with 'review-' without assignment -> 403 Forbidden!
+  const teacherPack = {
+    id: 'review-teacher-math',
+    version: 1,
+    title: 'Gói ôn tập giáo viên',
+    kind: 'quiz',
+    subject: 'math',
+    grade: 3,
+    source: 'local',
+    publishedAt: '2026-10-01',
+    items: [{ id: 'tq1', kind: 'multiple-choice', objectiveId: 'M1', prompt: '1+1=?', options: ['2','3','4','5'], correctIndex: 0, explanation: '1+1=2' }]
+  };
+  store.db.prepare("INSERT INTO packs(workspace_id, pack_id, version, subject_label, json, content_hash) VALUES(?,?,?,?,?,?)").run(
+    admin.workspaceId, teacherPack.id, teacherPack.version, 'math', JSON.stringify(teacherPack), 'hash-tp'
+  );
+  assert.throws(() => {
+    store.startPlay(authB, { requestId: 'play-b-tp', moduleId: 'math-quest', packId: teacherPack.id, contentVersion: 1 }, true, true);
+  }, /chỉ được học bộ câu hỏi thuộc tuần hiện tại/);
+
+  // PostgreSQL test
+  const f = await createPostgresFixture(t);
+  const pgCls = await f.store.createClass(f.admin, { name: 'Lớp PG ACL', grade: 3 });
+  const pgSA = await f.store.createStudent(f.admin, { classId: pgCls.id, name: 'PG Child A', username: 'pg.child.a' }, 'pwd', 'pg.child.a');
+  const pgSB = await f.store.createStudent(f.admin, { classId: pgCls.id, name: 'PG Child B', username: 'pg.child.b' }, 'pwd', 'pg.child.b');
+  const pgStA = await f.store.student(f.admin, pgSA.id), pgStB = await f.store.student(f.admin, pgSB.id);
+  const pgAuthA = { workspaceId: f.admin.workspaceId, id: pgStA.user_id, studentId: pgSA.id, role: 'student' };
+  const pgAuthB = { workspaceId: f.admin.workspaceId, id: pgStB.user_id, studentId: pgSB.id, role: 'student' };
+
+  const pgContestA = await f.store.startContest(pgAuthA, { presetId: 'violympic-math-g3', requestId: 'pg-req-a-c1' });
+  await f.store.submitContest(pgAuthA, pgContestA.sessionId, { answers: {} });
+  const pgReviewA = await f.store.contestReviewPack(pgAuthA, pgContestA.sessionId);
+  assert.ok(pgReviewA.id.startsWith('review-'));
+
+  // R211: PG A opens review -> allowed
+  const pgPlayA = await f.store.startPlay(pgAuthA, { requestId: 'pg-play-a-rev', moduleId: 'math-quest', packId: pgReviewA.id, contentVersion: pgReviewA.version }, true, true);
+  assert.ok(pgPlayA.session.sessionId);
+
+  // R212: PG B opens A's review -> 403 Forbidden!
+  await assert.rejects(async () => {
+    await f.store.startPlay(pgAuthB, { requestId: 'pg-play-b-rev', moduleId: 'math-quest', packId: pgReviewA.id, contentVersion: pgReviewA.version }, true, true);
+  }, /chỉ được học gói ôn tập của chính mình/);
+});

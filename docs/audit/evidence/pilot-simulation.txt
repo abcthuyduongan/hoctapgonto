@@ -1,0 +1,24 @@
+Đã xuất thành công 8 tuần học liệu Học kỳ 2 (24 bộ câu hỏi) ra tệp D:\Phần mềm 2026\BAO_AN_LEARNING_lam lại\data\curriculum\hoc-ky-2-8-tuan.json
+[C11 Metric 1] Tỉ lệ chuyên cần >= 4/5 ngày: 9/10 (90.0%)
+[C11 Metric 2] Tỉ lệ hoàn thành tuần (mọi câu >= 2 sao): 10/10 (100.0%)
+[C11 Metric 3] Số phút học trung bình mỗi buổi: 18.2 phút (Tổng: 857.0 phút)
+[C11 Metric 4] Đối soát ví sao: 10/10 tài khoản khớp 100% (0 sự cố lệch sao)
+[C11 Metric 5] Bảo mật dữ liệu & cách ly lớp: 100% an toàn (0 sự cố lộ dữ liệu)
+(node:11340) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+TAP version 13
+# Subtest: C11 Pilot Simulation Contract: 10 synthetic student profiles over 5 simulated days with full telemetry and zero star discrepancy
+ok 1 - C11 Pilot Simulation Contract: 10 synthetic student profiles over 5 simulated days with full telemetry and zero star discrepancy
+  ---
+  duration_ms: 537.3825
+  type: 'test'
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 1
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 544.8115

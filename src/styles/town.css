@@ -61,7 +61,7 @@
 .town-star-pill {
   background: #fff8e1;
   border: 1.5px solid #ffe082;
-  color: #b78103;
+  color: #7c4e00;
   font-weight: 700;
   font-size: 0.85rem;
   padding: 0.35rem 0.75rem;
@@ -285,7 +285,7 @@
 
 .empty-cell-hint {
   font-size: 0.65rem;
-  color: rgba(46, 125, 50, 0.5);
+  color: #1b5e20;
   font-weight: 700;
   user-select: none;
 }

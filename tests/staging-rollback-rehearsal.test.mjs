@@ -5,6 +5,7 @@ import {createPostgresFixture, authFor} from './helpers/postgres-fixture.mjs';
 import {seedLegacyWeek} from './helpers/legacy-weeks.mjs';
 import {exportCloudBackup, restoreCloudBackup} from '../server/cloud-backup-restore.mjs';
 import {readBuildIdentity} from '../server/build-identity.mjs';
+import packageJson from '../package.json' with { type: 'json' };
 
 const password = 'RollbackPassword123!', salt = 'rollback-salt';
 const passwordHash = `${salt}:${scryptSync(password, salt, 64, {N: 32768, r: 8, p: 1, maxmem: 64*1024*1024}).toString('hex')}`;
@@ -98,7 +99,7 @@ test('Staging Rollback & Re-Upgrade Rehearsal: zero data loss, idempotent schema
   const reUpgradedMaterials = await staging.store.materials(studentAuth, student.id);
   assert.equal(reUpgradedMaterials.stone, 15);
 
-  // STEP 5: Verify Build Identity matches v4.0.0
+  // STEP 5: Verify Build Identity matches package version
   const buildIdentity = await readBuildIdentity();
-  assert.equal(buildIdentity.version, '4.0.0', 'Build identity matches release version 4.0.0');
+  assert.equal(buildIdentity.version, packageJson.version, 'Build identity matches package version');
 });

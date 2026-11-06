@@ -1,0 +1,204 @@
+{
+  "stats": {
+    "startTime": "2026-11-06T05:51:02.886Z",
+    "duration": 1378423.962,
+    "expected": 152,
+    "skipped": 6,
+    "unexpected": 24,
+    "flaky": 0
+  },
+  "failures": [
+    {
+      "file": "online-games.spec.ts",
+      "line": 49,
+      "project": "online-chrome",
+      "errors": [
+        "Error: expect(locator).toBeEnabled() failed\n\nLocator: getByRole('button', { name: 'Ví đổi sao', exact: true })\nExpected: enabled\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n  - Expect \"toBeEnabled\" getByRole('button', { name: 'Ví đổi sao', exact: true }) with timeout 15000ms\n  - waiting for getByRole('button', { name: 'Ví đổi sao', exact: true })\n\n\n  59 |   await api('/weeks',{requestId:'account-five-games',title:'Tuần tự soạn game',classId:cls.id,sets:[pairs,sentence,trail].map(pack=>({subjectLabel:'Lĩnh vực do giáo viên đặt',pack}))});await page.context().clearCookies();await pag"
+      ]
+    },
+    {
+      "file": "online-games.spec.ts",
+      "line": 49,
+      "project": "online-msedge",
+      "errors": [
+        "Error: expect(locator).toBeEnabled() failed\n\nLocator: getByRole('button', { name: 'Ví đổi sao', exact: true })\nExpected: enabled\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n  - Expect \"toBeEnabled\" getByRole('button', { name: 'Ví đổi sao', exact: true }) with timeout 15000ms\n  - waiting for getByRole('button', { name: 'Ví đổi sao', exact: true })\n\n\n  59 |   await api('/weeks',{requestId:'account-five-games',title:'Tuần tự soạn game',classId:cls.id,sets:[pairs,sentence,trail].map(pack=>({subjectLabel:'Lĩnh vực do giáo viên đặt',pack}))});await page.context().clearCookies();await pag"
+      ]
+    },
+    {
+      "file": "online-mapflow.spec.ts",
+      "line": 5,
+      "project": "online-chrome",
+      "errors": [
+        "TimeoutError: locator.click: Timeout 30000ms exceeded.\nCall log:\n  - waiting for getByRole('button', { name: 'Trở về bản đồ thế giới' })\n\n\n  113 |\n  114 |     // Return to World Map\n> 115 |     await page.getByRole('button', { name: 'Trở về bản đồ thế giới' }).click();\n      |                                                                        ^\n  116 |     await expect(page.locator('.world-map-container')).toBeVisible();\n  117 |\n  118 |     // UI03: Click \"Tiếp tục chuyến đi\" button\n    at D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-mapflow.spec.ts:115:72"
+      ]
+    },
+    {
+      "file": "online-mapflow.spec.ts",
+      "line": 5,
+      "project": "online-msedge",
+      "errors": [
+        "TimeoutError: locator.click: Timeout 30000ms exceeded.\nCall log:\n  - waiting for getByRole('button', { name: 'Trở về bản đồ thế giới' })\n\n\n  113 |\n  114 |     // Return to World Map\n> 115 |     await page.getByRole('button', { name: 'Trở về bản đồ thế giới' }).click();\n      |                                                                        ^\n  116 |     await expect(page.locator('.world-map-container')).toBeVisible();\n  117 |\n  118 |     // UI03: Click \"Tiếp tục chuyến đi\" button\n    at D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-mapflow.spec.ts:115:72"
+      ]
+    },
+    {
+      "file": "online-mapperformance.spec.ts",
+      "line": 5,
+      "project": "online-chrome",
+      "errors": [
+        "TimeoutError: locator.click: Timeout 30000ms exceeded.\nCall log:\n  - waiting for getByRole('button', { name: 'Trở về bản đồ thế giới' })\n\n\n  84 |       await expect(page.locator('.region-map-container')).toBeVisible();\n  85 |\n> 86 |       await page.getByRole('button', { name: 'Trở về bản đồ thế giới' }).click();\n     |                                                                          ^\n  87 |       await expect(page.locator('.world-map-container')).toBeVisible();\n  88 |     }\n  89 |\n    at D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-mapperformance.spec.ts:86:74"
+      ]
+    },
+    {
+      "file": "online-mapperformance.spec.ts",
+      "line": 5,
+      "project": "online-msedge",
+      "errors": [
+        "TimeoutError: locator.click: Timeout 30000ms exceeded.\nCall log:\n  - waiting for getByRole('button', { name: 'Trở về bản đồ thế giới' })\n\n\n  84 |       await expect(page.locator('.region-map-container')).toBeVisible();\n  85 |\n> 86 |       await page.getByRole('button', { name: 'Trở về bản đồ thế giới' }).click();\n     |                                                                          ^\n  87 |       await expect(page.locator('.world-map-container')).toBeVisible();\n  88 |     }\n  89 |\n    at D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-mapperformance.spec.ts:86:74"
+      ]
+    },
+    {
+      "file": "online-media.spec.ts",
+      "line": 34,
+      "project": "online-chrome",
+      "errors": [
+        "Error: expect(locator).toHaveCount(expected) failed\n\nLocator:  getByRole('region', { name: 'Xem trước tuần học' })\nExpected: 0\nReceived: 1\nTimeout:  15000ms\n\nCall log:\n  - Expect \"toHaveCount\" getByRole('region', { name: 'Xem trước tuần học' }) with timeout 15000ms\n  - waiting for getByRole('region', { name: 'Xem trước tuần học' })\n    33 × locator resolved to 1 element\n       - unexpected value \"1\"\n\n\n  46 |     await expect.poll(()=>item.locator('img').evaluate((e:HTMLImageElement)=>e.complete&&e.naturalWidth>0)).toBe(true);\n  47 |     await item.locator('audio').evaluate(async(e:HTMLAudioEle"
+      ]
+    },
+    {
+      "file": "online-media.spec.ts",
+      "line": 34,
+      "project": "online-msedge",
+      "errors": [
+        "Error: expect(locator).toHaveCount(expected) failed\n\nLocator:  getByRole('region', { name: 'Xem trước tuần học' })\nExpected: 0\nReceived: 1\nTimeout:  15000ms\n\nCall log:\n  - Expect \"toHaveCount\" getByRole('region', { name: 'Xem trước tuần học' }) with timeout 15000ms\n  - waiting for getByRole('region', { name: 'Xem trước tuần học' })\n    33 × locator resolved to 1 element\n       - unexpected value \"1\"\n\n\n  46 |     await expect.poll(()=>item.locator('img').evaluate((e:HTMLImageElement)=>e.complete&&e.naturalWidth>0)).toBe(true);\n  47 |     await item.locator('audio').evaluate(async(e:HTMLAudioEle"
+      ]
+    },
+    {
+      "file": "online-regionmap.spec.ts",
+      "line": 5,
+      "project": "online-chrome",
+      "errors": [
+        "TimeoutError: locator.click: Timeout 30000ms exceeded.\nCall log:\n  - waiting for getByRole('button', { name: 'Trở về bản đồ thế giới' })\n\n\n  103 |\n  104 |     // Back to World Map\n> 105 |     await page.getByRole('button', { name: 'Trở về bản đồ thế giới' }).click();\n      |                                                                        ^\n  106 |     await expect(page.locator('.world-map-container')).toBeVisible();\n  107 |   } finally {\n  108 |     await f.close();\n    at D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-regionmap.spec.ts:105:72"
+      ]
+    },
+    {
+      "file": "online-regionmap.spec.ts",
+      "line": 5,
+      "project": "online-msedge",
+      "errors": [
+        "TimeoutError: locator.click: Timeout 30000ms exceeded.\nCall log:\n  - waiting for getByRole('button', { name: 'Trở về bản đồ thế giới' })\n\n\n  103 |\n  104 |     // Back to World Map\n> 105 |     await page.getByRole('button', { name: 'Trở về bản đồ thế giới' }).click();\n      |                                                                        ^\n  106 |     await expect(page.locator('.world-map-container')).toBeVisible();\n  107 |   } finally {\n  108 |     await f.close();\n    at D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-regionmap.spec.ts:105:72"
+      ]
+    },
+    {
+      "file": "online-studentflow.spec.ts",
+      "line": 34,
+      "project": "online-chrome",
+      "errors": [
+        "TimeoutError: locator.click: Timeout 30000ms exceeded.\nCall log:\n  - waiting for getByRole('button', { name: '📋 Thu gọn bản đồ', exact: true })\n\n\n  26 |     await api('/weeks',{requestId:'flow-week',classId:cls.id,title:'Tuần 01',sets:[{subjectLabel:'Công nghệ',pack},...(withSecondSubject?[{subjectLabel:'Tiếng Anh',pack:{...pack,id:'flow-english',title:'Khám phá English',items:pack.items.map((item,index)=>({...item,id:`english-${index}`,prompt:`Câu hỏi Tiếng Anh ${index+1}`}))}}]:[])]});\n  27 |     await page.context().clearCookies();await api('/login',{username:'flow.child',password});await "
+      ]
+    },
+    {
+      "file": "online-studentflow.spec.ts",
+      "line": 53,
+      "project": "online-chrome",
+      "errors": [
+        "TimeoutError: locator.click: Timeout 30000ms exceeded.\nCall log:\n  - waiting for getByRole('button', { name: '📋 Thu gọn bản đồ', exact: true })\n\n\n  26 |     await api('/weeks',{requestId:'flow-week',classId:cls.id,title:'Tuần 01',sets:[{subjectLabel:'Công nghệ',pack},...(withSecondSubject?[{subjectLabel:'Tiếng Anh',pack:{...pack,id:'flow-english',title:'Khám phá English',items:pack.items.map((item,index)=>({...item,id:`english-${index}`,prompt:`Câu hỏi Tiếng Anh ${index+1}`}))}}]:[])]});\n  27 |     await page.context().clearCookies();await api('/login',{username:'flow.child',password});await "
+      ]
+    },
+    {
+      "file": "online-studentflow.spec.ts",
+      "line": 73,
+      "project": "online-chrome",
+      "errors": [
+        "TimeoutError: locator.click: Timeout 30000ms exceeded.\nCall log:\n  - waiting for getByRole('button', { name: '📋 Thu gọn bản đồ', exact: true })\n\n\n  26 |     await api('/weeks',{requestId:'flow-week',classId:cls.id,title:'Tuần 01',sets:[{subjectLabel:'Công nghệ',pack},...(withSecondSubject?[{subjectLabel:'Tiếng Anh',pack:{...pack,id:'flow-english',title:'Khám phá English',items:pack.items.map((item,index)=>({...item,id:`english-${index}`,prompt:`Câu hỏi Tiếng Anh ${index+1}`}))}}]:[])]});\n  27 |     await page.context().clearCookies();await api('/login',{username:'flow.child',password});await "
+      ]
+    },
+    {
+      "file": "online-studentflow.spec.ts",
+      "line": 94,
+      "project": "online-chrome",
+      "errors": [
+        "TimeoutError: locator.click: Timeout 30000ms exceeded.\nCall log:\n  - waiting for getByRole('button', { name: '📋 Thu gọn bản đồ', exact: true })\n\n\n  26 |     await api('/weeks',{requestId:'flow-week',classId:cls.id,title:'Tuần 01',sets:[{subjectLabel:'Công nghệ',pack},...(withSecondSubject?[{subjectLabel:'Tiếng Anh',pack:{...pack,id:'flow-english',title:'Khám phá English',items:pack.items.map((item,index)=>({...item,id:`english-${index}`,prompt:`Câu hỏi Tiếng Anh ${index+1}`}))}}]:[])]});\n  27 |     await page.context().clearCookies();await api('/login',{username:'flow.child',password});await "
+      ]
+    },
+    {
+      "file": "online-studentflow.spec.ts",
+      "line": 119,
+      "project": "online-chrome",
+      "errors": [
+        "TimeoutError: locator.click: Timeout 30000ms exceeded.\nCall log:\n  - waiting for getByRole('button', { name: '📋 Thu gọn bản đồ', exact: true })\n\n\n  26 |     await api('/weeks',{requestId:'flow-week',classId:cls.id,title:'Tuần 01',sets:[{subjectLabel:'Công nghệ',pack},...(withSecondSubject?[{subjectLabel:'Tiếng Anh',pack:{...pack,id:'flow-english',title:'Khám phá English',items:pack.items.map((item,index)=>({...item,id:`english-${index}`,prompt:`Câu hỏi Tiếng Anh ${index+1}`}))}}]:[])]});\n  27 |     await page.context().clearCookies();await api('/login',{username:'flow.child',password});await "
+      ]
+    },
+    {
+      "file": "online-studentflow.spec.ts",
+      "line": 140,
+      "project": "online-chrome",
+      "errors": [
+        "TimeoutError: locator.click: Timeout 30000ms exceeded.\nCall log:\n  - waiting for getByRole('button', { name: '📋 Thu gọn bản đồ', exact: true })\n\n\n  26 |     await api('/weeks',{requestId:'flow-week',classId:cls.id,title:'Tuần 01',sets:[{subjectLabel:'Công nghệ',pack},...(withSecondSubject?[{subjectLabel:'Tiếng Anh',pack:{...pack,id:'flow-english',title:'Khám phá English',items:pack.items.map((item,index)=>({...item,id:`english-${index}`,prompt:`Câu hỏi Tiếng Anh ${index+1}`}))}}]:[])]});\n  27 |     await page.context().clearCookies();await api('/login',{username:'flow.child',password});await "
+      ]
+    },
+    {
+      "file": "online-studentflow.spec.ts",
+      "line": 34,
+      "project": "online-msedge",
+      "errors": [
+        "TimeoutError: locator.click: Timeout 30000ms exceeded.\nCall log:\n  - waiting for getByRole('button', { name: '📋 Thu gọn bản đồ', exact: true })\n\n\n  26 |     await api('/weeks',{requestId:'flow-week',classId:cls.id,title:'Tuần 01',sets:[{subjectLabel:'Công nghệ',pack},...(withSecondSubject?[{subjectLabel:'Tiếng Anh',pack:{...pack,id:'flow-english',title:'Khám phá English',items:pack.items.map((item,index)=>({...item,id:`english-${index}`,prompt:`Câu hỏi Tiếng Anh ${index+1}`}))}}]:[])]});\n  27 |     await page.context().clearCookies();await api('/login',{username:'flow.child',password});await "
+      ]
+    },
+    {
+      "file": "online-studentflow.spec.ts",
+      "line": 53,
+      "project": "online-msedge",
+      "errors": [
+        "TimeoutError: locator.click: Timeout 30000ms exceeded.\nCall log:\n  - waiting for getByRole('button', { name: '📋 Thu gọn bản đồ', exact: true })\n\n\n  26 |     await api('/weeks',{requestId:'flow-week',classId:cls.id,title:'Tuần 01',sets:[{subjectLabel:'Công nghệ',pack},...(withSecondSubject?[{subjectLabel:'Tiếng Anh',pack:{...pack,id:'flow-english',title:'Khám phá English',items:pack.items.map((item,index)=>({...item,id:`english-${index}`,prompt:`Câu hỏi Tiếng Anh ${index+1}`}))}}]:[])]});\n  27 |     await page.context().clearCookies();await api('/login',{username:'flow.child',password});await "
+      ]
+    },
+    {
+      "file": "online-studentflow.spec.ts",
+      "line": 73,
+      "project": "online-msedge",
+      "errors": [
+        "TimeoutError: locator.click: Timeout 30000ms exceeded.\nCall log:\n  - waiting for getByRole('button', { name: '📋 Thu gọn bản đồ', exact: true })\n\n\n  26 |     await api('/weeks',{requestId:'flow-week',classId:cls.id,title:'Tuần 01',sets:[{subjectLabel:'Công nghệ',pack},...(withSecondSubject?[{subjectLabel:'Tiếng Anh',pack:{...pack,id:'flow-english',title:'Khám phá English',items:pack.items.map((item,index)=>({...item,id:`english-${index}`,prompt:`Câu hỏi Tiếng Anh ${index+1}`}))}}]:[])]});\n  27 |     await page.context().clearCookies();await api('/login',{username:'flow.child',password});await "
+      ]
+    },
+    {
+      "file": "online-studentflow.spec.ts",
+      "line": 94,
+      "project": "online-msedge",
+      "errors": [
+        "TimeoutError: locator.click: Timeout 30000ms exceeded.\nCall log:\n  - waiting for getByRole('button', { name: '📋 Thu gọn bản đồ', exact: true })\n\n\n  26 |     await api('/weeks',{requestId:'flow-week',classId:cls.id,title:'Tuần 01',sets:[{subjectLabel:'Công nghệ',pack},...(withSecondSubject?[{subjectLabel:'Tiếng Anh',pack:{...pack,id:'flow-english',title:'Khám phá English',items:pack.items.map((item,index)=>({...item,id:`english-${index}`,prompt:`Câu hỏi Tiếng Anh ${index+1}`}))}}]:[])]});\n  27 |     await page.context().clearCookies();await api('/login',{username:'flow.child',password});await "
+      ]
+    },
+    {
+      "file": "online-studentflow.spec.ts",
+      "line": 119,
+      "project": "online-msedge",
+      "errors": [
+        "TimeoutError: locator.click: Timeout 30000ms exceeded.\nCall log:\n  - waiting for getByRole('button', { name: '📋 Thu gọn bản đồ', exact: true })\n\n\n  26 |     await api('/weeks',{requestId:'flow-week',classId:cls.id,title:'Tuần 01',sets:[{subjectLabel:'Công nghệ',pack},...(withSecondSubject?[{subjectLabel:'Tiếng Anh',pack:{...pack,id:'flow-english',title:'Khám phá English',items:pack.items.map((item,index)=>({...item,id:`english-${index}`,prompt:`Câu hỏi Tiếng Anh ${index+1}`}))}}]:[])]});\n  27 |     await page.context().clearCookies();await api('/login',{username:'flow.child',password});await "
+      ]
+    },
+    {
+      "file": "online-studentflow.spec.ts",
+      "line": 140,
+      "project": "online-msedge",
+      "errors": [
+        "TimeoutError: locator.click: Timeout 30000ms exceeded.\nCall log:\n  - waiting for getByRole('button', { name: '📋 Thu gọn bản đồ', exact: true })\n\n\n  26 |     await api('/weeks',{requestId:'flow-week',classId:cls.id,title:'Tuần 01',sets:[{subjectLabel:'Công nghệ',pack},...(withSecondSubject?[{subjectLabel:'Tiếng Anh',pack:{...pack,id:'flow-english',title:'Khám phá English',items:pack.items.map((item,index)=>({...item,id:`english-${index}`,prompt:`Câu hỏi Tiếng Anh ${index+1}`}))}}]:[])]});\n  27 |     await page.context().clearCookies();await api('/login',{username:'flow.child',password});await "
+      ]
+    },
+    {
+      "file": "online.spec.ts",
+      "line": 45,
+      "project": "online-chrome",
+      "errors": [
+        "Error: expect(locator).toBeEnabled() failed\n\nLocator: getByRole('button', { name: 'Ví đổi sao', exact: true })\nExpected: enabled\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n  - Expect \"toBeEnabled\" getByRole('button', { name: 'Ví đổi sao', exact: true }) with timeout 15000ms\n  - waiting for getByRole('button', { name: 'Ví đổi sao', exact: true })\n\n\n  39 | }\n  40 | async function openQuestionIsland(page:Page){await startAssignedGame(page,'Đảo Câu Hỏi');await expect(page.locator('.immersive-dialog .play-panel')).toBeVisible();}\n> 41 | async function exitCompletion(page:Page){await pa"
+      ]
+    },
+    {
+      "file": "online.spec.ts",
+      "line": 45,
+      "project": "online-msedge",
+      "errors": [
+        "Error: expect(locator).toBeEnabled() failed\n\nLocator: getByRole('button', { name: 'Ví đổi sao', exact: true })\nExpected: enabled\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n  - Expect \"toBeEnabled\" getByRole('button', { name: 'Ví đổi sao', exact: true }) with timeout 15000ms\n  - waiting for getByRole('button', { name: 'Ví đổi sao', exact: true })\n\n\n  39 | }\n  40 | async function openQuestionIsland(page:Page){await startAssignedGame(page,'Đảo Câu Hỏi');await expect(page.locator('.immersive-dialog .play-panel')).toBeVisible();}\n> 41 | async function exitCompletion(page:Page){await pa"
+      ]
+    }
+  ]
+}

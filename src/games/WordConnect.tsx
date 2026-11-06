@@ -1,5 +1,8 @@
-import '../styles/game-base.css';
-import '../styles/game-context-themes.css';
+import '../styles/games/primitives.css';
+import '../styles/games/stage.css';
+import '../styles/games/feedback.css';
+import '../styles/games/word-connect.css';
+import '../styles/themes/connect-context.css';
 import {useQuestionSpeech} from './useQuestionSpeech';
 import {saveFailureMessage} from './save-failure-message';
 import QuestionMedia,{QuestionImageRecovery} from '../components/QuestionMedia';

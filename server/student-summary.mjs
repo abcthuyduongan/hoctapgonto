@@ -2,7 +2,7 @@ import {fail} from './online-errors.mjs';
 import {publicSession,safePresentation} from './question-protocol.mjs';
 /** Shared metadata-only journey. No question body, media catalogue or passage is retained. */
 export function packSummary(pack){return{id:pack.id,version:pack.version,title:pack.title,kind:pack.kind,subject:pack.subject,grade:pack.grade,itemCount:pack.items?pack.items.length:(pack.itemCount||0),...(pack.discovery?{discovery:pack.discovery}:{})};}
-export function compactPlay(play){return{session:play.session.questionProtocolVersion===1?publicSession(play.session):play.session,pack:packSummary(play.pack),presentation:play.session.questionProtocolVersion===1?safePresentation(play.presentation):play.presentation};}
+export function compactPlay(play){return{session:publicSession(play.session),pack:packSummary(play.pack),presentation:play.session?.questionProtocolVersion===1?safePresentation(play.presentation):play.presentation};}
 export function summaryWeeks(rows){
   const weeks=new Map();for(const row of rows){if(!weeks.has(row.week_id))weeks.set(row.week_id,{id:row.week_id,classId:row.class_id,title:row.week_title,position:row.week_position,createdAt:row.created_at,sets:[]});if(row.summary)weeks.get(row.week_id).sets.push({pack:typeof row.summary==='string'?JSON.parse(row.summary):row.summary,subjectLabel:row.subject_label,games:[]});}return[...weeks.values()];
 }

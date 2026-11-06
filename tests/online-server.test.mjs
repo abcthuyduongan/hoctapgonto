@@ -305,7 +305,8 @@ test('online raw responses are graded by the host, retries commit once and pack 
   assert.equal(receipt.event.correct,true);assert.equal(receipt.duplicate,false);
   const retry=await submit(learner,perfect,item,{attemptKey:'stable-answer'});
   assert.equal(retry.duplicate,true);assert.equal(retry.event.eventId,receipt.event.eventId);
-  await learner.denied(`/play/${perfect.session.sessionId}/attempt`,{method:'POST',body:{attemptKey:'stable-answer',itemId:item.id,response:answer(perfect,item,false),hintsUsed:0,elapsedMs:100}},[409]);
+  const diffIndex=(receipt.event.response.choiceIndex+1)%4;
+  await learner.denied(`/play/${perfect.session.sessionId}/attempt`,{method:'POST',body:{attemptKey:'stable-answer',itemId:item.id,response:{kind:'choice',choiceIndex:diffIndex},hintsUsed:0,elapsedMs:100}},[409]);
   for(const next of perfect.presentation.items.slice(1))await submit(learner,perfect,next);
   const complete=await learner.ok(`/play/${perfect.session.sessionId}/complete`,{method:'POST'});
   assert.equal(complete.gained,3);assert.equal(complete.tier,3);assert.equal(complete.state.balance.earned,3);

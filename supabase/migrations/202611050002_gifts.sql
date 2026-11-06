@@ -42,3 +42,5 @@ DO $$ DECLARE table_name text; api_role text; BEGIN
 END $$;
 
 REVOKE ALL ON ALL TABLES IN SCHEMA bao_an FROM PUBLIC;
+ALTER TABLE bao_an.schema_version DROP CONSTRAINT IF EXISTS schema_version_version_check;
+INSERT INTO bao_an.schema_version VALUES(2) ON CONFLICT DO NOTHING;

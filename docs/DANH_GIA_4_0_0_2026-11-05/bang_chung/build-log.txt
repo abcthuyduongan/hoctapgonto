@@ -1,0 +1,123 @@
+
+> bao-an-learning@4.0.0 build
+> tsc -b && vite build
+
+vite v7.3.7 building client environment for production...
+transforming...
+✓ 136 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/build-info.json                                       0.22 kB │ gzip:  0.18 kB
+dist/sw.js                                                 0.33 kB
+dist/icons/bao-an.svg                                      0.37 kB │ gzip:  0.25 kB
+dist/manifest.webmanifest                                  0.69 kB
+dist/index.html                                            0.82 kB │ gzip:  0.49 kB
+dist/art/memory-card-back.svg                              1.95 kB │ gzip:  0.88 kB
+dist/art/town/building-bell-tower.webp                     3.60 kB
+dist/icons/bao-an-192.png                                  3.81 kB
+dist/THIRD_PARTY_NOTICES.txt                               4.68 kB │ gzip:  0.85 kB
+dist/art/town/building-water-well.webp                     4.81 kB
+dist/art/town/building-log-cabin.webp                      5.18 kB
+dist/art/town/building-mini-library.webp                   5.19 kB
+dist/art/town/building-village-market.webp                 5.20 kB
+dist/art/town/building-cottage.webp                        5.22 kB
+dist/art/town/building-fishing-dock.webp                   5.24 kB
+dist/art/town/building-flower-garden.webp                  5.33 kB
+dist/art/town/building-street-lamp.webp                    5.62 kB
+dist/art/town/building-ancient-tree.webp                   6.03 kB
+dist/art/town/building-wooden-bridge.webp                  6.20 kB
+dist/art/town/building-windmill.webp                       7.09 kB
+dist/question-templates/online-week.xlsx                   9.44 kB
+dist/art/maps/manifest.json                               11.54 kB │ gzip:  2.10 kB
+dist/icons/bao-an-512.png                                 14.21 kB
+dist/question-templates/bo-mau-day-du.xlsx                14.31 kB
+dist/art/original-sentence.webp                           18.53 kB
+dist/art/landmarks/place-english-lighthouse.webp          20.05 kB
+dist/art/landmarks/place-english-harbor.webp              22.84 kB
+dist/art/landmarks/place-math-number-house.webp           26.84 kB
+dist/art/landmarks/place-computing-info-station.webp      27.25 kB
+dist/art/landmarks/place-vietnamese-word-tree.webp        27.28 kB
+dist/art/landmarks/place-vietnamese-story-house.webp      27.61 kB
+dist/art/landmarks/place-computing-workshop.webp          29.26 kB
+dist/art/landmarks/place-english-cafe.webp                29.35 kB
+dist/art/fox-guide-common.webp                            29.36 kB
+dist/art/landmarks/place-computing-keyboard-garden.webp   30.09 kB
+dist/art/landmarks/place-vietnamese-library.webp          30.35 kB
+dist/art/original-memory.webp                             32.21 kB
+dist/art/landmarks/place-math-garden.webp                 33.44 kB
+dist/art/landmarks/place-math-market.webp                 33.63 kB
+dist/question-templates/online-week.docx                  42.06 kB
+dist/art/original-math.webp                               46.32 kB
+dist/art/game-cards/game-card-sentence-house.webp         54.47 kB
+dist/art/game-cards/game-card-sequence-trail.webp         58.55 kB
+dist/art/game-cards/game-card-word-bridge.webp            60.31 kB
+dist/art/game-cards/game-card-question-island.webp        61.32 kB
+dist/art/game-cards/game-card-memory-grove.webp           64.24 kB
+dist/art/original-world.webp                              68.52 kB
+dist/art/auth/auth-welcome.webp                           69.43 kB
+dist/art/premium-world-scene.webp                         79.68 kB
+dist/art/maps/map-english-wide.webp                       95.02 kB
+dist/art/maps/map-english-tall.webp                      105.42 kB
+dist/art/premium-world-cinematic.webp                    116.61 kB
+dist/art/premium-world-vivid.webp                        131.54 kB
+dist/art/maps/map-world-tall.webp                        131.64 kB
+dist/art/premium-sentence-cinematic.webp                 142.68 kB
+dist/art/maps/map-computing-tall.webp                    142.84 kB
+dist/art/premium-game-sentence.webp                      143.53 kB
+dist/art/maps/map-world-wide.webp                        144.44 kB
+dist/art/premium-math-cinematic.webp                     146.58 kB
+dist/art/premium-game-math.webp                          148.04 kB
+dist/art/maps/map-computing-wide.webp                    152.30 kB
+dist/art/premium-memory-cinematic.webp                   153.41 kB
+dist/art/premium-game-memory.webp                        156.21 kB
+dist/question-templates/bo-mau-day-du.zip                172.28 kB
+dist/art/maps/map-vietnamese-wide.webp                   197.64 kB
+dist/art/premium-world-clarity.webp                      198.23 kB
+dist/art/maps/map-vietnamese-tall.webp                   214.32 kB
+dist/art/maps/map-math-tall.webp                         214.49 kB
+dist/art/maps/map-math-wide.webp                         222.30 kB
+dist/assets/index-DaRcpkAD.css                             0.78 kB │ gzip:  0.46 kB
+dist/assets/BasketSort-DRiJq8v3.css                        2.80 kB │ gzip:  1.07 kB
+dist/assets/OnlineAdminDashboard-BlYGVA2x.css              2.91 kB │ gzip:  0.99 kB
+dist/assets/game-context-themes-DE65RjN-.css               3.51 kB │ gzip:  1.24 kB
+dist/assets/BalanceScale-C6rXM2GZ.css                      4.00 kB │ gzip:  1.32 kB
+dist/assets/TownScreen-DVkD32gE.css                        7.10 kB │ gzip:  2.05 kB
+dist/assets/useQuestionLayout-Dt2S6Dtn.css                 7.58 kB │ gzip:  1.42 kB
+dist/assets/ContestMockScreen-BZObUcAF.css                11.43 kB │ gzip:  2.74 kB
+dist/assets/ParentPortalScreen-BwwNxQjV.css               13.30 kB │ gzip:  3.06 kB
+dist/assets/OnlineScreen-UNKotzGV.css                     29.37 kB │ gzip:  6.63 kB
+dist/assets/OnlineStudentWorld-CD5gnIEh.css               50.94 kB │ gzip: 10.58 kB
+dist/assets/GameCompletion-DfX71KsR.css                  268.62 kB │ gzip: 52.02 kB
+dist/assets/sdk-BLNjduv7.js                                0.30 kB │ gzip:  0.23 kB
+dist/assets/FeedbackEffects-DFaqRm8K.js                    0.36 kB │ gzip:  0.25 kB
+dist/assets/useQuestionSpeech-c22oBIGN.js                  0.37 kB │ gzip:  0.31 kB
+dist/assets/pair-rounds-ocU5XXD6.js                        0.41 kB │ gzip:  0.31 kB
+dist/assets/GameMascot-CAEoDHIY.js                         0.56 kB │ gzip:  0.43 kB
+dist/assets/useQuestionLayout-B5rUA75Y.js                  1.59 kB │ gzip:  0.82 kB
+dist/assets/OnlineWeekAdvanceDialog-WdNY6yan.js            1.70 kB │ gzip:  0.93 kB
+dist/assets/useQuestionClock-Dz0TPoCJ.js                   1.73 kB │ gzip:  0.91 kB
+dist/assets/OnlinePasswordDialog-Bw4yVhm1.js               2.99 kB │ gzip:  1.26 kB
+dist/assets/rich-content-Cgbt1fh2.js                       3.59 kB │ gzip:  1.64 kB
+dist/assets/GameCompletion-BFsXV8pa.js                     3.91 kB │ gzip:  1.36 kB
+dist/assets/ParentPinModal-B8WaAI_f.js                     3.94 kB │ gzip:  1.73 kB
+dist/assets/BasketSort-CuX5zmWE.js                         4.45 kB │ gzip:  2.19 kB
+dist/assets/BoatRace-DnY0-2y_.js                           5.39 kB │ gzip:  2.55 kB
+dist/assets/TreasureFlip-D06CS1k8.js                       5.62 kB │ gzip:  2.60 kB
+dist/assets/BalanceScale-DUdzgVS0.js                       5.70 kB │ gzip:  2.51 kB
+dist/assets/FoxKitchen-9-0cN3RS.js                         5.93 kB │ gzip:  2.60 kB
+dist/assets/online-format-jDdE0EqY.js                      5.99 kB │ gzip:  2.89 kB
+dist/assets/MemoryMatch-sSE6eK3F.js                        8.23 kB │ gzip:  3.34 kB
+dist/assets/OnlineExerciseRunner-BOIYHMta.js               8.52 kB │ gzip:  3.49 kB
+dist/assets/SequenceTrail-C5u3hECj.js                      8.88 kB │ gzip:  3.51 kB
+dist/assets/MathQuest-BsLNxhgr.js                          9.22 kB │ gzip:  3.73 kB
+dist/assets/WordConnect-munHic97.js                        9.52 kB │ gzip:  3.75 kB
+dist/assets/SentenceBuilder-BBTpZDss.js                    9.68 kB │ gzip:  3.75 kB
+dist/assets/question-export-download-CXIjs62w.js          12.29 kB │ gzip:  5.19 kB
+dist/assets/ContestMockScreen-Dp3jKVcv.js                 13.83 kB │ gzip:  4.71 kB
+dist/assets/OnlineScreen-D_PSw9vp.js                      18.48 kB │ gzip:  7.13 kB
+dist/assets/ParentPortalScreen-2N6lSPZq.js                18.62 kB │ gzip:  5.39 kB
+dist/assets/TownScreen-BsCdBDsM.js                        28.43 kB │ gzip:  8.76 kB
+dist/assets/OnlineStudentWorld-Cti_KGAb.js                79.09 kB │ gzip: 23.86 kB
+dist/assets/OnlineAdminDashboard-D9RcmD1k.js             141.47 kB │ gzip: 46.75 kB
+dist/assets/index-DNbvFrKe.js                            226.35 kB │ gzip: 71.24 kB
+✓ built in 1.49s

@@ -1,4 +1,7 @@
-import '../styles/game-base.css';
+import '../styles/games/primitives.css';
+import '../styles/games/stage.css';
+import '../styles/games/feedback.css';
+import '../styles/games/online-exercise.css';
 import {useRef,useState} from 'react';
 import type {AttemptInput,AttemptFeedback,GameHostProps,GameResponse,StudentLearningPack,RichLearningItem} from '../core/contracts';
 import {normalizedNumber,normalizedWord} from '../core/rich-content';
@@ -39,7 +42,21 @@ export default function OnlineExerciseRunner({pack,onAttempt,onComplete,onExit,q
     if(!pendingRef.current&&/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/u.test(value)){setError('Đáp án có ký tự không đọc được. Con nhập lại giúp nhé.');return;}
     lock.current=true;setBusy(true);setError('');
     const response:GameResponse=choices?{kind:'choice',choiceIndex:selected!}:{kind:'text',value};
-    const input=pendingRef.current??{attemptKey:`${item.id}:answer:${questionMode?attemptNumber.current:1}`,itemId:item.id,objectiveId:item.objectiveId,response,correct:!serverScored&&correctAnswer(item as RichLearningItem,response),hintsUsed:hints?1:0,elapsedMs:Math.max(0,Math.round(performance.now()-started.current))};
+    const presId = ('presentationId' in item && typeof (item as any).presentationId === 'string')
+      ? (item as any).presentationId
+      : (clock.item && 'presentationId' in clock.item && typeof (clock.item as any).presentationId === 'string')
+      ? (clock.item as any).presentationId
+      : undefined;
+    const input: AttemptInput = pendingRef.current ?? {
+      attemptKey: `${item.id}:answer:${questionMode ? attemptNumber.current : 1}`,
+      itemId: item.id,
+      objectiveId: item.objectiveId,
+      response,
+      correct: !serverScored && correctAnswer(item as RichLearningItem, response),
+      hintsUsed: hints ? 1 : 0,
+      elapsedMs: Math.max(0, Math.round(performance.now() - started.current)),
+      ...(presId ? { presentationId: presId } : {})
+    };
     pendingRef.current=input;setPending(input);
     try{const result=await onAttempt(input);if(serverScored&&!result)throw new Error('Chưa nhận được kết quả chấm từ máy chủ. Con thử gửi lại nhé.');const correct=result?.correct??input.correct;setFeedback(correct);setFeedbackDetail(result?.feedback);if(correct)setCorrectCount(count=>count+1);if(questionMode)attemptNumber.current+=1;pendingRef.current=null;setPending(null);}catch(failure){setError(failure instanceof Error?failure.message:'Chưa gửi được đáp án. Bấm thử lại để gửi đúng lượt này.');}finally{lock.current=false;setBusy(false);}
   }
@@ -54,6 +71,6 @@ export default function OnlineExerciseRunner({pack,onAttempt,onComplete,onExit,q
     {passage&&<article className="online-reading" aria-label="Đoạn đọc"><h3>{passage.title}</h3><p>{passage.body}</p></article>}<h2>{item.prompt}</h2><QuestionMedia key={item.id} media={media} audioContext={serverScored&&mediaPlayId?{playId:mediaPlayId,itemId:item.id}:undefined} showTranscript={feedback!==null&&(!questionMode||feedback)} onAudioEnded={()=>setPlayed(true)} onImageReady={questionMode?()=>setImageReadyQuestion(item.id):undefined}/>{listening&&!played&&feedback===null&&<p className="online-audio-guide" role="status">Con nghe hết âm thanh để mở phần trả lời. Có thể nghe lại khi cần.</p>}
     <form className="online-form" onSubmit={event=>{event.preventDefault();void submit();}}><fieldset disabled={busy||feedback!==null||!!pending||listening&&!played||!clock.ready}>{choices?<div className="answer-grid">{choices.map((option,choice)=><button key={choice} type="button" aria-pressed={selected===choice} className={`answer-option ${selected===choice?'is-selected':''} ${feedback!==null&&(!questionMode||feedback)&&choice===correctIndex?'correct':''} ${feedback===false&&choice===selected?'incorrect':''}`} onClick={()=>setSelected(choice)}><span className="answer-index">{String.fromCharCode(65+choice)}</span><span>{option}</span></button>)}</div>:<label>Đáp án của con{item.kind==='numeric-answer'&&item.unit?` (${item.unit})`:''}<input key={item.id} autoComplete="off" spellCheck={false} inputMode={item.kind==='numeric-answer'?'decimal':'text'} maxLength={item.kind==='numeric-answer'?40:120} value={value} onChange={event=>setValue(event.target.value)}/></label>}</fieldset>
       {feedback===null&&<div className="online-actions"><button type="button" disabled={busy||hints||!!pending||!clock.ready} onClick={()=>void requestHint()}>{hints?'Đã xem gợi ý':'Xem gợi ý'}</button><button className="online-primary" disabled={busy||!clock.ready||(!pending&&!answerReady)}>{busy?'Đang gửi…':pending?'Thử gửi lại đáp án':'Kiểm tra đáp án'}</button></div>}
-    </form>{hints&&feedback===null&&<p className="online-hint">{hintText}</p>}{error&&<p className="online-notice online-error" role="alert">{error}</p>}{feedback!==null&&<div className={`online-exercise-feedback ${feedback?'is-correct':'is-incorrect'}`} role="status"><strong>{feedback?'✓ Chính xác!':questionMode?'Chưa đúng. Con thử lại nhé.':'Cùng xem lại đáp án nhé.'}</strong>{questionMode&&!feedback?<><p>Đồng hồ của câu này vẫn tiếp tục. Con cần trả lời đúng để nhận sao và qua câu.</p><button type="button" className="online-primary" onClick={()=>{setFeedback(null);setError('');}} disabled={busy}>Trả lời lại</button></>:<><p>Đáp án: {serverScored?feedbackDetail?.answer:expectedAnswer(item as RichLearningItem)}</p><p>{serverScored?feedbackDetail?.explanation:(item as RichLearningItem).explanation}</p><button className="online-primary" onClick={()=>void next()} disabled={busy}>{busy?'Đang lưu…':index===content.items.length-1?'Hoàn thành & lưu thành tích':'Câu tiếp theo →'}</button></>}</div>}
+    </form>{hints&&feedback===null&&<p className="online-hint">{hintText}</p>}{error&&<p className="online-notice online-error" role="alert">{error}{(error.includes('mở lại câu hỏi')||error.includes('hết hạn'))&&<button type="button" style={{marginLeft:'0.5rem'}} onClick={()=>{pendingRef.current=null;setPending(null);setSelected(null);setFeedback(null);setFeedbackDetail(undefined);setError('');clock.retry();}}>Tải lại câu hỏi</button>}</p>}{feedback!==null&&<div className={`online-exercise-feedback ${feedback?'is-correct':'is-incorrect'}`} role="status"><strong>{feedback?'✓ Chính xác!':questionMode?'Chưa đúng. Con thử lại nhé.':'Cùng xem lại đáp án nhé.'}</strong>{questionMode&&!feedback?<><p>Đồng hồ của câu này vẫn tiếp tục. Con cần trả lời đúng để nhận sao và qua câu.</p><button type="button" className="online-primary" onClick={()=>{setSelected(null);setFeedback(null);setFeedbackDetail(undefined);setError('');clock.retry();}} disabled={busy}>Trả lời lại</button></>:<><p>Đáp án: {serverScored?feedbackDetail?.answer:expectedAnswer(item as RichLearningItem)}</p><p>{serverScored?feedbackDetail?.explanation:(item as RichLearningItem).explanation}</p><button className="online-primary" onClick={()=>void next()} disabled={busy}>{busy?'Đang lưu…':index===content.items.length-1?'Hoàn thành & lưu thành tích':'Câu tiếp theo →'}</button></>}</div>}
     </div>{done&&<GameCompletion questionMode={questionMode} title="Hoàn thành lượt luyện tập!" summary={`Con trả lời đúng ${correctCount}/${content.items.length} câu. Máy chủ đã lưu kết quả của con.`} onExit={onExit}/>}</section>;
 }

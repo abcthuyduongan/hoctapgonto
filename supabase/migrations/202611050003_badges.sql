@@ -53,3 +53,4 @@ DO $$ DECLARE table_name text; api_role text; BEGIN
 END $$;
 
 REVOKE ALL ON ALL TABLES IN SCHEMA bao_an FROM PUBLIC;
+INSERT INTO bao_an.schema_version VALUES(3) ON CONFLICT DO NOTHING;

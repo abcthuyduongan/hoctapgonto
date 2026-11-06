@@ -1,0 +1,125 @@
+{
+  "kind": "Failure-injection reproduction, not performance measurement",
+  "allRequestsFailed": true,
+  "calls": [
+    {
+      "path": "/api/online/student/journey",
+      "status": 401,
+      "method": "GET"
+    },
+    {
+      "path": "/api/online/student/journey",
+      "status": 401,
+      "method": "GET"
+    },
+    {
+      "path": "/api/online/student/journey",
+      "status": 401,
+      "method": "GET"
+    },
+    {
+      "path": "/api/online/student/journey",
+      "status": 401,
+      "method": "GET"
+    },
+    {
+      "path": "/icons/bao-an.svg",
+      "status": 404,
+      "method": "GET"
+    },
+    {
+      "path": "/icons/bao-an.svg",
+      "status": 404,
+      "method": "GET"
+    },
+    {
+      "path": "/api/online/student/journey",
+      "status": 401,
+      "method": "GET"
+    },
+    {
+      "path": "/api/online/student/journey",
+      "status": 401,
+      "method": "GET"
+    },
+    {
+      "path": "/icons/bao-an.svg",
+      "status": 404,
+      "method": "GET"
+    },
+    {
+      "path": "/api/online/student/journey",
+      "status": 401,
+      "method": "GET"
+    },
+    {
+      "path": "/api/online/student/journey",
+      "status": 401,
+      "method": "GET"
+    },
+    {
+      "path": "/icons/bao-an.svg",
+      "status": 404,
+      "method": "GET"
+    },
+    {
+      "path": "/api/online/student/journey",
+      "status": 401,
+      "method": "GET"
+    },
+    {
+      "path": "/api/online/student/journey",
+      "status": 401,
+      "method": "GET"
+    },
+    {
+      "path": "/icons/bao-an.svg",
+      "status": 404,
+      "method": "GET"
+    },
+    {
+      "path": "/api/online/student/journey",
+      "status": 401,
+      "method": "GET"
+    },
+    {
+      "path": "/api/online/student/journey",
+      "status": 401,
+      "method": "GET"
+    },
+    {
+      "path": "/icons/bao-an.svg",
+      "status": 404,
+      "method": "GET"
+    }
+  ],
+  "runnerReport": {
+    "targetOrigin": "https://audit-invalid-staging.example.test",
+    "concurrency": 2,
+    "durationSeconds": 0.44,
+    "totalOperations": 6,
+    "totalErrors": 0,
+    "errorRatePercent": "0.00",
+    "metrics": {
+      "openQuestion": {
+        "count": 6,
+        "p50": "0.1ms",
+        "p95": "0.2ms",
+        "p99": "0.2ms"
+      },
+      "mediaDownload": {
+        "count": 0,
+        "p50": "0.0ms",
+        "p95": "0.0ms",
+        "p99": "0.0ms"
+      },
+      "journeySummary": {
+        "count": 0,
+        "p50": "0.0ms",
+        "p95": "0.0ms",
+        "p99": "0.0ms"
+      }
+    },
+    "sampleErrors": []
+  }
+}

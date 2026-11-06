@@ -1,0 +1,41 @@
+{
+  "before": {
+    "version": "4.0.1",
+    "commit": "f7c93337669379d768419ae1ab43cbde69f2aabe",
+    "sourceId": "59d67c93a8c3dd8839db1091c8760329f8d11c63984761ee5fe8342833bdff77",
+    "displayMode": "2d",
+    "questionProtocolVersion": 1
+  },
+  "after": {
+    "version": "4.0.1",
+    "commit": "f7c93337669379d768419ae1ab43cbde69f2aabe",
+    "sourceId": "5d9b56a43e18706af1f541af5ef12477c679a8d2fa0c0b1e667f45f1b48261a8",
+    "displayMode": "2d",
+    "questionProtocolVersion": 1
+  },
+  "changedTrackedFiles": [
+    "server/cloud-backup-restore.mjs",
+    "server/contest-data.mjs",
+    "server/online-store.mjs",
+    "server/postgres-store.mjs",
+    "src/components/MapWeekPanel.tsx",
+    "src/components/RegionMap.tsx",
+    "src/components/WorldMap.tsx",
+    "src/core/contest-matrix.ts",
+    "src/core/contracts.ts",
+    "src/core/online-client.ts",
+    "src/games/MathQuest.tsx",
+    "src/screens/ContestMockScreen.tsx",
+    "src/screens/OnlineAdminDashboard.tsx",
+    "src/screens/OnlineExerciseRunner.tsx",
+    "src/screens/OnlineStudentWorld.tsx",
+    "src/screens/StudentScreen.tsx",
+    "src/screens/TownScreen.tsx",
+    "src/styles/learning-interface.css",
+    "src/styles/student-assigned-games.css",
+    "src/styles/student-shell.css",
+    "src/styles/town.css",
+    "tests/staging-rollback-rehearsal.test.mjs",
+    "tests/visual/online-a11y.spec.ts"
+  ]
+}

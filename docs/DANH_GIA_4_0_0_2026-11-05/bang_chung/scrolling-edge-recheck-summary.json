@@ -1,0 +1,53 @@
+{
+  "source": "scrolling-edge-recheck.json",
+  "stats": {
+    "startTime": "2026-11-05T15:54:12.551Z",
+    "duration": 43220.723,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 2,
+    "flaky": 0
+  },
+  "globalErrors": [],
+  "configured": 2,
+  "passed": 0,
+  "failed": 2,
+  "skipped": 0,
+  "notRun": 0,
+  "cases": [
+    {
+      "file": "tests/visual/online-scrolling.spec.ts",
+      "line": 12,
+      "title": "reaches the weekly material and restores scrolling after leaving a game",
+      "project": "online-msedge",
+      "status": "unexpected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "failed",
+          "durationMs": 20111,
+          "errors": [
+            "Error: expect(locator).toBeInViewport() failed\n\nLocator:  locator('.online-week-path')\nExpected: in viewport\nReceived: viewport ratio 0\nTimeout:  15000ms\n\nCall log:\n  - Expect \"toBeInViewport\" locator('.online-week-path') with timeout 15000ms\n  - waiting for locator('.online-week-path')\n    33 × locator resolved to <ol class=\"online-week-path\">…</ol>\n       - unexpected value \"viewport ratio 0\"\n\n\n  56 |           }\n  57 |           await expect.poll(()=>page.evaluate(()=>window.scrollY)).toBeGreaterThan(100);\n> 58 |           await expect(material).toBeInViewport();\n     |                                  ^\n  59 |           expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(viewport.width);\n  60 |         }\n  61 |         await scrollDown();\n    at scrollDown (D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-scrolling.spec.ts:58:34)\n    at D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-scrolling.spec.ts:73:9"
+          ]
+        }
+      ]
+    },
+    {
+      "file": "tests/visual/online-scrolling.spec.ts",
+      "line": 12,
+      "title": "reaches the weekly material and restores scrolling after leaving a game",
+      "project": "online-msedge",
+      "status": "unexpected",
+      "annotations": [],
+      "results": [
+        {
+          "status": "failed",
+          "durationMs": 20123,
+          "errors": [
+            "Error: expect(locator).toBeInViewport() failed\n\nLocator:  locator('.online-week-path')\nExpected: in viewport\nReceived: viewport ratio 0\nTimeout:  15000ms\n\nCall log:\n  - Expect \"toBeInViewport\" locator('.online-week-path') with timeout 15000ms\n  - waiting for locator('.online-week-path')\n    33 × locator resolved to <ol class=\"online-week-path\">…</ol>\n       - unexpected value \"viewport ratio 0\"\n\n\n  56 |           }\n  57 |           await expect.poll(()=>page.evaluate(()=>window.scrollY)).toBeGreaterThan(100);\n> 58 |           await expect(material).toBeInViewport();\n     |                                  ^\n  59 |           expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(viewport.width);\n  60 |         }\n  61 |         await scrollDown();\n    at scrollDown (D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-scrolling.spec.ts:58:34)\n    at D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-scrolling.spec.ts:73:9"
+          ]
+        }
+      ]
+    }
+  ]
+}

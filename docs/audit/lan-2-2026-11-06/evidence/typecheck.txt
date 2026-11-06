@@ -1,0 +1,4 @@
+
+> bao-an-learning@4.0.1 typecheck
+> tsc --noEmit
+

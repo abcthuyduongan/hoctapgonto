@@ -1,0 +1,24 @@
+{
+  "kind": "Isolated UI reproduction; actual ContestMockScreen and actual SQLite store; network adapter test-only",
+  "mode": "autosave",
+  "displayCountdownSeconds": 300,
+  "saveRequestsStarted": 2,
+  "savedSnapshots": [
+    {
+      "vm3_12": "4 giờ 30 phút",
+      "vm3_08": "29 : 6"
+    },
+    {
+      "vm3_12": "4 giờ 30 phút",
+      "vm3_08": "29 : 6"
+    }
+  ],
+  "submitPayloads": [],
+  "consoleErrors": [],
+  "uiAnsweredCount": 2,
+  "finalAnswers": {
+    "vm3_12": "4 giờ 30 phút",
+    "vm3_08": "29 : 6"
+  },
+  "reproduced": false
+}

@@ -8,8 +8,9 @@ import type {OnlineAdminSummary,OnlineAdminSection,OnlineWeekCheck} from './onli
 import type {QuestionExport} from './question-export';
 
 let csrfToken='';
+let parentElevationToken: string | null = null;
 const openingQuestions=new Map<string,Promise<QuestionOpenReceipt>>();
-function clearSessionResources(){csrfToken='';questionImageLoader.clear();openingQuestions.clear();}
+function clearSessionResources(){csrfToken='';parentElevationToken=null;questionImageLoader.clear();openingQuestions.clear();}
 let mediaMaxBytes=8*1024*1024;
 let mediaUploadGzip=false;
 export const getOnlineMediaMaxBytes=()=>mediaMaxBytes;
@@ -30,7 +31,7 @@ async function request<T>(path:string,method='GET',body?:unknown,externalSignal?
       if(gzip.size<source.size*.95){payload=gzip;compressed=true;}
     }
     combined.throwIfAborted();
-    const response=await fetch(`/api/online${path}`,{method,signal:combined,credentials:'include',cache:'no-store',headers:{Accept:'application/json','X-Bao-An-Question-Protocol':'1',...(body!==undefined?{'Content-Type':'application/json'}:{}),...(compressed?{'Content-Encoding':'gzip'}:{}),...(method!=='GET'&&csrfToken?{'X-CSRF-Token':csrfToken}:{})},...(payload!==undefined?{body:payload}:{})});
+    const response=await fetch(`/api/online${path}`,{method,signal:combined,credentials:'include',cache:'no-store',headers:{Accept:'application/json','X-Bao-An-Question-Protocol':'1',...(body!==undefined?{'Content-Type':'application/json'}:{}),...(compressed?{'Content-Encoding':'gzip'}:{}),...(method!=='GET'&&csrfToken?{'X-CSRF-Token':csrfToken}:{}),...(parentElevationToken?{'X-Parent-Token':parentElevationToken}:{})},...(payload!==undefined?{body:payload}:{})});
     timingStatus=response.status;
     const data:unknown=await response.json().catch(error=>{if(combined.aborted)throw error;return null;});return {response,data};
   },path.startsWith('/restore/')?120_000:30_000));}
@@ -103,7 +104,7 @@ export const onlineApi={
   questionHint:(id:string,itemId:string)=>request<{hint:string;hintsUsed:number}>(`/play/${segment(id)}/question-hint`,'POST',{itemId}),
   completeCompact:(id:string)=>request<{state:OnlineStudentSummary;gained:number;tier:number}>(`/play/${segment(id)}/complete-compact`,'POST',{}),
   play:(body:{moduleId:ModuleId;packId:string;contentVersion:number;requestId:string})=>request<OnlineCompactPlay>('/play','POST',body),
-  attempt:(id:string,input:AttemptInput)=>request<OnlineAttemptReceipt>(`/play/${segment(id)}/attempt`,'POST',{attemptKey:input.attemptKey,itemId:input.itemId,response:input.response,hintsUsed:input.hintsUsed,elapsedMs:input.elapsedMs}),
+  attempt:(id:string,input:AttemptInput)=>request<OnlineAttemptReceipt>(`/play/${segment(id)}/attempt`,'POST',{attemptKey:input.attemptKey,itemId:input.itemId,response:input.response,hintsUsed:input.hintsUsed,elapsedMs:input.elapsedMs,...(input.presentationId?{presentationId:input.presentationId}:{})}),
   complete:(id:string)=>request<{state:OnlineStudentSummary;gained:number;tier:number}>(`/play/${segment(id)}/complete`,'POST',{}),
   abandon:(id:string)=>request(`/play/${segment(id)}/abandon`,'POST',{}),
   requestRedemption:(body:{requestId:string;title:string;goalVnd:number})=>request('/redemptions','POST',body),
@@ -119,8 +120,16 @@ export const onlineApi={
   streak:(signal?:AbortSignal)=>request<StudentStreakState>('/student/streak','GET',undefined,signal),
   dailyMissions:(signal?:AbortSignal)=>request<DailyMission[]>('/student/daily-missions','GET',undefined,signal),
   answerDailyRiddle:(chosenIndex:number)=>request<{correct:boolean;alreadySolved:boolean;streak:StudentStreakState;missions:DailyMission[]}>('/student/daily-riddle/answer','POST',{chosenIndex}),
-  setupParentPin:(body:{pin:string;oldPin?:string;studentId?:string})=>request<{success:true}>('/parent/setup-pin','POST',body),
-  verifyParentPin:(pin:string)=>request<{success:true;parentToken:string;studentId:string}>('/parent/verify-pin','POST',{pin}),
+  setupParentPin:async(body:{pin:string;oldPin?:string;studentId?:string})=>{
+    const res=await request<{success:true;parentToken?:string}>('/parent/setup-pin','POST',body);
+    if(res?.parentToken)parentElevationToken=res.parentToken;
+    return res;
+  },
+  verifyParentPin:async(pin:string)=>{
+    const res=await request<{success:true;parentToken:string;studentId:string}>('/parent/verify-pin','POST',{pin});
+    if(res?.parentToken)parentElevationToken=res.parentToken;
+    return res;
+  },
   parentDashboard:(studentId?:string,weekId?:string,signal?:AbortSignal)=>{
     const params = new URLSearchParams();
     if(studentId) params.set('studentId', studentId);
@@ -134,7 +143,7 @@ export const onlineApi={
   contestPresets:(signal?:AbortSignal)=>request<ContestPreset[]>('/contest/presets','GET',undefined,signal),
   startContest:(body:{presetId:string;requestId?:string})=>request<ActiveContestSession>('/contest/start','POST',body),
   activeContest:(signal?:AbortSignal)=>request<{active:boolean;session?:ActiveContestSession;lastResult?:ContestResult}>('/contest/active','GET',undefined,signal),
-  saveContestProgress:(sessionId:string,body:{answers?:Record<string,any>;skippedKeys?:string[]})=>request<{success:true;remainingSeconds:number}>(`/contest/${segment(sessionId)}/save`,'POST',body),
+  saveContestProgress:(sessionId:string,body:{answers?:Record<string,any>;skippedKeys?:string[];revision?:number;seq?:number})=>request<{success:true;remainingSeconds:number;answers?:Record<string,any>}>(`/contest/${segment(sessionId)}/save`,'POST',body),
   submitContest:(sessionId:string,body:{answers?:Record<string,any>})=>request<ContestResult>(`/contest/${segment(sessionId)}/submit`,'POST',body),
   contestHistory:(studentId?:string,presetId?:string,signal?:AbortSignal)=>{
     const params = new URLSearchParams();

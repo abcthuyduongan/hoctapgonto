@@ -1,0 +1,85 @@
+{
+  "kind": "Document-package verification only; not an application test or performance/load/usability result",
+  "verifiedAt": "2026-11-06T10:11:57.444Z",
+  "plannedDate": "2026-11-06",
+  "runtimeIdentityAtPlanning": {
+    "version": "4.0.2",
+    "commit": "f7c93337669379d768419ae1ab43cbde69f2aabe",
+    "sourceId": "b5f1c02e0b35b7ea54ce5bc70e2707538d8aafef46c95d7b2513ec8ee8ae697a",
+    "displayMode": "2d",
+    "questionProtocolVersion": 1
+  },
+  "runtimeIdentityAtPackaging": {
+    "version": "4.0.2",
+    "commit": "f7c93337669379d768419ae1ab43cbde69f2aabe",
+    "sourceId": "b5f1c02e0b35b7ea54ce5bc70e2707538d8aafef46c95d7b2513ec8ee8ae697a",
+    "displayMode": "2d",
+    "questionProtocolVersion": 1
+  },
+  "runtimeIdentityUnchanged": true,
+  "acceptanceCases": {
+    "total": 48,
+    "PERF": 20,
+    "LOAD": 16,
+    "USER": 12,
+    "allStatus": "CHUA_CHAY",
+    "executed": 0
+  },
+  "documentChecks": {
+    "uniqueAcceptanceIds": true,
+    "relativeLinks": [
+      {
+        "from": "00_DOC_TRUOC.md",
+        "target": "01_TOI_UU_CSS_VA_ANH_BAN_DO.md"
+      },
+      {
+        "from": "00_DOC_TRUOC.md",
+        "target": "02_STAGING_100_VA_USABILITY.md"
+      },
+      {
+        "from": "00_DOC_TRUOC.md",
+        "target": "03_MA_TRAN_NGHIEM_THU.md"
+      },
+      {
+        "from": "00_DOC_TRUOC.md",
+        "target": "04_BIEU_MAU_VA_NHAT_KY.md"
+      },
+      {
+        "from": "00_DOC_TRUOC.md",
+        "target": "05_NOI_DUNG_GIAO_THUC_HIEN.md"
+      },
+      {
+        "from": "00_DOC_TRUOC.md",
+        "target": "BASELINE_KE_HOACH.json"
+      },
+      {
+        "from": "00_DOC_TRUOC.md",
+        "target": "KET_QUA_KIEM_THU_TEMPLATE.json"
+      },
+      {
+        "from": "00_DOC_TRUOC.md",
+        "target": "KIEM_TRA_BAN_GIAO.json"
+      },
+      {
+        "from": "00_DOC_TRUOC.md",
+        "target": "HANDOFF_MANIFEST.json"
+      }
+    ],
+    "jsonParsed": [
+      "BASELINE_KE_HOACH.json",
+      "KET_QUA_KIEM_THU_TEMPLATE.json"
+    ]
+  },
+  "actionsPerformed": [
+    "Read current implementation and image metadata for planning",
+    "Wrote plan, acceptance specifications, blank result template and handoff documents",
+    "Compared runtime source identity with planning snapshot",
+    "Checked acceptance counts and local document links"
+  ],
+  "actionsNotPerformed": [
+    "Application implementation or asset optimization",
+    "Application test suite or new performance benchmark",
+    "Staging deployment, database seeding or load generation",
+    "Recruitment, contact or sessions with children, parents or teachers"
+  ]
+}

@@ -68,15 +68,26 @@ async function addStudent(store, admin, clsId, name, uname, engine) {
   return { student, studentAuth };
 }
 
-async function recordAttempt(store, auth, playId, itemId, elapsedMs, choiceIndex = 0) {
+async function recordAttempt(store, auth, playId, itemId, elapsedMs, choiceOption = 0) {
   const openedAt = new Date(Date.now() - elapsedMs).toISOString();
-  await store.openQuestion(auth, playId, { itemId, openedAt }, true);
+  const receipt = await store.openQuestion(auth, playId, { itemId, openedAt }, true);
+  const { pack } = await store.play(auth, playId);
+  const item = pack.items.find(i => i.id === itemId);
+  const correctText = item.options ? item.options[item.correctIndex] : null;
+  const correctIdx = correctText && receipt.item?.options ? receipt.item.options.indexOf(correctText) : 0;
+  let finalIdx;
+  if (choiceOption === 'wrong' || choiceOption === 1) {
+    finalIdx = (correctIdx + 1) % (receipt.item?.options?.length || 4);
+  } else {
+    finalIdx = correctIdx;
+  }
   return await store.attempt(auth, playId, {
     attemptKey: randomUUID(),
     itemId,
     elapsedMs,
     hintsUsed: 0,
-    response: { kind: 'choice', choiceIndex }
+    presentationId: receipt.item?.presentationId,
+    response: { kind: 'choice', choiceIndex: finalIdx }
   }, true);
 }
 
@@ -88,7 +99,8 @@ for (const engine of ['SQLite', 'PostgreSQL']) {
 
     // 1. Initial controls state
     const initial = await store.parentControls(admin, student.id);
-    assert.equal(initial.pinHash, null);
+    assert.equal(initial.hasPin, false);
+    assert.equal(initial.pinHash, undefined);
     assert.equal(initial.maxMinutesPerDay, 0);
 
     // 2. Setup PIN validation: invalid length rejected
@@ -106,7 +118,8 @@ for (const engine of ['SQLite', 'PostgreSQL']) {
     assert.equal(setupRes.success, true);
 
     const controls = await store.parentControls(admin, student.id);
-    assert.ok(controls.pinHash);
+    assert.equal(controls.hasPin, true);
+    assert.equal(controls.pinHash, undefined);
 
     // 4. Verify PIN: wrong PIN fails
     await assert.rejects(

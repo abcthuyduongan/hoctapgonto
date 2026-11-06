@@ -34,3 +34,4 @@ DO $$ DECLARE table_name text; BEGIN
     EXECUTE format('ALTER TABLE bao_an.%I ENABLE ROW LEVEL SECURITY', table_name);
   END LOOP;
 END $$;
+INSERT INTO bao_an.schema_version VALUES(5) ON CONFLICT DO NOTHING;

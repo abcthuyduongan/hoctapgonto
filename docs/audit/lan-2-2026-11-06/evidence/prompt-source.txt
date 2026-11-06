@@ -1,0 +1,271 @@
+# YÊU CẦU CODEX: KIỂM TOÁN TOÀN DIỆN DỰ ÁN
+
+Bạn là chuyên gia Senior Full-stack Architect, UI/UX Designer, Performance Engineer và Software QA.
+
+Hãy tiến hành **KIỂM TOÁN TOÀN DIỆN mã nguồn hiện tại của dự án**, đánh giá dựa trên bằng chứng thực tế, không chỉ nhận xét cảm tính về giao diện hoặc chất lượng code.
+
+## I. NGUYÊN TẮC BẮT BUỘC
+
+1. Đọc toàn bộ cấu trúc dự án, các module, luồng dữ liệu, thành phần giao diện, cơ chế xác thực và cấu hình triển khai.
+2. Xác định công nghệ thực sự được sử dụng, không suy đoán kiến trúc.
+3. Đánh giá hệ thống như một sản phẩm hoàn chỉnh, không đánh giá từng màn hình riêng lẻ.
+4. Ưu tiên trải nghiệm trên điện thoại, đặc biệt với giáo viên thao tác trong giờ học.
+5. Giữ nguyên mọi chức năng TKB hiện có đang hoạt động ổn định.
+6. Không tự ý xóa, viết lại hoặc thay đổi chức năng nghiệp vụ.
+7. Chưa chỉnh sửa mã nguồn trong giai đoạn kiểm toán. Chỉ phân tích, đo đạc, chỉ ra nguyên nhân và đề xuất phương án xử lý.
+8. Mọi nhận định về hiệu năng phải có số liệu đo thực tế hoặc bằng chứng từ mã nguồn. Không tự tạo kết quả kiểm thử.
+
+## II. KIỂM TOÁN KIẾN TRÚC VÀ KỸ THUẬT
+
+Kiểm tra toàn bộ:
+
+- Cấu trúc thư mục, tổ chức module, component và khả năng tái sử dụng.
+- Sự phân tách giữa giao diện, nghiệp vụ, truy xuất dữ liệu và quản lý trạng thái.
+- Mã nguồn trùng lặp, hàm dư thừa, logic chồng chéo.
+- Lỗi tiềm ẩn, xử lý bất đồng bộ, race condition, memory leak, event listener không được giải phóng.
+- Quản lý đăng nhập, phiên làm việc và phân quyền Admin/GVCN/GVBM.
+- Quy tắc bảo mật Supabase RLS, quyền đọc/ghi và nguy cơ lộ dữ liệu học sinh.
+- Tương thích Netlify, Supabase, PWA và thiết bị di động.
+- Các chức năng có nguy cơ hỏng khi nâng cấp hoặc tích hợp phân hệ mới.
+
+Đánh giá kiến trúc hiện tại có đủ ổn định, đơn giản và dễ bảo trì hay đang phát sinh nợ kỹ thuật.
+
+## III. KIỂM TOÁN GIAO DIỆN UI VÀ THIẾT KẾ ĐỒ HỌA
+
+Kiểm tra tất cả màn hình:
+
+- Bố cục tổng thể, điều hướng, menu, thẻ, bảng, biểu mẫu, hộp thoại.
+- Sự thống nhất về màu sắc, kiểu chữ, kích thước, icon, khoảng cách và trạng thái nút.
+- Tính đồng bộ giữa giao diện TKB, giáo viên, điểm danh, quan sát học sinh, thống kê và quản trị.
+- Khả năng hiển thị trên điện thoại, máy tính bảng và máy tính.
+- Kích thước vùng chạm, khả năng đọc và thao tác bằng một tay.
+- Hiện tượng tràn màn hình, bảng quá rộng, nút bị che hoặc phải cuộn không cần thiết.
+- Loading, skeleton, thông báo thành công, lỗi, dữ liệu trống và trạng thái ngoại tuyến.
+- Các hiệu ứng gây giật, chậm hoặc làm thay đổi bố cục.
+
+**Mục tiêu:** Toàn bộ hệ thống phải có ngôn ngữ thiết kế thống nhất, cảm giác như một ứng dụng duy nhất, không phải nhiều phân hệ ghép lại.
+
+## IV. ĐÁNH GIÁ TÍNH LIỀN MẠCH CỦA THAO TÁC
+
+Kiểm tra trực tiếp các hành trình người dùng:
+
+**1. Giáo viên:** Đăng nhập → xác định tiết/lớp theo TKB → xác nhận → xem sơ đồ lớp → điểm danh → nhận xét → lưu → chuyển tiết → xem tổng hợp.
+
+**2. GVCN:** Đăng nhập → chọn lớp → sắp xếp chỗ ngồi → xem ghi nhận từ các giáo viên → theo dõi tiến bộ học sinh.
+
+**3. Quản trị:** Đăng nhập → quản lý giáo viên, học sinh, lớp → nhập Excel → kiểm tra và xem trước dữ liệu → xác nhận → công bố → kiểm tra kết quả.
+
+**4. Người dùng TKB:** Tra cứu TKB → chuyển lớp/giáo viên/tuần → xem thông tin tiết học → quay lại mà không mất trạng thái không cần thiết.
+
+Với mỗi hành trình, kiểm tra:
+
+- Có thao tác thừa, bước trung gian hoặc xác nhận không cần thiết không?
+- Có phải tải lại toàn bộ trang khi chuyển chức năng không?
+- Có mất trạng thái hoặc dữ liệu đã nhập khi quay lại không?
+- Có phải chọn lại lớp, tiết, giáo viên hoặc thông tin hệ thống đã biết không?
+- Các thao tác có phản hồi tức thời, rõ ràng và nhất quán không?
+- Có thể hoàn thành thao tác thường xuyên bằng ít bước nhất không?
+- Có nguy cơ nhấn lưu nhiều lần gây trùng dữ liệu không?
+- Có sự đứt gãy giữa các phân hệ hoặc màn hình không?
+
+Đề xuất luồng thao tác thống nhất, ngắn gọn, phù hợp với giáo viên khi đang đứng lớp.
+
+## V. KIỂM TOÁN HIỆU NĂNG – ƯU TIÊN CAO NHẤT
+
+Đây là phần quan trọng nhất. Phải đo đạc, xác định nút thắt và đề xuất tối ưu có thể kiểm chứng.
+
+### 1. Tốc độ tải trang
+
+Kiểm tra:
+
+- Tải lần đầu (cold load).
+- Tải lại khi đã có cache (warm load).
+- Chuyển đổi giữa các màn hình.
+- Thời gian hiển thị nội dung có thể sử dụng.
+- Thời gian từ khi nhấn nút đến khi giao diện phản hồi.
+- Thời gian đăng nhập và khôi phục phiên.
+- Tốc độ tải trên điện thoại tầm trung, mạng 4G hạn chế.
+
+Sử dụng Lighthouse, Chrome DevTools, Performance API hoặc công cụ phù hợp.
+
+Đo tối thiểu 3 lần cho từng kịch bản, ghi rõ thiết bị, điều kiện mạng và phương pháp.
+
+Theo dõi:
+
+- FCP: First Contentful Paint.
+- LCP: Largest Contentful Paint.
+- CLS: Cumulative Layout Shift.
+- INP: Interaction to Next Paint nếu có dữ liệu tương tác phù hợp.
+- TTFB: Time to First Byte.
+- Dung lượng JavaScript/CSS tải xuống.
+- Số lượng và thời gian các network request.
+
+Đối chiếu với mục tiêu Web Vitals tốt: LCP ≤ 2,5 giây; INP ≤ 200 ms; CLS ≤ 0,1. Phân biệt số liệu phòng thí nghiệm với dữ liệu người dùng thực tế.
+
+### 2. Tốc độ truy xuất dữ liệu Supabase
+
+Phân tích:
+
+- Thời gian thực hiện từng truy vấn.
+- Số lượng request cho mỗi màn hình.
+- Request tuần tự không cần thiết.
+- Truy vấn lặp hoặc truy vấn dư thừa.
+- Tải toàn bộ dữ liệu khi chỉ cần một phần.
+- Thiếu index, bộ lọc, phân trang hoặc cache.
+- Chi phí truy vấn liên quan đến RLS.
+- Thao tác lưu điểm danh và nhận xét.
+- Đồng bộ dữ liệu khi nhiều giáo viên sử dụng.
+
+Đặc biệt đo thời gian tải:
+
+- TKB lớp và giáo viên.
+- Danh sách học sinh của một lớp.
+- Sơ đồ chỗ ngồi.
+- Dữ liệu điểm danh theo tiết.
+- Nhận xét và cảnh báo liên tiết.
+- Báo cáo thống kê theo lớp, tuần, tháng.
+- Dữ liệu quản trị và nhập Excel.
+
+Phân biệt rõ độ trễ do mạng, máy chủ, cơ sở dữ liệu, xử lý JavaScript và dựng giao diện.
+
+### 3. Tối ưu frontend
+
+Rà soát:
+
+- JavaScript/CSS không sử dụng.
+- Bundle quá lớn.
+- Hình ảnh, icon, font chưa tối ưu.
+- Render lại không cần thiết.
+- DOM quá lớn.
+- Tải dữ liệu trước khi thực sự cần.
+- Lazy loading, code splitting, prefetch.
+- Browser cache, PWA service worker.
+- Cache lỗi thời hoặc làm dữ liệu không được cập nhật.
+- Việc tạo lại toàn bộ giao diện khi chỉ thay đổi một thông tin nhỏ.
+
+Chỉ đề xuất caching khi có cơ chế làm mới và đảm bảo dữ liệu nghiệp vụ không bị sai lệch.
+
+### 4. Kiểm tra với dữ liệu thực tế
+
+Thử nghiệm trên dữ liệu có quy mô tương đương hệ thống trường học, bao gồm khoảng 23 lớp THCS và hàng trăm đến gần 1.000 hồ sơ học sinh nếu phù hợp với dữ liệu hiện có.
+
+Đánh giá cả trường hợp nhiều giáo viên truy cập đồng thời. Không thử nghiệm ghi/xóa dữ liệu trực tiếp trên production nếu chưa có môi trường an toàn.
+
+## VI. KIỂM THỬ CHẤT LƯỢNG VÀ TÍNH ỔN ĐỊNH
+
+Kiểm tra:
+
+- Các tính năng đang hoạt động.
+- Kiểm thử hồi quy đối với TKB.
+- Lỗi JavaScript console.
+- Lỗi network và API.
+- Mất mạng, mạng chậm, request timeout.
+- Người dùng bấm nút liên tiếp.
+- Phiên đăng nhập hết hạn.
+- Truy cập sai quyền.
+- Dữ liệu trống, sai định dạng, thiếu trường.
+- Lưu trùng, lưu thiếu hoặc mất dữ liệu.
+- Hoạt động sau khi cập nhật phiên bản PWA.
+
+Ưu tiên kiểm thử tự động bằng Playwright hoặc công cụ tương đương khi có thể.
+
+## VII. CHẤM ĐIỂM DỰ ÁN THEO THANG 100
+
+| Hạng mục | Điểm tối đa |
+|---|---:|
+| Kiến trúc kỹ thuật và chất lượng mã | 15 |
+| UI và thiết kế đồ họa | 15 |
+| UX và tính liền mạch thao tác | 20 |
+| Hiệu năng tải trang và truy xuất dữ liệu | 30 |
+| Bảo mật, ổn định và khả năng mở rộng | 15 |
+| Khả năng bảo trì và triển khai | 5 |
+
+Với từng mục, trình bày điểm số, bằng chứng, điểm mạnh, hạn chế và mức độ tin cậy của đánh giá.
+
+Không cho điểm tối đa đối với nội dung chưa thể kiểm chứng.
+
+## VIII. PHÂN LOẠI VẤN ĐỀ VÀ PHƯƠNG ÁN XỬ LÝ
+
+Mỗi vấn đề phải có đầy đủ:
+
+1. Vị trí: file, module, hàm hoặc màn hình.
+2. Mô tả hiện trạng.
+3. Bằng chứng đo đạc hoặc cách tái hiện.
+4. Nguyên nhân gốc.
+5. Ảnh hưởng đến người dùng và hệ thống.
+6. Phương án sửa cụ thể.
+7. Hiệu quả kỳ vọng.
+8. Rủi ro khi chỉnh sửa.
+9. Cách kiểm thử xác nhận sau sửa.
+
+Phân loại:
+
+- **P0 – Critical:** Bảo mật, mất dữ liệu, chức năng hỏng nghiêm trọng.
+- **P1 – High:** Tốc độ chậm rõ rệt, lỗi thao tác hoặc vấn đề ảnh hưởng trực tiếp đến giáo viên.
+- **P2 – Medium:** Giao diện chưa đồng bộ, logic chưa tối ưu, thao tác thừa.
+- **P3 – Low:** Cải tiến thẩm mỹ, bảo trì và tinh chỉnh nhỏ.
+
+Xếp hạng theo mức độ ảnh hưởng thực tế, không chỉ theo mức độ dễ sửa.
+
+## IX. ĐẦU RA BẮT BUỘC
+
+Tạo thư mục `docs/audit/` và xuất các báo cáo:
+
+**1. `01_TONG_QUAN_DANH_GIA.md`**
+
+- Điểm tổng thể.
+- Điểm từng nhóm.
+- Đánh giá mức độ sẵn sàng sử dụng.
+- 10 vấn đề đáng ưu tiên nhất.
+
+**2. `02_KIEN_TRUC_VA_BAO_MAT.md`**
+
+- Sơ đồ kiến trúc hiện tại.
+- Vấn đề kỹ thuật.
+- Rủi ro bảo mật và bảo trì.
+- Đề xuất cấu trúc tối ưu.
+
+**3. `03_UI_UX_VA_LUONG_THAO_TAC.md`**
+
+- Đánh giá từng màn hình.
+- Các điểm đứt gãy trong trải nghiệm.
+- Luồng thao tác hiện tại và luồng đề xuất.
+- Hướng thống nhất hệ thống thiết kế.
+
+**4. `04_HIEU_NANG_VA_TRUY_XUAT_DU_LIEU.md`**
+
+- Bảng kết quả đo tốc độ.
+- Các request và truy vấn chậm.
+- Phân tích nguyên nhân.
+- Danh sách giải pháp xếp theo hiệu quả kỳ vọng.
+- Chỉ tiêu cần đạt sau tối ưu.
+
+**5. `05_KE_HOACH_TOI_UU.md`**
+
+Đề xuất lộ trình nâng cấp theo thứ tự:
+
+- Giai đoạn 1: Sửa lỗi nghiêm trọng và nút thắt hiệu năng.
+- Giai đoạn 2: Tối ưu tải trang và truy xuất dữ liệu.
+- Giai đoạn 3: Thống nhất giao diện và luồng thao tác.
+- Giai đoạn 4: Tinh chỉnh, kiểm thử và hoàn thiện.
+
+Mỗi giai đoạn có danh sách file ảnh hưởng, độ khó, rủi ro và điều kiện nghiệm thu.
+
+## X. YÊU CẦU KẾT LUẬN
+
+Sau khi hoàn tất, hãy trả lời trực tiếp 6 câu hỏi:
+
+1. Kiến trúc dự án hiện tại đã hợp lý chưa?
+2. Giao diện đã thống nhất, hiện đại và thực sự phù hợp điện thoại chưa?
+3. Các thao tác đã liền mạch như một ứng dụng thống nhất chưa?
+4. Những nguyên nhân chính khiến trang và dữ liệu tải chậm là gì?
+5. Có thể cải thiện tốc độ đáng kể mà không phải viết lại toàn bộ hệ thống không?
+6. Nếu chỉ được thực hiện 10 cải tiến, nên ưu tiên những cải tiến nào và vì sao?
+
+**QUY TẮC CUỐI CÙNG:**
+
+Không dừng ở việc liệt kê vấn đề chung chung. Hãy đọc mã nguồn, chạy ứng dụng, thử thao tác, kiểm tra network, đo hiệu năng và đưa ra phương án cụ thể.
+
+Nếu môi trường không cho phép thực hiện một phép kiểm thử, phải ghi rõ "CHƯA KIỂM CHỨNG", nguyên nhân và cách kiểm chứng sau này.
+
+**Ở giai đoạn này chỉ kiểm toán và lập phương án. Không tự ý triển khai thay đổi khi chưa được phê duyệt.**

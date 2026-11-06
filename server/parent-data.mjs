@@ -1,5 +1,10 @@
-import { createHash, randomBytes } from 'node:crypto';
+import { createHash, randomBytes, timingSafeEqual } from 'node:crypto';
 import { getVietnamTimeParts, msToMinutes } from '../src/core/parent-controls.ts';
+
+export const PARENT_ELEVATION_TTL_MS = 10 * 60 * 1000; // 10 minutes
+const DEFAULT_SERVER_SECRET = 'bao-an-parent-elevation-secret-key-2026';
+const revokedTokens = new Set();
+const revokedTimestamps = new Map();
 
 export function hashParentPin(pin, salt = randomBytes(16).toString('hex')) {
   if (!/^\d{4,6}$/.test(pin)) {
@@ -13,6 +18,82 @@ export function verifyParentPin(pin, storedHash, storedSalt) {
   if (!/^\d{4,6}$/.test(pin)) return false;
   const computedHash = createHash('sha256').update(`${storedSalt}:${pin}`).digest('hex');
   return computedHash === storedHash;
+}
+
+export function issueParentElevationToken({ userId, studentId, workspaceId, pinHash, sessionHash = '', secretKey = DEFAULT_SERVER_SECRET, durationMs = PARENT_ELEVATION_TTL_MS }) {
+  const now = Date.now();
+  const expiresAt = now + durationMs;
+  const tokenId = randomBytes(16).toString('hex');
+  const payloadStr = [tokenId, userId, studentId, workspaceId, expiresAt, now].join('|');
+  const hmacKey = `${secretKey}:${pinHash}:${sessionHash}`;
+  const sig = createHash('sha256').update(`${payloadStr}:${hmacKey}`).digest('hex');
+  return `${Buffer.from(payloadStr).toString('base64url')}.${sig}`;
+}
+
+export function verifyParentElevationToken(token, { userId, studentId, workspaceId, pinHash, sessionHash = '', secretKey = DEFAULT_SERVER_SECRET }) {
+  if (!token || typeof token !== 'string') return false;
+  const parts = token.split('.');
+  if (parts.length !== 2) return false;
+  let payloadStr;
+  try {
+    payloadStr = Buffer.from(parts[0], 'base64url').toString('utf8');
+  } catch {
+    return false;
+  }
+  const [tokenId, tUserId, tStudentId, tWorkspaceId, tExpiresAtStr, tIssuedAtStr] = payloadStr.split('|');
+  if (revokedTokens.has(tokenId)) return false;
+  const revokedBefore = revokedTimestamps.get(`${userId}:${studentId}`) || 0;
+  const issuedAt = Number(tIssuedAtStr) || 0;
+  if (issuedAt < revokedBefore) return false;
+  const expiresAt = Number(tExpiresAtStr);
+  if (!Number.isFinite(expiresAt) || expiresAt <= Date.now()) return false;
+  if (tUserId !== userId || tStudentId !== studentId || tWorkspaceId !== workspaceId) return false;
+  const hmacKey = `${secretKey}:${pinHash}:${sessionHash}`;
+  const expectedSig = createHash('sha256').update(`${payloadStr}:${hmacKey}`).digest('hex');
+  try {
+    return timingSafeEqual(Buffer.from(parts[1], 'hex'), Buffer.from(expectedSig, 'hex'));
+  } catch {
+    return false;
+  }
+}
+
+export function revokeParentElevationToken(tokenOrKey) {
+  if (!tokenOrKey) return;
+  if (tokenOrKey.includes('.')) {
+    try {
+      const payloadStr = Buffer.from(tokenOrKey.split('.')[0], 'base64url').toString('utf8');
+      const [tokenId] = payloadStr.split('|');
+      if (tokenId) revokedTokens.add(tokenId);
+    } catch {}
+  } else {
+    revokedTimestamps.set(tokenOrKey, Date.now());
+  }
+}
+
+export function sanitizeParentControls(controls) {
+  if (!controls) {
+    return {
+      workspaceId: '',
+      studentId: '',
+      hasPin: false,
+      pinLocked: false,
+      maxMinutesPerDay: 0,
+      allowedStartHour: 0,
+      allowedEndHour: 24,
+      updatedAt: new Date().toISOString()
+    };
+  }
+  const isLocked = Boolean(controls.pinLocked || (controls.pinLockedUntil && new Date(controls.pinLockedUntil).getTime() > Date.now()));
+  return {
+    workspaceId: controls.workspaceId || controls.workspace_id,
+    studentId: controls.studentId || controls.student_id,
+    hasPin: Boolean(controls.pinHash || controls.pin_hash || controls.hasPin),
+    pinLocked: isLocked,
+    maxMinutesPerDay: controls.maxMinutesPerDay ?? controls.max_minutes_per_day ?? 0,
+    allowedStartHour: controls.allowedStartHour ?? controls.allowed_start_hour ?? 0,
+    allowedEndHour: controls.allowedEndHour ?? controls.allowed_end_hour ?? 24,
+    updatedAt: controls.updatedAt || controls.updated_at || new Date().toISOString()
+  };
 }
 
 function wrongLabel(response) {

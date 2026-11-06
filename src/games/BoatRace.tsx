@@ -1,4 +1,7 @@
-import '../styles/game-base.css';
+import '../styles/games/primitives.css';
+import '../styles/games/stage.css';
+import '../styles/games/feedback.css';
+import '../styles/games/boat-race.css';
 import { saveFailureMessage } from './save-failure-message';
 import GameMascot from './GameMascot';
 import { useEffect, useRef, useState } from 'react';
@@ -72,6 +75,11 @@ export default function BoatRace({
 
     const isCorrect = serverScored ? false : choice === legacyQuestion.correctIndex;
     const elapsed = Math.max(0, Math.round(performance.now() - started));
+    const presId = ('presentationId' in question && typeof (question as any).presentationId === 'string')
+      ? (question as any).presentationId
+      : (clock.item && 'presentationId' in clock.item && typeof (clock.item as any).presentationId === 'string')
+      ? (clock.item as any).presentationId
+      : undefined;
     const input: AttemptInput = {
       attemptKey: `race-${question.id}-${attemptNumber.current++}`,
       itemId: question.id,
@@ -80,6 +88,7 @@ export default function BoatRace({
       hintsUsed: 0,
       elapsedMs: elapsed,
       response: { kind: 'choice', choiceIndex: choice },
+      ...(presId ? { presentationId: presId } : {})
     };
 
     try {

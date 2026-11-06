@@ -35,11 +35,13 @@ export function generateContestQuestions(preset, studentId, sessionId, assignedP
     for (const pack of assignedPacks) {
       if (pack?.subject === preset.subject && Array.isArray(pack.items)) {
         for (const item of pack.items) {
-          if (item?.kind === 'choice' && Array.isArray(item.choices) && item.prompt) {
-            const options = item.choices.map(c => typeof c === 'string' ? c : c?.text || '');
-            const correctOpt = typeof item.choices[item.correctIndex] === 'string'
-              ? item.choices[item.correctIndex]
-              : item.choices[item.correctIndex]?.text || options[0];
+          const isChoice = item?.kind === 'choice' || item?.kind === 'multiple-choice';
+          const rawOptions = item?.options || item?.choices;
+          if (isChoice && Array.isArray(rawOptions) && rawOptions.length >= 2 && item.prompt) {
+            const options = rawOptions.map(c => typeof c === 'string' ? c : c?.text || '');
+            const correctOpt = typeof rawOptions[item.correctIndex] === 'string'
+              ? rawOptions[item.correctIndex]
+              : rawOptions[item.correctIndex]?.text || options[0];
             basePool.push({
               id: `${pack.id}_${item.id}`,
               kind: 'choice',
@@ -55,34 +57,74 @@ export function generateContestQuestions(preset, studentId, sessionId, assignedP
   }
 
   const seed = `${studentId}:${preset.id}:${sessionId}`;
-  return selectContestQuestions(basePool, preset.totalQuestions, seed);
+  const selected = selectContestQuestions(basePool, preset.totalQuestions, seed);
+
+  // Xáo trộn vị trí các lựa chọn (options) cho từng câu hỏi trắc nghiệm theo seed của lượt thi
+  return selected.map(item => {
+    if (item.kind !== 'choice' || !Array.isArray(item.options) || item.options.length < 2) {
+      return item;
+    }
+    const itemSeedKey = `${seed}:${item.id}:options`;
+    let hashVal = 0;
+    for (let i = 0; i < itemSeedKey.length; i++) {
+      hashVal = (hashVal * 31 + itemSeedKey.charCodeAt(i)) >>> 0;
+    }
+    const shuffled = [...item.options];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      hashVal = (hashVal * 1664525 + 1013904223) >>> 0;
+      const j = Math.floor((hashVal / 4294967296) * (i + 1));
+      const tmp = shuffled[i];
+      shuffled[i] = shuffled[j];
+      shuffled[j] = tmp;
+    }
+    return { ...item, options: shuffled };
+  });
 }
 
 /**
  * Xây dựng gói học liệu ôn tập cho các câu làm sai trong bài thi.
  */
-export function buildReviewMistakesPack(session, mistakes) {
-  const packId = `review_${session.sessionId.slice(0, 8)}`;
+export function buildReviewMistakesPack(session, mistakes = []) {
+  const cleanId = String(session.sessionId).toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/^-+|-+$/g, '') || 'contest';
+  const packId = `review-${cleanId}`.slice(0, 40);
   const items = mistakes.map((m, idx) => {
-    // Tạo câu hỏi trắc nghiệm ôn tập
-    const options = [String(m.correctAnswer), 'Phương án khác A', 'Phương án khác B', 'Phương án khác C'];
+    let options = Array.isArray(m.options) && m.options.length === 4
+      ? m.options.map(String)
+      : [String(m.correctAnswer), 'Phương án khác A', 'Phương án khác B', 'Phương án khác C'];
+    const unique = Array.from(new Set(options));
+    while (unique.length < 4) {
+      unique.push(`Phương án phụ ${unique.length + 1}`);
+    }
+    options = unique.slice(0, 4);
+    let correctIndex = options.indexOf(String(m.correctAnswer));
+    if (correctIndex === -1) {
+      options[0] = String(m.correctAnswer);
+      correctIndex = 0;
+    }
     return {
-      id: `err_${idx + 1}`,
-      kind: 'choice',
-      prompt: m.prompt,
+      id: `err-${idx + 1}`,
+      kind: 'multiple-choice',
+      objectiveId: 'CONTEST.REVIEW',
+      prompt: m.prompt || `Câu hỏi số ${idx + 1}`,
       choices: options,
-      correctIndex: 0,
-      explanation: m.explanation
+      options,
+      correctIndex,
+      explanation: m.explanation || `Đáp án đúng là: ${m.correctAnswer}`
     };
   });
 
   return {
     id: packId,
     version: 1,
-    title: `Ôn tập câu sai - ${session.title}`,
-    kind: 'choice',
-    subject: session.subject,
-    grade: session.grade,
-    items
+    title: `Ôn tập câu sai - ${session.title || 'Thi thử'}`.slice(0, 90),
+    kind: 'quiz',
+    subject: session.subject || 'math',
+    grade: Number.isInteger(session.grade) && session.grade >= 1 && session.grade <= 12 ? session.grade : 3,
+    source: 'local',
+    publishedAt: new Date().toISOString(),
+    ownerStudentId: session.studentId || session.ownerStudentId,
+    contestSessionId: session.sessionId,
+    workspaceId: session.workspaceId,
+    items: items.slice(0, 30)
   };
 }

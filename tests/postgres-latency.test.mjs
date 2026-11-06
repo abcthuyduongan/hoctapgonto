@@ -50,7 +50,8 @@ test('cloud login, week summary and secure game actions keep bounded database ro
   const input={requestId:'latency-play',moduleId:'math-quest',packId:source.id,contentVersion:1};
   const play=await request('firstGame','/play/compact',input,13);assert.equal(play.session.questionProtocolVersion,1);assert.equal(play.pack.items,undefined);
   const opened=await request('openQuestion',`/play/${play.session.sessionId}/question-open`,{itemId:'q1'},9);assert.equal(opened.item.id,'q1');assert.equal(opened.item.correctIndex,undefined);
-  const answer={attemptKey:'latency-answer',itemId:'q1',response:{kind:'choice',choiceIndex:0},hintsUsed:0,elapsedMs:0};
+  const choiceIdx=opened.item.options.indexOf('Lá');
+  const answer={attemptKey:'latency-answer',itemId:'q1',presentationId:opened.item.presentationId,response:{kind:'choice',choiceIndex:choiceIdx},hintsUsed:0,elapsedMs:0};
   const receipt=await request('answer',`/play/${play.session.sessionId}/attempt`,answer,12);assert.equal(receipt.event.correct,true);assert.equal(receipt.questionRewards.gained,3);
   // Students share the workspace lock so classmates do not queue behind each other.
   const workspaceLocks=pool.queries.filter(sql=>/FROM bao_an\.workspaces WHERE id=\$1 FOR /.test(sql));assert.deepEqual(workspaceLocks.map(sql=>sql.match(/FOR (UPDATE|SHARE)/)[0]),['FOR SHARE']);

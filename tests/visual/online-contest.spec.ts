@@ -43,8 +43,8 @@ test('Tuần 7 Cổng C7: Chế Độ Thi Thử Violympic & IOE, Đồng Hồ Se
     await expect(page.locator('.online-student')).toBeVisible({ timeout: 15000 });
     await expect(page.locator('.online-header')).toBeVisible({ timeout: 10000 });
 
-    // 3. Header has "🏆 Thi thử" button
-    const contestBtn = page.locator('button.contest-pill-btn');
+    // 3. Header has "🏆 Thi thử" button (unique role & accessible name)
+    const contestBtn = page.getByRole('button', { name: 'Mở phòng thi thử' });
     await expect(contestBtn).toBeVisible();
     await contestBtn.click();
 

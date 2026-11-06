@@ -1,0 +1,176 @@
+
+> bao-an-learning@4.0.1 test:map
+> node --experimental-strip-types --test tests/world-map-assets.test.mjs tests/world-map-domain.test.mjs tests/world-map-store.test.mjs tests/world-map-api.test.mjs tests/world-map-performance.test.mjs
+
+TAP version 13
+# (node:21092) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: API01, API02, API05: HTTP route /api/online/student/map on Local SQLite server
+ok 1 - API01, API02, API05: HTTP route /api/online/student/map on Local SQLite server
+  ---
+  duration_ms: 498.4649
+  type: 'test'
+  ...
+# Subtest: API01, API02, API10: HTTP route /api/online/student/map on Cloud PostgreSQL API
+ok 2 - API01, API02, API10: HTTP route /api/online/student/map on Cloud PostgreSQL API
+  ---
+  duration_ms: 2046.1909
+  type: 'test'
+  ...
+# Subtest: AS01 & AS02: manifest has exactly 28 verified assets with matching roles and dimensions
+ok 3 - AS01 & AS02: manifest has exactly 28 verified assets with matching roles and dimensions
+  ---
+  duration_ms: 33.2539
+  type: 'test'
+  ...
+# Subtest: AS03: all 12 landmark places have valid WebP alpha transparency
+ok 4 - AS03: all 12 landmark places have valid WebP alpha transparency
+  ---
+  duration_ms: 10.5003
+  type: 'test'
+  ...
+# Subtest: AS04: hash mismatch detection
+ok 5 - AS04: hash mismatch detection
+  ---
+  duration_ms: 2.5884
+  type: 'test'
+  ...
+# Subtest: AS05: anchor coordinates strictly between 0% and 100%
+ok 6 - AS05: anchor coordinates strictly between 0% and 100%
+  ---
+  duration_ms: 0.4602
+  type: 'test'
+  ...
+# Subtest: AS08: asset byte budget gate
+ok 7 - AS08: asset byte budget gate
+  ---
+  duration_ms: 1.368
+  type: 'test'
+  ...
+# Subtest: DM01: Subject normalization handles diacritics, case, spacing and preserves display label
+ok 8 - DM01: Subject normalization handles diacritics, case, spacing and preserves display label
+  ---
+  duration_ms: 1.1388
+  type: 'test'
+  ...
+# Subtest: DM02: Alias resolution handles exact aliases and rejects fuzzy false positives
+ok 9 - DM02: Alias resolution handles exact aliases and rejects fuzzy false positives
+  ---
+  duration_ms: 0.2342
+  type: 'test'
+  ...
+# Subtest: DM03: Positions 1, 2, 3 with Math only at 1 and 3 keep slots 1 and 3 without compression
+ok 10 - DM03: Positions 1, 2, 3 with Math only at 1 and 3 keep slots 1 and 3 without compression
+  ---
+  duration_ms: 0.3578
+  type: 'test'
+  ...
+# Subtest: DM04: Chapter and slot calculation for positions 7, 8, 35 and legacy gaps
+ok 11 - DM04: Chapter and slot calculation for positions 7, 8, 35 and legacy gaps
+  ---
+  duration_ms: 0.1108
+  type: 'test'
+  ...
+# Subtest: DM05: Deterministic order regardless of input row order; ID keyed, not array index
+ok 12 - DM05: Deterministic order regardless of input row order; ID keyed, not array index
+  ---
+  duration_ms: 0.6978
+  type: 'test'
+  ...
+# Subtest: DM06: Node ready condition requires zero=0, one=0 and all questions >= 2 stars
+ok 13 - DM06: Node ready condition requires zero=0, one=0 and all questions >= 2 stars
+  ---
+  duration_ms: 0.1325
+  type: 'test'
+  ...
+# Subtest: DM07: Current ready=true does not advance until server confirmation
+ok 14 - DM07: Current ready=true does not advance until server confirmation
+  ---
+  duration_ms: 0.1503
+  type: 'test'
+  ...
+# Subtest: DM08: Star counts preserve server invariant of maximum 3 stars per item
+ok 15 - DM08: Star counts preserve server invariant of maximum 3 stars per item
+  ---
+  duration_ms: 0.0855
+  type: 'test'
+  ...
+# Subtest: DM09: Selected pack invalidation when version or weekId changes
+ok 16 - DM09: Selected pack invalidation when version or weekId changes
+  ---
+  duration_ms: 0.3165
+  type: 'test'
+  ...
+# Subtest: DM10: Edge cases for 0 weeks, 1 week, and position 22
+ok 17 - DM10: Edge cases for 0 weeks, 1 week, and position 22
+  ---
+  duration_ms: 0.4597
+  type: 'test'
+  ...
+# (node:37252) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: PF03 & PF04: 35-week fixture produces JSON <= 64 KiB, <= 7 nodes, bounded queries and no item leaks
+ok 18 - PF03 & PF04: 35-week fixture produces JSON <= 64 KiB, <= 7 nodes, bounded queries and no item leaks
+  ---
+  duration_ms: 185.2727
+  type: 'test'
+  ...
+# Subtest: PF06: no 3D graphics engine (three.js, Babylon, Canvas 3D) and no GLB files in codebase
+ok 19 - PF06: no 3D graphics engine (three.js, Babylon, Canvas 3D) and no GLB files in codebase
+  ---
+  duration_ms: 1.9553
+  type: 'test'
+  ...
+# Subtest: PF08: Diagnostics and map logs redact passwords and sensitive tokens
+ok 20 - PF08: Diagnostics and map logs redact passwords and sensitive tokens
+  ---
+  duration_ms: 0.1442
+  type: 'test'
+  ...
+# (node:25008) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: API01: Admin calling studentMap is rejected with 403
+ok 21 - API01: Admin calling studentMap is rejected with 403
+  ---
+  duration_ms: 18.1048
+  type: 'test'
+  ...
+# Subtest: API02: Foreign parameters (studentId, classId, workspaceId, etc.) in query rejected with 400
+ok 22 - API02: Foreign parameters (studentId, classId, workspaceId, etc.) in query rejected with 400
+  ---
+  duration_ms: 3.6052
+  type: 'test'
+  ...
+# Subtest: API03 & API04: No items/PII leak; map reads are completely idempotent and mutate no records
+ok 23 - API03 & API04: No items/PII leak; map reads are completely idempotent and mutate no records
+  ---
+  duration_ms: 25.755
+  type: 'test'
+  ...
+# Subtest: API05 & API06: Query parameter validation & 0-week class edge cases
+ok 24 - API05 & API06: Query parameter validation & 0-week class edge cases
+  ---
+  duration_ms: 4.3531
+  type: 'test'
+  ...
+# Subtest: API07: Multi-week and multi-subject nodes mapped to correct slots and regions
+ok 25 - API07: Multi-week and multi-subject nodes mapped to correct slots and regions
+  ---
+  duration_ms: 7.6473
+  type: 'test'
+  ...
+# Subtest: API10: PostgresStore produces identical studentMap projections to SQLite
+ok 26 - API10: PostgresStore produces identical studentMap projections to SQLite
+  ---
+  duration_ms: 1706.9728
+  type: 'test'
+  ...
+1..26
+# tests 26
+# suites 0
+# pass 26
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 3112.8409

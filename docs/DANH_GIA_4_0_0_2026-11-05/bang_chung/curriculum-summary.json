@@ -1,0 +1,203 @@
+{
+  "weeks": [
+    {
+      "weekNumber": 19,
+      "packs": [
+        {
+          "id": "hk2-tuan-19-toan-nhan",
+          "subject": "math",
+          "items": 4,
+          "choiceCorrectIndexCounts": {
+            "0": 4
+          }
+        },
+        {
+          "id": "hk2-tuan-19-viet-sangtao",
+          "subject": "vietnamese",
+          "items": 3,
+          "choiceCorrectIndexCounts": {}
+        },
+        {
+          "id": "hk2-tuan-19-anh-family",
+          "subject": "english",
+          "items": 4,
+          "choiceCorrectIndexCounts": {}
+        }
+      ]
+    },
+    {
+      "weekNumber": 20,
+      "packs": [
+        {
+          "id": "hk2-tuan-20-toan-chia",
+          "subject": "math",
+          "items": 4,
+          "choiceCorrectIndexCounts": {
+            "0": 4
+          }
+        },
+        {
+          "id": "hk2-tuan-20-viet-caukhien",
+          "subject": "vietnamese",
+          "items": 3,
+          "choiceCorrectIndexCounts": {}
+        },
+        {
+          "id": "hk2-tuan-20-anh-clothes",
+          "subject": "english",
+          "items": 4,
+          "choiceCorrectIndexCounts": {}
+        }
+      ]
+    },
+    {
+      "weekNumber": 21,
+      "packs": [
+        {
+          "id": "hk2-tuan-21-toan-chuvi",
+          "subject": "math",
+          "items": 3,
+          "choiceCorrectIndexCounts": {}
+        },
+        {
+          "id": "hk2-tuan-21-viet-nghethuat",
+          "subject": "vietnamese",
+          "items": 2,
+          "choiceCorrectIndexCounts": {}
+        },
+        {
+          "id": "hk2-tuan-21-anh-activities",
+          "subject": "english",
+          "items": 3,
+          "choiceCorrectIndexCounts": {}
+        }
+      ]
+    },
+    {
+      "weekNumber": 22,
+      "packs": [
+        {
+          "id": "hk2-tuan-22-toan-thoigian",
+          "subject": "math",
+          "items": 4,
+          "choiceCorrectIndexCounts": {
+            "0": 4
+          }
+        },
+        {
+          "id": "hk2-tuan-22-viet-nhanhoa",
+          "subject": "vietnamese",
+          "items": 3,
+          "choiceCorrectIndexCounts": {}
+        },
+        {
+          "id": "hk2-tuan-22-anh-animals",
+          "subject": "english",
+          "items": 4,
+          "choiceCorrectIndexCounts": {}
+        }
+      ]
+    },
+    {
+      "weekNumber": 23,
+      "packs": [
+        {
+          "id": "hk2-tuan-23-toan-tien",
+          "subject": "math",
+          "items": 4,
+          "choiceCorrectIndexCounts": {
+            "0": 4
+          }
+        },
+        {
+          "id": "hk2-tuan-23-viet-sosanh",
+          "subject": "vietnamese",
+          "items": 3,
+          "choiceCorrectIndexCounts": {}
+        },
+        {
+          "id": "hk2-tuan-23-anh-food",
+          "subject": "english",
+          "items": 4,
+          "choiceCorrectIndexCounts": {}
+        }
+      ]
+    },
+    {
+      "weekNumber": 24,
+      "packs": [
+        {
+          "id": "hk2-tuan-24-toan-dientich",
+          "subject": "math",
+          "items": 4,
+          "choiceCorrectIndexCounts": {
+            "0": 4
+          }
+        },
+        {
+          "id": "hk2-tuan-24-viet-lehoi",
+          "subject": "vietnamese",
+          "items": 3,
+          "choiceCorrectIndexCounts": {}
+        },
+        {
+          "id": "hk2-tuan-24-anh-sports",
+          "subject": "english",
+          "items": 4,
+          "choiceCorrectIndexCounts": {}
+        }
+      ]
+    },
+    {
+      "weekNumber": 25,
+      "packs": [
+        {
+          "id": "hk2-tuan-25-toan-namchuso",
+          "subject": "math",
+          "items": 4,
+          "choiceCorrectIndexCounts": {
+            "0": 4
+          }
+        },
+        {
+          "id": "hk2-tuan-25-viet-caycoi",
+          "subject": "vietnamese",
+          "items": 3,
+          "choiceCorrectIndexCounts": {}
+        },
+        {
+          "id": "hk2-tuan-25-anh-weather",
+          "subject": "english",
+          "items": 4,
+          "choiceCorrectIndexCounts": {}
+        }
+      ]
+    },
+    {
+      "weekNumber": 26,
+      "packs": [
+        {
+          "id": "hk2-tuan-26-toan-tonghop",
+          "subject": "math",
+          "items": 4,
+          "choiceCorrectIndexCounts": {
+            "0": 4
+          }
+        },
+        {
+          "id": "hk2-tuan-26-viet-doanvan",
+          "subject": "vietnamese",
+          "items": 3,
+          "choiceCorrectIndexCounts": {}
+        },
+        {
+          "id": "hk2-tuan-26-anh-places",
+          "subject": "english",
+          "items": 4,
+          "choiceCorrectIndexCounts": {}
+        }
+      ]
+    }
+  ],
+  "totalQuestions": 85
+}

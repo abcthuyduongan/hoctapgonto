@@ -39,9 +39,10 @@ test('a student with an old 3D preference starts directly in 2D, warms the game 
     releasePlay();await expect(page.locator('.quiz-question')).toHaveText('Chọn câu trả lời 1');
     const enterMs=Date.now()-started;expect(modelFinished).toBe(0);await expect(host).toHaveCount(0);
     let failures=0;await page.route('**/api/online/play/*/attempt',async route=>{if(failures++===0)await route.fulfill({status:503,contentType:'application/json',body:JSON.stringify({error:'Kết nối thử nghiệm bị gián đoạn. Vui lòng thử lại.'})});else await route.continue();});
-    await page.locator('.answer-option').first().click();await expect(page.locator('.notice.error')).toContainText('Kết nối thử nghiệm bị gián đoạn');
+    const correctOpt=page.locator('.answer-option',{hasText:'Đúng 1'});
+    await correctOpt.click();await expect(page.locator('.notice.error')).toContainText('Kết nối thử nghiệm bị gián đoạn');
     expect((await f.pool.query('SELECT count(*)::int AS n FROM bao_an.attempts')).rows[0].n).toBe(0);
-    await expect(page.locator('.answer-option').first()).toBeDisabled();await page.locator('.notice.error').getByRole('button',{name:'Thử gửi lại đáp án',exact:true}).click();await expect(page.locator('.feedback-win')).toBeVisible();
+    await expect(correctOpt).toBeDisabled();await page.locator('.notice.error').getByRole('button',{name:'Thử gửi lại đáp án',exact:true}).click();await expect(page.locator('.feedback-win')).toBeVisible();
     expect((await f.pool.query('SELECT count(*)::int AS n FROM bao_an.attempts')).rows[0].n).toBe(1);
     const exitRefresh=page.waitForResponse(response=>new URL(response.url()).pathname==='/api/online/student/summary');
     await page.getByRole('button',{name:'← Thoát trò chơi',exact:true}).click();await exitRefresh;await expect(start).toBeVisible();
@@ -62,7 +63,7 @@ test('unavailable legacy models never block the 2D lesson',async({page})=>{
   try{
     await page.goto(f.origin+'/');await expect(page.locator('[data-hub-mode="light"]')).toBeVisible();await expect(page.locator('.ba3d-render-host')).toHaveCount(0);
     await page.getByRole('button',{name:'Chơi Đảo Câu Hỏi bằng bộ được giao',exact:true}).click();
-    await expect(page.locator('.quiz-question')).toHaveText('Chọn câu trả lời 1');await page.locator('.answer-option').first().click();await expect(page.locator('.feedback-win')).toBeVisible();
+    await expect(page.locator('.quiz-question')).toHaveText('Chọn câu trả lời 1');await page.locator('.answer-option',{hasText:'Đúng 1'}).click();await expect(page.locator('.feedback-win')).toBeVisible();
     await page.getByRole('button',{name:'← Thoát trò chơi',exact:true}).click();await expect(page.getByRole('button',{name:'Chơi Đảo Câu Hỏi bằng bộ được giao',exact:true})).toBeEnabled();
   }finally{await f.close();}
 });

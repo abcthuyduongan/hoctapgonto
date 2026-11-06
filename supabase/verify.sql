@@ -14,8 +14,8 @@ WITH required_tables(name) AS (
 ), api_roles AS (
   SELECT oid,rolname FROM pg_roles WHERE rolname IN ('anon','authenticated','service_role')
 ), checks AS (
-  SELECT 'schema_version_1' AS check_name,
-    (SELECT count(*)=1 AND min(version)=1 FROM bao_an.schema_version) AS passed
+  SELECT 'schema_version' AS check_name,
+    (SELECT max(version)>=8 FROM bao_an.schema_version) AS passed
   UNION ALL
   SELECT 'all_16_required_tables_exist',NOT EXISTS(
     SELECT 1 FROM required_tables r LEFT JOIN tables t ON t.relname=r.name WHERE t.oid IS NULL)

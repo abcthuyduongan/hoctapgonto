@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { playCompletionFanfare } from '../core/experience';
+import '../styles/games/completion.css';
 
 type Props = {
   title: string;

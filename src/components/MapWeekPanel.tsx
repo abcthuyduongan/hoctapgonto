@@ -53,7 +53,7 @@ export default function MapWeekPanel({
             type="button"
             className="map-nav-btn"
             onClick={onClose}
-            aria-label="Đóng bảng chi tiết"
+            aria-label="Đóng ✕ (bảng chi tiết)"
           >
             Đóng ✕
           </button>

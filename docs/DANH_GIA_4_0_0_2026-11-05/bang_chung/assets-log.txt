@@ -1,0 +1,5 @@
+
+> bao-an-learning@4.0.0 test:assets
+> node tests/release-online-assets.mjs
+
+ONLINE ASSET GATE PASS: 113 files, 5.08 MiB, 2D only, no authenticated precache.

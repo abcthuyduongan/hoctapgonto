@@ -1,0 +1,54 @@
+{
+  "kind": "Actual 4.0.1 built student UI and SQLite HTTP fixture; simulated another client reopens same question after wrong answer",
+  "firstOptions": [
+    "2",
+    "5",
+    "3",
+    "4"
+  ],
+  "retryOpenRequests": 1,
+  "optionsAfterRetry": [
+    "A2",
+    "B5",
+    "C3",
+    "D4"
+  ],
+  "newOptions": [
+    "4",
+    "2",
+    "5",
+    "3"
+  ],
+  "oldCorrectIndex": 0,
+  "newCorrectIndex": 1,
+  "attemptBodies": [
+    {
+      "attemptKey": "q1:answer:1",
+      "itemId": "q1",
+      "response": {
+        "kind": "choice",
+        "choiceIndex": 2
+      },
+      "hintsUsed": 0,
+      "elapsedMs": 64
+    },
+    {
+      "attemptKey": "q1:answer:2",
+      "itemId": "q1",
+      "response": {
+        "kind": "choice",
+        "choiceIndex": 0
+      },
+      "hintsUsed": 0,
+      "elapsedMs": 170
+    }
+  ],
+  "firstResultCorrect": false,
+  "secondUiDisplayedChosenContent": "2",
+  "secondResultCorrect": false,
+  "hasPresentationId": [
+    false,
+    false
+  ],
+  "reproduced": true
+}

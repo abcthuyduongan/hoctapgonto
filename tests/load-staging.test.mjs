@@ -15,7 +15,7 @@ function percentile(arr, p) {
   return sorted[Math.max(0, index)];
 }
 
-test('Staging Load Test: 30 then 100 concurrent students with audio & image gameplay', async t => {
+test('Synthetic Adapter Load Test (In-Process PGlite / Synthetic Concurrency): 30 then 100 accounts with audio & image gameplay logic', async t => {
   const origin = 'https://staging-load.example.test';
   const f = await createPostgresFixture(t);
 
@@ -158,12 +158,15 @@ test('Staging Load Test: 30 then 100 concurrent students with audio & image game
     openQuestionDurations.push(openDuration);
     assert.equal(openRes.status, 200);
 
+    const correctChoiceIdx = openRes.data.item?.options ? openRes.data.item.options.indexOf('8') : 0;
+
     // 6. Submit Attempt for Question
     const tA = performance.now();
     const ans = await req(`/play/${sessionId}/attempt`, 'POST', {
       attemptKey: `ans-${st.username}-${questionItem}-${randomUUID().slice(0, 6)}`,
       itemId: questionItem,
-      response: {kind: 'choice', choiceIndex: 0},
+      presentationId: openRes.data.item?.presentationId,
+      response: {kind: 'choice', choiceIndex: correctChoiceIdx >= 0 ? correctChoiceIdx : 0},
       hintsUsed: 0,
       elapsedMs: 2500
     });

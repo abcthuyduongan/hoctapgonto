@@ -1,0 +1,352 @@
+/* Bao An Learning - Game Stage & Dialog Layout */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(3, 29, 71, 0.77);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  overflow: auto;
+}
+
+.game-dialog {
+  width: min(900px, 100%);
+  max-height: calc(100vh - 40px);
+  overflow: auto;
+  background: #fff;
+  border-radius: 26px;
+  box-shadow: 0 35px 120px rgba(32, 32, 71, 0.4);
+}
+
+.game-dialog.adventure-dialog {
+  width: min(1150px, 100%);
+  border: 4px solid #a4deff;
+  border-radius: 28px;
+  max-height: calc(100dvh - 38px);
+  box-shadow: 0 32px 95px rgba(3, 27, 59, 0.6);
+  background: #e8f4ff;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.game-dialog-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 13px 23px;
+  min-height: 74px;
+  background: linear-gradient(100deg, #092e65, #155cab);
+  border-bottom: 2px solid #7cc9ff;
+  color: white;
+  position: relative;
+  z-index: 2;
+  flex: 0 0 auto;
+  gap: 14px;
+}
+
+.game-dialog-head h2 {
+  color: white;
+  font-size: 21px;
+  margin: 2px 0 0;
+  font-weight: 950;
+  letter-spacing: -0.02em;
+}
+
+.game-dialog-head .eyebrow {
+  color: #ffdf7e;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+}
+
+.game-dialog-head .button {
+  background: #eff8ff;
+  color: #114d91;
+  border: 2px solid #b6e3ff;
+}
+
+.game-dialog-head-info {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.game-stage-corner-landmark {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.18);
+  border: 2px solid rgba(255, 255, 255, 0.45);
+  padding: 3px;
+  flex-shrink: 0;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.3));
+}
+
+.game-region-backdrop {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background-size: cover;
+  background-position: center;
+  filter: blur(8px) saturate(1.15) brightness(0.9);
+  opacity: 0.22;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.game-region-backdrop picture,
+.game-region-backdrop-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+.play-panel {
+  padding: 22px 30px 18px;
+  box-sizing: border-box;
+}
+
+.game-card.play-panel {
+  background: #fff;
+  border: 1px solid #e7ebf6;
+  border-radius: 24px;
+  padding: 24px;
+  box-shadow: 0 12px 35px rgba(66, 84, 161, 0.08);
+}
+
+.game-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.world-stage {
+  min-height: 610px;
+  position: relative;
+  isolation: isolate;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  border-radius: 0 0 24px 24px;
+  padding: 22px 30px 18px;
+  background: #166fb5;
+  flex: 1 1 auto;
+}
+
+.world-stage .stage-backdrop {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  z-index: -3;
+  filter: saturate(1.08);
+}
+
+.world-stage .stage-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+}
+
+/* Default World HUD */
+.world-hud {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  position: relative;
+  z-index: 2;
+}
+
+.hud-label,
+.hud-score {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 30px;
+  padding: 10px 16px;
+  font-size: 12px;
+  letter-spacing: 0.03em;
+  font-weight: 950;
+  white-space: nowrap;
+}
+
+.hud-label {
+  color: white;
+  background: rgba(8, 43, 93, 0.86);
+  border: 2px solid #a6dafe;
+  box-shadow: 0 4px 0 #092a4a;
+}
+
+.hud-score {
+  color: #643e08;
+  background: linear-gradient(#fff9d6, #ffd668);
+  border: 2px solid #fff7d5;
+  box-shadow: 0 4px 0 #cd952b;
+}
+
+.world-stage-bottom {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: white;
+  text-shadow: 0 2px 5px #0b244b;
+  font-size: 12px;
+  font-weight: 850;
+  padding-top: 18px;
+  position: relative;
+  z-index: 2;
+}
+
+/* Ambient particles */
+.world-particles {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.world-particles i {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #fff4a5;
+  opacity: 0.7;
+  box-shadow: 0 0 22px 7px rgba(255, 243, 168, 0.33);
+  animation: va-fairy 7s linear infinite;
+}
+
+.world-particles i:nth-child(1) { top: 10%; left: 12%; animation-delay: -2s; }
+.world-particles i:nth-child(2) { top: 71%; left: 9%; animation-delay: -4s; width: 5px; height: 5px; }
+.world-particles i:nth-child(3) { top: 19%; right: 20%; animation-delay: -1s; }
+.world-particles i:nth-child(4) { bottom: 13%; right: 7%; animation-delay: -5s; width: 6px; height: 6px; }
+.world-particles i:nth-child(5) { top: 54%; left: 47%; animation-delay: -6s; width: 5px; height: 5px; }
+.world-particles i:nth-child(6) { top: 80%; right: 38%; animation-delay: -3s; width: 6px; height: 6px; }
+
+@keyframes va-fairy {
+  0% { transform: translate(0, 12px) scale(0.7); opacity: 0.18; }
+  50% { opacity: 0.85; }
+  100% { transform: translate(17px, -25px) scale(1.1); opacity: 0.08; }
+}
+
+/* Mascot & Guides */
+.world-guide,
+.forest-guide,
+.sentence-guide,
+.connect-guide,
+.trail-guide {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.guide-figure {
+  width: 175px;
+  height: 190px;
+  overflow: hidden;
+  border: 6px solid #f5eac7;
+  border-radius: 45% 45% 30% 30%;
+  background: linear-gradient(155deg, #68cdfa, #4ed4a8);
+  box-shadow: 0 10px 0 #0b6b83, 0 18px 22px rgba(4, 46, 78, 0.4);
+  animation: gw-float 4.5s ease-in-out infinite;
+}
+
+.guide-figure img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.guide-speech,
+.forest-speech,
+.connect-speech,
+.trail-speech {
+  background: #fffdf3;
+  color: #705325;
+  border: 3px solid #f5deac;
+  border-radius: 18px;
+  padding: 13px 17px;
+  font-size: 13px;
+  font-weight: 850;
+  max-width: 215px;
+  text-align: center;
+  box-shadow: 0 7px 0 #ad8649;
+  line-height: 1.5;
+}
+
+.ba37-mascot-window {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mascot-fallback {
+  display: inline-grid;
+  place-items: center;
+  font-size: 64px;
+  line-height: 1;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1050px) {
+  .guide-figure { width: 125px; height: 142px; }
+  .forest-guide { display: none; }
+}
+
+@media (max-width: 760px) {
+  .overlay { padding: 8px; align-items: flex-start; }
+  .game-dialog.adventure-dialog {
+    max-height: calc(100dvh - 16px);
+    border-radius: 18px;
+    border-width: 2px;
+  }
+  .game-dialog-head {
+    padding: 11px 14px;
+    min-height: 60px;
+  }
+  .game-dialog-head h2 { font-size: 16px; }
+  .game-dialog-head .button { font-size: 11px; padding: 8px 11px; }
+  .game-stage-corner-landmark { width: 40px; height: 40px; }
+  .world-stage {
+    padding: 14px 12px 14px;
+    min-height: 520px;
+    border-radius: 0 0 16px 16px;
+  }
+  .world-guide,
+  .sentence-guide,
+  .connect-guide,
+  .trail-guide { display: none; }
+  .hud-label,
+  .hud-score { font-size: 10px; padding: 7px 10px; }
+  .world-hud { margin-bottom: 12px; }
+  .world-stage-bottom { font-size: 10px; }
+}
+
+@media (max-width: 390px) {
+  .overlay { padding: 4px; }
+  .game-dialog.adventure-dialog { max-height: calc(100dvh - 8px); }
+  .hud-label,
+  .hud-score { font-size: 9px; padding: 6px 8px; }
+  .game-stage-corner-landmark { display: none; }
+}

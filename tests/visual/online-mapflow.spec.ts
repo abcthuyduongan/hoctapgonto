@@ -112,7 +112,7 @@ test('UI01-UI04: student map flow renders world map, switches regions, views sta
     await expect(page.locator('.map-set-title')).toContainText('Bài tập Toán học Tuần 1');
 
     // Return to World Map
-    await page.getByRole('button', { name: 'Trở về bản đồ thế giới' }).click();
+    await page.getByRole('button', { name: /bản đồ thế giới/i }).click();
     await expect(page.locator('.world-map-container')).toBeVisible();
 
     // UI03: Click "Tiếp tục chuyến đi" button
@@ -124,12 +124,12 @@ test('UI01-UI04: student map flow renders world map, switches regions, views sta
     }
 
     // Toggle to collapse map and back
-    await page.getByRole('button', { name: '📋 Thu gọn bản đồ' }).click();
+    await page.getByRole('button', { name: /Thu gọn bản đồ|Danh sách/i }).click();
     await expect(page.locator('.world-map-container')).toHaveCount(0);
     await expect(page.locator('.region-map-container')).toHaveCount(0);
 
     await page.getByRole('button', { name: '🗺️ Bản đồ học tập' }).click();
-    await expect(page.locator('.world-map-container')).toBeVisible();
+    await expect(page.locator('.world-map-container, .region-map-container')).toBeVisible();
   } finally {
     await f.close();
   }

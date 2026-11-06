@@ -25,7 +25,7 @@ async function fixture(page:Page,withSecondSubject=false){
     const pack={id:'flow-quiz',version:1,title:'Công nghệ | quiz | Tuần 01',kind:'quiz',subject:'thinking',grade:3,source:'local',publishedAt:'2026-10-18T00:00:00Z',items:[1,2].map(i=>({id:`flow-${i}`,objectiveId:'FLOW',kind:'multiple-choice',prompt:`Câu hỏi ${i}`,options:[`Đúng ${i}`,'Sai A','Sai B','Sai C'],correctIndex:0,explanation:'Đáp án đúng.'}))};
     await api('/weeks',{requestId:'flow-week',classId:cls.id,title:'Tuần 01',sets:[{subjectLabel:'Công nghệ',pack},...(withSecondSubject?[{subjectLabel:'Tiếng Anh',pack:{...pack,id:'flow-english',title:'Khám phá English',items:pack.items.map((item,index)=>({...item,id:`english-${index}`,prompt:`Câu hỏi Tiếng Anh ${index+1}`}))}}]:[])]});
     await page.context().clearCookies();await api('/login',{username:'flow.child',password});await page.goto(origin+'/');
-    await page.getByRole('button',{name:'📋 Thu gọn bản đồ',exact:true}).click();
+    await page.getByRole('button',{name:/Thu gọn bản đồ|Danh sách/i}).click();
     await expect(page.locator('[data-hub-mode="light"]')).toBeVisible();
     return{server,async close(){await page.unrouteAll({behavior:'ignoreErrors'});server.closeAllConnections?.();await new Promise<void>(resolve=>server.close(()=>resolve()));server.onlineClose();expect(path.dirname(directory)).toBe(root);expect(path.basename(directory)).toMatch(/^student-flow-/);await rm(directory,{recursive:true,force:true});}};
   }catch(error){server.closeAllConnections?.();await new Promise<void>(resolve=>server.close(()=>resolve()));server.onlineClose();expect(path.dirname(path.resolve(directory))).toBe(root);expect(path.basename(directory)).toMatch(/^student-flow-/);await rm(directory,{recursive:true,force:true});throw error;}
@@ -36,7 +36,7 @@ test('the lightweight exploration map and wallet remain usable on phone and desk
   try{
     for(const width of [320,390,620,1440]){
       await page.setViewportSize({width,height:844});
-      const wallet=page.getByRole('button',{name:'Ví đổi sao',exact:true});
+      const wallet=page.getByRole('button',{name:/Ví đổi sao|Mở ví/i});
       await expect(page.getByRole('heading',{name:'Chào Đặng Ngọc Bảo An'})).toBeVisible();
       await expect(page.getByRole('button',{name:'Khám phá Công nghệ · Công nghệ | quiz | Tuần 01',exact:true})).toHaveAttribute('aria-pressed','true');
       await expect(page.getByRole('progressbar',{name:'Số câu đạt yêu cầu tuần này'})).toHaveAttribute('value','0');
@@ -97,11 +97,11 @@ test('saving an answer and completing a lesson keep the exit disabled until serv
     const start=page.getByRole('button',{name:'Chơi Đảo Câu Hỏi bằng bộ được giao',exact:true});await start.click();
     await expect(page.locator('.quiz-question')).toHaveText('Câu hỏi 1');
     await page.route('**/api/online/play/*/attempt',async route=>{saving=true;await answerGate.held;await route.continue();},{times:1});
-    await page.locator('.answer-option').first().click();await expect.poll(()=>saving).toBe(true);
+    await page.locator('.answer-option',{hasText:'Đúng 1'}).click();await expect.poll(()=>saving).toBe(true);
     await expect(page.locator('.game-dialog-head button')).toBeDisabled();
     await expect(page.getByRole('status').filter({hasText:'Đang lưu câu trả lời…'})).toBeVisible();answerGate.release();
     await page.getByRole('button',{name:'Đến trạm kế tiếp ➜',exact:true}).click();
-    await expect(page.locator('.quiz-question')).toHaveText('Câu hỏi 2');await page.locator('.answer-option').first().click();
+    await expect(page.locator('.quiz-question')).toHaveText('Câu hỏi 2');await page.locator('.answer-option',{hasText:'Đúng 2'}).click();
     await page.route('**/api/online/play/*/complete-compact',async route=>{completing=true;await completeGate.held;await route.continue();});
     await page.getByRole('button',{name:'Hoàn thành bộ câu hỏi',exact:true}).click();await expect.poll(()=>completing).toBe(true);
     await expect(page.locator('.game-dialog-head button')).toBeDisabled();
@@ -126,7 +126,7 @@ test('a refresh snapshot requested before play cannot replace newly saved stars'
     const refresh=page.getByRole('button',{name:'Làm mới tiến độ',exact:true});await refresh.click();await expect.poll(()=>requested).toBe(true);
     await expect(page.getByRole('button',{name:'Đang làm mới…',exact:true})).toBeDisabled();
     await page.getByRole('button',{name:'Chơi Đảo Câu Hỏi bằng bộ được giao',exact:true}).click();
-    await expect(page.locator('.quiz-question')).toHaveText('Câu hỏi 1');await page.locator('.answer-option').first().click();
+    await expect(page.locator('.quiz-question')).toHaveText('Câu hỏi 1');await page.locator('.answer-option',{hasText:'Đúng 1'}).click();
     await expect(page.locator('.feedback-win')).toBeVisible();await expect(page.locator('.game-wallet-button')).toContainText('3 sao');
     snapshot.release();await expect.poll(()=>settled).toBe(true);
     await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
@@ -143,7 +143,7 @@ test('a failed answer or exit clears the busy state and allows a safe retry',asy
     await page.getByRole('button',{name:'Chơi Đảo Câu Hỏi bằng bộ được giao',exact:true}).click();
     await expect(page.locator('.quiz-question')).toHaveText('Câu hỏi 1');
     await page.route('**/api/online/play/*/attempt',route=>route.fulfill({status:503,contentType:'application/json',body:JSON.stringify({error:'Thử nghiệm mất kết nối khi lưu.'})}),{times:1});
-    await page.locator('.answer-option').first().click();
+    await page.locator('.answer-option',{hasText:'Đúng 1'}).click();
     await expect(page.getByRole('alert')).toContainText('Thử nghiệm mất kết nối khi lưu.');
     await expect(page.locator('.online-game-request-status')).toHaveCount(0);
     await expect(page.locator('.game-dialog-head button')).toBeEnabled();

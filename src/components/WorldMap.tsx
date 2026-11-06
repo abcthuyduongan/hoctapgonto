@@ -40,7 +40,7 @@ export default function WorldMap({
               className="map-nav-btn primary"
               disabled={disabled}
               onClick={onContinueCurrent}
-              aria-label={`Tiếp tục bài học: ${overview.currentWeek.title}`}
+              aria-label={`▶ Tiếp tục chuyến đi (${overview.currentWeek.title})`}
             >
               ▶ Tiếp tục chuyến đi ({overview.currentWeek.title})
             </button>
@@ -114,9 +114,6 @@ export default function WorldMap({
                 }
                 disabled={disabled}
                 onClick={handleClick}
-                aria-label={`${label}, ${closedCount} trên ${assignedCount} tuần hoàn thành${
-                  hasCurrent ? ', đang học tại đây' : ''
-                }${isLocked ? ', chưa mở' : ''}`}
               >
                 <div className="map-region-badge">
                   <strong>

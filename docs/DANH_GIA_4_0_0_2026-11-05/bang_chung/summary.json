@@ -1,0 +1,59 @@
+{
+  "auditDate": "2026-11-05",
+  "timezone": "Asia/Saigon",
+  "baseline": {
+    "version": "4.0.0",
+    "commit": "f7c93337669379d768419ae1ab43cbde69f2aabe",
+    "sourceId": "dcbc03d1d20639cb07741c3d20800a427e29cd90b47714010b63f8dcad9d4d72"
+  },
+  "verdict": "C12_NOT_CONFIRMED_RELEASE_BLOCKED",
+  "applicationCodeChanged": false,
+  "productionDataChanged": false,
+  "deploymentPerformed": false,
+  "checks": [
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0
+    },
+    {
+      "command": "npm test",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run build",
+      "exitCode": 0,
+      "note": "First sandbox-restricted attempt failed to write dist; approved rerun succeeded."
+    },
+    {
+      "command": "npm run test:assets",
+      "exitCode": 0,
+      "files": 113,
+      "MiBRounded": 5.08,
+      "currentLimitMiB": 8,
+      "baselineLimitMiB": 5
+    }
+  ],
+  "browser": {
+    "configured": 182,
+    "passed": 160,
+    "failed": 12,
+    "skipped": 2,
+    "notRun": 8,
+    "maxFailures": 12
+  },
+  "edgeMobileRecheck": {
+    "executions": 2,
+    "failed": 2
+  },
+  "reproduction": {
+    "tests": 7,
+    "reproduced": 7,
+    "note": "Passing assertions confirm unwanted baseline behavior; not acceptance passes."
+  },
+  "limitations": [
+    "PostgreSQL logic tested with PGlite, not real Supabase load.",
+    "Public site checked read-only at two endpoints.",
+    "No independent human pilot or subject-content certification."
+  ],
+  "files": "See individual JSON files and reports in this directory."
+}

@@ -28,10 +28,10 @@ async function fixture(t,{bucket=null}={}){
 }
 async function counts(db){const rows={};for(const table of CLOUD_TABLES)rows[table]=Number((await db.query(`SELECT count(*) AS n FROM bao_an.${table}`)).rows[0].n);return rows;}
 
-test('cloud setup applies the real migration to sixteen empty private tables and creates only private bucket metadata',async t=>{
+test('cloud setup applies all migrations to twenty-nine empty private tables and creates only private bucket metadata',async t=>{
   const f=await fixture(t),report=await f.run();
-  assert.deepEqual(report,{mode:'setup',schemaVersion:1,tables:16,rls:true,browserAccessBlocked:true,configured:false,privateBucket:true,mediaMaxBytes:2097152});
-  const expected=Object.fromEntries(CLOUD_TABLES.map(name=>[name,name==='schema_version'?1:0]));assert.deepEqual(await counts(f.db),expected);
+  assert.deepEqual(report,{mode:'setup',schemaVersion:8,tables:29,rls:true,browserAccessBlocked:true,configured:false,privateBucket:true,mediaMaxBytes:2097152});
+  const expected=Object.fromEntries(CLOUD_TABLES.map(name=>[name,name==='schema_version'?8:0]));assert.deepEqual(await counts(f.db),expected);
   assert.deepEqual(f.storageCalls.map(row=>row.method),['getBucket','createBucket','getBucket']);
   assert.deepEqual(f.storageCalls[1].options,CLOUD_MEDIA_OPTIONS);
   assert.equal(new URL(f.connections[0].connectionString).username,'owner');assert.equal(f.connections[0].ssl.rejectUnauthorized,true);

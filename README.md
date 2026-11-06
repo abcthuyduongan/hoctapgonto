@@ -1,8 +1,10 @@
-# Bảo An Learning · Phiên bản 4.0.0 (Bản hoàn thiện)
+> **Cập nhật khắc phục sau đánh giá độc lập (06/11/2026):** Toàn bộ các lỗi bảo mật P0/P1 phát hiện tại đợt kiểm thử độc lập 05/11/2026 (L01–L07) đã được sửa triệt để và nghiệm thu thành công trên bản **4.0.1**. Chi tiết xem [Ma trận nghiệm thu 4.0.1](docs/DANH_GIA_4_0_0_2026-11-05/03_MA_TRAN_NGHIEM_THU.md) và [Kết quả nghiệm thu JSON](docs/DANH_GIA_4_0_0_2026-11-05/KET_QUA_NGHIEM_THU_4_0_1.json).
 
-> **Trạng thái:** Bản phát hành chính thức 4.0.0 — Đầy đủ 10 điều kiện theo kế hoạch hoàn thiện 13 tuần [docs/KE_HOACH_HOAN_THIEN_THEO_TUAN_2026-11-05.md](docs/KE_HOACH_HOAN_THIEN_THEO_TUAN_2026-11-05.md).  
-> **Bộ học liệu:** Đã duyệt sẵn sàng 8 tuần học kỳ 2 lớp 3 (`data/curriculum/hoc-ky-2-8-tuan.json`).  
-> **Kiểm thử nghiệm thu:** 100% tests đạt (254 online, 46 cloud, 26 bản đồ, 12 release, 0 lỗi P0/P1).
+# Bảo An Learning · Phiên bản 4.0.1 (Bản hoàn thiện đã qua nghiệm thu)
+
+> **Trạng thái:** Bản phát hành hoàn thiện 4.0.1 — Đã khắc phục 100% các lỗi bảo mật máy chủ, quyền PIN, sao lưu cloud, migration DDL, xáo đáp án ngẫu nhiên và cuộn giao diện di động.  
+> **Bộ học liệu:** Khung 8 tuần học kỳ 2 lớp 3 (`data/curriculum/hoc-ky-2-8-tuan.json`) đạt chuẩn kỹ thuật; xáo đáp án tự động độc lập với vị trí nguồn.  
+> **Kiểm thử nghiệm thu:** 100% automated tests đạt (263 online, 47 cloud, 26 bản đồ, 12 release, 28/28 Playwright browser visual tests, 0 lỗi P0/P1).
 
 Ứng dụng học tập thông minh dành cho học sinh tiểu học (Lớp 3) kết hợp gia đình và nhà trường:
 - **Bản đồ thế giới học tập 2D:** 4 vùng môn học (Toán học, Tiếng Việt, Tiếng Anh, Tin học), 28 tranh cảnh quan và địa danh văn hóa Việt Nam, chặng học tập mở theo tuần, có sương mù và thẻ khám phá kể chuyện.
@@ -36,10 +38,10 @@ Truy cập ứng dụng tại: `http://127.0.0.1:4180/?online=1`
 
 ---
 
-## 2. Gói phát hành chính thức 4.0.0
+## 2. Gói phát hành chính thức 4.0.1
 
-- **Gói chạy ngoại tuyến (Standalone ZIP):** `releases/bao-an-learning-4.0.0.zip`
-- **Gói lưu trữ mã nguồn đầy đủ (Source ZIP):** `releases/bao-an-learning-4.0.0-source.zip`
+- **Gói chạy ngoại tuyến (Standalone ZIP):** `releases/bao-an-learning-4.0.1.zip`
+- **Gói lưu trữ mã nguồn đầy đủ (Source ZIP):** `releases/bao-an-learning-4.0.1-source.zip`
 - **Ghi chú phát hành chi tiết:** [docs/RELEASE_NOTES_v4.0.0.md](docs/RELEASE_NOTES_v4.0.0.md)
 - **Hướng dẫn sử dụng toàn diện:** [docs/HUONG_DAN_SU_DUNG.html](docs/HUONG_DAN_SU_DUNG.html)
 - **Cẩm nang phụ huynh 1 trang:** [docs/HUONG_DAN_PHU_HUYNH.md](docs/HUONG_DAN_PHU_HUYNH.md)

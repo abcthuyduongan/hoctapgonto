@@ -1,0 +1,89 @@
+{
+  "plannedDate": "2026-11-06",
+  "timezone": "Asia/Saigon",
+  "identity": {
+    "version": "4.0.2",
+    "commit": "f7c93337669379d768419ae1ab43cbde69f2aabe",
+    "sourceId": "b5f1c02e0b35b7ea54ce5bc70e2707538d8aafef46c95d7b2513ec8ee8ae697a",
+    "displayMode": "2d",
+    "questionProtocolVersion": 1
+  },
+  "kind": "Read-only planning snapshot; no implementation or new benchmark",
+  "viteInstalled": "7.3.7",
+  "images": [
+    {
+      "file": "public/art/maps/map-computing-tall.webp",
+      "width": 1024,
+      "height": 1365,
+      "bytes": 142840,
+      "sha256": "441c8d30691751230683805bfb9f3d8d95d74ac49aa28cd12e8812c1693bcb6c"
+    },
+    {
+      "file": "public/art/maps/map-computing-wide.webp",
+      "width": 1600,
+      "height": 1000,
+      "bytes": 152296,
+      "sha256": "cb6571a7d3acbe61dcc92d4cf05c65139e32ca8f16cc76e528d447def01c943d"
+    },
+    {
+      "file": "public/art/maps/map-english-tall.webp",
+      "width": 1024,
+      "height": 1365,
+      "bytes": 105422,
+      "sha256": "6c88f4cbfbd9e6e48ebc7f0c3f466497237d889265ec84e276f5ac674d300c02"
+    },
+    {
+      "file": "public/art/maps/map-english-wide.webp",
+      "width": 1600,
+      "height": 1000,
+      "bytes": 95018,
+      "sha256": "1a089f57f42312e45db72b48ac7bb2cabb3d58bdfe4ae9d6b3997e91df671e9c"
+    },
+    {
+      "file": "public/art/maps/map-math-tall.webp",
+      "width": 1024,
+      "height": 1365,
+      "bytes": 214492,
+      "sha256": "1d61884e635f43ae43030ae6534c132b727665e47b649b01629934ea05c3d64b"
+    },
+    {
+      "file": "public/art/maps/map-math-wide.webp",
+      "width": 1600,
+      "height": 1000,
+      "bytes": 222302,
+      "sha256": "f1a14eb2730a81813e31be084ca5888bab648464c85dffe751f53d1b3f8c3227"
+    },
+    {
+      "file": "public/art/maps/map-vietnamese-tall.webp",
+      "width": 1024,
+      "height": 1365,
+      "bytes": 214324,
+      "sha256": "b608d8e581aec851c875d17f5213f135b560441e6870c60a5c087ec0f5f96152"
+    },
+    {
+      "file": "public/art/maps/map-vietnamese-wide.webp",
+      "width": 1600,
+      "height": 1000,
+      "bytes": 197638,
+      "sha256": "abb9e665c6bccf7ed71c20aadaa2378d3db6b64248b2b7a3cfc79d0454db7e31"
+    },
+    {
+      "file": "public/art/maps/map-world-tall.webp",
+      "width": 1024,
+      "height": 1365,
+      "bytes": 131644,
+      "sha256": "314ff67e5b54aeec701af95a0c094df2df9885c59e7902f4c8f6b66527c84081"
+    },
+    {
+      "file": "public/art/maps/map-world-wide.webp",
+      "width": 1600,
+      "height": 1000,
+      "bytes": 144438,
+      "sha256": "42ce39cc241140cd8967affa7bda72fcf258ae700d9a58756f6b97dc366a3e9d"
+    }
+  ],
+  "notes": [
+    "Historical 3.5-3.9s measurements refer to prior audited builds and must be repeated on the implementation baseline.",
+    "Current performance and staging readiness have not been recertified by this planning task."
+  ]
+}

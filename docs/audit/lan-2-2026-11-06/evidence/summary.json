@@ -1,0 +1,80 @@
+{
+  "auditDate": "2026-11-06",
+  "round": 2,
+  "identity": {
+    "version": "4.0.1",
+    "commit": "f7c93337669379d768419ae1ab43cbde69f2aabe",
+    "sourceId": "5d9b56a43e18706af1f541af5ef12477c679a8d2fa0c0b1e667f45f1b48261a8",
+    "displayMode": "2d",
+    "questionProtocolVersion": 1
+  },
+  "previousSourceId": "59d67c93a8c3dd8839db1091c8760329f8d11c63984761ee5fe8342833bdff77",
+  "score": {
+    "architecture": 11,
+    "ui": 12,
+    "ux": 14,
+    "performance": 16,
+    "securityStability": 5,
+    "maintenance": 2,
+    "total": 60,
+    "maximum": 100,
+    "provisional": true
+  },
+  "verdict": "NOT_READY_FOR_FINAL_LOCK_OR_OFFICIAL_RELEASE",
+  "checks": {
+    "typecheckExit": 0,
+    "npmTestExit": 0,
+    "nodeTestsPassed": 350,
+    "buildExit": 0,
+    "assetsExit": 0,
+    "browserExit": 1,
+    "browser": {
+      "configured": 182,
+      "passed": 152,
+      "failed": 24,
+      "skippedMissingFixture": 2,
+      "notRunBlockedBySerial": 4,
+      "durationMs": 1378423.962
+    },
+    "independentAudit": {
+      "assertionsPassed": 14,
+      "bugReproductionAssertions": 11,
+      "repairedControlAssertions": 3
+    },
+    "browserLab": {
+      "samples": 54,
+      "profiles": 2,
+      "repetitions": 3,
+      "errors": 0
+    }
+  },
+  "applicationCodeChanged": false,
+  "sourceIntegrity": {
+    "checkedAtUtc": "2026-11-06T06:25:05.711Z",
+    "filesCompared": 445,
+    "changedExistingFiles": [],
+    "beforeIdentity": {
+      "version": "4.0.1",
+      "commit": "f7c93337669379d768419ae1ab43cbde69f2aabe",
+      "sourceId": "5d9b56a43e18706af1f541af5ef12477c679a8d2fa0c0b1e667f45f1b48261a8",
+      "displayMode": "2d",
+      "questionProtocolVersion": 1
+    },
+    "afterIdentity": {
+      "version": "4.0.1",
+      "commit": "f7c93337669379d768419ae1ab43cbde69f2aabe",
+      "sourceId": "5d9b56a43e18706af1f541af5ef12477c679a8d2fa0c0b1e667f45f1b48261a8",
+      "displayMode": "2d",
+      "questionProtocolVersion": 1
+    },
+    "runtimeUnchanged": true
+  },
+  "productionDataChanged": false,
+  "deployed": false,
+  "limitations": [
+    "PostgreSQL API cases use PGlite fixture, not real Supabase deployment.",
+    "Performance is local browser lab; no physical 4G device/field INP.",
+    "Full E2E failures are classified by trace, not all product failures.",
+    "Assert passes reproducing bugs are not product acceptance."
+  ]
+}

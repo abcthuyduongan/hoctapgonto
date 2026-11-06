@@ -1,0 +1,15 @@
+{
+  "kind": "Chrome desktop mobile viewport390x844, actual built app, axe default rules including color-contrast; not physical device or real200percentzoom",
+  "map": [],
+  "town": [],
+  "townCell": {
+    "x": 50,
+    "y": 610.90625,
+    "width": 34,
+    "height": 44
+  },
+  "scroll": {
+    "viewport": 390,
+    "documentWidth": 375
+  }
+}

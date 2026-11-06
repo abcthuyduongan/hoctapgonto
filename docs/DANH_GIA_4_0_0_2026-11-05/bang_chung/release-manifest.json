@@ -1,0 +1,634 @@
+{
+  "schemaVersion": 1,
+  "version": "4.0.0",
+  "pilot": true,
+  "releaseReady": false,
+  "humanPilotStatus": "UNVERIFIED",
+  "humanPilotTarget": "Quản lý và học sinh, Windows Edge/Chrome: Excel, tám dạng câu, năm game, đổi sao, sao lưu và khôi phục",
+  "createdAt": "2026-11-05T11:45:28.307Z",
+  "buildId": "dcbc03d1d20639cb",
+  "databaseSchemaVersion": 1,
+  "storageSchemas": {
+    "localSqlite": 1,
+    "cloudPostgres": 1
+  },
+  "assetCount": 113,
+  "payloadSha256": "d8812b2d9554d235ecbaced225170c0ec56ddb4331ab713850d74bb643523c46",
+  "files": [
+    {
+      "path": "app/art/auth/auth-welcome.webp",
+      "bytes": 69426,
+      "sha256": "3a7dbcdc4c87e79c47d79cbbb69ab605152e0a7f424aca60fbb85957b3fa6479"
+    },
+    {
+      "path": "app/art/fox-guide-common.webp",
+      "bytes": 29358,
+      "sha256": "257ca7360cb2d016b1b73a316b6f3c6f320be9458e88fedca1aa52cf9a2d2feb"
+    },
+    {
+      "path": "app/art/game-cards/game-card-memory-grove.webp",
+      "bytes": 64242,
+      "sha256": "718ffa364e85e4f896b7d3e1383d39b6f712309634623e940b66c32e0d7ef4ae"
+    },
+    {
+      "path": "app/art/game-cards/game-card-question-island.webp",
+      "bytes": 61316,
+      "sha256": "094a9c026a771d38a131bae05380f6bdfff6673842397658bd22081d4a4d1c80"
+    },
+    {
+      "path": "app/art/game-cards/game-card-sentence-house.webp",
+      "bytes": 54470,
+      "sha256": "0ac0c2c2e003ee892ebd8ca9fc7e6e853e97930708338d074143876e3ac2b89d"
+    },
+    {
+      "path": "app/art/game-cards/game-card-sequence-trail.webp",
+      "bytes": 58548,
+      "sha256": "bbc7e9fa9eb5d2c99168e3cd614e761cba76aeae9251934a9a1ad2b731d1669d"
+    },
+    {
+      "path": "app/art/game-cards/game-card-word-bridge.webp",
+      "bytes": 60310,
+      "sha256": "ab8afbc61c50c853c957c1c31922fbdf947cbd38468755f4103acc42d4c9a6b1"
+    },
+    {
+      "path": "app/art/landmarks/place-computing-info-station.webp",
+      "bytes": 27252,
+      "sha256": "edca8ab4f4d94664c75c81446bba2ebf916ac1ea65c05354ea8eaf2990aac1cc"
+    },
+    {
+      "path": "app/art/landmarks/place-computing-keyboard-garden.webp",
+      "bytes": 30088,
+      "sha256": "04a7a0a34ea61fca2e781a132dbf68ba1c45f98c7e108ba475dc9139599537d7"
+    },
+    {
+      "path": "app/art/landmarks/place-computing-workshop.webp",
+      "bytes": 29262,
+      "sha256": "3445ff5e8547303284d39a0e7f9c8e1182b840bc68304e1ec331cce555971abb"
+    },
+    {
+      "path": "app/art/landmarks/place-english-cafe.webp",
+      "bytes": 29352,
+      "sha256": "31ac62b277faf6dd9196bfaf6d7ee0cac127a65b2535bc6c10063c11c5ab5ebb"
+    },
+    {
+      "path": "app/art/landmarks/place-english-harbor.webp",
+      "bytes": 22844,
+      "sha256": "f5ec9aea76de44b1026530461c1c59fad16324b66ceaa2c653aac0bc810bc04f"
+    },
+    {
+      "path": "app/art/landmarks/place-english-lighthouse.webp",
+      "bytes": 20050,
+      "sha256": "92baadd50c398b763fb5e42513ded458449899a45b5af44f79237d678de4620c"
+    },
+    {
+      "path": "app/art/landmarks/place-math-garden.webp",
+      "bytes": 33436,
+      "sha256": "5113ea7f6c4a5bdae1bf1d37e9e3b0519b5b06a760e81ca88add5ac12fc2e0ef"
+    },
+    {
+      "path": "app/art/landmarks/place-math-market.webp",
+      "bytes": 33626,
+      "sha256": "f61be569429a80cd6559e856d5000ef41809582658a2ec8fbbbdae714c9d245e"
+    },
+    {
+      "path": "app/art/landmarks/place-math-number-house.webp",
+      "bytes": 26840,
+      "sha256": "9b99959d5e59d011654fc0d493841fba11ac88b5a55e87c95e66956b105193a4"
+    },
+    {
+      "path": "app/art/landmarks/place-vietnamese-library.webp",
+      "bytes": 30348,
+      "sha256": "2ef4546e69765aca7412f8d9ef148210143ba3d96b18896afb81f6874b50c148"
+    },
+    {
+      "path": "app/art/landmarks/place-vietnamese-story-house.webp",
+      "bytes": 27614,
+      "sha256": "e259562be76e520f5fe6619abf381e0896a1d4dd0f25071754efb840e6e26cdc"
+    },
+    {
+      "path": "app/art/landmarks/place-vietnamese-word-tree.webp",
+      "bytes": 27278,
+      "sha256": "bb185bdc3bf01a284c295ae332e6b11db19da5b425d3270e84ec77e954770730"
+    },
+    {
+      "path": "app/art/maps/manifest.json",
+      "bytes": 11543,
+      "sha256": "8e37ccbca6dcf8293e7edcb5ffa9ad0ca12587d11caa05610256ed71e418d285"
+    },
+    {
+      "path": "app/art/maps/map-computing-tall.webp",
+      "bytes": 142840,
+      "sha256": "441c8d30691751230683805bfb9f3d8d95d74ac49aa28cd12e8812c1693bcb6c"
+    },
+    {
+      "path": "app/art/maps/map-computing-wide.webp",
+      "bytes": 152296,
+      "sha256": "cb6571a7d3acbe61dcc92d4cf05c65139e32ca8f16cc76e528d447def01c943d"
+    },
+    {
+      "path": "app/art/maps/map-english-tall.webp",
+      "bytes": 105422,
+      "sha256": "6c88f4cbfbd9e6e48ebc7f0c3f466497237d889265ec84e276f5ac674d300c02"
+    },
+    {
+      "path": "app/art/maps/map-english-wide.webp",
+      "bytes": 95018,
+      "sha256": "1a089f57f42312e45db72b48ac7bb2cabb3d58bdfe4ae9d6b3997e91df671e9c"
+    },
+    {
+      "path": "app/art/maps/map-math-tall.webp",
+      "bytes": 214492,
+      "sha256": "1d61884e635f43ae43030ae6534c132b727665e47b649b01629934ea05c3d64b"
+    },
+    {
+      "path": "app/art/maps/map-math-wide.webp",
+      "bytes": 222302,
+      "sha256": "f1a14eb2730a81813e31be084ca5888bab648464c85dffe751f53d1b3f8c3227"
+    },
+    {
+      "path": "app/art/maps/map-vietnamese-tall.webp",
+      "bytes": 214324,
+      "sha256": "b608d8e581aec851c875d17f5213f135b560441e6870c60a5c087ec0f5f96152"
+    },
+    {
+      "path": "app/art/maps/map-vietnamese-wide.webp",
+      "bytes": 197638,
+      "sha256": "abb9e665c6bccf7ed71c20aadaa2378d3db6b64248b2b7a3cfc79d0454db7e31"
+    },
+    {
+      "path": "app/art/maps/map-world-tall.webp",
+      "bytes": 131644,
+      "sha256": "314ff67e5b54aeec701af95a0c094df2df9885c59e7902f4c8f6b66527c84081"
+    },
+    {
+      "path": "app/art/maps/map-world-wide.webp",
+      "bytes": 144438,
+      "sha256": "42ce39cc241140cd8967affa7bda72fcf258ae700d9a58756f6b97dc366a3e9d"
+    },
+    {
+      "path": "app/art/memory-card-back.svg",
+      "bytes": 1945,
+      "sha256": "cf682114b2d717349620f60ee9cbb54c35e4b8cece6ef340b976e01aa49add32"
+    },
+    {
+      "path": "app/art/original-math.webp",
+      "bytes": 46316,
+      "sha256": "8fdf8c8b103ed4290453bec4ca15c39223f9b8d13338441ca2bf4af9f8301497"
+    },
+    {
+      "path": "app/art/original-memory.webp",
+      "bytes": 32212,
+      "sha256": "56b4427fc68d7066271f0ad15d97c07319c9d1b0d0af2004f9c8d7d3cbb5bb9a"
+    },
+    {
+      "path": "app/art/original-sentence.webp",
+      "bytes": 18528,
+      "sha256": "b218d7c822a1b6ece32857d38f8dd4381bf117b1dc544c3ab1f8bdaa0b5b7c70"
+    },
+    {
+      "path": "app/art/original-world.webp",
+      "bytes": 68520,
+      "sha256": "5475ded5168b9bab4acd723ffa811f093fa28d5ad6973028766e36510ae5b595"
+    },
+    {
+      "path": "app/art/premium-game-math.webp",
+      "bytes": 148040,
+      "sha256": "53006f4a831f218e0cd748f0b0e2bb921f3daad291699b1a7dbf123deec8f2dc"
+    },
+    {
+      "path": "app/art/premium-game-memory.webp",
+      "bytes": 156212,
+      "sha256": "a1a9c78ada13aca43e4bc379ce6255122577300dd778828d0fff94fc48fc9b0f"
+    },
+    {
+      "path": "app/art/premium-game-sentence.webp",
+      "bytes": 143530,
+      "sha256": "839cb7bbe05afbd39683963155451637693834ce14e58fbb5e918b15b3cde9f0"
+    },
+    {
+      "path": "app/art/premium-math-cinematic.webp",
+      "bytes": 146580,
+      "sha256": "8df46f21157af594000c47e490c744d72ac98d833d58c9e2e3843489ecf326a3"
+    },
+    {
+      "path": "app/art/premium-memory-cinematic.webp",
+      "bytes": 153412,
+      "sha256": "84b5c97215e45f5f571c279818793dad48e7e657c56b590cf7ad7c31a1fb423f"
+    },
+    {
+      "path": "app/art/premium-sentence-cinematic.webp",
+      "bytes": 142682,
+      "sha256": "6778731995c022ccb9f243d35ad7a8363a0e1097086d2b03a2530884cd7f5d9d"
+    },
+    {
+      "path": "app/art/premium-world-cinematic.webp",
+      "bytes": 116606,
+      "sha256": "8fe75a8443dfe4f03a6349b2ce68773dd2099f4d9421b72dca36cab4e692ca21"
+    },
+    {
+      "path": "app/art/premium-world-clarity.webp",
+      "bytes": 198232,
+      "sha256": "4a8a41caa944fd19f0ee6d878e06c27610e45688fd4758971ff2e64362073e97"
+    },
+    {
+      "path": "app/art/premium-world-scene.webp",
+      "bytes": 79682,
+      "sha256": "5f673353c37bd054df5a8e3e24b4c55ff706274a71b62590531750b098b06ea9"
+    },
+    {
+      "path": "app/art/premium-world-vivid.webp",
+      "bytes": 131536,
+      "sha256": "984292abc0a67fa013c54f60d08c79dab3b577ba825dcfa8a69e4ce4177846c8"
+    },
+    {
+      "path": "app/art/town/building-ancient-tree.webp",
+      "bytes": 6026,
+      "sha256": "95a82ddaccb0db2192cc3269cfe2916c265cdcc29506fa4b7678bcc4eaa5c92c"
+    },
+    {
+      "path": "app/art/town/building-bell-tower.webp",
+      "bytes": 3604,
+      "sha256": "92ea721e7fe5fe223cd5bbe8848af9505f5c084092dbba657dc340cbfccaa2a2"
+    },
+    {
+      "path": "app/art/town/building-cottage.webp",
+      "bytes": 5216,
+      "sha256": "3de63eb2c6c82101b4fcd7355dcd0e18ccca8e4b31c254acd7a8c13807778650"
+    },
+    {
+      "path": "app/art/town/building-fishing-dock.webp",
+      "bytes": 5236,
+      "sha256": "55392f11a4a5fffdc497cc26a3b276ac3979c9902f9acd42b87917b875b6cef3"
+    },
+    {
+      "path": "app/art/town/building-flower-garden.webp",
+      "bytes": 5334,
+      "sha256": "c1534fc6cc1aa12dab0b3530eff1fdd5be801038ae16ec3a338f670013f4abf1"
+    },
+    {
+      "path": "app/art/town/building-log-cabin.webp",
+      "bytes": 5184,
+      "sha256": "771768fe6dc3f94a69bff58e39fea25bd4d0a4631472f03226ea609656866909"
+    },
+    {
+      "path": "app/art/town/building-mini-library.webp",
+      "bytes": 5192,
+      "sha256": "429440e8d9adc5d707e99bfaaf19f6e3b0d320c7f8b69e59acdcd8b3dbd0a4c2"
+    },
+    {
+      "path": "app/art/town/building-street-lamp.webp",
+      "bytes": 5616,
+      "sha256": "a041a20e6cc74a7f140ddd8c08eb94c17d7e7366171236b4705abc4b093c2097"
+    },
+    {
+      "path": "app/art/town/building-village-market.webp",
+      "bytes": 5198,
+      "sha256": "d67c9c30cc857e38127e99717c1bb6f07034c1c549a4513a471747cbe7c3a552"
+    },
+    {
+      "path": "app/art/town/building-water-well.webp",
+      "bytes": 4808,
+      "sha256": "bf98590c4cb9fdd941a9db6d84b9685de2e4f7772a05202adc7304f5d7917b9e"
+    },
+    {
+      "path": "app/art/town/building-windmill.webp",
+      "bytes": 7092,
+      "sha256": "d30f276666b6f9c9fffd1fbd219ef64752981f424f205ca5cf21cfa5fb119541"
+    },
+    {
+      "path": "app/art/town/building-wooden-bridge.webp",
+      "bytes": 6202,
+      "sha256": "99aba370161b6de9e79d0742c9631b12b9d00eca31ec677d445770dd40e881c0"
+    },
+    {
+      "path": "app/assets/BalanceScale-C6rXM2GZ.css",
+      "bytes": 3996,
+      "sha256": "fb5f1767848f7dd6577a91a4e7ece527dae9ff195fd49eff9478526ce8987af4"
+    },
+    {
+      "path": "app/assets/BalanceScale-DUdzgVS0.js",
+      "bytes": 5700,
+      "sha256": "5f324b273128bcf92ab357762eee5e714e5d9e5fd1bd1f70c69be943be260b21"
+    },
+    {
+      "path": "app/assets/BasketSort-CuX5zmWE.js",
+      "bytes": 4445,
+      "sha256": "85404263f27774f1b659411e8fcdca0eea999ca7bf699958cb21c96e8d58deb7"
+    },
+    {
+      "path": "app/assets/BasketSort-DRiJq8v3.css",
+      "bytes": 2798,
+      "sha256": "f43577707bdb587cc5e26e8d50e2c2c0b608aa7066f7baeda1d55ccb8f91697a"
+    },
+    {
+      "path": "app/assets/BoatRace-DnY0-2y_.js",
+      "bytes": 5394,
+      "sha256": "254a54c0c4ba04813de1fcbf3cfdb8d7befbafe1aac0b861b96d0c67523af891"
+    },
+    {
+      "path": "app/assets/ContestMockScreen-BZObUcAF.css",
+      "bytes": 11428,
+      "sha256": "0c2db8a50f6d3d51a0152839b1906d84826118466d418fded48f883d50f22d1b"
+    },
+    {
+      "path": "app/assets/ContestMockScreen-Dp3jKVcv.js",
+      "bytes": 13828,
+      "sha256": "5e7fe1bc600de1088b478f4f0b47c304d37daf52430e3f7f54f40233840f245f"
+    },
+    {
+      "path": "app/assets/FeedbackEffects-DFaqRm8K.js",
+      "bytes": 357,
+      "sha256": "935417fbd74b6d8108a4efaa17c2feecf4efcffbcfcf9ff209384279c5e333b8"
+    },
+    {
+      "path": "app/assets/FoxKitchen-9-0cN3RS.js",
+      "bytes": 5933,
+      "sha256": "8e029ad640d717787377297d2d5c73a5e1233a22b9ea51112cfb51a8ebebf3d2"
+    },
+    {
+      "path": "app/assets/game-context-themes-DE65RjN-.css",
+      "bytes": 3514,
+      "sha256": "ec85d2d2998ec4b0f1eddf97af861dbbb2a2459d60cfb16631b865ff2ddaf72e"
+    },
+    {
+      "path": "app/assets/GameCompletion-BFsXV8pa.js",
+      "bytes": 3907,
+      "sha256": "e45216a247e24614482d0375155b64c96448938a616d7c6ef05ad42e41cfee8f"
+    },
+    {
+      "path": "app/assets/GameCompletion-DfX71KsR.css",
+      "bytes": 268623,
+      "sha256": "9a6356798a3fa90a7ccc79425b310eb178c7151494d6a827ae0c9afce28e7dc4"
+    },
+    {
+      "path": "app/assets/GameMascot-CAEoDHIY.js",
+      "bytes": 555,
+      "sha256": "00b8761aab47bc627e6804f93f5e75baf6d3bc5927b8920dfda4d101c891d526"
+    },
+    {
+      "path": "app/assets/index-DaRcpkAD.css",
+      "bytes": 778,
+      "sha256": "977a5ba283580939927be6f2418ff037e42ab24df4d3c553d564a178ee8f9f53"
+    },
+    {
+      "path": "app/assets/index-DNbvFrKe.js",
+      "bytes": 226351,
+      "sha256": "3ab2a39181afda3b8fb68f2f0ebf4537ddfe2600106bd868902ce7d7330d109c"
+    },
+    {
+      "path": "app/assets/MathQuest-BsLNxhgr.js",
+      "bytes": 9221,
+      "sha256": "99f499e3aecf17bb183c224b614f92e61dc3f9f06bdefa0b99f0b376d64dd5e2"
+    },
+    {
+      "path": "app/assets/MemoryMatch-sSE6eK3F.js",
+      "bytes": 8229,
+      "sha256": "d45094836c8ef5fbb0556c660ab1746ff900baf81a92d4bee22b9e78be4e2905"
+    },
+    {
+      "path": "app/assets/online-format-jDdE0EqY.js",
+      "bytes": 5988,
+      "sha256": "c83a5ad7cdc86fb26637bd8ee89056709dba8b1087f42fed057feffe3e8e40e3"
+    },
+    {
+      "path": "app/assets/OnlineAdminDashboard-BlYGVA2x.css",
+      "bytes": 2912,
+      "sha256": "7a92e8d6970913af09059dfb67be2de71128466ce42cf014293888928d917c9e"
+    },
+    {
+      "path": "app/assets/OnlineAdminDashboard-D9RcmD1k.js",
+      "bytes": 141473,
+      "sha256": "749c23d70190997eed4ace1041814c7adcd451364626e7533a9b82d5f1ad5ac8"
+    },
+    {
+      "path": "app/assets/OnlineExerciseRunner-BOIYHMta.js",
+      "bytes": 8523,
+      "sha256": "542cb8b99c67238f02e96767d3df28edef55c516f5e18d78131b2b82b1cfe6f9"
+    },
+    {
+      "path": "app/assets/OnlinePasswordDialog-Bw4yVhm1.js",
+      "bytes": 2985,
+      "sha256": "90cabeb8d0f88b11607318b91623af79f40556f71a597ce2885d83f3c156846a"
+    },
+    {
+      "path": "app/assets/OnlineScreen-D_PSw9vp.js",
+      "bytes": 18476,
+      "sha256": "447616df5925fed558de10a12c174857f8ca33d0a180887e9867c1ac8eee9c48"
+    },
+    {
+      "path": "app/assets/OnlineScreen-UNKotzGV.css",
+      "bytes": 29371,
+      "sha256": "51c4be36bd9b667ddd8418cb8c070133ab80550facce02637bcf837a65eddbb1"
+    },
+    {
+      "path": "app/assets/OnlineStudentWorld-CD5gnIEh.css",
+      "bytes": 50937,
+      "sha256": "8e3224ac1ec401bfe9b0ad1bd6a98e5f3ad983ea6c14b27c7ce4fd58bdf67002"
+    },
+    {
+      "path": "app/assets/OnlineStudentWorld-Cti_KGAb.js",
+      "bytes": 79089,
+      "sha256": "6825f1742733674bfc39f585c233d163b9e59f2c841e02d395e2c9bcc659a4fd"
+    },
+    {
+      "path": "app/assets/OnlineWeekAdvanceDialog-WdNY6yan.js",
+      "bytes": 1701,
+      "sha256": "06c6417da2eb205aaeb51bb5d283fe370725d427053fb0098da3ecfa2385cd6e"
+    },
+    {
+      "path": "app/assets/pair-rounds-ocU5XXD6.js",
+      "bytes": 413,
+      "sha256": "0400aebd764ebcad022710f66241e80da9810af70d7129b984a3d2def15fc9db"
+    },
+    {
+      "path": "app/assets/ParentPinModal-B8WaAI_f.js",
+      "bytes": 3935,
+      "sha256": "57702d1204875d7601f8f0af414cbb828b7a1e26c8fb13cedeca8a72bf1c219f"
+    },
+    {
+      "path": "app/assets/ParentPortalScreen-2N6lSPZq.js",
+      "bytes": 18621,
+      "sha256": "255fe998cebefaed3548b42f5fb0f61b011e03b3a7de42c8e017ce8d95963b2e"
+    },
+    {
+      "path": "app/assets/ParentPortalScreen-BwwNxQjV.css",
+      "bytes": 13297,
+      "sha256": "1610f3f5d019d9a26a4f3f314c919be96d40d346c644ebd62dd6c72bdef86f47"
+    },
+    {
+      "path": "app/assets/question-export-download-CXIjs62w.js",
+      "bytes": 12285,
+      "sha256": "ca3c469c8f4dcbb7eae454ea2f72a6e8481f43bc85cad941db65331af4d0d12f"
+    },
+    {
+      "path": "app/assets/rich-content-Cgbt1fh2.js",
+      "bytes": 3591,
+      "sha256": "245cb5305a57b7cea2eb004c66beaa525d3a9181e593a905f80efec82c875b89"
+    },
+    {
+      "path": "app/assets/sdk-BLNjduv7.js",
+      "bytes": 295,
+      "sha256": "09362012d88cd54994d2a255322457bde1b7af571d8eb2e1d338994b4674faa9"
+    },
+    {
+      "path": "app/assets/SentenceBuilder-BBTpZDss.js",
+      "bytes": 9677,
+      "sha256": "71beb258ee0b0851de98f670cf988a18e1a70f4f55f7ca099528582150c442e3"
+    },
+    {
+      "path": "app/assets/SequenceTrail-C5u3hECj.js",
+      "bytes": 8880,
+      "sha256": "0aab2a7a5ec0ad5bae4d7f5b063ee3484f6a0939e01bef3f37cb32fe78aca6d2"
+    },
+    {
+      "path": "app/assets/TownScreen-BsCdBDsM.js",
+      "bytes": 28426,
+      "sha256": "559b4760be218fb3cfd314173d2554e1ece334fd4c56d48494cc0c47ac77dcd7"
+    },
+    {
+      "path": "app/assets/TownScreen-DVkD32gE.css",
+      "bytes": 7101,
+      "sha256": "d5a57dce4de630722bd740940ba30faec8c41e30b04e7a7081e7828ef77aa5c0"
+    },
+    {
+      "path": "app/assets/TreasureFlip-D06CS1k8.js",
+      "bytes": 5622,
+      "sha256": "935d704577614a537ff14887f390990a2df6e7e57770092118bf697dcfd73330"
+    },
+    {
+      "path": "app/assets/useQuestionClock-Dz0TPoCJ.js",
+      "bytes": 1733,
+      "sha256": "a90603f515c0f88c7272c2a011692646642611ede080f677aef689f0e00fc432"
+    },
+    {
+      "path": "app/assets/useQuestionLayout-B5rUA75Y.js",
+      "bytes": 1594,
+      "sha256": "caa501806aad642ddb3659466cc8b148ae6de063d62463fcb497e671d4b7bdf1"
+    },
+    {
+      "path": "app/assets/useQuestionLayout-Dt2S6Dtn.css",
+      "bytes": 7584,
+      "sha256": "961fdc69196ea3beb60073d8c6f8260abf27858d51606c0cbe2f84e6e8069778"
+    },
+    {
+      "path": "app/assets/useQuestionSpeech-c22oBIGN.js",
+      "bytes": 365,
+      "sha256": "9c7df3d6389ded1a05fe00c6344dee809a61d6537400b8876dae638da21c04e9"
+    },
+    {
+      "path": "app/assets/WordConnect-munHic97.js",
+      "bytes": 9519,
+      "sha256": "027fdb5bce48d05649de7cf33341dc995814d112555cc4efe17d75fd44c05c9b"
+    },
+    {
+      "path": "app/build-info.json",
+      "bytes": 218,
+      "sha256": "102a3eb9fd3f90b461f0dcee964e828b38bdbe26f08a89916572b66befe6eb12"
+    },
+    {
+      "path": "app/icons/bao-an-192.png",
+      "bytes": 3808,
+      "sha256": "06e675bbcf59fd2a585d14d9c54c5c8b44036765a9a4920b5f8b5a16c3dfd9f1"
+    },
+    {
+      "path": "app/icons/bao-an-512.png",
+      "bytes": 14207,
+      "sha256": "49d9a490819253c069be1177e45610a95749fc93357792d79ab7f6b5bc7c0d0a"
+    },
+    {
+      "path": "app/icons/bao-an.svg",
+      "bytes": 372,
+      "sha256": "54a088a78062cc06bea3cf9236c300d80b69a25e80f6d6fb65a49b5a4a658779"
+    },
+    {
+      "path": "app/index.html",
+      "bytes": 816,
+      "sha256": "7916037e375822ce0dbe448a65aa76a2f315edad5748eeac0b1fa78e94fcd6bd"
+    },
+    {
+      "path": "app/manifest.webmanifest",
+      "bytes": 689,
+      "sha256": "e81d20e22246ad1f062167dfd4f32bd04df0d37cd71a88886e9840b6269742b2"
+    },
+    {
+      "path": "app/question-templates/bo-mau-day-du.xlsx",
+      "bytes": 14311,
+      "sha256": "eae96f9da1398a7f53965647b9331a08faee2f8a7dfc21e20864da01bcc4e931"
+    },
+    {
+      "path": "app/question-templates/bo-mau-day-du.zip",
+      "bytes": 172284,
+      "sha256": "9b6f19b0975dd4a8c7cfaea5a8101cb6b7078c23e0ae8d079a62d4ddd11d773f"
+    },
+    {
+      "path": "app/question-templates/online-week.docx",
+      "bytes": 42056,
+      "sha256": "4ed5180b1f50c70272852763575b6d2100a7de69776ca3726d1425a41243cfe4"
+    },
+    {
+      "path": "app/question-templates/online-week.xlsx",
+      "bytes": 9442,
+      "sha256": "7cc06a508f0d058f55afdf3cac6933e2c45b343c41adca989a7d4045e1d4208f"
+    },
+    {
+      "path": "app/sw.js",
+      "bytes": 327,
+      "sha256": "fa82a2aee7c6276dc6b0966fde677f44391e3e0e5720781fa7163040a2ef937c"
+    },
+    {
+      "path": "app/THIRD_PARTY_NOTICES.txt",
+      "bytes": 4684,
+      "sha256": "b3bb87de1d2d1945c06dc587161189c35e1630f0f59af401a3b2e7ea54cb6abb"
+    },
+    {
+      "path": "backup-online.mjs",
+      "bytes": 557,
+      "sha256": "049baba21bd81b744389e38a7a9061cdb059454dcb221004de909256e8bc1aec"
+    },
+    {
+      "path": "HUONG_DAN_SU_DUNG.html",
+      "bytes": 11657,
+      "sha256": "a8303bbdea3df930ecfb9034d99ec7e8c979b939f1070c25ce17f3f3da5351ed"
+    },
+    {
+      "path": "MO_BAO_AN.cmd",
+      "bytes": 58,
+      "sha256": "ea8859bb8287ea6f0ac42153ba2a98f1fa5685371acd004821dcfef64bd50f1c"
+    },
+    {
+      "path": "MO_QUAN_LY.cmd",
+      "bytes": 709,
+      "sha256": "be1ac96cc6ca48a2ca30312d0b773527de620becec6ab8956211a7ec957ade55"
+    },
+    {
+      "path": "online-local.mjs",
+      "bytes": 1035205,
+      "sha256": "66b4cdb05e826971fe9da85976c753613d2e6576ca474b5e11fbcf2376e72834"
+    },
+    {
+      "path": "QUAN_LY_CUC_BO.md",
+      "bytes": 6047,
+      "sha256": "7d706d069b83ef93dfcc1c378025af1047f7d6a6b787a90ff5af502aee54cf70"
+    },
+    {
+      "path": "restore-online.mjs",
+      "bytes": 342565,
+      "sha256": "6808aefc5a2118ae86c088ef16395485fb25f7073f8e7709c40952e748c30950"
+    },
+    {
+      "path": "SAO_LUU_QUAN_LY.cmd",
+      "bytes": 121,
+      "sha256": "27e43d81279d31096e7341a99d5484b21dafc7f96407a99217fecada051210ed"
+    },
+    {
+      "path": "serve_release.mjs",
+      "bytes": 7794,
+      "sha256": "4570c7d272f1a81ac1f841223c0e75e6f85550723a8172ab902956e41be39f3c"
+    },
+    {
+      "path": "THIRD_PARTY_NOTICES.txt",
+      "bytes": 19969,
+      "sha256": "4854e5b6ab540d6f4cbc2b8cbec7666c044fdfa738554adfbcb605ffcaa65d42"
+    }
+  ]
+}

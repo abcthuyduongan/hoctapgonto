@@ -1,0 +1,23 @@
+{
+  "kind": "Isolated UI reproduction; actual ContestMockScreen and actual SQLite store; network adapter test-only",
+  "displayCountdownSeconds": 3,
+  "savedSnapshots": [
+    {
+      "vm3_07": "21"
+    }
+  ],
+  "submitPayloads": [
+    {
+      "answers": {}
+    }
+  ],
+  "consoleErrors": [],
+  "savedCorrectBeforeTimeout": true,
+  "result": {
+    "score": 0,
+    "correctCount": 0,
+    "totalItems": 15
+  },
+  "finalAnswers": {},
+  "reproduced": true
+}

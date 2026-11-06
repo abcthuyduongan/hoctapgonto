@@ -1,0 +1,22 @@
+{
+  "kind": "Isolated UI reproduction; actual ContestMockScreen and actual SQLite store; network adapter test-only",
+  "mode": "autosave",
+  "displayCountdownSeconds": 300,
+  "saveRequestsStarted": 2,
+  "savedSnapshots": [
+    {
+      "vm3_18": "60",
+      "vm3_05": "7 quả"
+    },
+    {
+      "vm3_18": "60"
+    }
+  ],
+  "submitPayloads": [],
+  "consoleErrors": [],
+  "uiAnsweredCount": 2,
+  "finalAnswers": {
+    "vm3_18": "60"
+  },
+  "reproduced": true
+}

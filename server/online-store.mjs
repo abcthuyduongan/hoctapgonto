@@ -14,10 +14,10 @@ import {createWeeklyPlan,weeklyPlanErrors,validateWeeklyPlan} from '../src/core/
 import {readWeekPolicies,closedStudentCount,changesQuestionMeaning} from './weekly-policy.mjs';
 import {journeyProgress,selectReviewItems,filterPlayPresentation,timedQuestion} from './question-journey.mjs';
 import {initializeQuestionRewardLedger,applyQuestionRewardCandidates,questionRewardCandidates,questionRewardProgress,questionRewardThresholds,earnedQuestionRewardStars,v2QuestionCompletionErrors} from '../src/core/question-rewards.ts';
-import {openProtocolQuestion,protocolAudioDelivery,protocolHint,answerFeedback} from './question-protocol.mjs';
+import {openProtocolQuestion,protocolAudioDelivery,protocolHint,answerFeedback,publicSession} from './question-protocol.mjs';
 import {toVietnamDateString,getVietnamWeekKey,computeStreakState,registerDailyCorrectAnswer,buildDailyMissions,buildStudentBadgeStatuses,BADGE_CATALOG} from '../src/core/badges.ts';
 import {getVietnamTimeParts,checkCurfewHours,checkDailyScreenTime,msToMinutes,MAX_PIN_FAILURES,PIN_LOCKOUT_MS} from '../src/core/parent-controls.ts';
-import {buildParentWeeklyReport,hashParentPin,verifyParentPin} from './parent-data.mjs';
+import {buildParentWeeklyReport,hashParentPin,verifyParentPin,issueParentElevationToken,verifyParentElevationToken,revokeParentElevationToken,sanitizeParentControls} from './parent-data.mjs';
 import {CONTEST_PRESETS,CONTESTANT_BADGE,sanitizeContestItem,evaluateContestSubmission,checkReadinessForExam,generateContestQuestions,buildReviewMistakesPack} from './contest-data.mjs';
 import {TOWN_BUILDING_CATALOG,TOWN_BUILDING_MAP,resolveTownSubject,getMaterialForSubject,calculateEarnedMaterialsFromAwards,calculateTotalSpentMaterials,calculateAvailableMaterials,canAffordBuilding,defaultTownState,evaluateBuildingPlacement} from './town-data.mjs';
 import {ANIMAL_CATALOG,ANIMAL_MAP,getUnlockedAnimals,validateAnimalName} from '../src/core/animal-neighbors.ts';
@@ -42,7 +42,46 @@ const contentIdentity=pack=>{const{publishedAt,source,...content}=pack;void publ
 export class OnlineStore{
   constructor(databasePath){
     if(databasePath!==':memory:')mkdirSync(dirname(databasePath),{recursive:true});
-    this.db=new DatabaseSync(databasePath);this.db.exec(`PRAGMA foreign_keys=ON; PRAGMA journal_mode=WAL; PRAGMA busy_timeout=5000;
+    this.db=new DatabaseSync(databasePath);
+    try {
+      const tables = new Set(this.db.prepare("SELECT name FROM sqlite_master WHERE type='table'").all().map(r => r.name));
+      if (tables.has('users_upgrade_v4')) {
+        this.db.exec('PRAGMA foreign_keys=OFF;');
+        if (!tables.has('users')) {
+          this.db.exec('ALTER TABLE users_upgrade_v4 RENAME TO users;');
+        } else {
+          const usersCount = this.db.prepare('SELECT count(*) AS n FROM users').get().n;
+          const upgradeCount = this.db.prepare('SELECT count(*) AS n FROM users_upgrade_v4').get().n;
+          if (usersCount === 0 && upgradeCount > 0) {
+            this.db.exec('DROP TABLE users; ALTER TABLE users_upgrade_v4 RENAME TO users;');
+          } else {
+            this.db.exec('DROP TABLE IF EXISTS users_upgrade_v4;');
+          }
+        }
+      }
+      const userTableSql = this.db.prepare("SELECT sql FROM sqlite_master WHERE type='table' AND name='users'").get()?.sql || '';
+      if (userTableSql && !userTableSql.includes("'parent'")) {
+        this.db.exec('PRAGMA foreign_keys=OFF;');
+        this.db.exec('DROP TABLE IF EXISTS users_upgrade_v4;');
+        this.db.exec(`
+          BEGIN IMMEDIATE;
+          CREATE TABLE users_upgrade_v4(id TEXT PRIMARY KEY,workspace_id TEXT NOT NULL REFERENCES workspaces(id),username TEXT NOT NULL UNIQUE,password_hash TEXT NOT NULL,role TEXT NOT NULL CHECK(role IN ('admin','student','parent')),student_id TEXT,active INTEGER NOT NULL DEFAULT 1,created_at TEXT NOT NULL);
+          INSERT INTO users_upgrade_v4(id, workspace_id, username, password_hash, role, student_id, active, created_at)
+            SELECT id, workspace_id, username, password_hash, role, student_id, active, created_at FROM users;
+          DROP TABLE users;
+          ALTER TABLE users_upgrade_v4 RENAME TO users;
+          COMMIT;
+        `);
+        const fkCheck = this.db.prepare('PRAGMA foreign_key_check').all();
+        if (fkCheck && fkCheck.length > 0) {
+          throw new Error('Nâng cấp bảng users làm hỏng ràng buộc khóa ngoại.');
+        }
+      }
+    } catch (err) {
+      try { this.db.exec('ROLLBACK;'); } catch {}
+      throw new Error(`Lỗi nâng cấp cấu trúc bảng users: ${err.message}`);
+    }
+    this.db.exec(`PRAGMA foreign_keys=ON; PRAGMA journal_mode=WAL; PRAGMA busy_timeout=5000;
       CREATE TABLE IF NOT EXISTS schema_version(version INTEGER PRIMARY KEY); INSERT OR IGNORE INTO schema_version VALUES(1);
       CREATE TABLE IF NOT EXISTS workspaces(id TEXT PRIMARY KEY,name TEXT NOT NULL,wallet_enabled INTEGER NOT NULL DEFAULT 0,rate_vnd INTEGER NOT NULL DEFAULT 1000,created_at TEXT NOT NULL);
       CREATE TABLE IF NOT EXISTS users(id TEXT PRIMARY KEY,workspace_id TEXT NOT NULL REFERENCES workspaces(id),username TEXT NOT NULL UNIQUE,password_hash TEXT NOT NULL,role TEXT NOT NULL CHECK(role IN ('admin','student','parent')),student_id TEXT,active INTEGER NOT NULL DEFAULT 1,created_at TEXT NOT NULL);
@@ -92,9 +131,50 @@ export class OnlineStore{
     try { this.db.prepare('ALTER TABLE classes ADD COLUMN feed_enabled INTEGER NOT NULL DEFAULT 1').run(); } catch {}
     this.db.function('baoan_fold',{deterministic:true},value=>typeof value==='string'?value.normalize('NFC').toLocaleLowerCase('vi'):value);
     if(this.db.prepare('SELECT max(version) AS version FROM schema_version').get().version!==1)fail(500,'Phiên bản dữ liệu online chưa được hỗ trợ.');
+    this.lastCorrectPositions = new Map();
   }
+  lastQuestionCorrectPosition(workspaceId, studentId, itemId, version, packId) {
+    try {
+      let query = `
+        SELECT CAST(json_extract(json, '$."questionPresentations"."' || replace(?, '"', '\"') || '".displayedCorrectIndex') AS INTEGER) AS pos
+        FROM plays
+        WHERE workspace_id=? AND student_id=?
+          AND json_extract(json, '$."questionPresentations"."' || replace(?, '"', '\"') || '".displayedCorrectIndex') IS NOT NULL
+      `;
+      const params = [itemId, workspaceId, studentId, itemId];
+      if (packId) {
+        query += ` AND json_extract(json, '$.packId') = ?`;
+        params.push(packId);
+      }
+      if (version) {
+        query += ` AND json_extract(json, '$.contentVersion') = ?`;
+        params.push(version);
+      }
+      query += ` ORDER BY json_extract(json, '$.startedAt') DESC LIMIT 1`;
+      const row = this.db.prepare(query).get(...params);
+      if (row && Number.isInteger(row.pos)) {
+        return row.pos;
+      }
+    } catch {}
+    return null;
+  }
+  recordQuestionCorrectPosition(workspaceId, studentId, itemId, version, pos) {}
   close(){this.db.close();}
-  tx(action){this.db.exec('BEGIN IMMEDIATE');try{const result=action();this.db.exec('COMMIT');return result;}catch(error){this.db.exec('ROLLBACK');throw error;}}
+  tx(action){
+    if(this._inTx) return action();
+    this._inTx=true;
+    this.db.exec('BEGIN IMMEDIATE');
+    try{
+      const result=action();
+      this.db.exec('COMMIT');
+      return result;
+    }catch(error){
+      this.db.exec('ROLLBACK');
+      throw error;
+    }finally{
+      this._inTx=false;
+    }
+  }
   audit(auth,action,target){this.db.prepare('INSERT INTO audit VALUES(?,?,?,?,?,?)').run(id(),auth.workspaceId,auth.id,action,target,now());}
   configured(){return !!this.db.prepare("SELECT id FROM users WHERE role='admin' LIMIT 1").get();}
   changeOwnPassword(auth,expectedHash,newHash){
@@ -294,8 +374,29 @@ export class OnlineStore{
     });
   }
   assignedPack(auth,packId,version){
-    const student=this.student(auth,auth.studentId),progress=this.summaryProgress(auth,student),assigned=progress.weeks.filter(week=>week.unlocked).flatMap(week=>week.sets).find(set=>set.pack.id===packId&&set.pack.version===version);
-    if(!assigned)fail(403,'Con chỉ được học bộ câu hỏi thuộc tuần hiện tại. Tuần đã đóng và tuần chưa mở không thể chơi.');return this.packRecord(this.db.prepare('SELECT * FROM packs WHERE workspace_id=? AND pack_id=? AND version=?').get(auth.workspaceId,packId,version));
+    const student=this.student(auth,auth.studentId);
+    const progress=this.summaryProgress(auth,student);
+    const assigned=progress.weeks.filter(week=>week.unlocked).flatMap(week=>week.sets).find(set=>set.pack.id===packId&&set.pack.version===version);
+    if(assigned){
+      const packed=this.db.prepare('SELECT * FROM packs WHERE workspace_id=? AND pack_id=? AND version=?').get(auth.workspaceId,packId,version);
+      if(!packed)fail(404,'Không tìm thấy bộ câu hỏi.');
+      return this.packRecord(packed);
+    }
+    const packed = this.db.prepare('SELECT * FROM packs WHERE workspace_id=? AND pack_id=? AND version=?').get(auth.workspaceId, packId, version);
+    if (packed) {
+      const packObj = parse(packed.json);
+      if (packObj.ownerStudentId) {
+        if (packObj.ownerStudentId !== auth.studentId) fail(403, 'Con chỉ được học gói ôn tập của chính mình.');
+        return this.packRecord(packed);
+      }
+      const cleanSessionId = packId.replace(/^review-/, '');
+      const contestRow = this.db.prepare('SELECT student_id FROM contest_sessions WHERE workspace_id=? AND session_id LIKE ?').get(auth.workspaceId, `${cleanSessionId}%`);
+      if (contestRow) {
+        if (contestRow.student_id !== auth.studentId) fail(403, 'Con chỉ được học gói ôn tập của chính mình.');
+        return this.packRecord(packed);
+      }
+    }
+    fail(403,'Con chỉ được học bộ câu hỏi thuộc tuần hiện tại. Tuần đã đóng và tuần chưa mở không thể chơi.');
   }
   packGames(auth,packId,version){if(auth.role!=='student')fail(403,'Hãy dùng tài khoản học sinh để vào luyện tập.');return{packId,contentVersion:version,games:this.assignedPack(auth,packId,version).games};}
   studentState(auth){const student=this.student(auth,auth.studentId),cls=this.class(auth,student.class_id),workspace=this.workspace(auth.workspaceId),progress=this.progress(auth,student);
@@ -313,12 +414,22 @@ export class OnlineStore{
       const marker=this.pinJourney(auth,student),prior=this.db.prepare('SELECT id FROM plays WHERE workspace_id=? AND student_id=? AND request_id=?').get(auth.workspaceId,auth.studentId,requestId);
       const choice=this.assignedPack(auth,packId,version);if(!choice.games.some(game=>game.id===moduleId))fail(400,'Dạng câu của bộ này chưa phù hợp với trò chơi đã chọn.');
       const presentation=onlinePresentation(moduleId,choice.pack),requiredItemIds=compact?selectReviewItems(input.reviewItemIds,choice.pack,presentation):undefined;
-      if(prior){const value=this.play(auth,prior.id);if(secure&&value.session.questionProtocolVersion!==1)fail(409,'Lượt cũ cần mở lại trên ứng dụng mới. Sao đã lưu vẫn được giữ.');if(value.session.packId!==packId||value.session.contentVersion!==version||value.session.moduleId!==moduleId||value.session.journeyWeekId&&value.session.journeyWeekId!==marker?.weekId||compact&&(value.session.rewardPolicyVersion!==2||json(value.session.requiredItemIds)!==json(requiredItemIds)))fail(409,'Mã lượt chơi đã dùng cho nội dung khác.');if(value.session.status==='abandoned')fail(409,'Lượt chơi đã thoát. Hãy mở lượt mới.');const result={...value,presentation:filterPlayPresentation(value.session,value.pack,onlinePresentation(moduleId,value.pack))};return compact||secure?compactPlay(result):result;}
+      if(prior){const value=this.play(auth,prior.id);if(secure&&value.session.questionProtocolVersion!==1)fail(409,'Lượt cũ cần mở lại trên ứng dụng mới. Sao đã lưu vẫn được giữ.');if(value.session.packId!==packId||value.session.contentVersion!==version||value.session.moduleId!==moduleId||value.session.journeyWeekId&&value.session.journeyWeekId!==marker?.weekId||compact&&(value.session.rewardPolicyVersion!==2||json(value.session.requiredItemIds)!==json(requiredItemIds)))fail(409,'Mã lượt chơi đã dùng cho nội dung khác.');if(value.session.status==='abandoned')fail(409,'Lượt chơi đã thoát. Hãy mở lượt mới.');const result={...value,presentation:filterPlayPresentation(value.session,value.pack,onlinePresentation(moduleId,value.pack))};return compact||secure?compactPlay(result):{...result,session:publicSession(result.session)};}
       this.abandonActive(auth,student.id);
       const session={sessionId:id(),profileId:student.id,packId,contentVersion:version,moduleId,moduleVersion:getGame(moduleId).version,startedAt:now(),status:'active',rewardPolicyVersion:compact?2:1,presentationVersion:1,journeyWeekId:marker?.weekId,...(compact?{requiredItemIds,questionClocks:{}}:{}),...(secure?{questionProtocolVersion:1,questionClocks:{},questionHints:{},audioReceipts:{}}:{})};
-      this.db.prepare('INSERT INTO plays VALUES(?,?,?,?,?)').run(session.sessionId,auth.workspaceId,student.id,requestId,json(session));const result={session,pack:choice.pack,presentation:filterPlayPresentation(session,choice.pack,presentation)};return compact||secure?compactPlay(result):result;
+      this.db.prepare('INSERT INTO plays VALUES(?,?,?,?,?)').run(session.sessionId,auth.workspaceId,student.id,requestId,json(session));const result={session,pack:choice.pack,presentation:filterPlayPresentation(session,choice.pack,presentation)};return compact||secure?compactPlay(result):{...result,session:publicSession(result.session)};
     });}
   assertCurrentPlay(auth,session){
+    if (session.packId.startsWith('review-')) {
+      const packed = this.db.prepare('SELECT json FROM packs WHERE workspace_id=? AND pack_id=? AND version=?').get(auth.workspaceId, session.packId, session.contentVersion);
+      if (packed) {
+        const pObj = parse(packed.json);
+        if (pObj.ownerStudentId && pObj.ownerStudentId !== auth.studentId) {
+          fail(403, 'Con chỉ được học gói ôn tập của chính mình.');
+        }
+      }
+      return;
+    }
     const student=this.student(auth,auth.studentId),marker=this.journeyMarker(auth,student)??this.pinJourney(auth,student);
     if(session.journeyWeekId&&session.journeyWeekId!==marker?.weekId||!marker)fail(403,'Tuần của lượt chơi này đã đóng hoặc chưa được mở.');
     const assigned=this.db.prepare('SELECT s.version FROM weeks w JOIN week_sets s ON s.workspace_id=w.workspace_id AND s.week_id=w.id WHERE w.workspace_id=? AND w.class_id=? AND w.id=? AND s.pack_id=?').get(auth.workspaceId,student.class_id,marker.weekId,session.packId);
@@ -333,7 +444,24 @@ export class OnlineStore{
       const{session,pack}=this.play(auth,playId);this.assertCurrentPlay(auth,session);
       if(session.status!=='active'||Date.now()-Date.parse(session.startedAt)>86400000)fail(409,'Lượt chơi đã kết thúc hoặc quá hạn.');
       if(requireProtocol&&session.questionProtocolVersion!==1)fail(409,'Lượt cũ cần mở lại trên ứng dụng mới. Sao đã lưu vẫn được giữ.');
-      if(session.questionProtocolVersion===1){const receipt=openProtocolQuestion(session,pack,this.events(auth,playId),itemId,openedTime);this.db.prepare('UPDATE plays SET json=? WHERE workspace_id=? AND id=?').run(json(session),auth.workspaceId,playId);return receipt;}
+      if(session.questionProtocolVersion===1){
+        const item = pack.items?.find(row => row.id === itemId);
+        const hasOptions = Array.isArray(item?.options) && item.options.length > 1;
+        const lastPos = hasOptions
+          ? (session.questionPresentations?.[itemId]?.displayedCorrectIndex ?? this.lastQuestionCorrectPosition(auth.workspaceId, auth.studentId, itemId, pack.version, session.packId))
+          : null;
+        const receipt=openProtocolQuestion(session,pack,this.events(auth,playId),itemId,openedTime,lastPos);
+        const currentPos = session.questionPresentations?.[itemId]?.displayedCorrectIndex;
+        if (Number.isInteger(currentPos)) {
+          this.recordQuestionCorrectPosition(auth.workspaceId, auth.studentId, itemId, pack.version, currentPos);
+        }
+        session.presentationsById ??= {};
+        if (session.questionPresentations?.[itemId]) {
+          session.presentationsById[session.questionPresentations[itemId].presentationId] = session.questionPresentations[itemId];
+        }
+        this.db.prepare('UPDATE plays SET json=? WHERE workspace_id=? AND id=?').run(json(session),auth.workspaceId,playId);
+        return receipt;
+      }
       const presentation=onlinePresentation(session.moduleId,pack),item=presentation?.items.find(item=>item.id===itemId);
       if(!timedQuestion(session,presentation)||!item||!session.requiredItemIds?.includes(itemId))fail(400,'Câu hỏi không dùng bộ đếm thời gian của lượt chơi này.');
       const clock=session.questionClocks??{},openedAt=Object.hasOwn(clock,itemId)?clock[itemId]:(input.openedAt||now());if(!Object.hasOwn(clock,itemId)){
@@ -343,22 +471,37 @@ export class OnlineStore{
     });
   }
   events(auth,playId){return this.db.prepare('SELECT json FROM attempts WHERE workspace_id=? AND play_id=? ORDER BY rowid').all(auth.workspaceId,playId).map(row=>parse(row.json));}
-  attempt(auth,playId,input,requireProtocol=false){if(auth.role!=='student')fail(403,'Hãy dùng tài khoản học sinh để vào luyện tập.');shape(input,['attemptKey','itemId','response','hintsUsed','elapsedMs']);const key=text(input.attemptKey,'Mã lần trả lời',120);if(!/^[a-zA-Z0-9._:-]+$/.test(key))fail(400,'Mã lần trả lời không hợp lệ.');
+  attempt(auth,playId,input,requireProtocol=false){if(auth.role!=='student')fail(403,'Hãy dùng tài khoản học sinh để vào luyện tập.');shape(input,['attemptKey','itemId','response','hintsUsed','elapsedMs','presentationId']);const key=text(input.attemptKey,'Mã lần trả lời',120);if(!/^[a-zA-Z0-9._:-]+$/.test(key))fail(400,'Mã lần trả lời không hợp lệ.');
     const itemId=text(input.itemId,'Mã câu',80),hintsUsed=integer(input.hintsUsed??0,'Số gợi ý',0,20),hash=digest({key,itemId,response:input.response,hintsUsed});
     return this.tx(()=>{const {session,pack}=this.play(auth,playId);this.assertCurrentPlay(auth,session);if(requireProtocol&&session.questionProtocolVersion!==1)fail(409,'Lượt cũ cần mở lại trên ứng dụng mới. Sao đã lưu vẫn được giữ.');const prior=this.db.prepare('SELECT payload_hash,json FROM attempts WHERE workspace_id=? AND play_id=? AND attempt_key=?').get(auth.workspaceId,playId,key);
       if(prior){if(prior.payload_hash!==hash)fail(409,'Lần trả lời đã được lưu với đáp án khác.');if(session.status==='abandoned')fail(409,'Lượt chơi đã thoát.');const event=parse(prior.json);let questionRewards;
         if(session.rewardPolicyVersion===2){let questions=[];if(event.correct){const row=this.db.prepare('SELECT json FROM awards WHERE workspace_id=? AND student_id=? AND pack_id=?').get(auth.workspaceId,auth.studentId,pack.id),reward=row?parse(row.json):null,touched=new Set(onlineScoreResponse(pack,session.moduleId,event.itemId,event.response).touchedItemIds);questions=questionRewardProgress(pack,reward?.questionLedger??initializeQuestionRewardLedger(pack.id,reward?.starTier??0)).questions.filter(question=>touched.has(question.itemId));}questionRewards={gained:0,questions};}
-        return{event,duplicate:true,...(session.questionProtocolVersion===1&&event.correct?{feedback:answerFeedback(pack,session,event)}:{}),...(questionRewards?{questionRewards}:{})};}
+        return{event:{...event,response:input.response},duplicate:true,...(session.questionProtocolVersion===1&&event.correct?{feedback:answerFeedback(pack,session,event)}:{}),...(questionRewards?{questionRewards}:{})};}
       if(session.status!=='active')fail(409,'Lượt chơi đã kết thúc hoặc được thay bằng lượt mới ở thiết bị khác.');
       if(Date.now()-Date.parse(session.startedAt)>86400000)fail(409,'Lượt chơi đã quá hạn. Hãy mở lượt mới.');
       const events=this.events(auth,playId);if(events.length>=5000)fail(400,'Lượt chơi đã đạt giới hạn số lần thử.');
       const item=pack.items.find(row=>row.id===itemId);if(!item)fail(400,'Câu hỏi không thuộc lượt chơi.');
-      let outcome;try{outcome=onlineScoreResponse(pack,session.moduleId,itemId,input.response);}catch(error){fail(400,error.message);}
+      session.presentationsById ??= {};
+      const currentPres = session.questionPresentations?.[itemId];
+      if (currentPres && input.presentationId && input.presentationId !== currentPres.presentationId) {
+        fail(409, 'Lượt trình bày câu hỏi đã hết hạn hoặc không khớp. Vui lòng mở lại câu hỏi.');
+      }
+      const pres = (input.presentationId && session.presentationsById[input.presentationId])
+        ?? currentPres;
+      let evalResponse = input.response;
+      if (pres && input.response?.kind === 'choice') {
+        if (!Number.isInteger(input.response.choiceIndex) || input.response.choiceIndex < 0 || input.response.choiceIndex >= pres.permutation.length) {
+          fail(400, 'Lựa chọn không hợp lệ.');
+        }
+        const originalChoiceIndex = pres.permutation[input.response.choiceIndex];
+        evalResponse = { ...input.response, choiceIndex: originalChoiceIndex };
+      }
+      let outcome;try{outcome=onlineScoreResponse(pack,session.moduleId,itemId,evalResponse);}catch(error){fail(400,error.message);}
       if(session.rewardPolicyVersion===2&&outcome.touchedItemIds.some(id=>!session.requiredItemIds?.includes(id)))fail(400,'Câu trả lời nằm ngoài các câu đã chọn cho lượt học lại.');
       const occurredAt=now();let elapsedMs=input.elapsedMs;if(timedQuestion(session,onlinePresentation(session.moduleId,pack))){const openedAt=session.questionClocks&&Object.hasOwn(session.questionClocks,itemId)&&session.questionClocks[itemId];if(!openedAt)fail(400,'Cần mở câu hỏi trước khi trả lời.');elapsedMs=Date.parse(occurredAt)-Date.parse(openedAt);}
       else if(session.rewardPolicyVersion===2)elapsedMs=0;
       if(!Number.isFinite(elapsedMs)||elapsedMs<0||elapsedMs>14400000)fail(400,'Thời gian trả lời không hợp lệ.');
-      const event={eventId:`${session.sessionId}:${key}`,sessionId:session.sessionId,profileId:session.profileId,packId:pack.id,contentVersion:pack.version,moduleId:session.moduleId,moduleVersion:session.moduleVersion,itemId,objectiveId:item.objectiveId,correct:outcome.correct,hintsUsed:session.questionProtocolVersion===1?(Object.hasOwn(session.questionHints??{},itemId)?session.questionHints[itemId].used:0):hintsUsed,elapsedMs,occurredAt,response:input.response,gameSequence:events.length+1};
+      const event={eventId:`${session.sessionId}:${key}`,sessionId:session.sessionId,profileId:session.profileId,packId:pack.id,contentVersion:pack.version,moduleId:session.moduleId,moduleVersion:session.moduleVersion,itemId,objectiveId:item.objectiveId,correct:outcome.correct,hintsUsed:session.questionProtocolVersion===1?(Object.hasOwn(session.questionHints??{},itemId)?session.questionHints[itemId].used:0):hintsUsed,elapsedMs,occurredAt,response:evalResponse,displayedChoiceIndex:pres?input.response.choiceIndex:undefined,gameSequence:events.length+1};
       const errors=onlineEvidenceErrors(session,[...events,event],pack);if(errors.length)fail(400,errors[0]);
       this.db.prepare('INSERT INTO attempts VALUES(?,?,?,?,?)').run(auth.workspaceId,playId,key,hash,json(event));
       this.onAttemptRecorded(auth, session, event, pack);
@@ -366,7 +509,7 @@ export class OnlineStore{
         const result=applyQuestionRewardCandidates(reward?.questionLedger??initializeQuestionRewardLedger(pack.id,reward?.starTier??0),questionRewardCandidates(session,[...events,event],pack)),progress=questionRewardProgress(pack,result.ledger),tier=Math.max(1,progress.bestTier);
         if(!reward||json(reward.questionLedger)!==json(result.ledger)){const award={...(reward??{profileId:auth.studentId,packId:pack.id,sessionId:session.sessionId,completedAt:event.occurredAt,totalItems:pack.items.length,firstTryCorrect:0}),starTier:tier,questionLedger:result.ledger};this.db.prepare('INSERT INTO awards VALUES(?,?,?,?,?) ON CONFLICT(workspace_id,student_id,pack_id) DO UPDATE SET tier=excluded.tier,json=excluded.json').run(auth.workspaceId,auth.studentId,pack.id,tier,json(award));}
         const touched=new Set(outcome.touchedItemIds);questionRewards={gained:result.gained,questions:progress.questions.filter(question=>touched.has(question.itemId))};
-      }return{event,duplicate:false,...(session.questionProtocolVersion===1&&event.correct?{feedback:answerFeedback(pack,session,event)}:{}),...(questionRewards?{questionRewards}:{})};
+      }return{event:{...event,response:input.response},duplicate:false,...(session.questionProtocolVersion===1&&event.correct?{feedback:answerFeedback(pack,session,event)}:{}),...(questionRewards?{questionRewards}:{})};
     });}
   finishPlay(auth,playId,abandon=false,compact=false,requireProtocol=false){if(auth.role!=='student')fail(403,'Hãy dùng tài khoản học sinh để vào luyện tập.');return this.tx(()=>{const{session,pack}=this.play(auth,playId);if(!abandon)this.assertCurrentPlay(auth,session);if(!abandon&&requireProtocol&&session.questionProtocolVersion!==1)fail(409,'Lượt cũ cần mở lại trên ứng dụng mới. Sao đã lưu vẫn được giữ.');if(session.status==='abandoned'){if(abandon)return{};fail(409,'Lượt chơi đã thoát.');}
     if(session.status==='completed')return{state:compact?this.studentSummary(auth,'current'):this.studentState(auth),gained:0,tier:this.rewards(auth,auth.studentId).find(row=>row.packId===pack.id)?.starTier??0};
@@ -838,7 +981,7 @@ export class OnlineStore{
     this.studentBadges(auth, studentId, nowIso);
   }
   assertStudentScreenTimeAllowed(auth, studentId){
-    const controls = this.parentControls(auth, studentId);
+    const controls = this.rawParentControls(auth.workspaceId, studentId);
     if (!controls) return;
     const curfew = checkCurfewHours(controls.allowedStartHour, controls.allowedEndHour);
     if (!curfew.allowed) fail(403, curfew.reason);
@@ -863,12 +1006,12 @@ export class OnlineStore{
     }
     return msToMinutes(totalMs);
   }
-  parentControls(auth, studentId){
+  rawParentControls(workspaceId, studentId){
     text(studentId, 'Mã học sinh', 100);
-    const row = this.db.prepare('SELECT * FROM parent_controls WHERE workspace_id=? AND student_id=?').get(auth.workspaceId, studentId);
+    const row = this.db.prepare('SELECT * FROM parent_controls WHERE workspace_id=? AND student_id=?').get(workspaceId, studentId);
     if (!row) {
       return {
-        workspaceId: auth.workspaceId,
+        workspaceId,
         studentId,
         pinHash: null,
         pinSalt: null,
@@ -893,15 +1036,44 @@ export class OnlineStore{
       updatedAt: row.updated_at
     };
   }
-  setupParentPin(auth, studentId, input){
-    shape(input, ['pin', 'oldPin', 'studentId']);
+  parentControls(auth, studentId){
+    return sanitizeParentControls(this.rawParentControls(auth.workspaceId, studentId));
+  }
+  setupParentPin(auth, studentId, input, parentToken = null){
+    shape(input, ['pin', 'oldPin', 'studentId', 'parentToken']);
     const pin = text(input.pin, 'Mã PIN mới', 10);
     if (!/^\d{4,6}$/.test(pin)) fail(400, 'Mã PIN phụ huynh phải gồm từ 4 đến 6 chữ số.');
-    const current = this.parentControls(auth, studentId);
-    if (current.pinHash && auth.role !== 'admin') {
-      const oldPin = text(input.oldPin, 'Mã PIN hiện tại', 10);
-      if (!verifyParentPin(oldPin, current.pinHash, current.pinSalt)) {
-        fail(403, 'Mã PIN cũ không chính xác.');
+    this.student(auth, studentId);
+    const current = this.rawParentControls(auth.workspaceId, studentId);
+    if (auth.role === 'parent') {
+      const linked = this.db.prepare('SELECT 1 FROM parent_students WHERE workspace_id=? AND parent_user_id=? AND student_id=?').get(auth.workspaceId, auth.id, studentId);
+      if (!linked) fail(403, 'Phụ huynh không có quyền thiết lập mã PIN cho học sinh này.');
+    } else if (auth.role === 'student') {
+      if (auth.studentId !== studentId) fail(403, 'Không có quyền truy cập học sinh khác.');
+      if (current.pinHash) {
+        if (current.pinLockedUntil && new Date(current.pinLockedUntil).getTime() > Date.now()) {
+          const remainingMinutes = Math.ceil((new Date(current.pinLockedUntil).getTime() - Date.now()) / 60000);
+          fail(429, `Mã PIN đang bị tạm khóa do nhập sai nhiều lần. Vui lòng thử lại sau ${remainingMinutes} phút.`);
+        }
+        const pToken = parentToken || input.parentToken;
+        const tokenOk = pToken && verifyParentElevationToken(pToken, { userId: auth.id, studentId, workspaceId: auth.workspaceId, pinHash: current.pinHash, sessionHash: auth.tokenHash });
+        if (!tokenOk) {
+          const oldPin = input.oldPin ? text(input.oldPin, 'Mã PIN hiện tại', 10) : '';
+          const isCorrect = oldPin && verifyParentPin(oldPin, current.pinHash, current.pinSalt);
+          if (!isCorrect) {
+            const newFailed = (current.pinFailedCount || 0) + 1;
+            let lockedUntil = null;
+            if (newFailed >= MAX_PIN_FAILURES) {
+              lockedUntil = new Date(Date.now() + PIN_LOCKOUT_MS).toISOString();
+            }
+            this.db.prepare('UPDATE parent_controls SET pin_failed_count=?, pin_locked_until=? WHERE workspace_id=? AND student_id=?')
+              .run(newFailed, lockedUntil, auth.workspaceId, studentId);
+            if (lockedUntil) {
+              fail(429, 'Bạn đã nhập sai PIN 5 lần. Mã PIN bị tạm khóa 15 phút để bảo vệ tài khoản.');
+            }
+            fail(403, `Mã PIN cũ không chính xác. Bạn còn ${MAX_PIN_FAILURES - newFailed} lần thử.`);
+          }
+        }
       }
     }
     const { pinHash, pinSalt } = hashParentPin(pin);
@@ -916,10 +1088,25 @@ export class OnlineStore{
         pin_locked_until=NULL,
         updated_at=excluded.updated_at
     `).run(auth.workspaceId, studentId, pinHash, pinSalt, current.maxMinutesPerDay, current.allowedStartHour, current.allowedEndHour, updatedAt);
-    return { success: true };
+    revokeParentElevationToken(`${auth.id}:${studentId}`);
+    const elevationToken = issueParentElevationToken({
+      userId: auth.id,
+      studentId,
+      workspaceId: auth.workspaceId,
+      pinHash,
+      sessionHash: auth.tokenHash
+    });
+    this.audit(auth, 'parent.setup_pin', studentId);
+    return { success: true, parentToken: elevationToken };
   }
   verifyParentPin(auth, studentId, pin){
-    const controls = this.parentControls(auth, studentId);
+    this.student(auth, studentId);
+    if (auth.role === 'student' && auth.studentId !== studentId) fail(403, 'Không có quyền truy cập học sinh khác.');
+    if (auth.role === 'parent') {
+      const linked = this.db.prepare('SELECT 1 FROM parent_students WHERE workspace_id=? AND parent_user_id=? AND student_id=?').get(auth.workspaceId, auth.id, studentId);
+      if (!linked) fail(403, 'Phụ huynh không có quyền truy cập học sinh này.');
+    }
+    const controls = this.rawParentControls(auth.workspaceId, studentId);
     if (!controls.pinHash) fail(400, 'Chưa thiết lập mã PIN cho học sinh này.');
     if (controls.pinLockedUntil && new Date(controls.pinLockedUntil).getTime() > Date.now()) {
       const remainingMinutes = Math.ceil((new Date(controls.pinLockedUntil).getTime() - Date.now()) / 60000);
@@ -941,18 +1128,44 @@ export class OnlineStore{
     }
     this.db.prepare('UPDATE parent_controls SET pin_failed_count=0, pin_locked_until=NULL WHERE workspace_id=? AND student_id=?')
       .run(auth.workspaceId, studentId);
-    const parentToken = createHash('sha256').update(`${auth.id}:${studentId}:${controls.pinHash}:${now()}`).digest('hex');
+    const parentToken = issueParentElevationToken({
+      userId: auth.id,
+      studentId,
+      workspaceId: auth.workspaceId,
+      pinHash: controls.pinHash,
+      sessionHash: auth.tokenHash
+    });
+    this.audit(auth, 'parent.verify_pin', studentId);
     return { success: true, parentToken, studentId };
   }
-  updateParentSettings(auth, studentId, input){
-    shape(input, ['maxMinutesPerDay', 'allowedStartHour', 'allowedEndHour', 'studentId']);
+  updateParentSettings(auth, studentId, input, parentToken = null){
+    shape(input, ['maxMinutesPerDay', 'allowedStartHour', 'allowedEndHour', 'studentId', 'parentToken']);
+    this.student(auth, studentId);
+    if (auth.role === 'parent') {
+      const linked = this.db.prepare('SELECT 1 FROM parent_students WHERE workspace_id=? AND parent_user_id=? AND student_id=?').get(auth.workspaceId, auth.id, studentId);
+      if (!linked) fail(403, 'Phụ huynh không có quyền thay đổi cài đặt cho học sinh này.');
+    } else if (auth.role === 'student') {
+      if (auth.studentId !== studentId) fail(403, 'Không có quyền truy cập học sinh khác.');
+      const currentRaw = this.rawParentControls(auth.workspaceId, studentId);
+      if (currentRaw.pinHash) {
+        const pToken = parentToken || input.parentToken;
+        const tokenOk = pToken && verifyParentElevationToken(pToken, {
+          userId: auth.id,
+          studentId,
+          workspaceId: auth.workspaceId,
+          pinHash: currentRaw.pinHash,
+          sessionHash: auth.tokenHash
+        });
+        if (!tokenOk) fail(403, 'Chưa xác thực quyền phụ huynh.');
+      }
+    }
     const maxMinutes = input.maxMinutesPerDay !== undefined ? integer(input.maxMinutesPerDay, 'Thời gian học', 0, 480) : 0;
     const startHour = input.allowedStartHour !== undefined ? integer(input.allowedStartHour, 'Giờ bắt đầu', 0, 23) : 0;
     const endHour = input.allowedEndHour !== undefined ? integer(input.allowedEndHour, 'Giờ kết thúc', 1, 24) : 24;
     if (endHour <= startHour && endHour !== 24 && startHour !== 0) {
       fail(400, 'Giờ kết thúc phải sau giờ bắt đầu.');
     }
-    const current = this.parentControls(auth, studentId);
+    const current = this.rawParentControls(auth.workspaceId, studentId);
     const updatedAt = now();
     this.db.prepare(`
       INSERT INTO parent_controls(workspace_id, student_id, pin_hash, pin_salt, pin_failed_count, pin_locked_until, max_minutes_per_day, allowed_start_hour, allowed_end_hour, updated_at)
@@ -963,6 +1176,7 @@ export class OnlineStore{
         allowed_end_hour=excluded.allowed_end_hour,
         updated_at=excluded.updated_at
     `).run(auth.workspaceId, studentId, current.pinHash, current.pinSalt, current.pinFailedCount, current.pinLockedUntil, maxMinutes, startHour, endHour, updatedAt);
+    this.audit(auth, 'parent.update_settings', studentId);
     return this.parentControls(auth, studentId);
   }
   createParent(auth, input, passwordHash, username){
@@ -995,13 +1209,25 @@ export class OnlineStore{
       active: !!r.active
     }));
   }
-  parentDashboard(auth, studentId, weekId){
+  parentDashboard(auth, studentId, weekId, parentToken = null){
     text(studentId, 'Mã học sinh', 100);
+    this.student(auth, studentId);
     if (auth.role === 'parent') {
       const linked = this.db.prepare('SELECT 1 FROM parent_students WHERE workspace_id=? AND parent_user_id=? AND student_id=?').get(auth.workspaceId, auth.id, studentId);
       if (!linked) fail(403, 'Phụ huynh không có quyền xem thông tin học sinh này.');
-    } else if (auth.role === 'student' && auth.studentId !== studentId) {
-      fail(403, 'Không có quyền truy cập.');
+    } else if (auth.role === 'student') {
+      if (auth.studentId !== studentId) fail(403, 'Không có quyền truy cập.');
+      const raw = this.rawParentControls(auth.workspaceId, studentId);
+      if (raw.pinHash) {
+        const tokenOk = parentToken && verifyParentElevationToken(parentToken, {
+          userId: auth.id,
+          studentId,
+          workspaceId: auth.workspaceId,
+          pinHash: raw.pinHash,
+          sessionHash: auth.tokenHash
+        });
+        if (!tokenOk) fail(403, 'Vui lòng xác thực mã PIN phụ huynh trước.');
+      }
     }
     const student = this.student(auth, studentId);
     const cls = this.class(auth, student.class_id);
@@ -1069,11 +1295,11 @@ export class OnlineStore{
     return {
       student: { id: student.id, name: student.name, className: cls.name },
       controls: {
-        hasPin: !!controls.pinHash,
+        hasPin: Boolean(controls.hasPin),
         maxMinutesPerDay: controls.maxMinutesPerDay,
         allowedStartHour: controls.allowedStartHour,
         allowedEndHour: controls.allowedEndHour,
-        pinLocked: !!(controls.pinLockedUntil && new Date(controls.pinLockedUntil).getTime() > Date.now())
+        pinLocked: Boolean(controls.pinLocked)
       },
       todayMinutes,
       report,
@@ -1120,6 +1346,8 @@ export class OnlineStore{
         const remainingSeconds = Math.max(0, Math.floor((Date.parse(active.deadline_at) - Date.now()) / 1000));
         if (remainingSeconds > 0) {
           const items = parse(active.items_json);
+          const stored = parse(active.answers_json || '{}');
+          const { _revisions: _discard, ...cleanAnswers } = stored;
           return {
             sessionId: active.session_id,
             preset,
@@ -1128,7 +1356,7 @@ export class OnlineStore{
             remainingSeconds,
             status: 'active',
             items: items.map(sanitizeContestItem),
-            answers: parse(active.answers_json || '{}'),
+            answers: cleanAnswers,
             skippedKeys: parse(active.skipped_keys || '[]')
           };
         } else {
@@ -1181,6 +1409,8 @@ export class OnlineStore{
 
     const preset = CONTEST_PRESETS[row.preset_id];
     const items = parse(row.items_json);
+    const stored = parse(row.answers_json || '{}');
+    const { _revisions: _discard, ...cleanAnswers } = stored;
     return {
       active: true,
       session: {
@@ -1191,7 +1421,7 @@ export class OnlineStore{
         remainingSeconds,
         status: 'active',
         items: items.map(sanitizeContestItem),
-        answers: parse(row.answers_json || '{}'),
+        answers: cleanAnswers,
         skippedKeys: parse(row.skipped_keys || '[]')
       }
     };
@@ -1200,7 +1430,7 @@ export class OnlineStore{
   saveContestProgress(auth, sessionId, input){
     role(auth, 'student');
     text(sessionId, 'Mã lượt thi', 100);
-    shape(input, ['answers', 'skippedKeys']);
+    shape(input, ['answers', 'skippedKeys', 'revision', 'seq']);
     return this.tx(() => {
       const row = this.db.prepare("SELECT * FROM contest_sessions WHERE workspace_id=? AND student_id=? AND session_id=? AND status='active'").get(auth.workspaceId, auth.studentId, sessionId);
       if (!row) fail(404, 'Không tìm thấy lượt thi đang làm.');
@@ -1210,10 +1440,35 @@ export class OnlineStore{
         return this.submitContest(auth, sessionId, { answers: input.answers ?? parse(row.answers_json || '{}') });
       }
 
-      const answers = input.answers !== undefined ? json(input.answers) : row.answers_json;
-      const skipped = input.skippedKeys !== undefined ? json(input.skippedKeys) : row.skipped_keys;
-      this.db.prepare('UPDATE contest_sessions SET answers_json=?, skipped_keys=? WHERE workspace_id=? AND session_id=?').run(answers, skipped, auth.workspaceId, sessionId);
-      return { success: true, remainingSeconds };
+      const existingStored = parse(row.answers_json || '{}');
+      const existingRevisions = existingStored._revisions && typeof existingStored._revisions === 'object'
+        ? { ...existingStored._revisions }
+        : {};
+      const { _revisions: _discard, ...cleanExistingAnswers } = existingStored;
+
+      let mergedAnswers = { ...cleanExistingAnswers };
+      if (input.answers !== undefined && input.answers !== null && typeof input.answers === 'object') {
+        const inputRev = typeof input.revision === 'number'
+          ? input.revision
+          : typeof input.seq === 'number'
+          ? input.seq
+          : null;
+
+        for (const [key, val] of Object.entries(input.answers)) {
+          if (key === '_revisions') continue;
+          const currentRev = existingRevisions[key] ?? 0;
+          if (inputRev === null || inputRev >= currentRev) {
+            mergedAnswers[key] = val;
+            existingRevisions[key] = inputRev !== null ? inputRev : currentRev + 1;
+          }
+        }
+      }
+
+      const answersToStore = json({ ...mergedAnswers, _revisions: existingRevisions });
+      const existingSkipped = parse(row.skipped_keys || '[]');
+      const skipped = input.skippedKeys !== undefined ? json(Array.from(new Set([...existingSkipped, ...input.skippedKeys]))) : row.skipped_keys;
+      this.db.prepare('UPDATE contest_sessions SET answers_json=?, skipped_keys=? WHERE workspace_id=? AND session_id=?').run(answersToStore, skipped, auth.workspaceId, sessionId);
+      return { success: true, remainingSeconds, answers: mergedAnswers };
     });
   }
 
@@ -1230,7 +1485,9 @@ export class OnlineStore{
       if (row.status !== 'active') {
         const historyRows = this.db.prepare("SELECT score, max_score, status FROM contest_sessions WHERE workspace_id=? AND student_id=? AND preset_id=? AND status IN ('submitted', 'timeout') ORDER BY created_at DESC").all(auth.workspaceId, auth.studentId, row.preset_id);
         const readiness = checkReadinessForExam(historyRows.map(r => ({ percent: r.max_score > 0 ? Math.round((r.score / r.max_score) * 100) : 0, passed: (r.max_score > 0 ? Math.round((r.score / r.max_score) * 100) : 0) >= preset.passPercent })));
-        const evaluation = evaluateContestSubmission(items, parse(row.answers_json || '{}'), preset, Math.min(preset.durationSeconds * 1000, Math.max(0, Date.parse(row.submitted_at || row.deadline_at) - Date.parse(row.started_at))), row.status);
+        const savedStored = parse(row.answers_json || '{}');
+        const { _revisions: _discard, ...cleanSavedAnswers } = savedStored;
+        const evaluation = evaluateContestSubmission(items, cleanSavedAnswers, preset, Math.min(preset.durationSeconds * 1000, Math.max(0, Date.parse(row.submitted_at || row.deadline_at) - Date.parse(row.started_at))), row.status);
         return {
           sessionId,
           ...evaluation,
@@ -1244,7 +1501,13 @@ export class OnlineStore{
       const isTimeout = nowMs > deadlineMs + 3000;
       const finishReason = isTimeout ? 'timeout' : 'submitted';
       const submittedAt = now();
-      const answers = input.answers !== undefined ? input.answers : parse(row.answers_json || '{}');
+      const savedStored = parse(row.answers_json || '{}');
+      const { _revisions: _discard, ...cleanSavedAnswers } = savedStored;
+      const inputAnswers = input.answers && typeof input.answers === 'object' ? input.answers : {};
+      const { _revisions: _discard2, ...cleanInputAnswers } = inputAnswers;
+      const answers = Object.keys(cleanInputAnswers).length > 0
+        ? { ...cleanSavedAnswers, ...cleanInputAnswers }
+        : cleanSavedAnswers;
       const elapsedMs = Math.min(preset.durationSeconds * 1000, Math.max(0, nowMs - Date.parse(row.started_at)));
 
       const evaluation = evaluateContestSubmission(items, answers, preset, elapsedMs, finishReason);
@@ -1332,7 +1595,11 @@ export class OnlineStore{
     const answers = parse(row.answers_json || '{}');
     const preset = CONTEST_PRESETS[row.preset_id];
     const evaluation = evaluateContestSubmission(items, answers, preset, 0, row.status);
-    return buildReviewMistakesPack({ sessionId: row.session_id, title: row.title, subject: row.subject, grade: row.grade }, evaluation.mistakes);
+    const pack = buildReviewMistakesPack({ sessionId: row.session_id, studentId: row.student_id, workspaceId: auth.workspaceId, title: row.title, subject: row.subject, grade: row.grade }, evaluation.mistakes);
+    this.db.prepare('INSERT OR REPLACE INTO packs(workspace_id, pack_id, version, subject_label, json, content_hash) VALUES(?,?,?,?,?,?)').run(
+      auth.workspaceId, pack.id, pack.version, pack.subject, json(pack), contentIdentity(pack)
+    );
+    return pack;
   }
 
   resolvePackSubject(auth, packId) {

@@ -107,9 +107,9 @@ export default function StudentScreen({studentName,availableStars,earnedStars,se
         <section className="student-light-games" aria-label="Trò chơi phù hợp bộ được giao" aria-busy={starting}>
           <div className="student-games-heading"><div><span className="student-kicker">CHỌN CÁCH CON MUỐN CHƠI</span><h2 id="student-games-title">{currentPack?currentPack.title:practiceContext.complete?'Thật tuyệt, con đã hoàn thành!':'Chuyến khám phá đang được chuẩn bị'}</h2></div>{currentPack&&<span className="student-question-count">{currentPack.itemCount} câu hỏi</span>}</div>
           {currentPack&&<p className="student-games-guide">Cùng một bộ câu hỏi, con có thể thử những cách chơi này.</p>}
-          <div className="student-game-grid">{games.map(game=><button key={game.id} type="button" className={`student-game-card game-card-${game.id}`} disabled={starting} aria-label={`Chơi ${game.label} bằng bộ được giao`} onClick={()=>currentPack&&void onPlay(game.id,currentPack)}>
+          <div className="student-game-grid">{games.map(game=><button key={game.id} type="button" className={`student-game-card game-card-${game.id}`} disabled={starting} onClick={()=>currentPack&&void onPlay(game.id,currentPack)}>
             {GAME_CARD_IMAGES[game.id]&&<img src={GAME_CARD_IMAGES[game.id]} alt="" className="student-game-thumbnail" aria-hidden="true" loading="lazy"/>}
-            <span className="student-game-symbol" aria-hidden="true">{themes[game.id].symbol}</span><span className="student-game-copy"><strong>{game.label}</strong><span>{themes[game.id].intro}</span><small>{themes[game.id].action} <span aria-hidden="true">→</span></small></span>
+            <span className="student-game-symbol" aria-hidden="true">{themes[game.id].symbol}</span><span className="student-game-copy"><span className="sr-only">Chơi </span><strong>{game.label}</strong><span className="sr-only"> bằng bộ được giao</span><span aria-hidden="true">{themes[game.id].intro}</span><small aria-hidden="true">{themes[game.id].action} <span aria-hidden="true">→</span></small></span>
           </button>)}</div>
           {currentPack&&!games.length&&<button type="button" disabled={starting} onClick={()=>void onChooseGames(currentPack)}>{starting?'Đang tìm trò phù hợp…':'Xem trò chơi của địa điểm này'}</button>}
           {!currentPack&&<p>{practiceContext.detail}</p>}

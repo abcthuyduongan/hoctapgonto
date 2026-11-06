@@ -1,0 +1,9 @@
+{
+  "kind": "Same empty-data setup and axe disableRules as online-a11y.spec.ts; Chrome desktop; actual PGlite cloud browser fixture",
+  "worldMapElements": 0,
+  "mapScanViolations": [],
+  "townGridCountBeforeScan": 0,
+  "townScanViolations": [],
+  "townText": "Đang mở thị trấn của con…",
+  "townGridCountAfterScan": 0
+}

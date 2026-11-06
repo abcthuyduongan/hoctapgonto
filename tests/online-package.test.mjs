@@ -140,7 +140,13 @@ test('actual pilot ZIP runs a standalone local manager from an extracted Unicode
   await t.test('real packaged gameplay awards stars and records a manager-approved redemption',async()=>{
     const play=await learner.call('/play',{method:'POST',body:{requestId:'packaged-play',moduleId:'math-quest',packId:quiz().id,contentVersion:1}});
     assert.equal(JSON.stringify(play).includes('correctIndex'),false);
-    for(const item of play.presentation.items){await learner.call(`/play/${play.session.sessionId}/question-open`,{method:'POST',body:{itemId:item.id}});await learner.call(`/play/${play.session.sessionId}/attempt`,{method:'POST',body:{attemptKey:`answer-${item.id}`,itemId:item.id,response:{kind:'choice',choiceIndex:quiz().items.find(q=>q.id===item.id).correctIndex},hintsUsed:0,elapsedMs:250}});}
+    for(const item of play.presentation.items){
+      const opened=await learner.call(`/play/${play.session.sessionId}/question-open`,{method:'POST',body:{itemId:item.id}});
+      const target=quiz().items.find(q=>q.id===item.id);
+      const correctText=target.options[target.correctIndex];
+      const displayedIndex=opened.item.options.indexOf(correctText);
+      await learner.call(`/play/${play.session.sessionId}/attempt`,{method:'POST',body:{attemptKey:`answer-${item.id}`,itemId:item.id,presentationId:opened.item.presentationId,response:{kind:'choice',choiceIndex:displayedIndex},hintsUsed:0,elapsedMs:250}});
+    }
     const complete=await learner.call(`/play/${play.session.sessionId}/complete`,{method:'POST'});assert.equal(complete.gained,3);
     request=await learner.call('/redemptions',{method:'POST',body:{requestId:'packaged-wish',title:'Hộp bút tự chọn',goalVnd:5000}});assert.equal(request.stars,2);
     const approved=await manager.call(`/redemptions/${request.requestId}/transition`,{method:'POST',body:{status:'approved',note:'Đã duyệt trong gói thử'}});assert.equal(approved.history.at(-1).status,'approved');
@@ -208,6 +214,7 @@ test('actual pilot ZIP runs a standalone local manager from an extracted Unicode
     const p=await child.call('/play/compact',{method:'POST',body:{requestId:'packaged-audio-play',moduleId:'math-quest',packId:source.id,contentVersion:1}}),url=origin+'/api/online/media/'+audio.id+'?playId='+p.session.sessionId+'&itemId=packaged-listen-1';
     const response=await fetch(url,{headers:{Cookie:child.cookie},signal:AbortSignal.timeout(5000)});assert.equal(response.status,200);assert.deepEqual(Buffer.from(await response.arrayBuffer()),wav);await delay(150);
     const opened=await child.call('/play/'+p.session.sessionId+'/question-open',{method:'POST',body:{itemId:'packaged-listen-1'}});assert.equal(opened.item.correctIndex,undefined);assert.equal(opened.item.prompt,source.items[0].prompt);
-    const receipt=await child.call('/play/'+p.session.sessionId+'/attempt',{method:'POST',body:{attemptKey:'audio-answer',itemId:'packaged-listen-1',response:{kind:'choice',choiceIndex:0},hintsUsed:0,elapsedMs:0}});assert.equal(receipt.questionRewards.gained,3);assert.equal(receipt.feedback.audioTranscript,'My name is Lucy.');
+    const targetIndex=opened.item.options.indexOf('Lucy');
+    const receipt=await child.call('/play/'+p.session.sessionId+'/attempt',{method:'POST',body:{attemptKey:'audio-answer',itemId:'packaged-listen-1',presentationId:opened.item.presentationId,response:{kind:'choice',choiceIndex:targetIndex},hintsUsed:0,elapsedMs:0}});assert.equal(receipt.questionRewards.gained,3);assert.equal(receipt.feedback.audioTranscript,'My name is Lucy.');
   });
 });

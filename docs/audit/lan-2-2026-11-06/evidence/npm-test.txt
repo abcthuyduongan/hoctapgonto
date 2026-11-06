@@ -1,0 +1,2281 @@
+
+> bao-an-learning@4.0.1 test
+> npm run test:syntax && npm run test:release && npm run test:online && npm run test:cloud && npm run test:map && node tests/semester2-curriculum.test.mjs && node tests/classroom-pilot-trial.test.mjs
+
+
+> bao-an-learning@4.0.1 test:syntax
+> node tests/check-tsx.mjs
+
+Syntax parsing: all src/*.ts and src/*.tsx files passed.
+
+> bao-an-learning@4.0.1 test:release
+> node --test tests/release-package.test.mjs tests/build-identity.test.mjs
+
+TAP version 13
+# Subtest: source fingerprint is reproducible and includes uncommitted runtime edits without leaking contents
+ok 1 - source fingerprint is reproducible and includes uncommitted runtime edits without leaking contents
+  ---
+  duration_ms: 259.0501
+  type: 'test'
+  ...
+# Subtest: status only publishes validated artifact identity and cannot label an old version as this build
+ok 2 - status only publishes validated artifact identity and cannot label an old version as this build
+  ---
+  duration_ms: 74.214
+  type: 'test'
+  ...
+# Subtest: the online worker removes only owned caches and unregisters without intercepting requests
+ok 3 - the online worker removes only owned caches and unregisters without intercepting requests
+  ---
+  duration_ms: 2.1981
+  type: 'test'
+  ...
+# Subtest: Release server defaults preserve the local origin; CLI accepts only bounded explicit options
+ok 4 - Release server defaults preserve the local origin; CLI accepts only bounded explicit options
+  ---
+  duration_ms: 0.4461
+  type: 'test'
+  ...
+# Subtest: Request boundary rejects traversal, nested encoding, NUL and Windows path ambiguities before resolution
+ok 5 - Request boundary rejects traversal, nested encoding, NUL and Windows path ambiguities before resolution
+  ---
+  duration_ms: 0.5714
+  type: 'test'
+  ...
+# Subtest: Static HTTP serves only app bytes with required media MIME, HEAD and no-cache headers
+ok 6 - Static HTTP serves only app bytes with required media MIME, HEAD and no-cache headers
+  ---
+  duration_ms: 74.9384
+  type: 'test'
+  ...
+# Subtest: SPA fallback is limited to HTML navigation; missing assets, API, other methods and traversal never become index HTML
+ok 7 - SPA fallback is limited to HTML navigation; missing assets, API, other methods and traversal never become index HTML
+  ---
+  duration_ms: 33.6397
+  type: 'test'
+  ...
+# Subtest: Pilot package is a bounded dist snapshot with standalone Unicode-safe Windows entrypoint and verified ZIP/manifest hashes
+ok 8 - Pilot package is a bounded dist snapshot with standalone Unicode-safe Windows entrypoint and verified ZIP/manifest hashes
+  ---
+  duration_ms: 552.5725
+  type: 'test'
+  ...
+# Subtest: Same version refuses a different build or any changed packaged bytes without replacing prior files
+ok 9 - Same version refuses a different build or any changed packaged bytes without replacing prior files
+  ---
+  duration_ms: 429.861
+  type: 'test'
+  ...
+# Subtest: Windows rename refusal falls back to an exclusive verified copy and preserves immutable artifacts
+ok 10 - Windows rename refusal falls back to an exclusive verified copy and preserves immutable artifacts
+  ---
+  duration_ms: 513.6317
+  type: 'test'
+  ...
+# Subtest: A modified ZIP or incomplete pre-existing package cannot be silently reused
+ok 11 - A modified ZIP or incomplete pre-existing package cannot be silently reused
+  ---
+  duration_ms: 434.7747
+  type: 'test'
+  ...
+# Subtest: Packaging rejects absent PWA build markers, overlapping output and output outside workspace
+ok 12 - Packaging rejects absent PWA build markers, overlapping output and output outside workspace
+  ---
+  duration_ms: 17.2174
+  type: 'test'
+  ...
+1..12
+# tests 12
+# suites 0
+# pass 12
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2219.9271
+
+> bao-an-learning@4.0.1 test:online
+> node --experimental-strip-types --test tests/api-diagnostics.test.mjs tests/online-content.test.mjs tests/online-request.test.mjs tests/online-media-budget.test.mjs tests/online-document-import.test.mjs tests/online-exercises.test.mjs tests/online-server.test.mjs tests/online-package.test.mjs tests/online-recovery.test.mjs tests/online-import-identity.test.mjs tests/online-password.test.mjs tests/pair-rounds.test.mjs tests/online-game-compatibility.test.mjs tests/online-summary.test.mjs tests/speech.test.mjs tests/speech-voices.test.mjs tests/question-rewards.test.mjs tests/online-question-store.test.mjs tests/online-question-protocol.test.mjs tests/online-question-recovery.test.mjs tests/weekly-plan.test.mjs tests/question-image-loader.test.mjs tests/online-image-optimize.test.mjs tests/question-export.test.mjs tests/audio-duration.test.mjs tests/media-upload.test.mjs tests/gift-catalog.test.mjs tests/badges-streaks.test.mjs tests/games-tuan5.test.mjs tests/parent-portal.test.mjs tests/online-contest.test.mjs tests/town.test.mjs tests/town-social-feed.test.mjs tests/games-wave2.test.mjs tests/d02-cumulative-optimization.test.mjs tests/load-staging.test.mjs tests/parent-authorization-matrix.test.mjs tests/question-shuffling.test.mjs tests/sqlite-legacy-role-migration.test.mjs
+
+TAP version 13
+# Subtest: failure diagnostics redact identifiers, queries, bodies and unknown routes
+ok 1 - failure diagnostics redact identifiers, queries, bodies and unknown routes
+  ---
+  duration_ms: 2.8248
+  type: 'test'
+  ...
+# Subtest: failure diagnostics keep a bounded log budget and cannot break an API if logging fails
+ok 2 - failure diagnostics keep a bounded log budget and cannot break an API if logging fails
+  ---
+  duration_ms: 0.6121
+  type: 'test'
+  ...
+# Subtest: diagnostics identify the same version as the application package
+ok 3 - diagnostics identify the same version as the application package
+  ---
+  duration_ms: 9.9953
+  type: 'test'
+  ...
+# Subtest: performance samples isolate overlapping requests and contain only allowlisted numbers and labels
+ok 4 - performance samples isolate overlapping requests and contain only allowlisted numbers and labels
+  ---
+  duration_ms: 56.5785
+  type: 'test'
+  ...
+# Subtest: performance reporting is opt-in, sampled, bounded per minute and cannot change responses or errors
+ok 5 - performance reporting is opt-in, sampled, bounded per minute and cannot change responses or errors
+  ---
+  duration_ms: 14.5941
+  type: 'test'
+  ...
+# Subtest: failure categories allowlist database codes and correlate with the sampled request without exposing errors
+ok 6 - failure categories allowlist database codes and correlate with the sampled request without exposing errors
+  ---
+  duration_ms: 0.7348
+  type: 'test'
+  ...
+# Subtest: verified audio duration coalesces identical bytes and MIME while preserving per-call size checks
+ok 7 - verified audio duration coalesces identical bytes and MIME while preserving per-call size checks
+  ---
+  duration_ms: 3.9923
+  type: 'test'
+  ...
+# Subtest: duration cache expires, is bounded and never remembers invalid audio
+ok 8 - duration cache expires, is bounded and never remembers invalid audio
+  ---
+  duration_ms: 0.9982
+  type: 'test'
+  ...
+# Subtest: actual WAV parsing still derives the server duration and rejects corrupt bytes
+ok 9 - actual WAV parsing still derives the server duration and rejects corrupt bytes
+  ---
+  duration_ms: 207.7869
+  type: 'test'
+  ...
+# (node:21088) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: Timezone boundary: 23:59 and 00:01 in Vietnam time strictly belong to two different days
+ok 10 - Timezone boundary: 23:59 and 00:01 in Vietnam time strictly belong to two different days
+  ---
+  duration_ms: 38.1214
+  type: 'test'
+  ...
+# Subtest: Streak pure functions: qualification, daily increment, freeze, and reset
+ok 11 - Streak pure functions: qualification, daily increment, freeze, and reset
+  ---
+  duration_ms: 7.925
+  type: 'test'
+  ...
+# Subtest: Streak computation handles inactive gap and displays status messages
+ok 12 - Streak computation handles inactive gap and displays status messages
+  ---
+  duration_ms: 1.1739
+  type: 'test'
+  ...
+# Subtest: Badges: 12 catalog badges, missing requirements calculation and auto-award
+ok 13 - Badges: 12 catalog badges, missing requirements calculation and auto-award
+  ---
+  duration_ms: 1.3719
+  type: 'test'
+  ...
+# Subtest: OnlineStore SQLite: Streak advances on 5 correct attempts and updates daily missions
+ok 14 - OnlineStore SQLite: Streak advances on 5 correct attempts and updates daily missions
+  ---
+  duration_ms: 17.1061
+  type: 'test'
+  ...
+# Subtest: OnlineStore SQLite: Badges are awarded automatically upon reaching criteria and are idempotent
+ok 15 - OnlineStore SQLite: Badges are awarded automatically upon reaching criteria and are idempotent
+  ---
+  duration_ms: 6.7351
+  type: 'test'
+  ...
+# Subtest: Regression CC8: Badges and missions preserve star balance strictly
+ok 16 - Regression CC8: Badges and missions preserve star balance strictly
+  ---
+  duration_ms: 8.3673
+  type: 'test'
+  ...
+# Subtest: PostgresStore: Streak, Missions, Badges, and CC8 Star Preservation
+ok 17 - PostgresStore: Streak, Missions, Badges, and CC8 Star Preservation
+  ---
+  duration_ms: 5149.5616
+  type: 'test'
+  ...
+# (node:19116) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Seeding 40-week curriculum dataset in Postgres...
+# D02 summary 40 weeks execution time: 99.87 ms
+# SQLite 40 weeks summary elapsed: 9.16 ms
+# Subtest: D02: 40-week cumulative dataset keeps bounded summary query count and sub-second execution
+ok 18 - D02: 40-week cumulative dataset keeps bounded summary query count and sub-second execution
+  ---
+  duration_ms: 15628.1373
+  type: 'test'
+  ...
+# Subtest: D02: SQLite OnlineStore handles 40 weeks with fast summary
+ok 19 - D02: SQLite OnlineStore handles 40 weeks with fast summary
+  ---
+  duration_ms: 397.3966
+  type: 'test'
+  ...
+# Subtest: Tuần 5: GAME_REGISTRY contains balance-scale and basket-sort with valid manifests
+ok 20 - Tuần 5: GAME_REGISTRY contains balance-scale and basket-sort with valid manifests
+  ---
+  duration_ms: 3.7836
+  type: 'test'
+  ...
+# Subtest: Tuần 5: Content Pack Validation for compare and categorize packs
+ok 21 - Tuần 5: Content Pack Validation for compare and categorize packs
+  ---
+  duration_ms: 3.8451
+  type: 'test'
+  ...
+# Subtest: Tuần 5: Bidirectional presentation bridges between new kinds and classic games
+ok 22 - Tuần 5: Bidirectional presentation bridges between new kinds and classic games
+  ---
+  duration_ms: 1.0618
+  type: 'test'
+  ...
+# Subtest: Tuần 5: Scoring and reward calculation for balance-scale and basket-sort
+ok 23 - Tuần 5: Scoring and reward calculation for balance-scale and basket-sort
+  ---
+  duration_ms: 0.909
+  type: 'test'
+  ...
+# Subtest: Tuần 5: onlineGameCompatibility correctly detects compatible game modes for new packs
+ok 24 - Tuần 5: onlineGameCompatibility correctly detects compatible game modes for new packs
+  ---
+  duration_ms: 9.1557
+  type: 'test'
+  ...
+# Subtest: Tuần 9 Cổng C9: GAME_REGISTRY contains >= 8 registered playable games
+ok 25 - Tuần 9 Cổng C9: GAME_REGISTRY contains >= 8 registered playable games
+  ---
+  duration_ms: 2.1977
+  type: 'test'
+  ...
+# Subtest: Tuần 9 Cổng C9: Presentation conversion and validation for Wave 2 games
+ok 26 - Tuần 9 Cổng C9: Presentation conversion and validation for Wave 2 games
+  ---
+  duration_ms: 13.3101
+  type: 'test'
+  ...
+# Subtest: Tuần 9 Cổng C9: Compatibility matrix covers all 10 registered games without crash
+ok 27 - Tuần 9 Cổng C9: Compatibility matrix covers all 10 registered games without crash
+  ---
+  duration_ms: 13.3925
+  type: 'test'
+  ...
+# (node:32548) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: SQLite: Admin CRUD gifts, toggles active, and respects class scope
+ok 28 - SQLite: Admin CRUD gifts, toggles active, and respects class scope
+  ---
+  duration_ms: 80.0292
+  type: 'test'
+  ...
+# Subtest: SQLite: Student pins goal, and goal is reflected in summary
+ok 29 - SQLite: Student pins goal, and goal is reflected in summary
+  ---
+  duration_ms: 39.0976
+  type: 'test'
+  ...
+# Subtest: SQLite: Redemption enforces star balance, decrements stock, and updates wallet
+ok 30 - SQLite: Redemption enforces star balance, decrements stock, and updates wallet
+  ---
+  duration_ms: 122.8984
+  type: 'test'
+  ...
+# Subtest: SQLite: Weekly limit and unlockAfterWeek enforcement
+ok 31 - SQLite: Weekly limit and unlockAfterWeek enforcement
+  ---
+  duration_ms: 74.4876
+  type: 'test'
+  ...
+# Subtest: SQLite: Cancel/Reject restores stock, Fulfill and ConfirmReceived close the loop into Memorial Cabinet
+ok 32 - SQLite: Cancel/Reject restores stock, Fulfill and ConfirmReceived close the loop into Memorial Cabinet
+  ---
+  duration_ms: 79.8949
+  type: 'test'
+  ...
+# Subtest: SQLite: Legacy savings wallet works 100% without loss
+ok 33 - SQLite: Legacy savings wallet works 100% without loss
+  ---
+  duration_ms: 87.418
+  type: 'test'
+  ...
+# Subtest: PostgreSQL: Admin CRUD gifts, toggles active, and respects class scope
+ok 34 - PostgreSQL: Admin CRUD gifts, toggles active, and respects class scope
+  ---
+  duration_ms: 5329.7066
+  type: 'test'
+  ...
+# Subtest: PostgreSQL: Student pins goal, and goal is reflected in summary
+ok 35 - PostgreSQL: Student pins goal, and goal is reflected in summary
+  ---
+  duration_ms: 3936.6558
+  type: 'test'
+  ...
+# Subtest: PostgreSQL: Redemption enforces star balance, decrements stock, and updates wallet
+ok 36 - PostgreSQL: Redemption enforces star balance, decrements stock, and updates wallet
+  ---
+  duration_ms: 4761.6156
+  type: 'test'
+  ...
+# Subtest: PostgreSQL: Weekly limit and unlockAfterWeek enforcement
+ok 37 - PostgreSQL: Weekly limit and unlockAfterWeek enforcement
+  ---
+  duration_ms: 3458.7767
+  type: 'test'
+  ...
+# Subtest: PostgreSQL: Cancel/Reject restores stock, Fulfill and ConfirmReceived close the loop into Memorial Cabinet
+ok 38 - PostgreSQL: Cancel/Reject restores stock, Fulfill and ConfirmReceived close the loop into Memorial Cabinet
+  ---
+  duration_ms: 2771.3204
+  type: 'test'
+  ...
+# Subtest: PostgreSQL: Legacy savings wallet works 100% without loss
+ok 39 - PostgreSQL: Legacy savings wallet works 100% without loss
+  ---
+  duration_ms: 2653.6458
+  type: 'test'
+  ...
+# Subtest: PostgreSQL: Concurrency test - 2 students concurrently redeem last stock item -> exactly 1 succeeds and 1 gets 409
+ok 40 - PostgreSQL: Concurrency test - 2 students concurrently redeem last stock item -> exactly 1 succeeds and 1 gets 409
+  ---
+  duration_ms: 2493.4338
+  type: 'test'
+  ...
+# Provisioning 30 students for Class A...
+# Provisioning 100 students for Class B...
+# Running Stage 1: 30 concurrent students on Class A...
+# Stage 1 completed with 30 students, 0 errors.
+# Running Stage 2: 100 concurrent students high-load simulation on Class B...
+# Stage 2 completed with 100 students, 0 errors.
+# === STAGING LOAD TEST REPORT ===
+# Total Requests Handled: 910
+# 5xx Errors Count: 0 (Requirement: 0)
+# Open Question Latency:
+#   p50: 12.51 ms
+#   p90: 17.35 ms
+#   p95: 23.59 ms (Requirement: <= 1000 ms)
+# Star & Balance Consistency: 100% (All 130 students verified)
+# Subtest: Synthetic Adapter Load Test (In-Process PGlite / Synthetic Concurrency): 30 then 100 accounts with audio & image gameplay logic
+ok 41 - Synthetic Adapter Load Test (In-Process PGlite / Synthetic Concurrency): 30 then 100 accounts with audio & image gameplay logic
+  ---
+  duration_ms: 27796.7738
+  type: 'test'
+  ...
+# (node:17584) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: compressed JSON preserves exact media data while decoded limits and malformed encodings are enforced
+ok 42 - compressed JSON preserves exact media data while decoded limits and malformed encodings are enforced
+  ---
+  duration_ms: 16.4318
+  type: 'test'
+  ...
+# Subtest: a real HTTP cloud adapter accepts compressed image/audio uploads and keeps their exact hashes and deduplication
+ok 43 - a real HTTP cloud adapter accepts compressed image/audio uploads and keeps their exact hashes and deduplication
+  ---
+  duration_ms: 6446.8461
+  type: 'test'
+  ...
+# {"originalRequestBytes":69257,"compressedRequestBytes":5542,"ratio":0.08,"mediaHashesUnchanged":true}
+# Subtest: Generic JSON is deterministic, subject-neutral and keeps valid author identifiers
+ok 44 - Generic JSON is deterministic, subject-neutral and keeps valid author identifiers
+  ---
+  duration_ms: 28.809
+  type: 'test'
+  ...
+# Subtest: Quiz answers and representations must be complete and unambiguous
+ok 45 - Quiz answers and representations must be complete and unambiguous
+  ---
+  duration_ms: 9.2008
+  type: 'test'
+  ...
+# Subtest: Pairs accept question/answer aliases but reject duplicate faces and conflicting aliases
+ok 46 - Pairs accept question/answer aliases but reject duplicate faces and conflicting aliases
+  ---
+  duration_ms: 2.2094
+  type: 'test'
+  ...
+# Subtest: Ordering content takes only the supplied answer order and uses engine token limits
+ok 47 - Ordering content takes only the supplied answer order and uses engine token limits
+  ---
+  duration_ms: 2.1763
+  type: 'test'
+  ...
+# Subtest: Strict shape checks reject wrong types, mixed kinds, unknown fields and duplicate IDs
+ok 48 - Strict shape checks reject wrong types, mixed kinds, unknown fields and duplicate IDs
+  ---
+  duration_ms: 4.6047
+  type: 'test'
+  ...
+# Subtest: The entire file is bounded and each pack contains exactly 2–30 questions
+ok 49 - The entire file is bounded and each pack contains exactly 2–30 questions
+  ---
+  duration_ms: 5.9965
+  type: 'test'
+  ...
+# Subtest: UTF-8 CSV and TSV map headers independently of order and preserve quoted data
+ok 50 - UTF-8 CSV and TSV map headers independently of order and preserve quoted data
+  ---
+  duration_ms: 2.7277
+  type: 'test'
+  ...
+# Subtest: Malformed CSV and incomplete or ambiguous headers are rejected without partial imports
+ok 51 - Malformed CSV and incomplete or ambiguous headers are rejected without partial imports
+  ---
+  duration_ms: 0.6721
+  type: 'test'
+  ...
+# Subtest: Existing single-pack envelopes preserve validated source data and mark local ownership
+ok 52 - Existing single-pack envelopes preserve validated source data and mark local ownership
+  ---
+  duration_ms: 4.1464
+  type: 'test'
+  ...
+# Subtest: Available games follow concrete shape and matching-answer ambiguity, without subject routing
+ok 53 - Available games follow concrete shape and matching-answer ambiguity, without subject routing
+  ---
+  duration_ms: 5.3952
+  type: 'test'
+  ...
+# Subtest: Weekly JSON keeps arbitrary author labels and separates author-supplied question kinds
+ok 54 - Weekly JSON keeps arbitrary author labels and separates author-supplied question kinds
+  ---
+  duration_ms: 3.4404
+  type: 'test'
+  ...
+# Subtest: Weekly JSON rejects invalid or oversized bundles as a whole
+ok 55 - Weekly JSON rejects invalid or oversized bundles as a whole
+  ---
+  duration_ms: 9.6695
+  type: 'test'
+  ...
+# Subtest: Weekly CSV groups exact author labels and kinds; single imports never split mixed files
+ok 56 - Weekly CSV groups exact author labels and kinds; single imports never split mixed files
+  ---
+  duration_ms: 3.7735
+  type: 'test'
+  ...
+# Subtest: Single files become one weekly set and templates contain no generated curriculum
+ok 57 - Single files become one weekly set and templates contain no generated curriculum
+  ---
+  duration_ms: 1.8302
+  type: 'test'
+  ...
+# (node:25912) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: Contest pure functions: sanitization, evaluation, readiness, and seeded shuffle
+ok 58 - Contest pure functions: sanitization, evaluation, readiness, and seeded shuffle
+  ---
+  duration_ms: 3.3797
+  type: 'test'
+  ...
+# Subtest: Contest presets declare at least 1 Violympic Math and 1 IOE English with mandatory disclaimer
+ok 59 - Contest presets declare at least 1 Violympic Math and 1 IOE English with mandatory disclaimer
+  ---
+  duration_ms: 0.5016
+  type: 'test'
+  ...
+# Subtest: SQLite Store: Complete contest mock lifecycle, security, zero stars, and readiness milestone
+ok 60 - SQLite Store: Complete contest mock lifecycle, security, zero stars, and readiness milestone
+  ---
+  duration_ms: 58.7448
+  type: 'test'
+  ...
+# Subtest: PostgreSQL Store: Complete contest mock lifecycle, security, zero stars, and readiness milestone
+ok 61 - PostgreSQL Store: Complete contest mock lifecycle, security, zero stars, and readiness milestone
+  ---
+  duration_ms: 5212.7093
+  type: 'test'
+  ...
+# Subtest: HTTP Cloud API: Endpoints enforce authentication, role check, and hide answers during contest
+ok 62 - HTTP Cloud API: Endpoints enforce authentication, role check, and hide answers during contest
+  ---
+  duration_ms: 3849.7987
+  type: 'test'
+  ...
+# Subtest: Word and Excel retain per-question difficulty, isolate invalid difficulty and list referenced media without loading a catalogue
+ok 63 - Word and Excel retain per-question difficulty, isolate invalid difficulty and list referenced media without loading a catalogue
+  ---
+  duration_ms: 158.1827
+  type: 'test'
+  ...
+# Subtest: Large workspace media catalogs do not block text or referenced media imports
+ok 64 - Large workspace media catalogs do not block text or referenced media imports
+  ---
+  duration_ms: 756.9352
+  type: 'test'
+  ...
+# Subtest: Imported pairs preserve every correct answer when presented as quizzes for all supported sizes
+ok 65 - Imported pairs preserve every correct answer when presented as quizzes for all supported sizes
+  ---
+  duration_ms: 1401.5537
+  type: 'test'
+  ...
+# Subtest: The actual exported blank Word and Excel templates contain all eight kinds and import no sample questions
+ok 66 - The actual exported blank Word and Excel templates contain all eight kinds and import no sample questions
+  ---
+  duration_ms: 95.7326
+  type: 'test'
+  ...
+# Subtest: Actual XLSX package populated with eight types retains author labels, metadata, answers and media
+ok 67 - Actual XLSX package populated with eight types retains author labels, metadata, answers and media
+  ---
+  duration_ms: 87.584
+  type: 'test'
+  ...
+# Subtest: Actual Word package with repeated field/value tables imports the same eight types and skips blank blocks
+ok 68 - Actual Word package with repeated field/value tables imports the same eight types and skips blank blocks
+  ---
+  duration_ms: 95.5989
+  type: 'test'
+  ...
+# Subtest: Missing answers, malformed fields and ambiguous author rows reject the entire document
+ok 69 - Missing answers, malformed fields and ambiguous author rows reject the entire document
+  ---
+  duration_ms: 1582.3694
+  type: 'test'
+  ...
+# Subtest: Images and audio resolve only unambiguous uploaded filenames and require descriptive text
+ok 70 - Images and audio resolve only unambiguous uploaded filenames and require descriptive text
+  ---
+  duration_ms: 602.0311
+  type: 'test'
+  ...
+# Subtest: Document-only boundary rejects malformed packages, formulas, embedded media and XML entities
+ok 71 - Document-only boundary rejects malformed packages, formulas, embedded media and XML entities
+  ---
+  duration_ms: 1002.3337
+  type: 'test'
+  ...
+# Subtest: DOCX ZIP budget checks bound declared expansion and XML size before interpretation
+ok 72 - DOCX ZIP budget checks bound declared expansion and XML size before interpretation
+  ---
+  duration_ms: 1443.9499
+  type: 'test'
+  ...
+# Subtest: Automatic source and item identities survive row/group reorder and fresh preview UUIDs across all eight kinds
+ok 73 - Automatic source and item identities survive row/group reorder and fresh preview UUIDs across all eight kinds
+  ---
+  duration_ms: 183.193
+  type: 'test'
+  ...
+# Subtest: Question errors identify the exact physical Excel row or Word table and missing field
+ok 74 - Question errors identify the exact physical Excel row or Word table and missing field
+  ---
+  duration_ms: 263.6524
+  type: 'test'
+  ...
+# Subtest: Partial preview excludes each malformed question and leaves only validated playable packs for all eight kinds
+ok 75 - Partial preview excludes each malformed question and leaves only validated playable packs for all eight kinds
+  ---
+  duration_ms: 1249.1408
+  type: 'test'
+  ...
+# Subtest: Partial preview keeps the first valid duplicate and identifies the later physical row
+ok 76 - Partial preview keeps the first valid duplicate and identifies the later physical row
+  ---
+  duration_ms: 697.7537
+  type: 'test'
+  ...
+# Subtest: Partial preview reports missing media, invalid grouping fields and literal null placeholders without changing supplied answers
+ok 77 - Partial preview reports missing media, invalid grouping fields and literal null placeholders without changing supplied answers
+  ---
+  duration_ms: 11.863
+  type: 'test'
+  ...
+# Subtest: Partial preview diagnoses every all-invalid question and excludes otherwise valid singletons with an explicit playable-size reason
+ok 78 - Partial preview diagnoses every all-invalid question and excludes otherwise valid singletons with an explicit playable-size reason
+  ---
+  duration_ms: 155.2985
+  type: 'test'
+  ...
+# Subtest: Partial preview rejects oversized groups explicitly without truncating and still allows other valid groups
+ok 79 - Partial preview rejects oversized groups explicitly without truncating and still allows other valid groups
+  ---
+  duration_ms: 14.8958
+  type: 'test'
+  ...
+# Subtest: Partial preview reports conflicting later titles but a malformed first row cannot determine the retained title
+ok 80 - Partial preview reports conflicting later titles but a malformed first row cannot determine the retained title
+  ---
+  duration_ms: 47.0295
+  type: 'test'
+  ...
+# Subtest: Partial preview scheduling title does not remap source pack identities and file-level failures remain fatal
+ok 81 - Partial preview scheduling title does not remap source pack identities and file-level failures remain fatal
+  ---
+  duration_ms: 61.1489
+  type: 'test'
+  ...
+# Subtest: Partial preview excludes malformed Word question tables and Excel overflow cells with source locations
+ok 82 - Partial preview excludes malformed Word question tables and Excel overflow cells with source locations
+  ---
+  duration_ms: 164.2264
+  type: 'test'
+  ...
+# Subtest: Excel null values mean missing data; only bad source rows and Excel error cells are excluded
+ok 83 - Excel null values mean missing data; only bad source rows and Excel error cells are excluded
+  ---
+  duration_ms: 29.8055
+  type: 'test'
+  ...
+# Subtest: prepared workbook reuses parsing but rechecks media and never retains a prior invalid catalogue result
+ok 84 - prepared workbook reuses parsing but rechecks media and never retains a prior invalid catalogue result
+  ---
+  duration_ms: 19.5746
+  type: 'test'
+  ...
+# Subtest: online rich exercises use only the question island and retain their immutable source
+ok 85 - online rich exercises use only the question island and retain their immutable source
+  ---
+  duration_ms: 8.3405
+  type: 'test'
+  ...
+# Subtest: online numeric grading normalizes signs, decimal commas and zeroes without evaluating expressions
+ok 86 - online numeric grading normalizes signs, decimal commas and zeroes without evaluating expressions
+  ---
+  duration_ms: 1.6239
+  type: 'test'
+  ...
+# Subtest: online fill and listening text preserve Vietnamese accents, Unicode normalization and authored case rules
+ok 87 - online fill and listening text preserve Vietnamese accents, Unicode normalization and authored case rules
+  ---
+  duration_ms: 0.7916
+  type: 'test'
+  ...
+# Subtest: online reading and listening choice grade exact raw indices and reject wrong answer shapes
+ok 88 - online reading and listening choice grade exact raw indices and reject wrong answer shapes
+  ---
+  duration_ms: 0.8402
+  type: 'test'
+  ...
+# Subtest: online rich answer boundary rejects hidden fields and accessors before reading them
+ok 89 - online rich answer boundary rejects hidden fields and accessors before reading them
+  ---
+  duration_ms: 0.5972
+  type: 'test'
+  ...
+# Subtest: online rich completion requires raw evidence for every item; exact 80 percent earns two stars
+ok 90 - online rich completion requires raw evidence for every item; exact 80 percent earns two stars
+  ---
+  duration_ms: 6.6897
+  type: 'test'
+  ...
+# Subtest: online rich first response and hint use determine the tier; retries and storage order cannot improve it
+ok 91 - online rich first response and hint use determine the tier; retries and storage order cannot improve it
+  ---
+  duration_ms: 2.2909
+  type: 'test'
+  ...
+# Subtest: online rich evidence rejects forged identity, version, time, sequence and outcome
+ok 92 - online rich evidence rejects forged identity, version, time, sequence and outcome
+  ---
+  duration_ms: 12.8781
+  type: 'test'
+  ...
+# Subtest: online rich awards require a completed session under the current reward policy
+ok 93 - online rich awards require a completed session under the current reward policy
+  ---
+  duration_ms: 1.0215
+  type: 'test'
+  ...
+# Subtest: online native pack presentation, grading, evidence and awards retain the existing game semantics
+ok 94 - online native pack presentation, grading, evidence and awards retain the existing game semantics
+  ---
+  duration_ms: 15.4915
+  type: 'test'
+  ...
+# (node:22860) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: Question two can limit the whole source to two games without dropping or changing items
+ok 95 - Question two can limit the whole source to two games without dropping or changing items
+  ---
+  duration_ms: 15.9218
+  type: 'test'
+  ...
+# Subtest: Compatibility explains matching limits and ambiguous faces in the actual group
+ok 96 - Compatibility explains matching limits and ambiguous faces in the actual group
+  ---
+  duration_ms: 1.4045
+  type: 'test'
+  ...
+# Subtest: Pair conversion explains the group minimum and author restrictions cannot force unsupported games
+ok 97 - Pair conversion explains the group minimum and author restrictions cannot force unsupported games
+  ---
+  duration_ms: 2.3415
+  type: 'test'
+  ...
+# Subtest: Rich contexts and sentence order respect the same author intersection without inventing missing structure
+ok 98 - Rich contexts and sentence order respect the same author intersection without inventing missing structure
+  ---
+  duration_ms: 1.4298
+  type: 'test'
+  ...
+# Subtest: Policy validation rejects empty, duplicate, unknown and malformed game lists
+ok 99 - Policy validation rejects empty, duplicate, unknown and malformed game lists
+  ---
+  duration_ms: 3.2691
+  type: 'test'
+  ...
+# Subtest: A policy-only edit keeps generated item and reward identity but changes immutable source identity
+ok 100 - A policy-only edit keeps generated item and reward identity but changes immutable source identity
+  ---
+  duration_ms: 20.5334
+  type: 'test'
+  ...
+# Subtest: docx: optional author policy imports, diagnoses bad rows and preserves generated IDs
+ok 101 - docx: optional author policy imports, diagnoses bad rows and preserves generated IDs
+  ---
+  duration_ms: 28.3805
+  type: 'test'
+  ...
+# Subtest: xlsx: optional author policy imports, diagnoses bad rows and preserves generated IDs
+ok 102 - xlsx: optional author policy imports, diagnoses bad rows and preserves generated IDs
+  ---
+  duration_ms: 113.4946
+  type: 'test'
+  ...
+# Subtest: SQLite: policy revision rejects excluded games and keeps old evidence and the source star ceiling
+ok 103 - SQLite: policy revision rejects excluded games and keeps old evidence and the source star ceiling
+  ---
+  duration_ms: 200.4494
+  type: 'test'
+  ...
+# Subtest: PostgreSQL: policy revision rejects excluded games and keeps old evidence and the source star ceiling
+ok 104 - PostgreSQL: policy revision rejects excluded games and keeps old evidence and the source star ceiling
+  ---
+  duration_ms: 10875.8379
+  type: 'test'
+  ...
+# Subtest: large photos are shrunk to 1024 px WebP, keeping their aspect ratio
+ok 105 - large photos are shrunk to 1024 px WebP, keeping their aspect ratio
+  ---
+  duration_ms: 6.4036
+  type: 'test'
+  ...
+# Subtest: small images, exported files and audio stay byte for byte
+ok 106 - small images, exported files and audio stay byte for byte
+  ---
+  duration_ms: 1.4095
+  type: 'test'
+  ...
+# Subtest: the original is kept when re-encoding would not help or the browser cannot write WebP
+ok 107 - the original is kept when re-encoding would not help or the browser cannot write WebP
+  ---
+  duration_ms: 1.5247
+  type: 'test'
+  ...
+# (node:37136) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: Editorial revisions retain source question IDs without conflating new meaning or duplicate rows
+ok 108 - Editorial revisions retain source question IDs without conflating new meaning or duplicate rows
+  ---
+  duration_ms: 40.9654
+  type: 'test'
+  ...
+# Subtest: Portable SHA-256 source identities match independent Node cryptographic vectors
+ok 109 - Portable SHA-256 source identities match independent Node cryptographic vectors
+  ---
+  duration_ms: 3.623
+  type: 'test'
+  ...
+# Subtest: SQLite: explicit week revision pins old plays/media, advances future plays and preserves the source star ceiling
+ok 110 - SQLite: explicit week revision pins old plays/media, advances future plays and preserves the source star ceiling
+  ---
+  duration_ms: 231.7876
+  type: 'test'
+  ...
+# Subtest: PostgreSQL: explicit week revision pins old plays/media, advances future plays and preserves the source star ceiling
+ok 111 - PostgreSQL: explicit week revision pins old plays/media, advances future plays and preserves the source star ceiling
+  ---
+  duration_ms: 12794.0777
+  type: 'test'
+  ...
+# Subtest: SQLite: editorial import IDs preserve per-question stars on revision and replay
+ok 112 - SQLite: editorial import IDs preserve per-question stars on revision and replay
+  ---
+  duration_ms: 69.9289
+  type: 'test'
+  ...
+# Subtest: PostgreSQL: editorial import IDs preserve per-question stars on revision and replay
+ok 113 - PostgreSQL: editorial import IDs preserve per-question stars on revision and replay
+  ---
+  duration_ms: 4470.4239
+  type: 'test'
+  ...
+# Subtest: SQLite: a shared source retains its published grade across class assignment, revision and transfer
+ok 114 - SQLite: a shared source retains its published grade across class assignment, revision and transfer
+  ---
+  duration_ms: 83.0084
+  type: 'test'
+  ...
+# Subtest: PostgreSQL: a shared source retains its published grade across class assignment, revision and transfer
+ok 115 - PostgreSQL: a shared source retains its published grade across class assignment, revision and transfer
+  ---
+  duration_ms: 3017.3651
+  type: 'test'
+  ...
+# Subtest: SQLite: reimport is source-stable, immutable, atomic and cannot mint stars through copied IDs
+ok 116 - SQLite: reimport is source-stable, immutable, atomic and cannot mint stars through copied IDs
+  ---
+  duration_ms: 82.9084
+  type: 'test'
+  ...
+# Subtest: PostgreSQL: reimport is source-stable, immutable, atomic and cannot mint stars through copied IDs
+ok 117 - PostgreSQL: reimport is source-stable, immutable, atomic and cannot mint stars through copied IDs
+  ---
+  duration_ms: 2766.9064
+  type: 'test'
+  ...
+# Subtest: media selection accepts exact count and byte boundaries without reading any file
+ok 118 - media selection accepts exact count and byte boundaries without reading any file
+  ---
+  duration_ms: 2.5892
+  type: 'test'
+  ...
+# Subtest: media selection rejects aggregate limits before decoding, including combined additions
+ok 119 - media selection rejects aggregate limits before decoding, including combined additions
+  ---
+  duration_ms: 1.025
+  type: 'test'
+  ...
+# (node:29184) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: actual pilot ZIP runs a standalone local manager from an extracted Unicode folder and preserves data and backups
+    # Subtest: extracted bundle has only builtin imports and needs no npm install or source checkout
+    ok 1 - extracted bundle has only builtin imports and needs no npm install or source checkout
+      ---
+      duration_ms: 3245.9303
+      type: 'test'
+      ...
+    # Subtest: standalone executable serves the fixture app and handles setup, accounts, wallet and question publication through HTTP
+    ok 2 - standalone executable serves the fixture app and handles setup, accounts, wallet and question publication through HTTP
+      ---
+      duration_ms: 628.7356
+      type: 'test'
+      ...
+    # Subtest: real packaged gameplay awards stars and records a manager-approved redemption
+    ok 3 - real packaged gameplay awards stars and records a manager-approved redemption
+      ---
+      duration_ms: 268.9172
+      type: 'test'
+      ...
+    # Subtest: packaged backup script creates a consistent read-only SQLite snapshot while the executable is running
+    ok 4 - packaged backup script creates a consistent read-only SQLite snapshot while the executable is running
+      ---
+      duration_ms: 261.6134
+      type: 'test'
+      ...
+    # Subtest: public static URLs never expose private database, bootstrap token, backup or server source
+    ok 5 - public static URLs never expose private database, bootstrap token, backup or server source
+      ---
+      duration_ms: 38.9657
+      type: 'test'
+      ...
+    # Subtest: restarting the extracted executable retains accounts, assignments, earnings, wallet and redemption history
+    ok 6 - restarting the extracted executable retains accounts, assignments, earnings, wallet and redemption history
+      ---
+      duration_ms: 965.1401
+      type: 'test'
+      ...
+    # Subtest: bundled restore CLI previews then restores a real backup into a clean Unicode data directory and boots preserved history
+    ok 7 - bundled restore CLI previews then restores a real backup into a clean Unicode data directory and boots preserved history
+      ---
+      duration_ms: 1541.5267
+      type: 'test'
+      ...
+    # Subtest: packaged audio parser validates the listening duration without installed dependencies
+    ok 8 - packaged audio parser validates the listening duration without installed dependencies
+      ---
+      duration_ms: 899.6648
+      type: 'test'
+      ...
+    1..8
+ok 120 - actual pilot ZIP runs a standalone local manager from an extracted Unicode folder and preserves data and backups
+  ---
+  duration_ms: 13297.4497
+  type: 'test'
+  ...
+# (node:12740) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: sqlite: student password change preserves progress, abandons play and revokes every session
+ok 121 - sqlite: student password change preserves progress, abandons play and revokes every session
+  ---
+  duration_ms: 2733.5596
+  type: 'test'
+  ...
+# Subtest: sqlite: password change validates the current user, origin, CSRF and untrimmed password bounds
+ok 122 - sqlite: password change validates the current user, origin, CSRF and untrimmed password bounds
+  ---
+  duration_ms: 1618.3444
+  type: 'test'
+  ...
+# Subtest: sqlite: password attempts have a shared per-student quota separate from login
+ok 123 - sqlite: password attempts have a shared per-student quota separate from login
+  ---
+  duration_ms: 3622.1555
+  type: 'test'
+  ...
+# Subtest: sqlite: logout or a changed password during verification cannot commit a new password
+ok 124 - sqlite: logout or a changed password during verification cannot commit a new password
+  ---
+  duration_ms: 1621.8703
+  type: 'test'
+  ...
+# {"event":"api.failure","version":"4.0.1","supportId":"BA-2a10315deb1b","at":"2026-11-06T05:50:26.389Z","routeGroup":"account","method":"POST","status":500,"elapsedMs":486}
+# Subtest: sqlite: password update and session revocation roll back together on failure
+ok 125 - sqlite: password update and session revocation roll back together on failure
+  ---
+  duration_ms: 1064.6595
+  type: 'test'
+  ...
+# Subtest: postgres: student password change preserves progress, abandons play and revokes every session
+ok 126 - postgres: student password change preserves progress, abandons play and revokes every session
+  ---
+  duration_ms: 6694.536
+  type: 'test'
+  ...
+# Subtest: postgres: password change validates the current user, origin, CSRF and untrimmed password bounds
+ok 127 - postgres: password change validates the current user, origin, CSRF and untrimmed password bounds
+  ---
+  duration_ms: 3517.2111
+  type: 'test'
+  ...
+# Subtest: postgres: password attempts have a shared per-student quota separate from login
+ok 128 - postgres: password attempts have a shared per-student quota separate from login
+  ---
+  duration_ms: 4652.7461
+  type: 'test'
+  ...
+# Subtest: postgres: logout or a changed password during verification cannot commit a new password
+ok 129 - postgres: logout or a changed password during verification cannot commit a new password
+  ---
+  duration_ms: 2674.6443
+  type: 'test'
+  ...
+# {"event":"api.failure","version":"4.0.1","supportId":"BA-76639bbdf7e8","requestId":"BT-1273ff620168","at":"2026-11-06T05:50:45.906Z","routeGroup":"account","method":"POST","status":500,"elapsedMs":278}
+# Subtest: postgres: password update and session revocation roll back together on failure
+ok 130 - postgres: password update and session revocation roll back together on failure
+  ---
+  duration_ms: 1975.5271
+  type: 'test'
+  ...
+# (node:39620) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: SQLite: a recognized audio header without playable duration is rejected before upload writes
+ok 131 - SQLite: a recognized audio header without playable duration is rejected before upload writes
+  ---
+  duration_ms: 1749.0349
+  type: 'test'
+  ...
+# Subtest: SQLite: ordering hints are disclosed and charged by the server and validated in backups
+ok 132 - SQLite: ordering hints are disclosed and charged by the server and validated in backups
+  ---
+  duration_ms: 4473.2124
+  type: 'test'
+  ...
+# Subtest: SQLite: public routes keep future prompts, answers and solutions private; server hints and receipts are authoritative
+ok 133 - SQLite: public routes keep future prompts, answers and solutions private; server hints and receipts are authoritative
+  ---
+  duration_ms: 2370.9368
+  type: 'test'
+  ...
+# Subtest: SQLite: a listening answer needs the assigned audio download and its verified minimum duration
+ok 134 - SQLite: a listening answer needs the assigned audio download and its verified minimum duration
+  ---
+  duration_ms: 3671.5239
+  type: 'test'
+  ...
+# Subtest: SQLite: changed meaning cannot retain an old ID; a new question starts without mastery and keeps the old wallet
+ok 135 - SQLite: changed meaning cannot retain an old ID; a new question starts without mastery and keeps the old wallet
+  ---
+  duration_ms: 1192.9564
+  type: 'test'
+  ...
+# Subtest: PostgreSQL: a recognized audio header without playable duration is rejected before upload writes
+ok 136 - PostgreSQL: a recognized audio header without playable duration is rejected before upload writes
+  ---
+  duration_ms: 5027.7935
+  type: 'test'
+  ...
+# Subtest: PostgreSQL: ordering hints are disclosed and charged by the server and validated in backups
+ok 137 - PostgreSQL: ordering hints are disclosed and charged by the server and validated in backups
+  ---
+  duration_ms: 3739.4207
+  type: 'test'
+  ...
+# Subtest: PostgreSQL: public routes keep future prompts, answers and solutions private; server hints and receipts are authoritative
+ok 138 - PostgreSQL: public routes keep future prompts, answers and solutions private; server hints and receipts are authoritative
+  ---
+  duration_ms: 2801.9131
+  type: 'test'
+  ...
+# Subtest: PostgreSQL: a listening answer needs the assigned audio download and its verified minimum duration
+ok 139 - PostgreSQL: a listening answer needs the assigned audio download and its verified minimum duration
+  ---
+  duration_ms: 4507.4625
+  type: 'test'
+  ...
+# Subtest: PostgreSQL: changed meaning cannot retain an old ID; a new question starts without mastery and keeps the old wallet
+ok 140 - PostgreSQL: changed meaning cannot retain an old ID; a new question starts without mastery and keeps the old wallet
+  ---
+  duration_ms: 1909.4519
+  type: 'test'
+  ...
+# Subtest: server audio duration is taken from bounded bytes, not a filename or client duration
+ok 141 - server audio duration is taken from bounded bytes, not a filename or client duration
+  ---
+  duration_ms: 28.4568
+  type: 'test'
+  ...
+# (node:38684) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# (node:38684) ExperimentalWarning: The MockTimers API is an experimental feature and might change at any time
+# Subtest: question backups retain partial active/abandoned stars and restore exact wallet and ledger
+ok 142 - question backups retain partial active/abandoned stars and restore exact wallet and ledger
+  ---
+  duration_ms: 410.8426
+  type: 'test'
+  ...
+# Subtest: question backup verifies manual advancement using pinned pack versions and rejects forged jumps or early redemptions
+ok 143 - question backup verifies manual advancement using pinned pack versions and rejects forged jumps or early redemptions
+  ---
+  duration_ms: 249.2599
+  type: 'test'
+  ...
+# Subtest: question backup accepts original legacy-only evidence without creating per-question mastery
+ok 144 - question backup accepts original legacy-only evidence without creating per-question mastery
+  ---
+  duration_ms: 216.9297
+  type: 'test'
+  ...
+# (node:29888) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: SQLite awards each correct question immediately with server timing and compact idempotent receipts
+ok 145 - SQLite awards each correct question immediately with server timing and compact idempotent receipts
+  ---
+  duration_ms: 189.3036
+  type: 'test'
+  ...
+# Subtest: SQLite question caps cross games and reviews without dropping source items or rewarding completion twice
+ok 146 - SQLite question caps cross games and reviews without dropping source items or rewarding completion twice
+  ---
+  duration_ms: 57.3977
+  type: 'test'
+  ...
+# Subtest: SQLite requires two stars on every question and an explicit advance, then rejects old-week retries and play
+ok 147 - SQLite requires two stars on every question and an explicit advance, then rejects old-week retries and play
+  ---
+  duration_ms: 61.9477
+  type: 'test'
+  ...
+# Subtest: SQLite progression checks every assigned set and keeps account, class and version scopes
+ok 148 - SQLite progression checks every assigned set and keeps account, class and version scopes
+  ---
+  duration_ms: 177.0591
+  type: 'test'
+  ...
+# Subtest: SQLite legacy credits preserve the exact wallet and remain separate from per-question mastery
+ok 149 - SQLite legacy credits preserve the exact wallet and remain separate from per-question mastery
+  ---
+  duration_ms: 72.9782
+  type: 'test'
+  ...
+# Subtest: SQLite attempt and question ledger writes roll back together on a persistence failure
+ok 150 - SQLite attempt and question ledger writes roll back together on a persistence failure
+  ---
+  duration_ms: 26.649
+  type: 'test'
+  ...
+# Subtest: SQLite current cursors reach later weeks while each metadata page remains bounded to twenty sets
+ok 151 - SQLite current cursors reach later weeks while each metadata page remains bounded to twenty sets
+  ---
+  duration_ms: 362.6126
+  type: 'test'
+  ...
+# (node:16484) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: reward note validation preserves history and a restorable HTTP backup
+ok 152 - reward note validation preserves history and a restorable HTTP backup
+  ---
+  duration_ms: 855.4411
+  type: 'test'
+  ...
+# Subtest: recovery CLI previews without writing, restores into a clean directory and boots through real HTTP after restart
+ok 153 - recovery CLI previews without writing, restores into a clean directory and boots through real HTTP after restart
+  ---
+  duration_ms: 3070.651
+  type: 'test'
+  ...
+# Subtest: recovery rejects altered schema, broken links, changed media and changed preview hashes without overwriting data
+ok 154 - recovery rejects altered schema, broken links, changed media and changed preview hashes without overwriting data
+  ---
+  duration_ms: 593.4865
+  type: 'test'
+  ...
+# Subtest: recovery rolls back a failed atomic install and keeps a verified pre-restore snapshot
+ok 155 - recovery rolls back a failed atomic install and keeps a verified pre-restore snapshot
+  ---
+  duration_ms: 470.0995
+  type: 'test'
+  ...
+# Subtest: recovery HTTP requires an explicit session-bound preview and restores live data with all sessions revoked
+ok 156 - recovery HTTP requires an explicit session-bound preview and restores live data with all sessions revoked
+  ---
+  duration_ms: 2334.2856
+  type: 'test'
+  ...
+# Subtest: recovery startup rolls back an interrupted rename journal before opening the database
+ok 157 - recovery startup rolls back an interrupted rename journal before opening the database
+  ---
+  duration_ms: 840.702
+  type: 'test'
+  ...
+# Subtest: API deadline releases a hung connection and aborts its transport
+ok 158 - API deadline releases a hung connection and aborts its transport
+  ---
+  duration_ms: 22.78
+  type: 'test'
+  ...
+# (node:39004) ExperimentalWarning: The MockTimers API is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: API deadline includes a stalled response body after headers have arrived
+ok 159 - API deadline includes a stalled response body after headers have arrived
+  ---
+  duration_ms: 29.8904
+  type: 'test'
+  ...
+# Subtest: API deadline preserves successful data and original errors without replaying a mutation
+ok 160 - API deadline preserves successful data and original errors without replaying a mutation
+  ---
+  duration_ms: 2.1558
+  type: 'test'
+  ...
+# Subtest: student API releases its waiting state when the network never returns headers
+ok 161 - student API releases its waiting state when the network never returns headers
+  ---
+  duration_ms: 4.88
+  type: 'test'
+  ...
+# Subtest: answer API deadline includes stalled JSON and never resends the answer automatically
+ok 162 - answer API deadline includes stalled JSON and never resends the answer automatically
+  ---
+  duration_ms: 1.2438
+  type: 'test'
+  ...
+# Subtest: bounded API preserves server validation errors and expires sessions on 401
+ok 163 - bounded API preserves server validation errors and expires sessions on 401
+  ---
+  duration_ms: 31.8605
+  type: 'test'
+  ...
+# Subtest: game APIs reject a mixed old Function response and send the supported protocol without replaying requests
+ok 164 - game APIs reject a mixed old Function response and send the supported protocol without replaying requests
+  ---
+  duration_ms: 4.8305
+  type: 'test'
+  ...
+# Subtest: concurrent opens share one request but failed or finished opens can be requested again
+ok 165 - concurrent opens share one request but failed or finished opens can be requested again
+  ---
+  duration_ms: 5.2613
+  type: 'test'
+  ...
+# Subtest: media uploads negotiate lossless gzip and fall back to plain JSON for older servers
+ok 166 - media uploads negotiate lossless gzip and fall back to plain JSON for older servers
+  ---
+  duration_ms: 155.8079
+  type: 'test'
+  ...
+# (node:33868) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: online HTTP authentication requires setup token, own origin and CSRF; logout revokes the cookie
+ok 167 - online HTTP authentication requires setup token, own origin and CSRF; logout revokes the cookie
+  ---
+  duration_ms: 996.1589
+  type: 'test'
+  ...
+# Subtest: online class assignment and student authority stay isolated; weekly imports are immutable and atomic
+ok 168 - online class assignment and student authority stay isolated; weekly imports are immutable and atomic
+  ---
+  duration_ms: 3875.247
+  type: 'test'
+  ...
+# Subtest: online resources and identically named packs remain isolated across workspaces
+ok 169 - online resources and identically named packs remain isolated across workspaces
+  ---
+  duration_ms: 3954.9947
+  type: 'test'
+  ...
+# Subtest: online raw responses are graded by the host, retries commit once and pack revisions cannot multiply stars
+ok 170 - online raw responses are graded by the host, retries commit once and pack revisions cannot multiply stars
+  ---
+  duration_ms: 2192.0659
+  type: 'test'
+  ...
+# Subtest: online weekly progression requires every question to pass and a manual advance before closing the old week
+ok 171 - online weekly progression requires every question to pass and a manual advance before closing the old week
+  ---
+  duration_ms: 2330.9766
+  type: 'test'
+  ...
+# Subtest: online redemptions reserve stars atomically and survive restart with decisions and locked rates
+ok 172 - online redemptions reserve stars atomically and survive restart with decisions and locked rates
+  ---
+  duration_ms: 2400.3557
+  type: 'test'
+  ...
+# Subtest: online student suspension and credential reset revoke existing access
+ok 173 - online student suspension and credential reset revoke existing access
+  ---
+  duration_ms: 1455.6695
+  type: 'test'
+  ...
+# Subtest: online an in-flight old password check cannot restore access after an administrative reset
+ok 174 - online an in-flight old password check cannot restore access after an administrative reset
+  ---
+  duration_ms: 586.2267
+  type: 'test'
+  ...
+# Subtest: online authenticated chunked mutations cannot outlive reset or suspension while the body is pending
+    # Subtest: reset-password
+    ok 1 - reset-password
+      ---
+      duration_ms: 685.4187
+      type: 'test'
+      ...
+    # Subtest: suspend
+    ok 2 - suspend
+      ---
+      duration_ms: 609.7415
+      type: 'test'
+      ...
+    1..2
+ok 175 - online authenticated chunked mutations cannot outlive reset or suspension while the body is pending
+  ---
+  duration_ms: 1296.3253
+  type: 'test'
+  ...
+# Subtest: online login cleanup is bounded and preserves active counters
+ok 176 - online login cleanup is bounded and preserves active counters
+  ---
+  duration_ms: 857.605
+  type: 'test'
+  ...
+# Subtest: online repeated failed logins are limited by normalized account and remain limited after restart
+ok 177 - online repeated failed logins are limited by normalized account and remain limited after restart
+  ---
+  duration_ms: 2146.0263
+  type: 'test'
+  ...
+# Subtest: online image and audio uploads verify type, enforce assignment ownership and support private byte ranges
+ok 178 - online image and audio uploads verify type, enforce assignment ownership and support private byte ranges
+  ---
+  duration_ms: 1215.8024
+  type: 'test'
+  ...
+# Subtest: online rich image, numeric, reading and listening exercises complete through server-scored HTTP evidence
+ok 179 - online rich image, numeric, reading and listening exercises complete through server-scored HTTP evidence
+  ---
+  duration_ms: 711.408
+  type: 'test'
+  ...
+# (node:6004) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: SQLite: bounded summaries, compact evidence and strict sequential week authorization
+ok 180 - SQLite: bounded summaries, compact evidence and strict sequential week authorization
+  ---
+  duration_ms: 756.5899
+  type: 'test'
+  ...
+# Subtest: PostgreSQL: bounded summaries, compact evidence and strict sequential week authorization
+ok 181 - PostgreSQL: bounded summaries, compact evidence and strict sequential week authorization
+  ---
+  duration_ms: 8303.5083
+  type: 'test'
+  ...
+# Subtest: summary cursors reject malformed and out-of-range input
+ok 182 - summary cursors reject malformed and out-of-range input
+  ---
+  duration_ms: 0.4777
+  type: 'test'
+  ...
+# Subtest: SQLite: discovery card viewed status is tracked on server and awards zero stars or attempts
+ok 183 - SQLite: discovery card viewed status is tracked on server and awards zero stars or attempts
+  ---
+  duration_ms: 90.1996
+  type: 'test'
+  ...
+# Subtest: PostgreSQL: discovery card viewed status is tracked on server and awards zero stars or attempts
+ok 184 - PostgreSQL: discovery card viewed status is tracked on server and awards zero stars or attempts
+  ---
+  duration_ms: 4084.3922
+  type: 'test'
+  ...
+# Subtest: pair rounds cover every immutable source item once within the screen limit
+ok 185 - pair rounds cover every immutable source item once within the screen limit
+  ---
+  duration_ms: 4.2081
+  type: 'test'
+  ...
+# Subtest: question audio switches player ownership and releases detached audio resources
+ok 186 - question audio switches player ownership and releases detached audio resources
+  ---
+  duration_ms: 0.7327
+  type: 'test'
+  ...
+# (node:36288) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: Parent Authorization Matrix [SQLite HTTP]: AU01-AU10 strict security controls
+ok 187 - Parent Authorization Matrix [SQLite HTTP]: AU01-AU10 strict security controls
+  ---
+  duration_ms: 1221.1238
+  type: 'test'
+  ...
+# Subtest: Parent Authorization Matrix [PostgreSQL cloud adapter]: AU01-AU10 strict security controls
+ok 188 - Parent Authorization Matrix [PostgreSQL cloud adapter]: AU01-AU10 strict security controls
+  ---
+  duration_ms: 6496.1416
+  type: 'test'
+  ...
+# (node:33092) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: SQLite: PIN setup, validation, lockout after 5 failures, and PIN change
+ok 189 - SQLite: PIN setup, validation, lockout after 5 failures, and PIN change
+  ---
+  duration_ms: 23.2336
+  type: 'test'
+  ...
+# Subtest: SQLite: Parent creation, linking 1-3 students, and authorization boundaries
+ok 190 - SQLite: Parent creation, linking 1-3 students, and authorization boundaries
+  ---
+  duration_ms: 34.6841
+  type: 'test'
+  ...
+# Subtest: SQLite: Screen time limits and Curfew hours: startPlay blocked, but in-progress questions save cleanly
+ok 191 - SQLite: Screen time limits and Curfew hours: startPlay blocked, but in-progress questions save cleanly
+  ---
+  duration_ms: 69.5556
+  type: 'test'
+  ...
+# Subtest: SQLite: Parent gift approval, fulfillment, and reject refunds stars to child
+ok 192 - SQLite: Parent gift approval, fulfillment, and reject refunds stars to child
+  ---
+  duration_ms: 42.5921
+  type: 'test'
+  ...
+# Subtest: SQLite: Weekly Report metrics match admin Excel export stats 100%
+ok 193 - SQLite: Weekly Report metrics match admin Excel export stats 100%
+  ---
+  duration_ms: 81.3576
+  type: 'test'
+  ...
+# Subtest: PostgreSQL: PIN setup, validation, lockout after 5 failures, and PIN change
+ok 194 - PostgreSQL: PIN setup, validation, lockout after 5 failures, and PIN change
+  ---
+  duration_ms: 7480.2825
+  type: 'test'
+  ...
+# Subtest: PostgreSQL: Parent creation, linking 1-3 students, and authorization boundaries
+ok 195 - PostgreSQL: Parent creation, linking 1-3 students, and authorization boundaries
+  ---
+  duration_ms: 5390.5161
+  type: 'test'
+  ...
+# Subtest: PostgreSQL: Screen time limits and Curfew hours: startPlay blocked, but in-progress questions save cleanly
+ok 196 - PostgreSQL: Screen time limits and Curfew hours: startPlay blocked, but in-progress questions save cleanly
+  ---
+  duration_ms: 3138.8564
+  type: 'test'
+  ...
+# Subtest: PostgreSQL: Parent gift approval, fulfillment, and reject refunds stars to child
+ok 197 - PostgreSQL: Parent gift approval, fulfillment, and reject refunds stars to child
+  ---
+  duration_ms: 2492.2559
+  type: 'test'
+  ...
+# Subtest: PostgreSQL: Weekly Report metrics match admin Excel export stats 100%
+ok 198 - PostgreSQL: Weekly Report metrics match admin Excel export stats 100%
+  ---
+  duration_ms: 2548.777
+  type: 'test'
+  ...
+# (node:27080) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: a week exported to Excel re-imports to identical questions, answers, media and metadata for all eight kinds
+ok 199 - a week exported to Excel re-imports to identical questions, answers, media and metadata for all eight kinds
+  ---
+  duration_ms: 139.7
+  type: 'test'
+  ...
+# Subtest: Cổng C2: a week with discovery cards exported to Excel re-imports round-trip without shifting any row or dropping metadata
+ok 200 - Cổng C2: a week with discovery cards exported to Excel re-imports round-trip without shifting any row or dropping metadata
+  ---
+  duration_ms: 52.2508
+  type: 'test'
+  ...
+# Subtest: statistics count first-try accuracy, wrong answers and class stars without student names
+ok 201 - statistics count first-try accuracy, wrong answers and class stars without student names
+  ---
+  duration_ms: 1.4278
+  type: 'test'
+  ...
+# Subtest: a question whose media file is missing from the library is reported instead of exported half-empty
+ok 202 - a question whose media file is missing from the library is reported instead of exported half-empty
+  ---
+  duration_ms: 0.9234
+  type: 'test'
+  ...
+# Subtest: SQLite: admin export returns answers and class statistics, and students cannot use it
+ok 203 - SQLite: admin export returns answers and class statistics, and students cannot use it
+  ---
+  duration_ms: 66.6794
+  type: 'test'
+  ...
+# Subtest: PostgreSQL: admin export returns answers and class statistics, and students cannot use it
+ok 204 - PostgreSQL: admin export returns answers and class statistics, and students cannot use it
+  ---
+  duration_ms: 4300.6725
+  type: 'test'
+  ...
+# Subtest: image requests coalesce within a play, isolate other plays and revoke blobs at scope cleanup
+ok 205 - image requests coalesce within a play, isolate other plays and revoke blobs at scope cleanup
+  ---
+  duration_ms: 54.3965
+  type: 'test'
+  ...
+# Subtest: image loader bounds network concurrency and aborts both queued and active work on logout
+ok 206 - image loader bounds network concurrency and aborts both queued and active work on logout
+  ---
+  duration_ms: 13.8644
+  type: 'test'
+  ...
+# Subtest: images use the private HTTP cache so a replay does not reach the server
+ok 207 - images use the private HTTP cache so a replay does not reach the server
+  ---
+  duration_ms: 1.8585
+  type: 'test'
+  ...
+# Subtest: unused image memory obeys its budget and lifetime, and failed responses can be retried
+ok 208 - unused image memory obeys its budget and lifetime, and failed responses can be retried
+  ---
+  duration_ms: 9.973
+  type: 'test'
+  ...
+# Subtest: policy v2 immediately rewards a first correct question without requiring pack completion
+ok 209 - policy v2 immediately rewards a first correct question without requiring pack completion
+  ---
+  duration_ms: 23.878
+  type: 'test'
+  ...
+# Subtest: standard speed thresholds are inclusive and add wrong-answer and cumulative hint penalties
+ok 210 - standard speed thresholds are inclusive and add wrong-answer and cumulative hint penalties
+  ---
+  duration_ms: 3.4671
+  type: 'test'
+  ...
+# Subtest: rich question budgets distinguish numeric, filling, reading and post-audio listening
+ok 211 - rich question budgets distinguish numeric, filling, reading and post-audio listening
+  ---
+  duration_ms: 9.5186
+  type: 'test'
+  ...
+# Subtest: memory-match charges a mismatch to both distinct source questions before their first match
+ok 212 - memory-match charges a mismatch to both distinct source questions before their first match
+  ---
+  duration_ms: 3.0888
+  type: 'test'
+  ...
+# Subtest: word-connect charges a mismatch to both distinct source questions before their first match
+ok 213 - word-connect charges a mismatch to both distinct source questions before their first match
+  ---
+  duration_ms: 2.8249
+  type: 'test'
+  ...
+# Subtest: sentence-builder counts incorrect orders and hints independently of speed
+ok 214 - sentence-builder counts incorrect orders and hints independently of speed
+  ---
+  duration_ms: 1.3296
+  type: 'test'
+  ...
+# Subtest: sequence-trail counts incorrect orders and hints independently of speed
+ok 215 - sequence-trail counts incorrect orders and hints independently of speed
+  ---
+  duration_ms: 0.6549
+  type: 'test'
+  ...
+# Subtest: the source-question cap survives another game, replay, content version and duplicate application
+ok 216 - the source-question cap survives another game, replay, content version and duplicate application
+  ---
+  duration_ms: 4.5933
+  type: 'test'
+  ...
+# Subtest: legacy wallet stars are a preserved pool and do not fabricate question mastery
+ok 217 - legacy wallet stars are a preserved pool and do not fabricate question mastery
+  ---
+  duration_ms: 1.9586
+  type: 'test'
+  ...
+# Subtest: week progress requires every source question to have at least two stars
+ok 218 - week progress requires every source question to have at least two stars
+  ---
+  duration_ms: 1.4329
+  type: 'test'
+  ...
+# Subtest: a review can require one known question while preserving the complete immutable source
+ok 219 - a review can require one known question while preserving the complete immutable source
+  ---
+  duration_ms: 3.2087
+  type: 'test'
+  ...
+# Subtest: forged outcomes, identity, timing, sequence and raw evidence never produce question rewards
+ok 220 - forged outcomes, identity, timing, sequence and raw evidence never produce question rewards
+  ---
+  duration_ms: 5.4802
+  type: 'test'
+  ...
+# Subtest: ledger updates are immutable, reject foreign candidates and safely handle author IDs as data
+ok 221 - ledger updates are immutable, reject foreign candidates and safely handle author IDs as data
+  ---
+  duration_ms: 2.2155
+  type: 'test'
+  ...
+# (node:24972) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: AN01 & AN02 (Pure Function): Shuffling covers all 4 positions, avoids repeating last position, preserves correct content
+ok 222 - AN01 & AN02 (Pure Function): Shuffling covers all 4 positions, avoids repeating last position, preserves correct content
+  ---
+  duration_ms: 4.7343
+  type: 'test'
+  ...
+# Subtest: AN09: QuestionView before answering contains NO correctIndex, NO answer key, NO permutation
+ok 223 - AN09: QuestionView before answering contains NO correctIndex, NO answer key, NO permutation
+  ---
+  duration_ms: 0.6061
+  type: 'test'
+  ...
+# Subtest: AN11: Validation detects positional references like "Cả A và B" and analyzes distribution
+ok 224 - AN11: Validation detects positional references like "Cả A và B" and analyzes distribution
+  ---
+  duration_ms: 9.3676
+  type: 'test'
+  ...
+# Subtest: AN10: Contest questions and Review Mistakes pack have shuffled options
+ok 225 - AN10: Contest questions and Review Mistakes pack have shuffled options
+  ---
+  duration_ms: 3.7633
+  type: 'test'
+  ...
+# Subtest: End-to-End [SQLite]: AN01-AN08, AN10, AN12 full question presentation lifecycle
+ok 226 - End-to-End [SQLite]: AN01-AN08, AN10, AN12 full question presentation lifecycle
+  ---
+  duration_ms: 82.853
+  type: 'test'
+  ...
+# Subtest: End-to-End [PostgreSQL]: AN01-AN08, AN10, AN12 full question presentation lifecycle
+ok 227 - End-to-End [PostgreSQL]: AN01-AN08, AN10, AN12 full question presentation lifecycle
+  ---
+  duration_ms: 4655.1981
+  type: 'test'
+  ...
+# Subtest: Vietnamese text selects an explicit Vietnamese voice, even with an English default or English subject
+ok 228 - Vietnamese text selects an explicit Vietnamese voice, even with an English default or English subject
+  ---
+  duration_ms: 3.5696
+  type: 'test'
+  ...
+# Subtest: voiceschanged resolves late voices and a cancelled request never speaks later
+ok 229 - voiceschanged resolves late voices and a cancelled request never speaks later
+  ---
+  duration_ms: 1.1785
+  type: 'test'
+  ...
+# Subtest: a missing Vietnamese voice reports a usable error without speaking a foreign fallback
+ok 230 - a missing Vietnamese voice reports a usable error without speaking a foreign fallback
+  ---
+  duration_ms: 1605.3967
+  type: 'test'
+  ...
+# Subtest: Speech: returns false safely in headless Node environment
+ok 231 - Speech: returns false safely in headless Node environment
+  ---
+  duration_ms: 1.5209
+  type: 'test'
+  ...
+# Subtest: Speech: mock Web Speech API interactions
+ok 232 - Speech: mock Web Speech API interactions
+  ---
+  duration_ms: 0.8292
+  type: 'test'
+  ...
+# (node:23140) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: SQLite migration upgrades legacy users table with role IN (admin, student) to allow parent role preserving existing rows
+ok 233 - SQLite migration upgrades legacy users table with role IN (admin, student) to allow parent role preserving existing rows
+  ---
+  duration_ms: 139.7763
+  type: 'test'
+  ...
+# (node:9608) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: SOCIAL-01: Pure domain logic for animal unlocks and profanity filter
+ok 234 - SOCIAL-01: Pure domain logic for animal unlocks and profanity filter
+  ---
+  duration_ms: 2.3164
+  type: 'test'
+  ...
+# Subtest: SOCIAL-02: Class feed event sanitization and strict child privacy verification
+ok 235 - SOCIAL-02: Class feed event sanitization and strict child privacy verification
+  ---
+  duration_ms: 0.5895
+  type: 'test'
+  ...
+# Subtest: SOCIAL-03: SQLite OnlineStore full social workflow (Animals, Visits, Cheers, Feed)
+ok 236 - SOCIAL-03: SQLite OnlineStore full social workflow (Animals, Visits, Cheers, Feed)
+  ---
+  duration_ms: 39.9811
+  type: 'test'
+  ...
+# Subtest: SOCIAL-04: PostgreSQL Store animal naming, town visit, cheer, and feed parity
+ok 237 - SOCIAL-04: PostgreSQL Store animal naming, town visit, cheer, and feed parity
+  ---
+  duration_ms: 3896.9855
+  type: 'test'
+  ...
+# Subtest: SOCIAL-05: Cloud API /town and /class-feed endpoints with privacy and role enforcement
+ok 238 - SOCIAL-05: Cloud API /town and /class-feed endpoints with privacy and role enforcement
+  ---
+  duration_ms: 2991.6063
+  type: 'test'
+  ...
+# (node:13560) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: TOWN-01: Pure material calculations by subject and catalog pricing
+ok 239 - TOWN-01: Pure material calculations by subject and catalog pricing
+  ---
+  duration_ms: 4.6486
+  type: 'test'
+  ...
+# Subtest: TOWN-02: evaluateBuildingPlacement validation and optimistic locking
+ok 240 - TOWN-02: evaluateBuildingPlacement validation and optimistic locking
+  ---
+  duration_ms: 1.3614
+  type: 'test'
+  ...
+# Subtest: TOWN-03: SQLite OnlineStore full town journey, wallet star safety, and recalculation gate
+ok 241 - TOWN-03: SQLite OnlineStore full town journey, wallet star safety, and recalculation gate
+  ---
+  duration_ms: 15.9343
+  type: 'test'
+  ...
+# Subtest: TOWN-04: PostgreSQL Store town state, optimistic concurrency, and recalculation
+ok 242 - TOWN-04: PostgreSQL Store town state, optimistic concurrency, and recalculation
+  ---
+  duration_ms: 3911.9892
+  type: 'test'
+  ...
+# Subtest: TOWN-05: Cloud API /town endpoints and revision conflict response
+ok 243 - TOWN-05: Cloud API /town endpoints and revision conflict response
+  ---
+  duration_ms: 3240.7583
+  type: 'test'
+  ...
+# (node:31236) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: weekly subject IDs normalize known names, count every source set and retain explicit difficulty
+ok 244 - weekly subject IDs normalize known names, count every source set and retain explicit difficulty
+  ---
+  duration_ms: 5.3338
+  type: 'test'
+  ...
+# Subtest: SQLite: new weeks enforce 3–4 subjects and 12 questions per subject in the authoritative store
+ok 245 - SQLite: new weeks enforce 3–4 subjects and 12 questions per subject in the authoritative store
+  ---
+  duration_ms: 114.129
+  type: 'test'
+  ...
+# Subtest: SQLite: a closed week protects question meaning but permits editorial revisions and keeps its policy
+ok 246 - SQLite: a closed week protects question meaning but permits editorial revisions and keeps its policy
+  ---
+  duration_ms: 190.1733
+  type: 'test'
+  ...
+# Subtest: PostgreSQL: new weeks enforce 3–4 subjects and 12 questions per subject in the authoritative store
+ok 247 - PostgreSQL: new weeks enforce 3–4 subjects and 12 questions per subject in the authoritative store
+  ---
+  duration_ms: 4982.003
+  type: 'test'
+  ...
+# Subtest: PostgreSQL: a closed week protects question meaning but permits editorial revisions and keeps its policy
+ok 248 - PostgreSQL: a closed week protects question meaning but permits editorial revisions and keeps its policy
+  ---
+  duration_ms: 3155.9367
+  type: 'test'
+  ...
+# Subtest: SQLite media pagination still looks up a file beyond the visible library page
+ok 249 - SQLite media pagination still looks up a file beyond the visible library page
+  ---
+  duration_ms: 9.4468
+  type: 'test'
+  ...
+# Subtest: SQLite: admin pagination, search, media lookup and selected-week detail stay scoped
+ok 250 - SQLite: admin pagination, search, media lookup and selected-week detail stay scoped
+  ---
+  duration_ms: 40.1206
+  type: 'test'
+  ...
+# Subtest: PostgreSQL: admin pagination, search, media lookup and selected-week detail stay scoped
+ok 251 - PostgreSQL: admin pagination, search, media lookup and selected-week detail stay scoped
+  ---
+  duration_ms: 2716.0344
+  type: 'test'
+  ...
+# Subtest: cloud admin endpoints enforce authentication, CSRF and authoritative week limits
+ok 252 - cloud admin endpoints enforce authentication, CSRF and authoritative week limits
+  ---
+  duration_ms: 2137.8149
+  type: 'test'
+  ...
+# Subtest: SQLite recovery retains a weekly policy snapshot and rejects corrupt or duplicate policy records
+ok 253 - SQLite recovery retains a weekly policy snapshot and rejects corrupt or duplicate policy records
+  ---
+  duration_ms: 82.5553
+  type: 'test'
+  ...
+1..253
+# tests 263
+# suites 0
+# pass 263
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 33082.5551
+
+> bao-an-learning@4.0.1 test:cloud
+> node --experimental-strip-types --test tests/postgres-store.test.mjs tests/cloud-api.test.mjs tests/cloud-config.test.mjs tests/cloud-deployment.test.mjs tests/supabase-storage.test.mjs tests/postgres-question-journey.test.mjs tests/postgres-latency.test.mjs tests/cloud-backup-restore.test.mjs tests/staging-rollback-rehearsal.test.mjs
+
+TAP version 13
+# Subtest: cloud batches sixteen audio uploads in one transaction, deduplicates retries and validates the entire batch
+ok 1 - cloud batches sixteen audio uploads in one transaction, deduplicates retries and validates the entire batch
+  ---
+  duration_ms: 3852.9382
+  type: 'test'
+  ...
+# {"event":"api.failure","version":"4.0.1","supportId":"BA-aa4ffde8539a","requestId":"BT-1c60b0aa0fb6","at":"2026-11-06T05:50:54.057Z","routeGroup":"media","method":"POST","status":500,"elapsedMs":17}
+# {"event":"api.failure","version":"4.0.1","supportId":"BA-596fb25a2435","requestId":"BT-5f0f7597212c","at":"2026-11-06T05:50:54.065Z","routeGroup":"media","method":"POST","status":500,"elapsedMs":3}
+# Subtest: cloud batch failures roll back metadata and clean uploaded objects; logout during upload cannot commit
+ok 2 - cloud batch failures roll back metadata and clean uploaded objects; logout during upload cannot commit
+  ---
+  duration_ms: 2113.6167
+  type: 'test'
+  ...
+# Subtest: cloud pending mutations cannot outlive logout or session expiry
+ok 3 - cloud pending mutations cannot outlive logout or session expiry
+  ---
+  duration_ms: 2332.3928
+  type: 'test'
+  ...
+# Subtest: cloud pending student play cannot outlive a password reset
+ok 4 - cloud pending student play cannot outlive a password reset
+  ---
+  duration_ms: 2585.2333
+  type: 'test'
+  ...
+# Subtest: cloud Request/Response API preserves real scrypt authentication, CSRF, gameplay and atomic reward accounting
+ok 5 - cloud Request/Response API preserves real scrypt authentication, CSRF, gameplay and atomic reward accounting
+  ---
+  duration_ms: 3136.7792
+  type: 'test'
+  ...
+# {"event":"api.failure","version":"4.0.1","supportId":"BA-1b5709ca9088","requestId":"BT-be1d32f7b0bc","at":"2026-11-06T05:51:05.377Z","routeGroup":"media","method":"GET","status":502,"elapsedMs":6}
+# Subtest: cloud private media stays assigned and tenant scoped, deduplicates concurrent uploads and supports rich exercises
+ok 6 - cloud private media stays assigned and tenant scoped, deduplicates concurrent uploads and supports rich exercises
+  ---
+  duration_ms: 3235.8783
+  type: 'test'
+  ...
+# Subtest: cloud concurrent initial setup creates exactly one management workspace
+ok 7 - cloud concurrent initial setup creates exactly one management workspace
+  ---
+  duration_ms: 2087.7139
+  type: 'test'
+  ...
+# Cloud backup exported: 1 media assets, checksum: 7bdc8371ab38da99...
+# Cloud backup restored in 34 ms with 16 records.
+# Rehearsal PASS: RTO << 2 hours (restored in < 1s), RPO <= 24 hours (0 data loss), 100% parity.
+# Subtest: Cloud Backup and Restore Drill: PostgreSQL + Storage to empty instance with zero data loss
+ok 8 - Cloud Backup and Restore Drill: PostgreSQL + Storage to empty instance with zero data loss
+  ---
+  duration_ms: 5541.2017
+  type: 'test'
+  ...
+# Subtest: cloud PostgreSQL always verifies TLS even if a copied URI tries to disable SSL or override its CA
+ok 9 - cloud PostgreSQL always verifies TLS even if a copied URI tries to disable SSL or override its CA
+  ---
+  duration_ms: 2.8171
+  type: 'test'
+  ...
+# Subtest: cloud migration can use a separate owner URI and CA while runtime keeps its transaction-pooler settings
+ok 10 - cloud migration can use a separate owner URI and CA while runtime keeps its transaction-pooler settings
+  ---
+  duration_ms: 1.0182
+  type: 'test'
+  ...
+# {"event":"api.failure","version":"4.0.1","supportId":"BA-bbdf377d5a10","at":"2026-11-06T05:50:48.253Z","routeGroup":"status","method":"GET","status":503,"elapsedMs":2}
+# Subtest: bundled Netlify function has no SQLite dependency and returns a private configuration error before any external connection
+ok 11 - bundled Netlify function has no SQLite dependency and returns a private configuration error before any external connection
+  ---
+  duration_ms: 470.3619
+  type: 'test'
+  ...
+# Subtest: cloud setup applies all migrations to twenty-nine empty private tables and creates only private bucket metadata
+ok 12 - cloud setup applies all migrations to twenty-nine empty private tables and creates only private bucket metadata
+  ---
+  duration_ms: 3308.8275
+  type: 'test'
+  ...
+# Subtest: reapplying setup preserves real accounts and classes, and check uses runtime URI with SELECT and bucket reads only
+ok 13 - reapplying setup preserves real accounts and classes, and check uses runtime URI with SELECT and bucket reads only
+  ---
+  duration_ms: 2212.08
+  type: 'test'
+  ...
+# Subtest: check does not initialize an empty database or fix a missing or misconfigured bucket
+ok 14 - check does not initialize an empty database or fix a missing or misconfigured bucket
+  ---
+  duration_ms: 2106.5094
+  type: 'test'
+  ...
+# Subtest: an existing public bucket is refused before SQL mutation or storage update
+ok 15 - an existing public bucket is refused before SQL mutation or storage update
+  ---
+  duration_ms: 1756.4218
+  type: 'test'
+  ...
+# Subtest: read-only check detects service-role, schema, column, sequence, function and PUBLIC privilege drift
+ok 16 - read-only check detects service-role, schema, column, sequence, function and PUBLIC privilege drift
+  ---
+  duration_ms: 2055.6355
+  type: 'test'
+  ...
+# Subtest: deployment validation refuses missing settings and browser keys before opening any connection
+ok 17 - deployment validation refuses missing settings and browser keys before opening any connection
+  ---
+  duration_ms: 1.9624
+  type: 'test'
+  ...
+# Subtest: migration failure rolls back all SQL changes, leaves Storage untouched, and hides raw secret-bearing errors
+ok 18 - migration failure rolls back all SQL changes, leaves Storage untouched, and hides raw secret-bearing errors
+  ---
+  duration_ms: 1592.8977
+  type: 'test'
+  ...
+# Subtest: connection failures explain TLS, login and network problems without exposing URI, keys or raw error messages
+ok 19 - connection failures explain TLS, login and network problems without exposing URI, keys or raw error messages
+  ---
+  duration_ms: 1.4916
+  type: 'test'
+  ...
+# Subtest: cloud login, week summary and secure game actions keep bounded database round trips
+ok 20 - cloud login, week summary and secure game actions keep bounded database round trips
+  ---
+  duration_ms: 4828.1656
+  type: 'test'
+  ...
+# {"login":{"queries":13,"injectedRttMs":5,"injectedWaitMs":65,"elapsedMs":389},"summary":{"queries":4,"injectedRttMs":5,"injectedWaitMs":20,"elapsedMs":83},"privateImage":{"queries":2,"injectedRttMs":5,"injectedWaitMs":10,"elapsedMs":62},"firstGame":{"queries":13,"injectedRttMs":5,"injectedWaitMs":65,"elapsedMs":200},"openQuestion":{"queries":9,"injectedRttMs":5,"injectedWaitMs":45,"elapsedMs":146},"answer":{"queries":12,"injectedRttMs":5,"injectedWaitMs":60,"elapsedMs":189},"duplicate":{"queries":10,"injectedRttMs":5,"injectedWaitMs":50,"elapsedMs":162},"retryGame":{"queries":9,"injectedRttMs":5,"injectedWaitMs":45,"elapsedMs":138},"nextGame":{"queries":10,"injectedRttMs":5,"injectedWaitMs":50,"elapsedMs":158}}
+# Subtest: batched login counters roll back both keys on rejection and reset after expiry
+ok 21 - batched login counters roll back both keys on rejection and reset after expiry
+  ---
+  duration_ms: 2076.749
+  type: 'test'
+  ...
+# Subtest: PostgreSQL v2 credits each question once across games, retains partial work and ignores forged speed
+ok 22 - PostgreSQL v2 credits each question once across games, retains partial work and ignores forged speed
+  ---
+  duration_ms: 3756.5972
+  type: 'test'
+  ...
+# Subtest: PostgreSQL week requires two stars on every question and explicit irreversible advance
+ok 23 - PostgreSQL week requires two stars on every question and explicit irreversible advance
+  ---
+  duration_ms: 2414.2647
+  type: 'test'
+  ...
+# Subtest: PostgreSQL v2 parallel receipts cannot exceed question max and preserve legacy wallet floor
+ok 24 - PostgreSQL v2 parallel receipts cannot exceed question max and preserve legacy wallet floor
+  ---
+  duration_ms: 2160.2925
+  type: 'test'
+  ...
+# Subtest: cloud question clocks and manual journey mutations enforce session, origin and CSRF with compact receipts
+ok 25 - cloud question clocks and manual journey mutations enforce session, origin and CSRF with compact receipts
+  ---
+  duration_ms: 2151.5556
+  type: 'test'
+  ...
+# Subtest: login limit cleanup is bounded and preserves active counters
+ok 26 - login limit cleanup is bounded and preserves active counters
+  ---
+  duration_ms: 3059.6703
+  type: 'test'
+  ...
+# Subtest: PostgreSQL migration is repeatable, private, tenant constrained and stores media metadata only
+ok 27 - PostgreSQL migration is repeatable, private, tenant constrained and stores media metadata only
+  ---
+  duration_ms: 2086.6389
+  type: 'test'
+  ...
+# Subtest: Supabase SQL starts empty and read-only verification detects actual privilege drift
+ok 28 - Supabase SQL starts empty and read-only verification detects actual privilege drift
+  ---
+  duration_ms: 2120.0326
+  type: 'test'
+  ...
+# Subtest: Supabase API roles cannot query private data even with BYPASSRLS; reapplying preserves real data
+ok 29 - Supabase API roles cannot query private data even with BYPASSRLS; reapplying preserves real data
+  ---
+  duration_ms: 2282.0894
+  type: 'test'
+  ...
+# Subtest: PostgreSQL setup, opaque sessions, reset snapshots and suspension are transactional
+ok 30 - PostgreSQL setup, opaque sessions, reset snapshots and suspension are transactional
+  ---
+  duration_ms: 1913.252
+  type: 'test'
+  ...
+# Subtest: PostgreSQL login limits atomically persist account and address limits
+ok 31 - PostgreSQL login limits atomically persist account and address limits
+  ---
+  duration_ms: 1810.5509
+  type: 'test'
+  ...
+# Subtest: PostgreSQL publication is immutable, atomic and idempotent under concurrent submissions
+ok 32 - PostgreSQL publication is immutable, atomic and idempotent under concurrent submissions
+  ---
+  duration_ms: 1892.7407
+  type: 'test'
+  ...
+# Subtest: PostgreSQL week and student reads stay bounded while preserving class, order and pinned versions
+ok 33 - PostgreSQL week and student reads stay bounded while preserving class, order and pinned versions
+  ---
+  duration_ms: 2095.8399
+  type: 'test'
+  ...
+# 3 weeks / 6 sets: week reads 2, empty class 1, student state 8
+# Subtest: PostgreSQL answer evidence loads its authorized play once and still rejects guessed plays
+ok 34 - PostgreSQL answer evidence loads its authorized play once and still rejects guessed plays
+  ---
+  duration_ms: 2044.542
+  type: 'test'
+  ...
+# answer queries 9, authorized play reads 1, pack reads 1
+# Subtest: PostgreSQL raw attempts, ordered evidence and completion award only the best original-pack tier
+ok 35 - PostgreSQL raw attempts, ordered evidence and completion award only the best original-pack tier
+  ---
+  duration_ms: 1825.9407
+  type: 'test'
+  ...
+# Subtest: PostgreSQL concurrent redemptions cannot overspend and retain immutable rates and decisions
+ok 36 - PostgreSQL concurrent redemptions cannot overspend and retain immutable rates and decisions
+  ---
+  duration_ms: 1780.9295
+  type: 'test'
+  ...
+# Subtest: PostgreSQL guessed identifiers, same pack IDs and student permissions remain tenant isolated
+ok 37 - PostgreSQL guessed identifiers, same pack IDs and student permissions remain tenant isolated
+  ---
+  duration_ms: 1960.4237
+  type: 'test'
+  ...
+# Subtest: PostgreSQL media records store no bytes and enforce tenant, assignment, MIME and object-path checks
+ok 38 - PostgreSQL media records store no bytes and enforce tenant, assignment, MIME and object-path checks
+  ---
+  duration_ms: 1937.4203
+  type: 'test'
+  ...
+# Subtest: PostgreSQL media authorization batches assigned weeks without granting other-class assets or unlocking games
+ok 39 - PostgreSQL media authorization batches assigned weeks without granting other-class assets or unlocking games
+  ---
+  duration_ms: 2002.3897
+  type: 'test'
+  ...
+# media access across 3 weeks: assigned 1, other class 1, foreign workspace 1
+# Subtest: Staging Rollback & Re-Upgrade Rehearsal: zero data loss, idempotent schema, 1-action restore
+ok 40 - Staging Rollback & Re-Upgrade Rehearsal: zero data loss, idempotent schema, 1-action restore
+  ---
+  duration_ms: 3514.598
+  type: 'test'
+  ...
+# Subtest: Supabase public bucket blocks upload and download before any object request
+ok 41 - Supabase public bucket blocks upload and download before any object request
+  ---
+  duration_ms: 43.8919
+  type: 'test'
+  ...
+# Subtest: Supabase private bucket is checked once across concurrent uploads and returns exact download bytes
+ok 42 - Supabase private bucket is checked once across concurrent uploads and returns exact download bytes
+  ---
+  duration_ms: 10.7966
+  type: 'test'
+  ...
+# Subtest: Supabase upload, download and removal API errors are sanitized
+ok 43 - Supabase upload, download and removal API errors are sanitized
+  ---
+  duration_ms: 7.4468
+  type: 'test'
+  ...
+# Subtest: Supabase oversized downloaded objects are rejected at the two MB boundary
+ok 44 - Supabase oversized downloaded objects are rejected at the two MB boundary
+  ---
+  duration_ms: 7.8965
+  type: 'test'
+  ...
+# Subtest: Supabase failed private-bucket verification can retry without uploading before verification succeeds
+ok 45 - Supabase failed private-bucket verification can retry without uploading before verification succeeds
+  ---
+  duration_ms: 2.3025
+  type: 'test'
+  ...
+# Subtest: verified storage downloads coalesce and reuse immutable bytes without returning mutable cache buffers
+ok 46 - verified storage downloads coalesce and reuse immutable bytes without returning mutable cache buffers
+  ---
+  duration_ms: 6.7938
+  type: 'test'
+  ...
+# Subtest: verified storage cache obeys TTL and byte budget and never caches legacy unverified downloads
+ok 47 - verified storage cache obeys TTL and byte budget and never caches legacy unverified downloads
+  ---
+  duration_ms: 7.2557
+  type: 'test'
+  ...
+1..47
+# tests 47
+# suites 0
+# pass 47
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 29353.5126
+
+> bao-an-learning@4.0.1 test:map
+> node --experimental-strip-types --test tests/world-map-assets.test.mjs tests/world-map-domain.test.mjs tests/world-map-store.test.mjs tests/world-map-api.test.mjs tests/world-map-performance.test.mjs
+
+TAP version 13
+# (node:39464) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: API01, API02, API05: HTTP route /api/online/student/map on Local SQLite server
+ok 1 - API01, API02, API05: HTTP route /api/online/student/map on Local SQLite server
+  ---
+  duration_ms: 491.2798
+  type: 'test'
+  ...
+# Subtest: API01, API02, API10: HTTP route /api/online/student/map on Cloud PostgreSQL API
+ok 2 - API01, API02, API10: HTTP route /api/online/student/map on Cloud PostgreSQL API
+  ---
+  duration_ms: 2228.6618
+  type: 'test'
+  ...
+# Subtest: AS01 & AS02: manifest has exactly 28 verified assets with matching roles and dimensions
+ok 3 - AS01 & AS02: manifest has exactly 28 verified assets with matching roles and dimensions
+  ---
+  duration_ms: 34.7537
+  type: 'test'
+  ...
+# Subtest: AS03: all 12 landmark places have valid WebP alpha transparency
+ok 4 - AS03: all 12 landmark places have valid WebP alpha transparency
+  ---
+  duration_ms: 13.0359
+  type: 'test'
+  ...
+# Subtest: AS04: hash mismatch detection
+ok 5 - AS04: hash mismatch detection
+  ---
+  duration_ms: 3.419
+  type: 'test'
+  ...
+# Subtest: AS05: anchor coordinates strictly between 0% and 100%
+ok 6 - AS05: anchor coordinates strictly between 0% and 100%
+  ---
+  duration_ms: 0.4241
+  type: 'test'
+  ...
+# Subtest: AS08: asset byte budget gate
+ok 7 - AS08: asset byte budget gate
+  ---
+  duration_ms: 1.5284
+  type: 'test'
+  ...
+# Subtest: DM01: Subject normalization handles diacritics, case, spacing and preserves display label
+ok 8 - DM01: Subject normalization handles diacritics, case, spacing and preserves display label
+  ---
+  duration_ms: 2.0027
+  type: 'test'
+  ...
+# Subtest: DM02: Alias resolution handles exact aliases and rejects fuzzy false positives
+ok 9 - DM02: Alias resolution handles exact aliases and rejects fuzzy false positives
+  ---
+  duration_ms: 0.5172
+  type: 'test'
+  ...
+# Subtest: DM03: Positions 1, 2, 3 with Math only at 1 and 3 keep slots 1 and 3 without compression
+ok 10 - DM03: Positions 1, 2, 3 with Math only at 1 and 3 keep slots 1 and 3 without compression
+  ---
+  duration_ms: 0.6565
+  type: 'test'
+  ...
+# Subtest: DM04: Chapter and slot calculation for positions 7, 8, 35 and legacy gaps
+ok 11 - DM04: Chapter and slot calculation for positions 7, 8, 35 and legacy gaps
+  ---
+  duration_ms: 0.1466
+  type: 'test'
+  ...
+# Subtest: DM05: Deterministic order regardless of input row order; ID keyed, not array index
+ok 12 - DM05: Deterministic order regardless of input row order; ID keyed, not array index
+  ---
+  duration_ms: 0.7046
+  type: 'test'
+  ...
+# Subtest: DM06: Node ready condition requires zero=0, one=0 and all questions >= 2 stars
+ok 13 - DM06: Node ready condition requires zero=0, one=0 and all questions >= 2 stars
+  ---
+  duration_ms: 0.1279
+  type: 'test'
+  ...
+# Subtest: DM07: Current ready=true does not advance until server confirmation
+ok 14 - DM07: Current ready=true does not advance until server confirmation
+  ---
+  duration_ms: 0.1533
+  type: 'test'
+  ...
+# Subtest: DM08: Star counts preserve server invariant of maximum 3 stars per item
+ok 15 - DM08: Star counts preserve server invariant of maximum 3 stars per item
+  ---
+  duration_ms: 0.0973
+  type: 'test'
+  ...
+# Subtest: DM09: Selected pack invalidation when version or weekId changes
+ok 16 - DM09: Selected pack invalidation when version or weekId changes
+  ---
+  duration_ms: 0.3373
+  type: 'test'
+  ...
+# Subtest: DM10: Edge cases for 0 weeks, 1 week, and position 22
+ok 17 - DM10: Edge cases for 0 weeks, 1 week, and position 22
+  ---
+  duration_ms: 0.3428
+  type: 'test'
+  ...
+# (node:10064) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: PF03 & PF04: 35-week fixture produces JSON <= 64 KiB, <= 7 nodes, bounded queries and no item leaks
+ok 18 - PF03 & PF04: 35-week fixture produces JSON <= 64 KiB, <= 7 nodes, bounded queries and no item leaks
+  ---
+  duration_ms: 197.1907
+  type: 'test'
+  ...
+# Subtest: PF06: no 3D graphics engine (three.js, Babylon, Canvas 3D) and no GLB files in codebase
+ok 19 - PF06: no 3D graphics engine (three.js, Babylon, Canvas 3D) and no GLB files in codebase
+  ---
+  duration_ms: 3.3182
+  type: 'test'
+  ...
+# Subtest: PF08: Diagnostics and map logs redact passwords and sensitive tokens
+ok 20 - PF08: Diagnostics and map logs redact passwords and sensitive tokens
+  ---
+  duration_ms: 0.3046
+  type: 'test'
+  ...
+# (node:30416) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: API01: Admin calling studentMap is rejected with 403
+ok 21 - API01: Admin calling studentMap is rejected with 403
+  ---
+  duration_ms: 6.9197
+  type: 'test'
+  ...
+# Subtest: API02: Foreign parameters (studentId, classId, workspaceId, etc.) in query rejected with 400
+ok 22 - API02: Foreign parameters (studentId, classId, workspaceId, etc.) in query rejected with 400
+  ---
+  duration_ms: 3.5575
+  type: 'test'
+  ...
+# Subtest: API03 & API04: No items/PII leak; map reads are completely idempotent and mutate no records
+ok 23 - API03 & API04: No items/PII leak; map reads are completely idempotent and mutate no records
+  ---
+  duration_ms: 27.0843
+  type: 'test'
+  ...
+# Subtest: API05 & API06: Query parameter validation & 0-week class edge cases
+ok 24 - API05 & API06: Query parameter validation & 0-week class edge cases
+  ---
+  duration_ms: 4.2799
+  type: 'test'
+  ...
+# Subtest: API07: Multi-week and multi-subject nodes mapped to correct slots and regions
+ok 25 - API07: Multi-week and multi-subject nodes mapped to correct slots and regions
+  ---
+  duration_ms: 7.3138
+  type: 'test'
+  ...
+# Subtest: API10: PostgresStore produces identical studentMap projections to SQLite
+ok 26 - API10: PostgresStore produces identical studentMap projections to SQLite
+  ---
+  duration_ms: 1739.2082
+  type: 'test'
+  ...
+1..26
+# tests 26
+# suites 0
+# pass 26
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 3332.0578
+TAP version 13
+# Subtest: HK2 Curriculum: 8 approved weeks ready for Semester 2
+ok 1 - HK2 Curriculum: 8 approved weeks ready for Semester 2
+  ---
+  duration_ms: 8.9627
+  type: 'test'
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 1
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 15.0231
+Đã xuất thành công 8 tuần học liệu Học kỳ 2 (24 bộ câu hỏi) ra tệp D:\Phần mềm 2026\BAO_AN_LEARNING_lam lại\data\curriculum\hoc-ky-2-8-tuan.json
+[C11 Metric 1] Tỉ lệ chuyên cần >= 4/5 ngày: 9/10 (90.0%)
+[C11 Metric 2] Tỉ lệ hoàn thành tuần (mọi câu >= 2 sao): 10/10 (100.0%)
+[C11 Metric 3] Số phút học trung bình mỗi buổi: 18.2 phút (Tổng: 857.0 phút)
+[C11 Metric 4] Đối soát ví sao: 10/10 tài khoản khớp 100% (0 sự cố lệch sao)
+[C11 Metric 5] Bảo mật dữ liệu & cách ly lớp: 100% an toàn (0 sự cố lộ dữ liệu)
+(node:12116) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+TAP version 13
+# Subtest: C11 Pilot Simulation Contract: 10 synthetic student profiles over 5 simulated days with full telemetry and zero star discrepancy
+ok 1 - C11 Pilot Simulation Contract: 10 synthetic student profiles over 5 simulated days with full telemetry and zero star discrepancy
+  ---
+  duration_ms: 500.3884
+  type: 'test'
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 1
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 508.5324

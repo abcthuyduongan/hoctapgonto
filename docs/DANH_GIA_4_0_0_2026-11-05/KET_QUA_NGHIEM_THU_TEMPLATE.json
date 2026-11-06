@@ -1,0 +1,1086 @@
+{
+  "kind": "Specification template, not executed results",
+  "createdDate": "2026-11-05",
+  "cases": [
+    {
+      "id": "AU01",
+      "status": "CHUA_CHAY",
+      "executedAt": null,
+      "executor": null,
+      "buildSourceId": null,
+      "environment": {
+        "engine": null,
+        "browser": null,
+        "viewport": null
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": null,
+      "testFile": null,
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "AU02",
+      "status": "CHUA_CHAY",
+      "executedAt": null,
+      "executor": null,
+      "buildSourceId": null,
+      "environment": {
+        "engine": null,
+        "browser": null,
+        "viewport": null
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": null,
+      "testFile": null,
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "AU03",
+      "status": "CHUA_CHAY",
+      "executedAt": null,
+      "executor": null,
+      "buildSourceId": null,
+      "environment": {
+        "engine": null,
+        "browser": null,
+        "viewport": null
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": null,
+      "testFile": null,
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "AU04",
+      "status": "CHUA_CHAY",
+      "executedAt": null,
+      "executor": null,
+      "buildSourceId": null,
+      "environment": {
+        "engine": null,
+        "browser": null,
+        "viewport": null
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": null,
+      "testFile": null,
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "AU05",
+      "status": "CHUA_CHAY",
+      "executedAt": null,
+      "executor": null,
+      "buildSourceId": null,
+      "environment": {
+        "engine": null,
+        "browser": null,
+        "viewport": null
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": null,
+      "testFile": null,
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "AU06",
+      "status": "CHUA_CHAY",
+      "executedAt": null,
+      "executor": null,
+      "buildSourceId": null,
+      "environment": {
+        "engine": null,
+        "browser": null,
+        "viewport": null
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": null,
+      "testFile": null,
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "AU07",
+      "status": "CHUA_CHAY",
+      "executedAt": null,
+      "executor": null,
+      "buildSourceId": null,
+      "environment": {
+        "engine": null,
+        "browser": null,
+        "viewport": null
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": null,
+      "testFile": null,
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "AU08",
+      "status": "CHUA_CHAY",
+      "executedAt": null,
+      "executor": null,
+      "buildSourceId": null,
+      "environment": {
+        "engine": null,
+        "browser": null,
+        "viewport": null
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": null,
+      "testFile": null,
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "AU09",
+      "status": "CHUA_CHAY",
+      "executedAt": null,
+      "executor": null,
+      "buildSourceId": null,
+      "environment": {
+        "engine": null,
+        "browser": null,
+        "viewport": null
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": null,
+      "testFile": null,
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "AN01",
+      "status": "CHUA_CHAY",
+      "executedAt": null,
+      "executor": null,
+      "buildSourceId": null,
+      "environment": {
+        "engine": null,
+        "browser": null,
+        "viewport": null
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": null,
+      "testFile": null,
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "AN02",
+      "status": "CHUA_CHAY",
+      "executedAt": null,
+      "executor": null,
+      "buildSourceId": null,
+      "environment": {
+        "engine": null,
+        "browser": null,
+        "viewport": null
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": null,
+      "testFile": null,
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "AN03",
+      "status": "CHUA_CHAY",
+      "executedAt": null,
+      "executor": null,
+      "buildSourceId": null,
+      "environment": {
+        "engine": null,
+        "browser": null,
+        "viewport": null
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": null,
+      "testFile": null,
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "AN04",
+      "status": "CHUA_CHAY",
+      "executedAt": null,
+      "executor": null,
+      "buildSourceId": null,
+      "environment": {
+        "engine": null,
+        "browser": null,
+        "viewport": null
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": null,
+      "testFile": null,
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "AN05",
+      "status": "CHUA_CHAY",
+      "executedAt": null,
+      "executor": null,
+      "buildSourceId": null,
+      "environment": {
+        "engine": null,
+        "browser": null,
+        "viewport": null
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": null,
+      "testFile": null,
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "AN06",
+      "status": "CHUA_CHAY",
+      "executedAt": null,
+      "executor": null,
+      "buildSourceId": null,
+      "environment": {
+        "engine": null,
+        "browser": null,
+        "viewport": null
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": null,
+      "testFile": null,
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "AN07",
+      "status": "CHUA_CHAY",
+      "executedAt": null,
+      "executor": null,
+      "buildSourceId": null,
+      "environment": {
+        "engine": null,
+        "browser": null,
+        "viewport": null
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": null,
+      "testFile": null,
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "AN08",
+      "status": "CHUA_CHAY",
+      "executedAt": null,
+      "executor": null,
+      "buildSourceId": null,
+      "environment": {
+        "engine": null,
+        "browser": null,
+        "viewport": null
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": null,
+      "testFile": null,
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "AN09",
+      "status": "CHUA_CHAY",
+      "executedAt": null,
+      "executor": null,
+      "buildSourceId": null,
+      "environment": {
+        "engine": null,
+        "browser": null,
+        "viewport": null
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": null,
+      "testFile": null,
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "AN10",
+      "status": "CHUA_CHAY",
+      "executedAt": null,
+      "executor": null,
+      "buildSourceId": null,
+      "environment": {
+        "engine": null,
+        "browser": null,
+        "viewport": null
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": null,
+      "testFile": null,
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "AN11",
+      "status": "CHUA_CHAY",
+      "executedAt": null,
+      "executor": null,
+      "buildSourceId": null,
+      "environment": {
+        "engine": null,
+        "browser": null,
+        "viewport": null
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": null,
+      "testFile": null,
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "AN12",
+      "status": "CHUA_CHAY",
+      "executedAt": null,
+      "executor": null,
+      "buildSourceId": null,
+      "environment": {
+        "engine": null,
+        "browser": null,
+        "viewport": null
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": null,
+      "testFile": null,
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "BK01",
+      "status": "CHUA_CHAY",
+      "executedAt": null,
+      "executor": null,
+      "buildSourceId": null,
+      "environment": {
+        "engine": null,
+        "browser": null,
+        "viewport": null
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": null,
+      "testFile": null,
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "BK02",
+      "status": "CHUA_CHAY",
+      "executedAt": null,
+      "executor": null,
+      "buildSourceId": null,
+      "environment": {
+        "engine": null,
+        "browser": null,
+        "viewport": null
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": null,
+      "testFile": null,
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "BK03",
+      "status": "CHUA_CHAY",
+      "executedAt": null,
+      "executor": null,
+      "buildSourceId": null,
+      "environment": {
+        "engine": null,
+        "browser": null,
+        "viewport": null
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": null,
+      "testFile": null,
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "BK04",
+      "status": "CHUA_CHAY",
+      "executedAt": null,
+      "executor": null,
+      "buildSourceId": null,
+      "environment": {
+        "engine": null,
+        "browser": null,
+        "viewport": null
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": null,
+      "testFile": null,
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "BK05",
+      "status": "CHUA_CHAY",
+      "executedAt": null,
+      "executor": null,
+      "buildSourceId": null,
+      "environment": {
+        "engine": null,
+        "browser": null,
+        "viewport": null
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": null,
+      "testFile": null,
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "BK06",
+      "status": "CHUA_CHAY",
+      "executedAt": null,
+      "executor": null,
+      "buildSourceId": null,
+      "environment": {
+        "engine": null,
+        "browser": null,
+        "viewport": null
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": null,
+      "testFile": null,
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "BK07",
+      "status": "CHUA_CHAY",
+      "executedAt": null,
+      "executor": null,
+      "buildSourceId": null,
+      "environment": {
+        "engine": null,
+        "browser": null,
+        "viewport": null
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": null,
+      "testFile": null,
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "BK08",
+      "status": "CHUA_CHAY",
+      "executedAt": null,
+      "executor": null,
+      "buildSourceId": null,
+      "environment": {
+        "engine": null,
+        "browser": null,
+        "viewport": null
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": null,
+      "testFile": null,
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "MG01",
+      "status": "CHUA_CHAY",
+      "executedAt": null,
+      "executor": null,
+      "buildSourceId": null,
+      "environment": {
+        "engine": null,
+        "browser": null,
+        "viewport": null
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": null,
+      "testFile": null,
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "MG02",
+      "status": "CHUA_CHAY",
+      "executedAt": null,
+      "executor": null,
+      "buildSourceId": null,
+      "environment": {
+        "engine": null,
+        "browser": null,
+        "viewport": null
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": null,
+      "testFile": null,
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "MG03",
+      "status": "CHUA_CHAY",
+      "executedAt": null,
+      "executor": null,
+      "buildSourceId": null,
+      "environment": {
+        "engine": null,
+        "browser": null,
+        "viewport": null
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": null,
+      "testFile": null,
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "MG04",
+      "status": "CHUA_CHAY",
+      "executedAt": null,
+      "executor": null,
+      "buildSourceId": null,
+      "environment": {
+        "engine": null,
+        "browser": null,
+        "viewport": null
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": null,
+      "testFile": null,
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "MG05",
+      "status": "CHUA_CHAY",
+      "executedAt": null,
+      "executor": null,
+      "buildSourceId": null,
+      "environment": {
+        "engine": null,
+        "browser": null,
+        "viewport": null
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": null,
+      "testFile": null,
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "MG06",
+      "status": "CHUA_CHAY",
+      "executedAt": null,
+      "executor": null,
+      "buildSourceId": null,
+      "environment": {
+        "engine": null,
+        "browser": null,
+        "viewport": null
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": null,
+      "testFile": null,
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "UI01",
+      "status": "CHUA_CHAY",
+      "executedAt": null,
+      "executor": null,
+      "buildSourceId": null,
+      "environment": {
+        "engine": null,
+        "browser": null,
+        "viewport": null
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": null,
+      "testFile": null,
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "UI02",
+      "status": "CHUA_CHAY",
+      "executedAt": null,
+      "executor": null,
+      "buildSourceId": null,
+      "environment": {
+        "engine": null,
+        "browser": null,
+        "viewport": null
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": null,
+      "testFile": null,
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "UI03",
+      "status": "CHUA_CHAY",
+      "executedAt": null,
+      "executor": null,
+      "buildSourceId": null,
+      "environment": {
+        "engine": null,
+        "browser": null,
+        "viewport": null
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": null,
+      "testFile": null,
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "UI04",
+      "status": "CHUA_CHAY",
+      "executedAt": null,
+      "executor": null,
+      "buildSourceId": null,
+      "environment": {
+        "engine": null,
+        "browser": null,
+        "viewport": null
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": null,
+      "testFile": null,
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "UI05",
+      "status": "CHUA_CHAY",
+      "executedAt": null,
+      "executor": null,
+      "buildSourceId": null,
+      "environment": {
+        "engine": null,
+        "browser": null,
+        "viewport": null
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": null,
+      "testFile": null,
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "UI06",
+      "status": "CHUA_CHAY",
+      "executedAt": null,
+      "executor": null,
+      "buildSourceId": null,
+      "environment": {
+        "engine": null,
+        "browser": null,
+        "viewport": null
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": null,
+      "testFile": null,
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "EV01",
+      "status": "CHUA_CHAY",
+      "executedAt": null,
+      "executor": null,
+      "buildSourceId": null,
+      "environment": {
+        "engine": null,
+        "browser": null,
+        "viewport": null
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": null,
+      "testFile": null,
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "EV02",
+      "status": "CHUA_CHAY",
+      "executedAt": null,
+      "executor": null,
+      "buildSourceId": null,
+      "environment": {
+        "engine": null,
+        "browser": null,
+        "viewport": null
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": null,
+      "testFile": null,
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "EV03",
+      "status": "CHUA_CHAY",
+      "executedAt": null,
+      "executor": null,
+      "buildSourceId": null,
+      "environment": {
+        "engine": null,
+        "browser": null,
+        "viewport": null
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": null,
+      "testFile": null,
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "PF01",
+      "status": "CHUA_CHAY",
+      "executedAt": null,
+      "executor": null,
+      "buildSourceId": null,
+      "environment": {
+        "engine": null,
+        "browser": null,
+        "viewport": null
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": null,
+      "testFile": null,
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "PF02",
+      "status": "CHUA_CHAY",
+      "executedAt": null,
+      "executor": null,
+      "buildSourceId": null,
+      "environment": {
+        "engine": null,
+        "browser": null,
+        "viewport": null
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": null,
+      "testFile": null,
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "PF03",
+      "status": "CHUA_CHAY",
+      "executedAt": null,
+      "executor": null,
+      "buildSourceId": null,
+      "environment": {
+        "engine": null,
+        "browser": null,
+        "viewport": null
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": null,
+      "testFile": null,
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "HP01",
+      "status": "CHUA_CHAY",
+      "executedAt": null,
+      "executor": null,
+      "buildSourceId": null,
+      "environment": {
+        "engine": null,
+        "browser": null,
+        "viewport": null
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": null,
+      "testFile": null,
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "HP02",
+      "status": "CHUA_CHAY",
+      "executedAt": null,
+      "executor": null,
+      "buildSourceId": null,
+      "environment": {
+        "engine": null,
+        "browser": null,
+        "viewport": null
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": null,
+      "testFile": null,
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "HP03",
+      "status": "CHUA_CHAY",
+      "executedAt": null,
+      "executor": null,
+      "buildSourceId": null,
+      "environment": {
+        "engine": null,
+        "browser": null,
+        "viewport": null
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": null,
+      "testFile": null,
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "CT01",
+      "status": "CHUA_CHAY",
+      "executedAt": null,
+      "executor": null,
+      "buildSourceId": null,
+      "environment": {
+        "engine": null,
+        "browser": null,
+        "viewport": null
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": null,
+      "testFile": null,
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "CT02",
+      "status": "CHUA_CHAY",
+      "executedAt": null,
+      "executor": null,
+      "buildSourceId": null,
+      "environment": {
+        "engine": null,
+        "browser": null,
+        "viewport": null
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": null,
+      "testFile": null,
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "CT03",
+      "status": "CHUA_CHAY",
+      "executedAt": null,
+      "executor": null,
+      "buildSourceId": null,
+      "environment": {
+        "engine": null,
+        "browser": null,
+        "viewport": null
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": null,
+      "testFile": null,
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "AC01",
+      "status": "CHUA_CHAY",
+      "executedAt": null,
+      "executor": null,
+      "buildSourceId": null,
+      "environment": {
+        "engine": null,
+        "browser": null,
+        "viewport": null
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": null,
+      "testFile": null,
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "AC02",
+      "status": "CHUA_CHAY",
+      "executedAt": null,
+      "executor": null,
+      "buildSourceId": null,
+      "environment": {
+        "engine": null,
+        "browser": null,
+        "viewport": null
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": null,
+      "testFile": null,
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "AC03",
+      "status": "CHUA_CHAY",
+      "executedAt": null,
+      "executor": null,
+      "buildSourceId": null,
+      "environment": {
+        "engine": null,
+        "browser": null,
+        "viewport": null
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": null,
+      "testFile": null,
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "RL01",
+      "status": "CHUA_CHAY",
+      "executedAt": null,
+      "executor": null,
+      "buildSourceId": null,
+      "environment": {
+        "engine": null,
+        "browser": null,
+        "viewport": null
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": null,
+      "testFile": null,
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "RL02",
+      "status": "CHUA_CHAY",
+      "executedAt": null,
+      "executor": null,
+      "buildSourceId": null,
+      "environment": {
+        "engine": null,
+        "browser": null,
+        "viewport": null
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": null,
+      "testFile": null,
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "RL03",
+      "status": "CHUA_CHAY",
+      "executedAt": null,
+      "executor": null,
+      "buildSourceId": null,
+      "environment": {
+        "engine": null,
+        "browser": null,
+        "viewport": null
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": null,
+      "testFile": null,
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "RL04",
+      "status": "CHUA_CHAY",
+      "executedAt": null,
+      "executor": null,
+      "buildSourceId": null,
+      "environment": {
+        "engine": null,
+        "browser": null,
+        "viewport": null
+      },
+      "fixture": null,
+      "expected": "See 03_MA_TRAN_NGHIEM_THU.md",
+      "actual": null,
+      "testFile": null,
+      "evidence": [],
+      "notes": ""
+    }
+  ]
+}

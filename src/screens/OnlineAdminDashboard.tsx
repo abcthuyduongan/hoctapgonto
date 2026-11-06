@@ -53,7 +53,7 @@ export default function AdminDashboard({identity,onLogout,onRestored}:{identity:
     if(!force&&readRequest.current?.key===key)return readRequest.current.work;
     readController.current?.abort();const controller=new AbortController();readController.current=controller;const current=++generation.current;setLoading(true);
     const work=(async()=>{
-      try{const result=await onlineApi.adminSummary(input,controller.signal);if(current!==generation.current)return;setData(result);setLibrary(null);setPreview(null);setWeekCheck(null);}
+      try{const result=await onlineApi.adminSummary(input,controller.signal);if(current!==generation.current)return;setData(result);setLibrary(null);}
       catch(error){if(!controller.signal.aborted)throw error;}finally{if(current===generation.current)setLoading(false);}
     })().finally(()=>{if(readRequest.current?.work===work)readRequest.current=null;});
     readRequest.current={key,work};return work;

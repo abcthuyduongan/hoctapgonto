@@ -107,11 +107,31 @@ export interface LearnerProfile {
   learningSettings?: LearnerSettings;
 }
 
+export type PublicPlaySession = {
+  sessionId: string;
+  studentId?: string;
+  packId: string;
+  contentVersion: number;
+  moduleId: ModuleId;
+  moduleVersion?: string;
+  startedAt: string;
+  endedAt?: string;
+  status: 'active' | 'completed' | 'abandoned';
+  rewardPolicyVersion?: 1 | 2;
+  questionProtocolVersion?: 1;
+  requiredItemIds?: string[];
+  questionClocks?: Record<string, string>;
+  journeyWeekId?: string;
+  currentSequence?: number;
+};
+
 export type PlaySession = {
   sessionId: string; packId: string; contentVersion: number; moduleId: ModuleId;
   moduleVersion: string; startedAt: string; endedAt?: string;
   status: 'active' | 'completed' | 'abandoned';
   profileId?: string;
+  studentId?: string;
+  currentSequence?: number;
   /** Volatile ownership marker; not transferred in a backup. */
   ownerTabId?: string;
   /** New game sessions only; old boolean-only evidence never earns retroactive stars. */
@@ -143,7 +163,7 @@ export type LearningEvent = {
   gameSequence?: number;
 };
 /** attemptKey must be stable for a single logical submission, even on retry after failed storage. */
-export type AttemptInput = Pick<LearningEvent, 'itemId' | 'objectiveId' | 'correct' | 'hintsUsed' | 'elapsedMs' | 'response'> & {attemptKey:string};
+export type AttemptInput = Pick<LearningEvent, 'itemId' | 'objectiveId' | 'correct' | 'hintsUsed' | 'elapsedMs' | 'response'> & {attemptKey:string; presentationId?: string};
 export type GameHostProps = {
   pack: ContentPack|StudentQuestionPack;
   onAttempt: (attempt: AttemptInput) => Promise<void|AttemptOutcome>;

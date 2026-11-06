@@ -83,7 +83,7 @@ test('PF02, PF07: rapid map navigation world <-> region <-> chapter cleans up in
       await page.locator('.map-region-anchor.region-math').click();
       await expect(page.locator('.region-map-container')).toBeVisible();
 
-      await page.getByRole('button', { name: 'Trở về bản đồ thế giới' }).click();
+      await page.getByRole('button', { name: /bản đồ thế giới/i }).click();
       await expect(page.locator('.world-map-container')).toBeVisible();
     }
 

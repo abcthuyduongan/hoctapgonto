@@ -1,0 +1,56 @@
+{
+  "note": "Passing assertions confirm unwanted behavior, not product acceptance",
+  "observations": [
+    {
+      "case": "anti-repeat-cold-history-limit",
+      "engine": "SQLite",
+      "unrelatedLaterPlays": 5,
+      "previousPosition": 0,
+      "lookup": null,
+      "newPosition": 0,
+      "repeated": true
+    },
+    {
+      "case": "anti-repeat-stale-instance-cache",
+      "engine": "SQLite",
+      "cachedPosition": 0,
+      "latestStoredPosition": 1,
+      "newPosition": 1,
+      "repeated": true
+    },
+    {
+      "case": "anti-repeat-cold-history-limit",
+      "engine": "PostgreSQL",
+      "unrelatedLaterPlays": 5,
+      "previousPosition": 0,
+      "lookup": null,
+      "newPosition": 0,
+      "repeated": true
+    },
+    {
+      "case": "anti-repeat-stale-instance-cache",
+      "engine": "PostgreSQL",
+      "cachedPosition": 0,
+      "latestStoredPosition": 1,
+      "newPosition": 1,
+      "repeated": true
+    },
+    {
+      "case": "contest-authored-bank-and-review-contract",
+      "authoredQuestionIncluded": false,
+      "reviewKind": "choice",
+      "reviewItemKind": "choice",
+      "reviewCorrectIndex": 0,
+      "validationErrors": [
+        "Mã bộ học liệu chỉ được dùng chữ thường, số và dấu gạch nối.",
+        "Loại học liệu chưa được hỗ trợ.",
+        "Mục 1: thiếu mã mục tiêu kiến thức.",
+        "Câu 1: đề bài trống hoặc quá dài.",
+        "Câu 1: bắt buộc có 4 phương án không trống.",
+        "Mục 2: thiếu mã mục tiêu kiến thức.",
+        "Câu 2: đề bài trống hoặc quá dài.",
+        "Câu 2: bắt buộc có 4 phương án không trống."
+      ]
+    }
+  ]
+}

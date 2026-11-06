@@ -13,11 +13,11 @@ import {createWeeklyPlan,weeklyPlanErrors,validateWeeklyPlan} from '../src/core/
 import {readWeekPolicies,closedStudentCount,changesQuestionMeaning} from './weekly-policy.mjs';
 import {journeyProgress,selectReviewItems,filterPlayPresentation,timedQuestion} from './question-journey.mjs';
 import {initializeQuestionRewardLedger,applyQuestionRewardCandidates,questionRewardCandidates,questionRewardProgress,questionRewardThresholds,earnedQuestionRewardStars,v2QuestionCompletionErrors} from '../src/core/question-rewards.ts';
-import {openProtocolQuestion,protocolAudioDelivery,protocolHint,answerFeedback} from './question-protocol.mjs';
+import {openProtocolQuestion,protocolAudioDelivery,protocolHint,answerFeedback,publicSession} from './question-protocol.mjs';
 import {measureApiSpan} from './api-diagnostics.mjs';
 import {toVietnamDateString,getVietnamWeekKey,computeStreakState,registerDailyCorrectAnswer,buildDailyMissions,buildStudentBadgeStatuses,BADGE_CATALOG} from '../src/core/badges.ts';
 import {checkCurfewHours,checkDailyScreenTime,msToMinutes,getVietnamTimeParts} from '../src/core/parent-controls.ts';
-import {buildParentWeeklyReport,hashParentPin,verifyParentPin} from './parent-data.mjs';
+import {buildParentWeeklyReport,hashParentPin,verifyParentPin,issueParentElevationToken,verifyParentElevationToken,revokeParentElevationToken,sanitizeParentControls} from './parent-data.mjs';
 import {CONTEST_PRESETS,CONTESTANT_BADGE,sanitizeContestItem,evaluateContestSubmission,checkReadinessForExam,generateContestQuestions,buildReviewMistakesPack} from './contest-data.mjs';
 import {TOWN_BUILDING_CATALOG,TOWN_BUILDING_MAP,resolveTownSubject,getMaterialForSubject,calculateEarnedMaterialsFromAwards,calculateTotalSpentMaterials,calculateAvailableMaterials,canAffordBuilding,defaultTownState,evaluateBuildingPlacement} from './town-data.mjs';
 import {ANIMAL_CATALOG,ANIMAL_MAP,getUnlockedAnimals,validateAnimalName} from '../src/core/animal-neighbors.ts';
@@ -43,8 +43,42 @@ function databaseError(error){
 export class PostgresStore{
   constructor({pool,connectionString,ssl,max=5}={}){
     this.pool=pool??new pg.Pool({connectionString,ssl,max,connectionTimeoutMillis:10000,idleTimeoutMillis:20000});this.ownsPool=!pool;
+    this.lastCorrectPositions = new Map();
   }
-  async ready(){const row=await this.one('SELECT max(version) AS version FROM bao_an.schema_version');if(row?.version!==1)fail(500,'Cần chạy migration dữ liệu online phiên bản 1.');return this;}
+  async lastQuestionCorrectPosition(workspaceId, studentId, itemId, version, client = this.pool, packId = null) {
+    try {
+      let query = `
+        SELECT (json->'questionPresentations'->$3->>'displayedCorrectIndex')::int AS pos
+        FROM bao_an.plays
+        WHERE workspace_id=$1 AND student_id=$2 AND (json->'questionPresentations'->$3->>'displayedCorrectIndex') IS NOT NULL
+      `;
+      const params = [workspaceId, studentId, itemId];
+      let pIdx = 4;
+      if (packId) {
+        query += ` AND json->>'packId' = $${pIdx++}`;
+        params.push(packId);
+      }
+      if (version) {
+        query += ` AND (json->>'contentVersion')::int = $${pIdx++}`;
+        params.push(version);
+      }
+      query += ` ORDER BY (json->>'startedAt') DESC LIMIT 1`;
+      const row = await this.one(query, params, client);
+      if (row && Number.isInteger(row.pos)) {
+        return row.pos;
+      }
+    } catch {}
+    return null;
+  }
+  recordQuestionCorrectPosition(workspaceId, studentId, itemId, version, pos) {}
+  async ready(){
+    const row=await this.one('SELECT max(version) AS version, count(*)::int AS count FROM bao_an.schema_version');
+    if(!row||row.version<8||row.count<8)fail(500,'Cần chạy migration dữ liệu online đầy đủ (phiên bản 8). Chạy cloud:setup hoặc áp dụng các migration trong supabase/migrations/.');
+    const required=['student_goals','parent_controls','parent_students','gift_catalog','badge_awards','contest_sessions','town_states'];
+    const existing=(await this.rows("SELECT tablename FROM pg_tables WHERE schemaname='bao_an'")).map(r=>r.tablename);
+    for(const t of required)if(!existing.includes(t))fail(500,`Cần chạy migration dữ liệu online: thiếu bảng bao_an.${t}.`);
+    return this;
+  }
   async close(){if(this.ownsPool)await this.pool.end();}
   async query(sql,values=[],client=this.pool){return measureApiSpan('sql',()=>/\bFOR (UPDATE|SHARE)\b/i.test(sql)?measureApiSpan('lockingSql',()=>client.query(sql,values)):client.query(sql,values));}
   async rows(sql,values=[],client=this.pool){return(await this.query(sql,values,client)).rows;}
@@ -455,10 +489,29 @@ export class PostgresStore{
     if(context.marker){
       const row=await this.one(`SELECT p.* FROM bao_an.packs p JOIN bao_an.week_sets s ON s.workspace_id=p.workspace_id AND s.pack_id=p.pack_id AND s.version=p.version JOIN bao_an.weeks w ON w.workspace_id=s.workspace_id AND w.id=s.week_id
         WHERE p.workspace_id=$1 AND p.pack_id=$2 AND p.version=$3 AND s.week_id=$4 AND w.class_id=$5`,[auth.workspaceId,packId,version,context.marker.weekId,context.student.class_id],client);
-      if(!row)fail(403,'Con chỉ được học bộ câu hỏi thuộc tuần hiện tại. Tuần đã đóng và tuần chưa mở không thể chơi.');return this.packRecord(row);
+      if(row)return this.packRecord(row);
     }
     const student=context.student??await this.student(auth,auth.studentId,client),progress=context.progress??await this.summaryProgress(auth,student,client,undefined,context.marker),assigned=progress.weeks.filter(week=>week.unlocked).flatMap(week=>week.sets).find(set=>set.pack.id===packId&&set.pack.version===version);
-    if(!assigned)fail(403,'Con chỉ được học bộ câu hỏi thuộc tuần hiện tại. Tuần đã đóng và tuần chưa mở không thể chơi.');return this.packRecord(await this.one('SELECT * FROM bao_an.packs WHERE workspace_id=$1 AND pack_id=$2 AND version=$3',[auth.workspaceId,packId,version],client));
+    if(assigned){
+      const packed=await this.one('SELECT * FROM bao_an.packs WHERE workspace_id=$1 AND pack_id=$2 AND version=$3',[auth.workspaceId,packId,version],client);
+      if(!packed)fail(404,'Không tìm thấy bộ câu hỏi.');
+      return this.packRecord(packed);
+    }
+    const packed = await this.one('SELECT * FROM bao_an.packs WHERE workspace_id=$1 AND pack_id=$2 AND version=$3', [auth.workspaceId, packId, version], client);
+    if (packed) {
+      const packObj = parse(packed.json);
+      if (packObj.ownerStudentId) {
+        if (packObj.ownerStudentId !== auth.studentId) fail(403, 'Con chỉ được học gói ôn tập của chính mình.');
+        return this.packRecord(packed);
+      }
+      const cleanSessionId = packId.replace(/^review-/, '');
+      const contestRow = await this.one('SELECT student_id FROM bao_an.contest_sessions WHERE workspace_id=$1 AND session_id LIKE $2', [auth.workspaceId, `${cleanSessionId}%`], client);
+      if (contestRow) {
+        if (contestRow.student_id !== auth.studentId) fail(403, 'Con chỉ được học gói ôn tập của chính mình.');
+        return this.packRecord(packed);
+      }
+    }
+    fail(403,'Con chỉ được học bộ câu hỏi thuộc tuần hiện tại. Tuần đã đóng và tuần chưa mở không thể chơi.');
   }
   async packGames(auth,packId,version){role(auth,'student');return{packId,contentVersion:version,games:(await this.assignedPack(auth,packId,version)).games};}
   async dashboard(auth){role(auth,'admin');const classes=(await this.rows('SELECT * FROM bao_an.classes WHERE workspace_id=$1 ORDER BY created_at,id',[auth.workspaceId])).map(row=>this.publicClass(row)),students=[],weeks=[];
@@ -482,13 +535,21 @@ export class PostgresStore{
       await this.assertStudentScreenTimeAllowed(auth,student.id,client,context.parentControls);
       const choice=await this.assignedPack(auth,packId,version,client,context);if(!choice.games.some(game=>game.id===moduleId))fail(400,'Dạng câu của bộ này chưa phù hợp với trò chơi đã chọn.');
       const presentation=onlinePresentation(moduleId,choice.pack),requiredItemIds=compact?selectReviewItems(input.reviewItemIds,choice.pack,presentation):undefined;
-      if(prior){const value=await this.play(auth,prior.id,client);if(secure&&value.session.questionProtocolVersion!==1)fail(409,'Lượt cũ cần mở lại trên ứng dụng mới. Sao đã lưu vẫn được giữ.');if(value.session.packId!==packId||value.session.contentVersion!==version||value.session.moduleId!==moduleId||value.session.journeyWeekId&&value.session.journeyWeekId!==marker?.weekId||compact&&(value.session.rewardPolicyVersion!==2||json(value.session.requiredItemIds)!==json(requiredItemIds)))fail(409,'Mã lượt chơi đã dùng cho nội dung khác.');if(value.session.status==='abandoned')fail(409,'Lượt chơi đã thoát. Hãy mở lượt mới.');const result={...value,presentation:filterPlayPresentation(value.session,value.pack,onlinePresentation(moduleId,value.pack))};return compact||secure?compactPlay(result):result;}
+      if(prior){const value=await this.play(auth,prior.id,client);if(secure&&value.session.questionProtocolVersion!==1)fail(409,'Lượt cũ cần mở lại trên ứng dụng mới. Sao đã lưu vẫn được giữ.');if(value.session.packId!==packId||value.session.contentVersion!==version||value.session.moduleId!==moduleId||value.session.journeyWeekId&&value.session.journeyWeekId!==marker?.weekId||compact&&(value.session.rewardPolicyVersion!==2||json(value.session.requiredItemIds)!==json(requiredItemIds)))fail(409,'Mã lượt chơi đã dùng cho nội dung khác.');if(value.session.status==='abandoned')fail(409,'Lượt chơi đã thoát. Hãy mở lượt mới.');const result={...value,presentation:filterPlayPresentation(value.session,value.pack,onlinePresentation(moduleId,value.pack))};return compact||secure?compactPlay(result):{...result,session:publicSession(result.session)};}
       await this.abandonActive(auth,student.id,client);
       const session={sessionId:id(),profileId:student.id,packId,contentVersion:version,moduleId,moduleVersion:getGame(moduleId).version,startedAt:now(),status:'active',rewardPolicyVersion:compact?2:1,presentationVersion:1,journeyWeekId:marker?.weekId,...(compact?{requiredItemIds,questionClocks:{}}:{}),...(secure?{questionProtocolVersion:1,questionClocks:{},questionHints:{},audioReceipts:{}}:{})};
-      await this.exec('INSERT INTO bao_an.plays(id,workspace_id,student_id,request_id,json) VALUES($1,$2,$3,$4,$5::jsonb)',[session.sessionId,auth.workspaceId,student.id,requestId,json(session)],client);const result={session,pack:choice.pack,presentation:filterPlayPresentation(session,choice.pack,presentation)};return compact||secure?compactPlay(result):result;
+      await this.exec('INSERT INTO bao_an.plays(id,workspace_id,student_id,request_id,json) VALUES($1,$2,$3,$4,$5::jsonb)',[session.sessionId,auth.workspaceId,student.id,requestId,json(session)],client);const result={session,pack:choice.pack,presentation:filterPlayPresentation(session,choice.pack,presentation)};return compact||secure?compactPlay(result):{...result,session:publicSession(result.session)};
     });
   }
   async assertCurrentPlay(auth,session,client){
+    if (session.packId.startsWith('review-')) {
+      const packed = await this.one('SELECT json FROM bao_an.packs WHERE workspace_id=$1 AND pack_id=$2 AND version=$3', [auth.workspaceId, session.packId, session.contentVersion], client);
+      if (packed) {
+        const pObj = parse(packed.json);
+        if (pObj.ownerStudentId && pObj.ownerStudentId !== auth.studentId) fail(403, 'Con chỉ được học gói ôn tập của chính mình.');
+      }
+      return;
+    }
     const{student,marker,assignments}=await this.studentPlayContext(auth,client,{packId:session.packId});
     if(marker){if(session.journeyWeekId&&session.journeyWeekId!==marker.weekId)fail(403,'Tuần của lượt chơi này đã đóng hoặc chưa được mở.');const assigned=assignments.find(row=>row.weekId===marker.weekId);if(!assigned)fail(403,'Tuần của lượt chơi này đã đóng hoặc chưa được mở.');if(session.rewardPolicyVersion===2&&assigned.version!==session.contentVersion)fail(409,'Bộ câu hỏi vừa được cập nhật. Thoát rồi mở lại bài; sao đã lưu vẫn được giữ nguyên.');return;}
     const progress=await this.summaryProgress(auth,student,client);if(session.journeyWeekId&&session.journeyWeekId!==progress.journey?.weekId)fail(403,'Tuần của lượt chơi này đã đóng hoặc chưa được mở.');const assigned=progress.weeks.find(week=>week.current)?.sets.find(set=>set.pack.id===session.packId);if(!assigned)fail(403,'Tuần của lượt chơi này đã đóng hoặc chưa được mở.');if(session.rewardPolicyVersion===2&&assigned.pack.version!==session.contentVersion)fail(409,'Bộ câu hỏi vừa được cập nhật. Thoát rồi mở lại bài; sao đã lưu vẫn được giữ nguyên.');
@@ -501,7 +562,24 @@ export class PostgresStore{
       const{session,pack,events}=await this.play(auth,playId,client,{includeEvents:true});await this.assertCurrentPlay(auth,session,client);
       if(session.status!=='active'||Date.now()-Date.parse(session.startedAt)>86400000)fail(409,'Lượt chơi đã kết thúc hoặc quá hạn.');
       if(requireProtocol&&session.questionProtocolVersion!==1)fail(409,'Lượt cũ cần mở lại trên ứng dụng mới. Sao đã lưu vẫn được giữ.');
-      if(session.questionProtocolVersion===1){const receipt=openProtocolQuestion(session,pack,events,itemId,openedTime);await this.exec('UPDATE bao_an.plays SET json=$3::jsonb WHERE workspace_id=$1 AND id=$2',[auth.workspaceId,playId,json(session)],client);return receipt;}
+      if(session.questionProtocolVersion===1){
+        const item = pack.items?.find(row => row.id === itemId);
+        const hasOptions = Array.isArray(item?.options) && item.options.length > 1;
+        const lastPos = hasOptions
+          ? (session.questionPresentations?.[itemId]?.displayedCorrectIndex ?? await this.lastQuestionCorrectPosition(auth.workspaceId, auth.studentId, itemId, pack.version, client, session.packId))
+          : null;
+        const receipt=openProtocolQuestion(session,pack,events,itemId,openedTime,lastPos);
+        const currentPos = session.questionPresentations?.[itemId]?.displayedCorrectIndex;
+        if (Number.isInteger(currentPos)) {
+          this.recordQuestionCorrectPosition(auth.workspaceId, auth.studentId, itemId, pack.version, currentPos);
+        }
+        session.presentationsById ??= {};
+        if (session.questionPresentations?.[itemId]) {
+          session.presentationsById[session.questionPresentations[itemId].presentationId] = session.questionPresentations[itemId];
+        }
+        await this.exec('UPDATE bao_an.plays SET json=$3::jsonb WHERE workspace_id=$1 AND id=$2',[auth.workspaceId,playId,json(session)],client);
+        return receipt;
+      }
       const presentation=onlinePresentation(session.moduleId,pack),item=presentation?.items.find(item=>item.id===itemId);
       if(!timedQuestion(session,presentation)||!item||!session.requiredItemIds?.includes(itemId))fail(400,'Câu hỏi không dùng bộ đếm thời gian của lượt chơi này.');
       const clock=session.questionClocks??{},openedAt=Object.hasOwn(clock,itemId)?clock[itemId]:(input.openedAt||now());if(!Object.hasOwn(clock,itemId)){
@@ -512,18 +590,34 @@ export class PostgresStore{
   }
   async #playEvents(auth,playId,client){return(await this.rows('SELECT json FROM bao_an.attempts WHERE workspace_id=$1 AND play_id=$2 ORDER BY sequence',[auth.workspaceId,playId],client)).map(row=>parse(row.json));}
   async events(auth,playId,client=this.pool){if(auth.role==='student')await this.play(auth,playId,client);return this.#playEvents(auth,playId,client);}
-  async attempt(auth,playId,input,requireProtocol=false){role(auth,'student');shape(input,['attemptKey','itemId','response','hintsUsed','elapsedMs']);const key=text(input.attemptKey,'Mã lần trả lời',120);if(!/^[a-zA-Z0-9._:-]+$/.test(key))fail(400,'Mã lần trả lời không hợp lệ.');const itemId=text(input.itemId,'Mã câu',80),hintsUsed=integer(input.hintsUsed??0,'Số gợi ý',0,20);
+  async attempt(auth,playId,input,requireProtocol=false){role(auth,'student');shape(input,['attemptKey','itemId','response','hintsUsed','elapsedMs','presentationId']);const key=text(input.attemptKey,'Mã lần trả lời',120);if(!/^[a-zA-Z0-9._:-]+$/.test(key))fail(400,'Mã lần trả lời không hợp lệ.');const itemId=text(input.itemId,'Mã câu',80),hintsUsed=integer(input.hintsUsed??0,'Số gợi ý',0,20);
     const hash=digest({key,itemId,response:input.response,hintsUsed});
     return this.mutate(auth,async client=>{
       const{session,pack,events,streakRow}=await this.play(auth,playId,client,{includeEvents:true});await this.assertCurrentPlay(auth,session,client);if(requireProtocol&&session.questionProtocolVersion!==1)fail(409,'Lượt cũ cần mở lại trên ứng dụng mới. Sao đã lưu vẫn được giữ.');const prior=await this.one('SELECT payload_hash,json FROM bao_an.attempts WHERE workspace_id=$1 AND play_id=$2 AND attempt_key=$3',[auth.workspaceId,playId,key],client);
-      if(prior){if(prior.payload_hash!==hash)fail(409,'Lần trả lời đã được lưu với đáp án khác.');if(session.status==='abandoned')fail(409,'Lượt chơi đã thoát.');const event=parse(prior.json);let questionRewards;if(session.rewardPolicyVersion===2){questionRewards={gained:0,questions:[]};if(event.correct){const previous=await this.one('SELECT json FROM bao_an.awards WHERE workspace_id=$1 AND student_id=$2 AND pack_id=$3',[auth.workspaceId,auth.studentId,pack.id],client),reward=previous?parse(previous.json):null,touched=onlineScoreResponse(pack,session.moduleId,event.itemId,event.response).touchedItemIds;questionRewards.questions=questionRewardProgress(pack,reward?.questionLedger??initializeQuestionRewardLedger(pack.id,reward?.starTier??0)).questions.filter(q=>touched.includes(q.itemId));}}return{event,duplicate:true,...(session.questionProtocolVersion===1&&event.correct?{feedback:answerFeedback(pack,session,event)}:{}),...(questionRewards?{questionRewards}:{})};}
+      if(prior){if(prior.payload_hash!==hash)fail(409,'Lần trả lời đã được lưu với đáp án khác.');if(session.status==='abandoned')fail(409,'Lượt chơi đã thoát.');const event=parse(prior.json);let questionRewards;if(session.rewardPolicyVersion===2){questionRewards={gained:0,questions:[]};if(event.correct){const previous=await this.one('SELECT json FROM bao_an.awards WHERE workspace_id=$1 AND student_id=$2 AND pack_id=$3',[auth.workspaceId,auth.studentId,pack.id],client),reward=previous?parse(previous.json):null,touched=onlineScoreResponse(pack,session.moduleId,event.itemId,event.response).touchedItemIds;questionRewards.questions=questionRewardProgress(pack,reward?.questionLedger??initializeQuestionRewardLedger(pack.id,reward?.starTier??0)).questions.filter(q=>touched.includes(q.itemId));}}return{event:{...event,response:input.response},duplicate:true,...(session.questionProtocolVersion===1&&event.correct?{feedback:answerFeedback(pack,session,event)}:{}),...(questionRewards?{questionRewards}:{})};}
       if(session.status!=='active')fail(409,'Lượt chơi đã kết thúc hoặc được thay bằng lượt mới ở thiết bị khác.');if(Date.now()-Date.parse(session.startedAt)>86400000)fail(409,'Lượt chơi đã quá hạn. Hãy mở lượt mới.');
-      if(events.length>=5000)fail(400,'Lượt chơi đã đạt giới hạn số lần thử.');const item=pack.items.find(row=>row.id===itemId);if(!item)fail(400,'Câu hỏi không thuộc lượt chơi.');let outcome;try{outcome=onlineScoreResponse(pack,session.moduleId,itemId,input.response);}catch(error){fail(400,error.message);}
+      if(events.length>=5000)fail(400,'Lượt chơi đã đạt giới hạn số lần thử.');const item=pack.items.find(row=>row.id===itemId);if(!item)fail(400,'Câu hỏi không thuộc lượt chơi.');
+      session.presentationsById ??= {};
+      const currentPres = session.questionPresentations?.[itemId];
+      if (currentPres && input.presentationId && input.presentationId !== currentPres.presentationId) {
+        fail(409, 'Lượt trình bày câu hỏi đã hết hạn hoặc không khớp. Vui lòng mở lại câu hỏi.');
+      }
+      const pres = (input.presentationId && session.presentationsById[input.presentationId])
+        ?? currentPres;
+      let evalResponse = input.response;
+      if (pres && input.response?.kind === 'choice') {
+        if (!Number.isInteger(input.response.choiceIndex) || input.response.choiceIndex < 0 || input.response.choiceIndex >= pres.permutation.length) {
+          fail(400, 'Lựa chọn không hợp lệ.');
+        }
+        const originalChoiceIndex = pres.permutation[input.response.choiceIndex];
+        evalResponse = { ...input.response, choiceIndex: originalChoiceIndex };
+      }
+      let outcome;try{outcome=onlineScoreResponse(pack,session.moduleId,itemId,evalResponse);}catch(error){fail(400,error.message);}
       if(session.rewardPolicyVersion===2&&outcome.touchedItemIds.some(id=>!session.requiredItemIds?.includes(id)))fail(400,'Câu trả lời nằm ngoài các câu đã chọn cho lượt học lại.');
       const occurredAt=now();let elapsedMs=input.elapsedMs;if(timedQuestion(session,onlinePresentation(session.moduleId,pack))){const openedAt=session.questionClocks&&Object.hasOwn(session.questionClocks,itemId)&&session.questionClocks[itemId];if(!openedAt)fail(400,'Cần mở câu hỏi trước khi trả lời.');elapsedMs=Date.parse(occurredAt)-Date.parse(openedAt);}
       else if(session.rewardPolicyVersion===2)elapsedMs=0;
       if(!Number.isFinite(elapsedMs)||elapsedMs<0||elapsedMs>14400000)fail(400,'Thời gian trả lời không hợp lệ.');
-      const event={eventId:`${session.sessionId}:${key}`,sessionId:session.sessionId,profileId:session.profileId,packId:pack.id,contentVersion:pack.version,moduleId:session.moduleId,moduleVersion:session.moduleVersion,itemId,objectiveId:item.objectiveId,correct:outcome.correct,hintsUsed:session.questionProtocolVersion===1?(Object.hasOwn(session.questionHints??{},itemId)?session.questionHints[itemId].used:0):hintsUsed,elapsedMs,occurredAt,response:input.response,gameSequence:events.length+1};
+      const event={eventId:`${session.sessionId}:${key}`,sessionId:session.sessionId,profileId:session.profileId,packId:pack.id,contentVersion:pack.version,moduleId:session.moduleId,moduleVersion:session.moduleVersion,itemId,objectiveId:item.objectiveId,correct:outcome.correct,hintsUsed:session.questionProtocolVersion===1?(Object.hasOwn(session.questionHints??{},itemId)?session.questionHints[itemId].used:0):hintsUsed,elapsedMs,occurredAt,response:evalResponse,displayedChoiceIndex:pres?input.response.choiceIndex:undefined,gameSequence:events.length+1};
       const errors=onlineEvidenceErrors(session,[...events,event],pack);if(errors.length)fail(400,errors[0]);
       const {newStreakRecord, streakIncreased} = registerDailyCorrectAnswer(streakRow, outcome.correct, occurredAt);
       await this.exec(`
@@ -552,7 +646,7 @@ export class PostgresStore{
         const result=applyQuestionRewardCandidates(reward?.questionLedger??initializeQuestionRewardLedger(pack.id,reward?.starTier??0),questionRewardCandidates(session,[...events,event],pack)),progress=questionRewardProgress(pack,result.ledger),tier=Math.max(1,progress.bestTier);
         if(!reward||json(reward.questionLedger)!==json(result.ledger)){const award={...(reward??{profileId:auth.studentId,packId:pack.id,sessionId:session.sessionId,completedAt:event.occurredAt,totalItems:pack.items.length,firstTryCorrect:0}),starTier:tier,questionLedger:result.ledger};await this.exec('INSERT INTO bao_an.awards(workspace_id,student_id,pack_id,tier,json) VALUES($1,$2,$3,$4,$5::jsonb) ON CONFLICT(workspace_id,student_id,pack_id) DO UPDATE SET tier=excluded.tier,json=excluded.json',[auth.workspaceId,auth.studentId,pack.id,tier,json(award)],client);}
         questionRewards={gained:result.gained,questions:progress.questions.filter(q=>outcome.touchedItemIds.includes(q.itemId))};}
-      }return{event,duplicate:false,...(session.questionProtocolVersion===1&&event.correct?{feedback:answerFeedback(pack,session,event)}:{}),...(questionRewards?{questionRewards}:{})};
+      }return{event:{...event,response:input.response},duplicate:false,...(session.questionProtocolVersion===1&&event.correct?{feedback:answerFeedback(pack,session,event)}:{}),...(questionRewards?{questionRewards}:{})};
     });
   }
   async finishPlay(auth,playId,abandon=false,compact=false,requireProtocol=false){role(auth,'student');return this.mutate(auth,async client=>{
@@ -1033,7 +1127,7 @@ export class PostgresStore{
     await this.studentBadges(auth, studentId, nowIso, client);
   }
   async assertStudentScreenTimeAllowed(auth, studentId, client = this.pool, existingControls = null){
-    const controls = existingControls !== null ? existingControls : await this.parentControls(auth, studentId, client);
+    const controls = existingControls !== null ? existingControls : await this.rawParentControls(auth.workspaceId, studentId, client);
     if (!controls) return;
     const curfew = checkCurfewHours(controls.allowedStartHour, controls.allowedEndHour);
     if (!curfew.allowed) fail(403, curfew.reason);
@@ -1058,12 +1152,12 @@ export class PostgresStore{
     }
     return msToMinutes(totalMs);
   }
-  async parentControls(auth, studentId, client = this.pool){
+  async rawParentControls(workspaceId, studentId, client = this.pool){
     text(studentId, 'Mã học sinh', 100);
-    const row = await this.one('SELECT * FROM bao_an.parent_controls WHERE workspace_id=$1 AND student_id=$2', [auth.workspaceId, studentId], client);
+    const row = await this.one('SELECT * FROM bao_an.parent_controls WHERE workspace_id=$1 AND student_id=$2', [workspaceId, studentId], client);
     if (!row) {
       return {
-        workspaceId: auth.workspaceId,
+        workspaceId,
         studentId,
         pinHash: null,
         pinSalt: null,
@@ -1088,15 +1182,43 @@ export class PostgresStore{
       updatedAt: row.updated_at
     };
   }
-  async setupParentPin(auth, studentId, input){
-    shape(input, ['pin', 'oldPin', 'studentId']);
+  async parentControls(auth, studentId, client = this.pool){
+    return sanitizeParentControls(await this.rawParentControls(auth.workspaceId, studentId, client));
+  }
+  async setupParentPin(auth, studentId, input, parentToken = null){
+    shape(input, ['pin', 'oldPin', 'studentId', 'parentToken']);
     const pin = text(input.pin, 'Mã PIN mới', 10);
     if (!/^\d{4,6}$/.test(pin)) fail(400, 'Mã PIN phụ huynh phải gồm từ 4 đến 6 chữ số.');
-    const current = await this.parentControls(auth, studentId);
-    if (current.pinHash && auth.role !== 'admin') {
-      const oldPin = text(input.oldPin, 'Mã PIN hiện tại', 10);
-      if (!verifyParentPin(oldPin, current.pinHash, current.pinSalt)) {
-        fail(403, 'Mã PIN cũ không chính xác.');
+    await this.student(auth, studentId);
+    const current = await this.rawParentControls(auth.workspaceId, studentId);
+    if (auth.role === 'parent') {
+      const linked = await this.one('SELECT 1 FROM bao_an.parent_students WHERE workspace_id=$1 AND parent_user_id=$2 AND student_id=$3', [auth.workspaceId, auth.id, studentId]);
+      if (!linked) fail(403, 'Phụ huynh không có quyền thiết lập mã PIN cho học sinh này.');
+    } else if (auth.role === 'student') {
+      if (auth.studentId !== studentId) fail(403, 'Không có quyền truy cập học sinh khác.');
+      if (current.pinHash) {
+        if (current.pinLockedUntil && new Date(current.pinLockedUntil).getTime() > Date.now()) {
+          const remainingMinutes = Math.ceil((new Date(current.pinLockedUntil).getTime() - Date.now()) / 60000);
+          fail(429, `Mã PIN đang bị tạm khóa do nhập sai nhiều lần. Vui lòng thử lại sau ${remainingMinutes} phút.`);
+        }
+        const pToken = parentToken || input.parentToken;
+        const tokenOk = pToken && verifyParentElevationToken(pToken, { userId: auth.id, studentId, workspaceId: auth.workspaceId, pinHash: current.pinHash, sessionHash: auth.tokenHash });
+        if (!tokenOk) {
+          const oldPin = input.oldPin ? text(input.oldPin, 'Mã PIN hiện tại', 10) : '';
+          const isCorrect = oldPin && verifyParentPin(oldPin, current.pinHash, current.pinSalt);
+          if (!isCorrect) {
+            const newFailed = (current.pinFailedCount || 0) + 1;
+            let lockedUntil = null;
+            if (newFailed >= MAX_PIN_FAILURES) {
+              lockedUntil = new Date(Date.now() + PIN_LOCKOUT_MS).toISOString();
+            }
+            await this.exec('UPDATE bao_an.parent_controls SET pin_failed_count=$1, pin_locked_until=$2 WHERE workspace_id=$3 AND student_id=$4', [newFailed, lockedUntil, auth.workspaceId, studentId]);
+            if (lockedUntil) {
+              fail(429, 'Bạn đã nhập sai PIN 5 lần. Mã PIN bị tạm khóa 15 phút để bảo vệ tài khoản.');
+            }
+            fail(403, `Mã PIN cũ không chính xác. Bạn còn ${MAX_PIN_FAILURES - newFailed} lần thử.`);
+          }
+        }
       }
     }
     const { pinHash, pinSalt } = hashParentPin(pin);
@@ -1111,10 +1233,25 @@ export class PostgresStore{
         pin_locked_until=NULL,
         updated_at=EXCLUDED.updated_at
     `, [auth.workspaceId, studentId, pinHash, pinSalt, current.maxMinutesPerDay, current.allowedStartHour, current.allowedEndHour, updatedAt]);
-    return { success: true };
+    revokeParentElevationToken(`${auth.id}:${studentId}`);
+    const elevationToken = issueParentElevationToken({
+      userId: auth.id,
+      studentId,
+      workspaceId: auth.workspaceId,
+      pinHash,
+      sessionHash: auth.tokenHash
+    });
+    await this.audit(auth, 'parent.setup_pin', studentId);
+    return { success: true, parentToken: elevationToken };
   }
   async verifyParentPin(auth, studentId, pin){
-    const controls = await this.parentControls(auth, studentId);
+    await this.student(auth, studentId);
+    if (auth.role === 'student' && auth.studentId !== studentId) fail(403, 'Không có quyền truy cập học sinh khác.');
+    if (auth.role === 'parent') {
+      const linked = await this.one('SELECT 1 FROM bao_an.parent_students WHERE workspace_id=$1 AND parent_user_id=$2 AND student_id=$3', [auth.workspaceId, auth.id, studentId]);
+      if (!linked) fail(403, 'Phụ huynh không có quyền truy cập học sinh này.');
+    }
+    const controls = await this.rawParentControls(auth.workspaceId, studentId);
     if (!controls.pinHash) fail(400, 'Chưa thiết lập mã PIN cho học sinh này.');
     if (controls.pinLockedUntil && new Date(controls.pinLockedUntil).getTime() > Date.now()) {
       const remainingMinutes = Math.ceil((new Date(controls.pinLockedUntil).getTime() - Date.now()) / 60000);
@@ -1136,18 +1273,44 @@ export class PostgresStore{
     }
     await this.exec('UPDATE bao_an.parent_controls SET pin_failed_count=0, pin_locked_until=NULL WHERE workspace_id=$1 AND student_id=$2',
       [auth.workspaceId, studentId]);
-    const parentToken = createHash('sha256').update(`${auth.id}:${studentId}:${controls.pinHash}:${now()}`).digest('hex');
+    const parentToken = issueParentElevationToken({
+      userId: auth.id,
+      studentId,
+      workspaceId: auth.workspaceId,
+      pinHash: controls.pinHash,
+      sessionHash: auth.tokenHash
+    });
+    await this.audit(auth, 'parent.verify_pin', studentId);
     return { success: true, parentToken, studentId };
   }
-  async updateParentSettings(auth, studentId, input){
-    shape(input, ['maxMinutesPerDay', 'allowedStartHour', 'allowedEndHour', 'studentId']);
+  async updateParentSettings(auth, studentId, input, parentToken = null){
+    shape(input, ['maxMinutesPerDay', 'allowedStartHour', 'allowedEndHour', 'studentId', 'parentToken']);
+    await this.student(auth, studentId);
+    if (auth.role === 'parent') {
+      const linked = await this.one('SELECT 1 FROM bao_an.parent_students WHERE workspace_id=$1 AND parent_user_id=$2 AND student_id=$3', [auth.workspaceId, auth.id, studentId]);
+      if (!linked) fail(403, 'Phụ huynh không có quyền thay đổi cài đặt cho học sinh này.');
+    } else if (auth.role === 'student') {
+      if (auth.studentId !== studentId) fail(403, 'Không có quyền truy cập học sinh khác.');
+      const currentRaw = await this.rawParentControls(auth.workspaceId, studentId);
+      if (currentRaw.pinHash) {
+        const pToken = parentToken || input.parentToken;
+        const tokenOk = pToken && verifyParentElevationToken(pToken, {
+          userId: auth.id,
+          studentId,
+          workspaceId: auth.workspaceId,
+          pinHash: currentRaw.pinHash,
+          sessionHash: auth.tokenHash
+        });
+        if (!tokenOk) fail(403, 'Chưa xác thực quyền phụ huynh.');
+      }
+    }
     const maxMinutes = input.maxMinutesPerDay !== undefined ? integer(input.maxMinutesPerDay, 'Thời gian học', 0, 480) : 0;
     const startHour = input.allowedStartHour !== undefined ? integer(input.allowedStartHour, 'Giờ bắt đầu', 0, 23) : 0;
     const endHour = input.allowedEndHour !== undefined ? integer(input.allowedEndHour, 'Giờ kết thúc', 1, 24) : 24;
     if (endHour <= startHour && endHour !== 24 && startHour !== 0) {
       fail(400, 'Giờ kết thúc phải sau giờ bắt đầu.');
     }
-    const current = await this.parentControls(auth, studentId);
+    const current = await this.rawParentControls(auth.workspaceId, studentId);
     const updatedAt = now();
     await this.exec(`
       INSERT INTO bao_an.parent_controls(workspace_id, student_id, pin_hash, pin_salt, pin_failed_count, pin_locked_until, max_minutes_per_day, allowed_start_hour, allowed_end_hour, updated_at)
@@ -1158,6 +1321,7 @@ export class PostgresStore{
         allowed_end_hour=EXCLUDED.allowed_end_hour,
         updated_at=EXCLUDED.updated_at
     `, [auth.workspaceId, studentId, current.pinHash, current.pinSalt, current.pinFailedCount, current.pinLockedUntil, maxMinutes, startHour, endHour, updatedAt]);
+    await this.audit(auth, 'parent.update_settings', studentId);
     return this.parentControls(auth, studentId);
   }
   async createParent(auth, input, passwordHash, username){
@@ -1190,13 +1354,25 @@ export class PostgresStore{
       active: !!r.active
     }));
   }
-  async parentDashboard(auth, studentId, weekId){
+  async parentDashboard(auth, studentId, weekId, parentToken = null){
     text(studentId, 'Mã học sinh', 100);
+    await this.student(auth, studentId);
     if (auth.role === 'parent') {
       const linked = await this.one('SELECT 1 FROM bao_an.parent_students WHERE workspace_id=$1 AND parent_user_id=$2 AND student_id=$3', [auth.workspaceId, auth.id, studentId]);
       if (!linked) fail(403, 'Phụ huynh không có quyền xem thông tin học sinh này.');
-    } else if (auth.role === 'student' && auth.studentId !== studentId) {
-      fail(403, 'Không có quyền truy cập.');
+    } else if (auth.role === 'student') {
+      if (auth.studentId !== studentId) fail(403, 'Không có quyền truy cập.');
+      const raw = await this.rawParentControls(auth.workspaceId, studentId);
+      if (raw.pinHash) {
+        const tokenOk = parentToken && verifyParentElevationToken(parentToken, {
+          userId: auth.id,
+          studentId,
+          workspaceId: auth.workspaceId,
+          pinHash: raw.pinHash,
+          sessionHash: auth.tokenHash
+        });
+        if (!tokenOk) fail(403, 'Vui lòng xác thực mã PIN phụ huynh trước.');
+      }
     }
     const student = await this.student(auth, studentId);
     const cls = await this.class(auth, student.class_id);
@@ -1265,11 +1441,11 @@ export class PostgresStore{
     return {
       student: { id: student.id, name: student.name, className: cls.name },
       controls: {
-        hasPin: !!controls.pinHash,
+        hasPin: Boolean(controls.hasPin),
         maxMinutesPerDay: controls.maxMinutesPerDay,
         allowedStartHour: controls.allowedStartHour,
         allowedEndHour: controls.allowedEndHour,
-        pinLocked: !!(controls.pinLockedUntil && new Date(controls.pinLockedUntil).getTime() > Date.now())
+        pinLocked: Boolean(controls.pinLocked)
       },
       todayMinutes,
       report,
@@ -1316,6 +1492,8 @@ export class PostgresStore{
         const remainingSeconds = Math.max(0, Math.floor((Date.parse(active.deadline_at) - Date.now()) / 1000));
         if (remainingSeconds > 0) {
           const items = parse(active.items_json);
+          const stored = parse(active.answers_json || '{}');
+          const { _revisions: _discard, ...cleanAnswers } = stored;
           return {
             sessionId: active.session_id,
             preset,
@@ -1324,7 +1502,7 @@ export class PostgresStore{
             remainingSeconds,
             status: 'active',
             items: items.map(sanitizeContestItem),
-            answers: parse(active.answers_json || '{}'),
+            answers: cleanAnswers,
             skippedKeys: parse(active.skipped_keys || '[]')
           };
         } else {
@@ -1376,6 +1554,8 @@ export class PostgresStore{
 
     const preset = CONTEST_PRESETS[row.preset_id];
     const items = parse(row.items_json);
+    const stored = parse(row.answers_json || '{}');
+    const { _revisions: _discard, ...cleanAnswers } = stored;
     return {
       active: true,
       session: {
@@ -1386,7 +1566,7 @@ export class PostgresStore{
         remainingSeconds,
         status: 'active',
         items: items.map(sanitizeContestItem),
-        answers: parse(row.answers_json || '{}'),
+        answers: cleanAnswers,
         skippedKeys: parse(row.skipped_keys || '[]')
       }
     };
@@ -1395,7 +1575,7 @@ export class PostgresStore{
   async saveContestProgress(auth, sessionId, input){
     role(auth, 'student');
     text(sessionId, 'Mã lượt thi', 100);
-    shape(input, ['answers', 'skippedKeys']);
+    shape(input, ['answers', 'skippedKeys', 'revision', 'seq']);
     return this.mutate(auth, async client => {
       const row = await this.one("SELECT * FROM bao_an.contest_sessions WHERE workspace_id=$1 AND student_id=$2 AND session_id=$3 AND status='active'", [auth.workspaceId, auth.studentId, sessionId], client);
       if (!row) fail(404, 'Không tìm thấy lượt thi đang làm.');
@@ -1405,11 +1585,36 @@ export class PostgresStore{
         return this.submitContest(auth, sessionId, { answers: input.answers ?? parse(row.answers_json || '{}') }, client);
       }
 
-      const answers = input.answers !== undefined ? json(input.answers) : row.answers_json;
-      const skipped = input.skippedKeys !== undefined ? json(input.skippedKeys) : row.skipped_keys;
+      const existingStored = parse(row.answers_json || '{}');
+      const existingRevisions = existingStored._revisions && typeof existingStored._revisions === 'object'
+        ? { ...existingStored._revisions }
+        : {};
+      const { _revisions: _discard, ...cleanExistingAnswers } = existingStored;
+
+      let mergedAnswers = { ...cleanExistingAnswers };
+      if (input.answers !== undefined && input.answers !== null && typeof input.answers === 'object') {
+        const inputRev = typeof input.revision === 'number'
+          ? input.revision
+          : typeof input.seq === 'number'
+          ? input.seq
+          : null;
+
+        for (const [key, val] of Object.entries(input.answers)) {
+          if (key === '_revisions') continue;
+          const currentRev = existingRevisions[key] ?? 0;
+          if (inputRev === null || inputRev >= currentRev) {
+            mergedAnswers[key] = val;
+            existingRevisions[key] = inputRev !== null ? inputRev : currentRev + 1;
+          }
+        }
+      }
+
+      const answersToStore = json({ ...mergedAnswers, _revisions: existingRevisions });
+      const existingSkipped = parse(row.skipped_keys || '[]');
+      const skipped = input.skippedKeys !== undefined ? json(Array.from(new Set([...existingSkipped, ...input.skippedKeys]))) : row.skipped_keys;
       await this.exec('UPDATE bao_an.contest_sessions SET answers_json=$3::jsonb, skipped_keys=$4::jsonb WHERE workspace_id=$1 AND session_id=$2',
-        [auth.workspaceId, sessionId, answers, skipped], client);
-      return { success: true, remainingSeconds };
+        [auth.workspaceId, sessionId, answersToStore, skipped], client);
+      return { success: true, remainingSeconds, answers: mergedAnswers };
     });
   }
 
@@ -1429,7 +1634,9 @@ export class PostgresStore{
     if (row.status !== 'active') {
       const historyRows = await this.rows("SELECT score, max_score, status FROM bao_an.contest_sessions WHERE workspace_id=$1 AND student_id=$2 AND preset_id=$3 AND status IN ('submitted', 'timeout') ORDER BY created_at DESC", [auth.workspaceId, auth.studentId, row.preset_id], client);
       const readiness = checkReadinessForExam(historyRows.map(r => ({ percent: r.max_score > 0 ? Math.round((r.score / r.max_score) * 100) : 0, passed: (r.max_score > 0 ? Math.round((r.score / r.max_score) * 100) : 0) >= preset.passPercent })));
-      const evaluation = evaluateContestSubmission(items, parse(row.answers_json || '{}'), preset, Math.min(preset.durationSeconds * 1000, Math.max(0, Date.parse(row.submitted_at || row.deadline_at) - Date.parse(row.started_at))), row.status);
+      const savedStored = parse(row.answers_json || '{}');
+      const { _revisions: _discard, ...cleanSavedAnswers } = savedStored;
+      const evaluation = evaluateContestSubmission(items, cleanSavedAnswers, preset, Math.min(preset.durationSeconds * 1000, Math.max(0, Date.parse(row.submitted_at || row.deadline_at) - Date.parse(row.started_at))), row.status);
       return {
         sessionId,
         ...evaluation,
@@ -1443,7 +1650,13 @@ export class PostgresStore{
     const isTimeout = nowMs > deadlineMs + 3000;
     const finishReason = isTimeout ? 'timeout' : 'submitted';
     const submittedAt = now();
-    const answers = input.answers !== undefined ? input.answers : parse(row.answers_json || '{}');
+    const savedStored = parse(row.answers_json || '{}');
+    const { _revisions: _discard, ...cleanSavedAnswers } = savedStored;
+    const inputAnswers = input.answers && typeof input.answers === 'object' ? input.answers : {};
+    const { _revisions: _discard2, ...cleanInputAnswers } = inputAnswers;
+    const answers = Object.keys(cleanInputAnswers).length > 0
+      ? { ...cleanSavedAnswers, ...cleanInputAnswers }
+      : cleanSavedAnswers;
     const elapsedMs = Math.min(preset.durationSeconds * 1000, Math.max(0, nowMs - Date.parse(row.started_at)));
 
     const evaluation = evaluateContestSubmission(items, answers, preset, elapsedMs, finishReason);
@@ -1530,7 +1743,9 @@ export class PostgresStore{
     const answers = parse(row.answers_json || '{}');
     const preset = CONTEST_PRESETS[row.preset_id];
     const evaluation = evaluateContestSubmission(items, answers, preset, 0, row.status);
-    return buildReviewMistakesPack({ sessionId: row.session_id, title: row.title, subject: row.subject, grade: row.grade }, evaluation.mistakes);
+    const pack = buildReviewMistakesPack({ sessionId: row.session_id, studentId: row.student_id, workspaceId: auth.workspaceId, title: row.title, subject: row.subject, grade: row.grade }, evaluation.mistakes);
+    await this.exec('INSERT INTO bao_an.packs(workspace_id, pack_id, version, subject_label, json, content_hash) VALUES($1,$2,$3,$4,$5::jsonb,$6) ON CONFLICT (workspace_id, pack_id, version) DO UPDATE SET json=EXCLUDED.json, content_hash=EXCLUDED.content_hash', [auth.workspaceId, pack.id, pack.version, pack.subject, json(pack), contentIdentity(pack)], client);
+    return pack;
   }
 
   async resolvePackSubject(auth, packId, client = this.pool) {

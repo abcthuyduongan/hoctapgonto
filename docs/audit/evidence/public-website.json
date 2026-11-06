@@ -1,0 +1,34 @@
+[
+  {
+    "url": "https://gontogontet.netlify.app/build-info.json",
+    "status": 200,
+    "body": {
+      "version": "3.9.0-rc.1",
+      "commit": "bc58393fa14a7490e49ced7c1249cc8c7360d4f2",
+      "sourceId": "caed213678ee6d8da896e5f87b0e2730c5babe46763bc4094ef29bfdbe2b595b",
+      "displayMode": "2d",
+      "questionProtocolVersion": 1
+    },
+    "checkedAtUtc": "2026-11-06T04:18:54.6065884Z"
+  },
+  {
+    "url": "https://gontogontet.netlify.app/api/online/status",
+    "status": 200,
+    "body": {
+      "available": true,
+      "configured": true,
+      "mediaMaxBytes": 2097152,
+      "runtimeVersion": "3.9.0-rc.1",
+      "questionProtocolVersion": 1,
+      "mediaUploadEncoding": "gzip",
+      "build": {
+        "version": "3.9.0-rc.1",
+        "sourceId": "caed213678ee6d8da896e5f87b0e2730c5babe46763bc4094ef29bfdbe2b595b",
+        "commit": "bc58393fa14a7490e49ced7c1249cc8c7360d4f2",
+        "displayMode": "2d",
+        "questionProtocolVersion": 1
+      }
+    },
+    "checkedAtUtc": "2026-11-06T04:18:58.6826881Z"
+  }
+]
