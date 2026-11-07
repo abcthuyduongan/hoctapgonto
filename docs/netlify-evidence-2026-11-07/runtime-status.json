@@ -1,0 +1,23 @@
+{
+  "checkedAt": "2026-11-07T00:46:28.460Z",
+  "origin": "https://hoctapgonto.netlify.app",
+  "deployId": "6aee747670abba8754694cde",
+  "apiHttpStatus": 200,
+  "buildHttpStatus": 200,
+  "available": true,
+  "configured": true,
+  "runtimeVersion": "4.0.2",
+  "apiSourceId": "556aba824efa09aa0766549a2ed91c02349cca5150f7e6c05b21e7d3f3bd89c0",
+  "uiVersion": "4.0.2",
+  "uiSourceId": "556aba824efa09aa0766549a2ed91c02349cca5150f7e6c05b21e7d3f3bd89c0",
+  "sourceMatches": true,
+  "privateApiCacheControl": "no-store,private",
+  "checksNotPerformed": [
+    "Signing in to a learner/admin account",
+    "Playing, awarding stars, media playback or export",
+    "Load testing"
+  ],
+  "notes": [
+    "No database migration, seed, credential reset or learner-data mutation performed."
+  ]
+}

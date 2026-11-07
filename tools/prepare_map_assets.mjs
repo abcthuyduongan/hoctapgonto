@@ -1,10 +1,16 @@
 import sharp from 'sharp';
+import { existsSync } from 'node:fs';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import path from 'node:path';
 
 const SRC_DIR = './ảnh';
 const ART_ROOT = './public/art';
+
+if (!existsSync(SRC_DIR)) {
+  console.log(`Source directory ${SRC_DIR} not found. Processed assets are already active in ${ART_ROOT}.`);
+  process.exit(0);
+}
 
 // Target folders
 const DIRS = {
