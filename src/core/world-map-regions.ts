@@ -111,6 +111,7 @@ export function normalizeSubjectLabel(label: string | null | undefined): string 
     .replace(/đ/g, 'd')
     .replace(/Đ/g, 'd')
     .toLowerCase()
+    .replace(/[-_]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
 }

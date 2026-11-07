@@ -20,15 +20,18 @@ import WorldMap from '../components/WorldMap';
 import RegionMap, {getLandmark} from '../components/RegionMap';
 import MapWeekPanel from '../components/MapWeekPanel';
 import GoalBar from '../components/GoalBar';
-import GiftShelfDialog from '../components/GiftShelfDialog';
 import {DiscoveryCardDialog, DiscoveryNotebookDialog, type DiscoveryNotebookItem} from '../components/DiscoveryDialog';
-import {StreakDialog} from '../components/StreakDialog';
-import {DailyMissionDialog} from '../components/DailyMissionDialog';
-import {BadgeShowcaseDialog} from '../components/BadgeShowcaseDialog';
+import StudentHeader from '../components/StudentHeader';
+import StudentBottomNav from '../components/StudentBottomNav';
+import {EmptyState} from '../ui/EmptyState';
+import {parseStudentDeepLink, type DeepLinkRoute} from '../core/student-deep-link';
+import '../styles/student-frame.css';
 import '../styles/world-map.css';
-import '../styles/streak.css';
-import '../styles/daily-missions.css';
-import '../styles/badges.css';
+
+const GiftShelfDialog=lazy(()=>import('../components/GiftShelfDialog'));
+const StreakDialog=lazy(()=>import('../components/StreakDialog').then(m=>({default:m.StreakDialog})));
+const DailyMissionDialog=lazy(()=>import('../components/DailyMissionDialog').then(m=>({default:m.DailyMissionDialog})));
+const BadgeShowcaseDialog=lazy(()=>import('../components/BadgeShowcaseDialog').then(m=>({default:m.BadgeShowcaseDialog})));
 
 const ParentPinModal=lazy(()=>import('../components/ParentPinModal'));
 const ParentPortalScreen=lazy(()=>import('./ParentPortalScreen'));
@@ -78,7 +81,7 @@ export default function OnlineStudentWorld({identity,onLogout,onPasswordChanged}
   const [state,setState]=useState<OnlineStudentSummary|null>(null),[error,setError]=useState(''),[loading,setLoading]=useState(true),[starting,setStarting]=useState(false),[active,setActive]=useState<OnlineCompactPlay|null>(null),[walletOpen,setWalletOpen]=useState(false),[giftShelfOpen,setGiftShelfOpen]=useState(false),[passwordOpen,setPasswordOpen]=useState(false),[loadingMore,setLoadingMore]=useState(false),[motionOn,setMotionOn]=useState(()=>!window.matchMedia('(prefers-reduced-motion: reduce)').matches),[soundOn,setSoundOn]=useState(false),[reward,setReward]=useState<{gained:number;tier:number}|null>(null);
   const [streakOpen,setStreakOpen]=useState(false),[missionsOpen,setMissionsOpen]=useState(false),[badgesOpen,setBadgesOpen]=useState(false);
   const [parentPinOpen,setParentPinOpen]=useState(false),[parentPortalOpen,setParentPortalOpen]=useState(false),[parentDashboardData,setParentDashboardData]=useState<any>(null);
-  const [contestOpen,setContestOpen]=useState(false);
+  const [contestOpen,setContestOpen]=useState(false),[contestPresetId,setContestPresetId]=useState<string|undefined>(undefined);
   const [townOpen,setTownOpen]=useState(false);
   const [advanceOpen,setAdvanceOpen]=useState(false),[reviewEpoch,setReviewEpoch]=useState(0),[questionNotice,setQuestionNotice]=useState('');
   const [refreshing,setRefreshing]=useState(false),[selectingPack,setSelectingPack]=useState<string|null>(null),[gameAction,setGameAction]=useState<'answer'|'complete'|'exit'|null>(null);
@@ -86,12 +89,105 @@ export default function OnlineStudentWorld({identity,onLogout,onPasswordChanged}
     if(typeof window==='undefined')return 'map';
     const params=new URLSearchParams(window.location.search);
     const mode=params.get('mode')||params.get('view');
-    if(mode==='list')return 'list';
-    if(mode==='map')return 'map';
-    if(params.get('controls')==='1'||params.get('online')==='1')return 'map';
-    return 'list';
+    if (mode === 'list') return 'list';
+    return 'map';
   }),[mapView,setMapView]=useState<'world'|'region'>('world'),[selectedRegion,setSelectedRegion]=useState<MapRegionId|null>(null),[selectedChapter,setSelectedChapter]=useState(1),[selectedWeekId,setSelectedWeekId]=useState<string|null>(null),[mapData,setMapData]=useState<MapOverviewResponse|null>(null);
   const [journeyExpanded,setJourneyExpanded]=useState(false);
+  const [isMobile,setIsMobile]=useState(()=>{
+    if(typeof window==='undefined')return false;
+    return window.matchMedia('(max-width: 1024px)').matches;
+  });
+  useEffect(()=>{
+    if(typeof window==='undefined')return;
+    const mql=window.matchMedia('(max-width: 1024px)');
+    const handler=(e:MediaQueryListEvent)=>setIsMobile(e.matches);
+    mql.addEventListener('change',handler);
+    return()=>mql.removeEventListener('change',handler);
+  },[]);
+  useEffect(()=>{
+    if(active) document.title=`Bảo An Learning · ${active.pack.title}`;
+    else if(parentPortalOpen) document.title='Bảo An Learning · Khu phụ huynh';
+    else if(contestOpen) document.title='Bảo An Learning · Thi thử Trạng Nguyên & Violympic';
+    else if(townOpen) document.title='Bảo An Learning · Thị trấn của con';
+    else if(mapMode==='list') document.title='Bảo An Learning · Hành trình theo tuần';
+    else if(mapView==='region'&&selectedRegion) document.title='Bảo An Learning · Bản đồ vùng môn';
+    else document.title='Bảo An Learning · Bản đồ thế giới';
+  },[active,parentPortalOpen,contestOpen,townOpen,mapMode,mapView,selectedRegion]);
+
+  const handleDeepLink = useCallback((route: DeepLinkRoute) => {
+    switch (route.target) {
+      case 'hoc': {
+        setContestOpen(false);
+        setTownOpen(false);
+        setGiftShelfOpen(false);
+        setMissionsOpen(false);
+        setBadgesOpen(false);
+        setStreakOpen(false);
+        const region = route.regionId || (route.subject ? resolveRegionId(route.subject) : null);
+        if (region && region !== 'discovery') {
+          setSelectedRegion(region);
+          setMapView('region');
+        } else {
+          setMapView('world');
+        }
+        break;
+      }
+      case 'nhiem-vu': {
+        setContestOpen(false);
+        setTownOpen(false);
+        setGiftShelfOpen(false);
+        setBadgesOpen(false);
+        setStreakOpen(false);
+        setMissionsOpen(true);
+        break;
+      }
+      case 'thi': {
+        setTownOpen(false);
+        setGiftShelfOpen(false);
+        setMissionsOpen(false);
+        setBadgesOpen(false);
+        setStreakOpen(false);
+        setContestPresetId(route.presetId);
+        setContestOpen(true);
+        break;
+      }
+      case 'qua': {
+        setContestOpen(false);
+        setTownOpen(false);
+        setMissionsOpen(false);
+        setBadgesOpen(false);
+        setStreakOpen(false);
+        setGiftShelfOpen(true);
+        break;
+      }
+      case 'ban-do':
+      default: {
+        setContestOpen(false);
+        setTownOpen(false);
+        setGiftShelfOpen(false);
+        setMissionsOpen(false);
+        setBadgesOpen(false);
+        setStreakOpen(false);
+        setMapView('world');
+        setSelectedRegion(null);
+        break;
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const applyHash = () => {
+      const hash = window.location.hash;
+      if (hash && hash !== '#' && hash !== '#/') {
+        const route = parseStudentDeepLink(hash);
+        handleDeepLink(route);
+      }
+    };
+    applyHash();
+    window.addEventListener('hashchange', applyHash);
+    return () => window.removeEventListener('hashchange', applyHash);
+  }, [handleDeepLink]);
   const [activeDiscovery,setActiveDiscovery]=useState<{pack:OnlinePackSummary;subjectLabel:string}|null>(null),[notebookOpen,setNotebookOpen]=useState(false);
   const mapGeneration=useRef(0),mapAbort=useRef<AbortController|null>(null);
   const selectedRegionRef=useRef(selectedRegion);selectedRegionRef.current=selectedRegion;
@@ -297,46 +393,168 @@ export default function OnlineStudentWorld({identity,onLogout,onPasswordChanged}
   const selectedNode=mapData?.regionView?.nodes.find(n=>n.weekId===selectedWeekId)??null;
   const matchedWeek=selectedWeekId?state?.weeks.find(w=>w.id===selectedWeekId)??null:null;
   return <div className="app-shell focused-games-app ba-frame-shell online-app online-student" data-motion={motionOn?'on':'off'}>
-    <header className="online-header" inert={!!active||walletOpen||giftShelfOpen||passwordOpen||advanceOpen||streakOpen||missionsOpen||badgesOpen||parentPinOpen||parentPortalOpen||contestOpen||townOpen}><a href="?online=1" className="online-brand">✦ BẢO AN <span>LEARNING</span></a><div><strong>{identity.workspace.name}</strong><span>{state?.student.name??identity.user.username}{state?` · ${state.className}`:''}</span></div><div className="online-header-actions">{state?.todayStudyMinutes!==undefined&&<span className="study-timer-pill" title="Thời gian con đã học hôm nay">⏱️ {state.todayStudyMinutes} phút hôm nay</span>}<button type="button" className="town-pill-btn" onClick={()=>setTownOpen(true)} title="Thị trấn của con" aria-label="Mở thị trấn của con">🏡 Thị trấn</button><button type="button" className="contest-pill-btn" onClick={()=>setContestOpen(true)} title="Phòng luyện thi thử Violympic & IOE" aria-label="Mở phòng thi thử">🏆 Thi thử</button>{state?.streak&&<button type="button" className="streak-pill-btn" onClick={()=>setStreakOpen(true)} title="Xem chuỗi ngày học tập"><span className="streak-flame-icon">🔥</span> {state.streak.currentStreak} Ngày</button>}{state?.dailyMissions&&<button type="button" className="missions-pill-btn" onClick={()=>setMissionsOpen(true)} title="Xem nhiệm vụ ngày"><span>📋</span> Nhiệm vụ ({state.dailyMissions.filter(m=>m.completed).length}/3)</button>}{state?.badges&&<button type="button" className="badges-pill-btn" onClick={()=>setBadgesOpen(true)} title="Xem sổ huy hiệu">🎖️ Huy hiệu ({state.badges.filter(b=>b.unlocked).length}/{state.badges.length})</button>}<button type="button" className="online-notebook-btn" onClick={()=>setNotebookOpen(true)} title="Mở Sổ khám phá" aria-label="Mở Sổ khám phá">📖 Sổ khám phá {unlockedDiscoveryCards.length>0?`(${unlockedDiscoveryCards.length})`:''}</button><button type="button" className="parent-portal-pill-btn" onClick={()=>setParentPinOpen(true)} title="Khu vực dành cho Phụ huynh" aria-label="Mở khu phụ huynh">👨‍👩‍👧 Phụ huynh</button><button aria-pressed={soundOn} onClick={()=>setSoundOn(value=>!value)}>{soundOn?'🔊':'🔇'} Âm thanh</button><button aria-pressed={motionOn} onClick={()=>setMotionOn(value=>!value)}>Hiệu ứng {motionOn?'bật':'tắt'}</button><button disabled={starting} onClick={openPassword}>Đổi mật khẩu</button><button disabled={starting} onClick={()=>void onLogout().catch(error=>setError(messageOf(error)))}>Đăng xuất</button></div></header>
-    <main ref={studentMain} tabIndex={-1} className="site-main site-main-gameworld" aria-busy={starting||refreshing||loadingMore} inert={!!active||walletOpen||giftShelfOpen||passwordOpen||advanceOpen||streakOpen||missionsOpen||badgesOpen||parentPinOpen||parentPortalOpen||contestOpen||townOpen}>
+    <StudentHeader
+      identity={identity}
+      state={state}
+      mapMode={mapMode}
+      activeSection={contestOpen?'contest':townOpen?'town':'map'}
+      isMobile={isMobile}
+      onToggleMap={()=>{
+        if(contestOpen||townOpen){
+          setContestOpen(false);
+          setTownOpen(false);
+          setMapMode('map');
+        }else{
+          setMapMode(m=>m==='map'?'list':'map');
+        }
+      }}
+      onOpenTown={()=>{setContestOpen(false);setTownOpen(true);}}
+      onOpenContest={()=>{setTownOpen(false);setContestOpen(true);}}
+      onOpenStreak={()=>setStreakOpen(true)}
+      onOpenMissions={()=>setMissionsOpen(true)}
+      onOpenBadges={()=>setBadgesOpen(true)}
+      onOpenNotebook={()=>setNotebookOpen(true)}
+      onOpenParentPin={()=>setParentPinOpen(true)}
+      onOpenWallet={()=>setWalletOpen(true)}
+      soundOn={soundOn}
+      onToggleSound={()=>setSoundOn(v=>!v)}
+      motionOn={motionOn}
+      onToggleMotion={()=>setMotionOn(v=>!v)}
+      onOpenPassword={openPassword}
+      onLogout={async()=>{
+        try{await onLogout();}catch(error){setError(messageOf(error));}
+      }}
+      unlockedDiscoveryCount={unlockedDiscoveryCards.length}
+      disabled={starting||refreshing}
+      inert={!!active||walletOpen||giftShelfOpen||passwordOpen||advanceOpen||streakOpen||missionsOpen||badgesOpen||parentPinOpen||parentPortalOpen}
+    />
+    <main ref={studentMain} tabIndex={-1} className={`site-main site-main-gameworld ${contestOpen?'is-contest-mode':townOpen?'is-town-mode':mapMode==='map'?'is-map-mode':'is-list-mode'}`} aria-busy={starting||refreshing||loadingMore} inert={!!active||walletOpen||giftShelfOpen||passwordOpen||advanceOpen||streakOpen||missionsOpen||badgesOpen||parentPinOpen||parentPortalOpen}>
       {error&&!active&&<div className="online-notice online-error" role="alert">{error}<button onClick={()=>void refresh().catch(error=>setError(messageOf(error)))}>Thử kết nối lại</button></div>}
-      {loading?<p className="online-loading" role="status">Đang mở hành trình của con…</p>:state?<>
+      {contestOpen?(
+        <Suspense fallback={<p className="online-loading" role="status">Đang mở phòng thi thử…</p>}>
+          <ContestMockScreen
+            initialPresetId={contestPresetId}
+            onClose={()=>{
+              setContestOpen(false);
+              setContestPresetId(undefined);
+              void refresh();
+            }}
+            onStartPracticeWithPack={async (reviewPack)=>{
+              setContestOpen(false);
+              setContestPresetId(undefined);
+              await startGame('math-quest', reviewPack as any);
+            }}
+          />
+        </Suspense>
+      ):townOpen?(
+        <Suspense fallback={<p className="online-loading" role="status">Đang mở thị trấn của con…</p>}>
+          <TownScreen
+            onBack={()=>{
+              setTownOpen(false);
+              void refresh();
+            }}
+            studentId={state?.student.id}
+          />
+        </Suspense>
+      ):loading?<p className="online-loading" role="status">Đang mở hành trình của con…</p>:state?<>
         <GoalBar goal={state.goal??null} availableStars={state.balance.available} onOpenShelf={()=>setGiftShelfOpen(true)} disabled={starting||refreshing}/>
         {state.weeks.length>0?<>
-          <div className="map-view-toggle-bar">
-            <div className="view-toggle-group" role="group" aria-label="Chế độ hiển thị">
-              <button type="button" className={`view-toggle-btn ${mapMode==='map'?'active':''}`} onClick={()=>setMapMode('map')} aria-pressed={mapMode==='map'}>🗺️ Bản đồ học tập</button>
-              <button type="button" className={`view-toggle-btn ${mapMode==='list'?'active':''}`} onClick={()=>setMapMode('list')} aria-pressed={mapMode==='list'} aria-label="📋 Thu gọn bản đồ">📋 Danh sách</button>
-            </div>
-          </div>
-          {mapMode==='map'&&(mapView==='world'?(
-            <WorldMap overview={mapData??fallbackOverview} onSelectRegion={handleSelectRegion} onContinueCurrent={state.currentWeekSummary?handleContinueCurrent:undefined} disabled={starting||refreshing}/>
-          ):selectedRegion?(
+          {mapMode==='map'?(
+            mapView==='world'?(
+              <WorldMap
+                overview={mapData??fallbackOverview}
+                currentWeek={state.currentWeekSummary}
+                currentSet={state.current??hubSets[0]??null}
+                allSets={hubSets}
+                onSelectRegion={handleSelectRegion}
+                onContinueCurrent={state.currentWeekSummary?handleContinueCurrent:undefined}
+                onPlayGame={startGame}
+                onOpenListView={()=>setMapMode('list')}
+                onRefresh={()=>void refresh().catch(error=>{if(error?.name!=='AbortError')setError(messageOf(error));})}
+                disabled={starting||refreshing}
+              />
+            ):selectedRegion?(
+              <div className="region-map-layout">
+                <RegionMap
+                  regionId={selectedRegion}
+                  regionView={mapData?.regionView??fallbackRegionView}
+                  selectedWeekId={selectedWeekId}
+                  onSelectWeek={handleSelectWeek}
+                  onChangeChapter={handleChangeChapter}
+                  onBackToWorld={handleBackToWorld}
+                  onOpenListView={()=>setMapMode('list')}
+                  onRefresh={()=>void refresh().catch(error=>{if(error?.name!=='AbortError')setError(messageOf(error));})}
+                  disabled={starting||refreshing}
+                />
+                {selectedNode && (
+                  <>
+                    <div
+                      className="map-week-panel-backdrop"
+                      onClick={() => setSelectedWeekId(null)}
+                      aria-hidden="true"
+                    />
+                    <MapWeekPanel
+                      node={selectedNode}
+                      summaryWeek={matchedWeek}
+                      onPlayGame={startGame}
+                      onChooseGames={chooseReplay}
+                      onAdvanceWeek={state.currentWeekSummary?.ready&&state.currentWeekSummary.hasNext?()=>setAdvanceOpen(true):undefined}
+                      onClose={()=>setSelectedWeekId(null)}
+                      disabled={starting||refreshing}
+                      reviewEpoch={reviewEpoch}
+                    />
+                  </>
+                )}
+              </div>
+            ):null
+          ):(
             <>
-              <RegionMap regionId={selectedRegion} regionView={mapData?.regionView??fallbackRegionView} selectedWeekId={selectedWeekId} onSelectWeek={handleSelectWeek} onChangeChapter={handleChangeChapter} onBackToWorld={handleBackToWorld} disabled={starting||refreshing}/>
-              {selectedNode&&<MapWeekPanel node={selectedNode} summaryWeek={matchedWeek} onPlayGame={startGame} onChooseGames={chooseReplay} onAdvanceWeek={state.currentWeekSummary?.ready&&state.currentWeekSummary.hasNext?()=>setAdvanceOpen(true):undefined} onClose={()=>setSelectedWeekId(null)} disabled={starting||refreshing} reviewEpoch={reviewEpoch}/>}
+              <div className="list-mode-nav-banner">
+                <button
+                  type="button"
+                  className="back-to-map-btn"
+                  onClick={()=>setMapMode('map')}
+                  aria-label="🗺️ Bản đồ học tập"
+                >
+                  ← 🗺️ Quay lại Bản đồ thế giới
+                </button>
+                <div className="view-toggle-group" role="group" aria-label="Chế độ hiển thị">
+                  <button type="button" className="view-toggle-btn" onClick={()=>setMapMode('map')}>🗺️ Bản đồ</button>
+                  <button type="button" className="view-toggle-btn active" onClick={()=>setMapMode('list')} aria-pressed="true">📋 Danh sách</button>
+                </div>
+              </div>
+              <StudentScreen studentName={state.student.name} availableStars={state.balance.available} earnedStars={state.balance.earned} sets={hubSets} week={state.currentWeekSummary} practiceContext={{title:state.current?.weekTitle??'Hành trình của con',detail:state.current?`${state.current.subjectLabel} · ${state.current.pack.title}`:state.weeks.length?'Con đã hoàn thành tất cả học liệu được giao.':'Quản trị viên đang chuẩn bị học liệu cho lớp.',pack:state.current?.pack??null,games:state.current?.games??[],complete:state.weeks.length>0&&!state.current}} onPlay={startGame} onChooseGames={chooseReplay} starting={starting||!!active} onOpenWallet={()=>setWalletOpen(true)} showCardBlock={true}/>
+              <section id="online-week-journey" className={`online-student-weeks ${journeyExpanded?'is-expanded':'is-collapsed'}`} aria-label="Học liệu được giao">
+                <div className="online-section-head">
+                  <h2>Hành trình theo tuần</h2>
+                  <div className="online-section-actions">
+                    <button type="button" className="online-journey-toggle-btn" onClick={()=>setJourneyExpanded(v=>!v)} aria-expanded={journeyExpanded}>
+                      {journeyExpanded?'Thu gọn hành trình ▴':'Xem cả hành trình ▾'}
+                    </button>
+                    <button disabled={starting||refreshing||loadingMore} onClick={()=>void refresh().catch(error=>{if(error?.name!=='AbortError')setError(messageOf(error));})}>
+                      {refreshing?'Đang làm mới…':'Làm mới tiến độ'}
+                    </button>
+                  </div>
+                </div>
+                <p>Mỗi câu cần ít nhất 2 sao để hoàn thành tuần. Con có thể ôn lên 3 sao trước khi xác nhận sang tuần mới; tuần đã qua sẽ khóa.</p>
+                {state.currentWeekSummary&&<div className="online-week-progress" aria-label="Tiến độ tuần hiện tại"><strong>{state.currentWeekSummary.title}: {state.currentWeekSummary.total-state.currentWeekSummary.zero-state.currentWeekSummary.one}/{state.currentWeekSummary.total} câu đạt yêu cầu</strong><p>{state.currentWeekSummary.two} câu 2 sao · {state.currentWeekSummary.three} câu 3 sao</p>{state.currentWeekSummary.ready?<><p>Con đã hoàn thành yêu cầu của tuần.{state.currentWeekSummary.two>0?` Còn ${state.currentWeekSummary.two} câu 2 sao; con có muốn ôn để kiếm 3 sao không?`:' Tất cả câu đã đạt 3 sao.'}</p><div className="online-actions">{state.currentWeekSummary.two>0&&<button type="button" disabled={starting||loadingMore} onClick={()=>{setReviewEpoch(value=>value+1);if(state.page.cursor!==state.currentWeekSummary!.cursor)void loadPage('current');}}>Ôn lại các câu 2 sao</button>}<button type="button" className="online-primary" disabled={!state.currentWeekSummary.hasNext||starting} onClick={()=>setAdvanceOpen(true)}>{state.currentWeekSummary.hasNext?`Sang ${state.currentWeekSummary.nextWeekTitle}`:'Chưa có tuần tiếp theo'}</button></div></>:<p>Còn {state.currentWeekSummary.zero+state.currentWeekSummary.one} câu chưa đạt 2 sao. Sao của từng câu được giữ khi con đổi trò hoặc học lại.</p>}</div>}
+                {state.weeks.length?<ol className="online-week-path">{state.weeks.map(week=><li key={week.id} id={`online-week-${week.id}`} className={week.closed?'is-done':week.current?'is-current':'is-locked'}><strong>{week.closed?'🔒 Đã qua · ':week.current?'▶ ':'🔒 '}{week.title}</strong>{week.closed&&<p>Tuần này đã khóa sau khi chuyển tuần.</p>}<ul>{week.sets.map(set=><li key={`${set.pack.id}@${set.pack.version}`}><span>{set.subjectLabel} · {set.pack.title}</span><span>{set.questionProgress.two} câu 2 sao · {set.questionProgress.three} câu 3 sao</span>{week.current&&<OnlineQuestionStars set={set} disabled={starting||!!active} reviewEpoch={reviewEpoch} onChooseGames={()=>chooseReplay(set.pack)} onPlay={(game,ids)=>void startGame(game,set.pack,ids)}/>}</li>)}</ul></li>)}</ol>:<p>Lớp chưa có tuần học nào. Con quay lại sau khi quản trị viên giao học liệu nhé.</p>}
+                <div className="online-actions online-journey-pages">{Number(state.page.cursor)>0&&<button type="button" disabled={loadingMore||starting} onClick={()=>void loadPage(String(Math.max(0,Number(state.page.cursor)-20)))}>Xem tóm tắt các bộ trước</button>}{state.currentWeekSummary&&state.page.cursor!==state.currentWeekSummary.cursor&&<button type="button" disabled={loadingMore||starting} onClick={()=>void loadPage('current')}>Xem tuần đang học</button>}{state.page.nextCursor&&<button type="button" disabled={loadingMore||starting||!!active} onClick={()=>void loadPage(state.page.nextCursor!)}>{loadingMore?'Đang tải…':'Xem thêm tuần học'}</button>}</div>
+              </section>
             </>
-          ):null)}
-          <StudentScreen studentName={state.student.name} availableStars={state.balance.available} earnedStars={state.balance.earned} sets={hubSets} week={state.currentWeekSummary} practiceContext={{title:state.current?.weekTitle??'Hành trình của con',detail:state.current?`${state.current.subjectLabel} · ${state.current.pack.title}`:state.weeks.length?'Con đã hoàn thành tất cả học liệu được giao.':'Quản trị viên đang chuẩn bị học liệu cho lớp.',pack:state.current?.pack??null,games:state.current?.games??[],complete:state.weeks.length>0&&!state.current}} onPlay={startGame} onChooseGames={chooseReplay} starting={starting||!!active} onOpenWallet={()=>setWalletOpen(true)} showCardBlock={mapMode==='list'}/>
-        </>:<section className="online-student-empty" aria-label="Chờ giáo viên giao học liệu"><span aria-hidden="true">🦊</span><h1>Chờ bộ câu hỏi của thầy cô</h1><p>Khi giáo viên giao bộ câu hỏi tuần cho lớp, bài học và trò chơi phù hợp sẽ xuất hiện ở đây.</p><p>⭐ {state.balance.available} sao</p><button onClick={()=>setWalletOpen(true)}>Ví đổi sao</button></section>}
-        <section id="online-week-journey" className={`online-student-weeks ${journeyExpanded?'is-expanded':'is-collapsed'}`} aria-label="Học liệu được giao">
-          <div className="online-section-head">
-            <h2>Hành trình theo tuần</h2>
-            <div className="online-section-actions">
-              <button type="button" className="online-journey-toggle-btn" onClick={()=>setJourneyExpanded(v=>!v)} aria-expanded={journeyExpanded}>
-                {journeyExpanded?'Thu gọn hành trình ▴':'Xem cả hành trình ▾'}
-              </button>
-              <button disabled={starting||refreshing||loadingMore} onClick={()=>void refresh().catch(error=>{if(error?.name!=='AbortError')setError(messageOf(error));})}>
-                {refreshing?'Đang làm mới…':'Làm mới tiến độ'}
-              </button>
-            </div>
-          </div>
-          <p>Mỗi câu cần ít nhất 2 sao để hoàn thành tuần. Con có thể ôn lên 3 sao trước khi xác nhận sang tuần mới; tuần đã qua sẽ khóa.</p>
-          {state.currentWeekSummary&&<div className="online-week-progress" aria-label="Tiến độ tuần hiện tại"><strong>{state.currentWeekSummary.title}: {state.currentWeekSummary.total-state.currentWeekSummary.zero-state.currentWeekSummary.one}/{state.currentWeekSummary.total} câu đạt yêu cầu</strong><p>{state.currentWeekSummary.two} câu 2 sao · {state.currentWeekSummary.three} câu 3 sao</p>{state.currentWeekSummary.ready?<><p>Con đã hoàn thành yêu cầu của tuần.{state.currentWeekSummary.two>0?` Còn ${state.currentWeekSummary.two} câu 2 sao; con có muốn ôn để kiếm 3 sao không?`:' Tất cả câu đã đạt 3 sao.'}</p><div className="online-actions">{state.currentWeekSummary.two>0&&<button type="button" disabled={starting||loadingMore} onClick={()=>{setReviewEpoch(value=>value+1);if(state.page.cursor!==state.currentWeekSummary!.cursor)void loadPage('current');}}>Ôn lại các câu 2 sao</button>}<button type="button" className="online-primary" disabled={!state.currentWeekSummary.hasNext||starting} onClick={()=>setAdvanceOpen(true)}>{state.currentWeekSummary.hasNext?`Sang ${state.currentWeekSummary.nextWeekTitle}`:'Chưa có tuần tiếp theo'}</button></div></>:<p>Còn {state.currentWeekSummary.zero+state.currentWeekSummary.one} câu chưa đạt 2 sao. Sao của từng câu được giữ khi con đổi trò hoặc học lại.</p>}</div>}
-          {state.weeks.length?<ol className="online-week-path">{state.weeks.map(week=><li key={week.id} id={`online-week-${week.id}`} className={week.closed?'is-done':week.current?'is-current':'is-locked'}><strong>{week.closed?'🔒 Đã qua · ':week.current?'▶ ':'🔒 '}{week.title}</strong>{week.closed&&<p>Tuần này đã khóa sau khi chuyển tuần.</p>}<ul>{week.sets.map(set=><li key={`${set.pack.id}@${set.pack.version}`}><span>{set.subjectLabel} · {set.pack.title}</span><span>{set.questionProgress.two} câu 2 sao · {set.questionProgress.three} câu 3 sao</span>{week.current&&<OnlineQuestionStars set={set} disabled={starting||!!active} reviewEpoch={reviewEpoch} onChooseGames={()=>chooseReplay(set.pack)} onPlay={(game,ids)=>void startGame(game,set.pack,ids)}/>}</li>)}</ul></li>)}</ol>:<p>Lớp chưa có tuần học nào. Con quay lại sau khi quản trị viên giao học liệu nhé.</p>}
-          <div className="online-actions online-journey-pages">{Number(state.page.cursor)>0&&<button type="button" disabled={loadingMore||starting} onClick={()=>void loadPage(String(Math.max(0,Number(state.page.cursor)-20)))}>Xem tóm tắt các bộ trước</button>}{state.currentWeekSummary&&state.page.cursor!==state.currentWeekSummary.cursor&&<button type="button" disabled={loadingMore||starting} onClick={()=>void loadPage('current')}>Xem tuần đang học</button>}{state.page.nextCursor&&<button type="button" disabled={loadingMore||starting||!!active} onClick={()=>void loadPage(state.page.nextCursor!)}>{loadingMore?'Đang tải…':'Xem thêm tuần học'}</button>}</div>
-        </section>
-      </>:<div className="online-loading"><p>Chưa mở được thông tin tài khoản.</p><button onClick={()=>void refresh().catch(error=>setError(messageOf(error)))}>Thử lại</button></div>}
+          )}
+        </>:<section className="online-student-empty" aria-label="Chờ giáo viên giao học liệu">
+          <EmptyState
+            icon="sparkles"
+            message="Khi giáo viên giao bộ câu hỏi tuần cho lớp, bài học và trò chơi phù hợp sẽ xuất hiện ở đây."
+            actionLabel="Ví đổi sao"
+            onAction={()=>setWalletOpen(true)}
+          >
+            <h1>Chờ bộ câu hỏi của thầy cô</h1>
+            <p>⭐ {state.balance.available} sao</p>
+          </EmptyState>
+        </section>}
+      </>:<EmptyState icon="refresh" title="Chưa mở được thông tin tài khoản" message="Không thể tải thông tin hành trình. Con hãy kiểm tra kết nối và thử lại nhé." actionLabel="Thử lại" onAction={()=>void refresh().catch(error=>setError(messageOf(error)))} className="online-loading" />}
     </main>
     {starting&&<div className="online-student-status" role="status">{selectingPack?'Đang tải trò phù hợp…':'Đang mở trò chơi…'}</div>}
     {active&&GameComponent&&gameProps&&(()=>{
@@ -352,7 +570,7 @@ export default function OnlineStudentWorld({identity,onLogout,onPasswordChanged}
       return (
         <div className="overlay immersive-overlay" role="presentation">
           <div className={`game-dialog adventure-dialog immersive-dialog premium-game dialog-${active.session.moduleId} dialog-region-${activeRegionId}`} data-scene-engine="html" data-scene-state="ready" ref={gameDialog} tabIndex={-1} role="dialog" aria-modal="true" aria-busy={gameAction!==null} aria-label={`Đang chơi ${active.pack.title}`}>
-            <div className="game-region-backdrop" aria-hidden="true">
+            <div className="game-region-backdrop" style={{backgroundImage:`url(${activeRegionBgWide})`}} aria-hidden="true">
               <picture>
                 <source media="(max-width: 768px), (orientation: portrait)" srcSet={activeRegionBgTall} type="image/webp" />
                 <img src={activeRegionBgWide} alt="" className="game-region-backdrop-img" loading="eager" />
@@ -366,7 +584,12 @@ export default function OnlineStudentWorld({identity,onLogout,onPasswordChanged}
                   <h2>{active.pack.title}</h2>
                 </div>
               </div>
-              <button className="button outline" disabled={gameAction!==null} onClick={()=>void leaveGame()}>{gameAction==='exit'?'Đang trở về…':'← Thoát trò chơi'}</button>
+              <div className="game-dialog-head-status" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span className="game-dialog-stars-pill" aria-label={`Ví sao: ${state?.balance.available ?? 0} sao`} style={{ background: 'rgba(255, 255, 255, 0.18)', borderRadius: '14px', padding: '4px 10px', fontSize: '13px', fontWeight: 700 }}>
+                  ⭐ {state?.balance.available ?? 0}
+                </span>
+                <button className="button outline" disabled={gameAction!==null} onClick={()=>void leaveGame()}>{gameAction==='exit'?'Đang trở về…':'← Thoát trò chơi'}</button>
+              </div>
             </div>
             {gameAction&&<div className={`online-game-request-status ${gameAction==='exit'?'is-leaving':''}`} role="status">{gameAction==='answer'?'Đang lưu câu trả lời…':gameAction==='complete'?'Đang lưu kết quả hoàn thành…':'Đang trở về hành trình…'}</div>}
             {error&&<p className="online-notice online-error" role="alert">{error} Con có thể thử lại thao tác vừa rồi.</p>}
@@ -378,14 +601,14 @@ export default function OnlineStudentWorld({identity,onLogout,onPasswordChanged}
       );
     })()}
     {activeDiscovery&&<DiscoveryCardDialog discovery={activeDiscovery.pack.discovery!} subjectLabel={activeDiscovery.subjectLabel} packTitle={activeDiscovery.pack.title} soundOn={soundOn} onClose={handleCloseDiscovery}/>}
-    {notebookOpen&&<DiscoveryNotebookDialog cards={unlockedDiscoveryCards} onClose={()=>setNotebookOpen(false)}/>}
+    {notebookOpen&&<DiscoveryNotebookDialog cards={unlockedDiscoveryCards} onClose={()=>setNotebookOpen(false)} onExplore={()=>{setContestOpen(false);setTownOpen(false);setMapMode('map');setMapView('world');}}/>}
     {advanceOpen&&state?.currentWeekSummary&&<AsyncBoundary label="xác nhận chuyển tuần" onExit={()=>setAdvanceOpen(false)}><Suspense fallback={<p className="online-loading" role="status">Đang mở xác nhận chuyển tuần…</p>}><OnlineWeekAdvanceDialog week={state.currentWeekSummary} onClose={()=>setAdvanceOpen(false)} onConfirm={advanceWeek}/></Suspense></AsyncBoundary>}
     {passwordOpen&&<AsyncBoundary label="biểu mẫu đổi mật khẩu" onExit={()=>setPasswordOpen(false)}><Suspense fallback={<p className="online-loading" role="status">Đang mở biểu mẫu đổi mật khẩu…</p>}><OnlinePasswordDialog onClose={()=>{setPasswordOpen(false);void refresh().catch(error=>setError(messageOf(error)));}} onChanged={onPasswordChanged}/></Suspense></AsyncBoundary>}
-    {giftShelfOpen&&state&&<GiftShelfDialog state={state} onRefresh={refresh} onClose={()=>setGiftShelfOpen(false)} onOpenLegacyWallet={()=>setWalletOpen(true)}/>}
+    {giftShelfOpen&&state&&<AsyncBoundary label="kệ quà" onExit={()=>setGiftShelfOpen(false)}><Suspense fallback={<p className="online-loading" role="status">Đang mở kệ quà…</p>}><GiftShelfDialog state={state} onRefresh={refresh} onClose={()=>setGiftShelfOpen(false)} onOpenLegacyWallet={()=>setWalletOpen(true)} onAskParentsAddGift={()=>setParentPinOpen(true)}/></Suspense></AsyncBoundary>}
     {walletOpen&&state&&<OnlineWallet state={state} onRefresh={refresh} onClose={()=>setWalletOpen(false)}/>}
-    {streakOpen&&<StreakDialog streak={state?.streak} onClose={()=>setStreakOpen(false)}/>}
-    {missionsOpen&&<DailyMissionDialog missions={state?.dailyMissions} riddle={state?.dailyRiddle} onClose={()=>setMissionsOpen(false)} onRefreshSummary={()=>void refresh()}/>}
-    {badgesOpen&&<BadgeShowcaseDialog badges={state?.badges} onClose={()=>setBadgesOpen(false)}/>}
+    {streakOpen&&<AsyncBoundary label="chuỗi ngày học" onExit={()=>setStreakOpen(false)}><Suspense fallback={<p className="online-loading" role="status">Đang mở chuỗi ngày học…</p>}><StreakDialog streak={state?.streak} onClose={()=>setStreakOpen(false)}/></Suspense></AsyncBoundary>}
+    {missionsOpen&&<AsyncBoundary label="nhiệm vụ hôm nay" onExit={()=>setMissionsOpen(false)}><Suspense fallback={<p className="online-loading" role="status">Đang mở nhiệm vụ hôm nay…</p>}><DailyMissionDialog missions={state?.dailyMissions} riddle={state?.dailyRiddle} onClose={()=>setMissionsOpen(false)} onRefreshSummary={()=>void refresh()}/></Suspense></AsyncBoundary>}
+    {badgesOpen&&<AsyncBoundary label="huy hiệu" onExit={()=>setBadgesOpen(false)}><Suspense fallback={<p className="online-loading" role="status">Đang mở bộ huy hiệu…</p>}><BadgeShowcaseDialog badges={state?.badges} onClose={()=>setBadgesOpen(false)}/></Suspense></AsyncBoundary>}
     {parentPinOpen&&(
       <Suspense fallback={null}>
         <ParentPinModal
@@ -415,34 +638,25 @@ export default function OnlineStudentWorld({identity,onLogout,onPasswordChanged}
         </Suspense>
       </div>
     )}
-    {contestOpen&&(
-      <div className="contest-overlay-modal" role="dialog" aria-modal="true" aria-label="Phòng thi thử">
-        <Suspense fallback={<p className="online-loading" role="status">Đang mở phòng thi thử…</p>}>
-          <ContestMockScreen
-            onClose={()=>{
-              setContestOpen(false);
-              void refresh();
-            }}
-            onStartPracticeWithPack={async (reviewPack)=>{
-              setContestOpen(false);
-              await startGame('math-quest', reviewPack as any);
-            }}
-          />
-        </Suspense>
-      </div>
-    )}
-    {townOpen&&(
-      <div className="contest-overlay-modal" role="dialog" aria-modal="true" aria-label="Thị trấn của con">
-        <Suspense fallback={<p className="online-loading" role="status">Đang mở thị trấn của con…</p>}>
-          <TownScreen
-            onBack={()=>{
-              setTownOpen(false);
-              void refresh();
-            }}
-            studentId={state?.student.id}
-          />
-        </Suspense>
-      </div>
+    {isMobile&&(
+      <StudentBottomNav
+        activeTab={giftShelfOpen?'shelf':missionsOpen?'missions':contestOpen?'contest':townOpen?'town':'map'}
+        onNavigateHome={()=>{
+          setContestOpen(false);
+          setTownOpen(false);
+          setMapMode('map');
+          setMapView('world');
+          setSelectedRegion(null);
+          setSelectedWeekId(null);
+        }}
+        onOpenMissions={()=>setMissionsOpen(true)}
+        onOpenTown={()=>{setContestOpen(false);setTownOpen(true);}}
+        onOpenGiftShelf={()=>setGiftShelfOpen(true)}
+        onOpenContest={()=>{setTownOpen(false);setContestOpen(true);}}
+        missions={state?.dailyMissions}
+        disabled={starting||refreshing||!!active}
+        inert={!!active||walletOpen||giftShelfOpen||passwordOpen||advanceOpen||streakOpen||missionsOpen||badgesOpen||parentPinOpen||parentPortalOpen}
+      />
     )}
   </div>;
 }

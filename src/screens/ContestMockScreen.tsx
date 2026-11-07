@@ -12,11 +12,13 @@ import '../styles/contest-mock.css';
 interface ContestMockScreenProps {
   onClose: () => void;
   onStartPracticeWithPack?: (pack: ContentPack) => void;
+  initialPresetId?: string;
 }
 
 export const ContestMockScreen: React.FC<ContestMockScreenProps> = ({
   onClose,
-  onStartPracticeWithPack
+  onStartPracticeWithPack,
+  initialPresetId
 }) => {
   const [viewMode, setViewMode] = useState<'select' | 'exam' | 'result'>('select');
   const [presets, setPresets] = useState<ContestPreset[]>([]);
@@ -72,6 +74,11 @@ export const ContestMockScreen: React.FC<ContestMockScreenProps> = ({
           setSkippedKeys(sess.skippedKeys || []);
           skippedKeysRef.current = sess.skippedKeys || [];
           setViewMode('exam');
+        } else if (initialPresetId && typeof document !== 'undefined') {
+          setTimeout(() => {
+            const card = document.getElementById(`preset-card-${initialPresetId}`);
+            card?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }, 100);
         } else if (act.lastResult) {
           setContestResult(act.lastResult);
           setViewMode('result');
@@ -242,8 +249,8 @@ export const ContestMockScreen: React.FC<ContestMockScreenProps> = ({
   return (
     <div className="contest-screen-root" data-testid="contest-screen-root">
       {/* 1. Sticky Disclaimer Banner */}
-      <div className="contest-disclaimer-banner">
-        <span>⚠️</span>
+      <div className="contest-disclaimer-banner" role="note">
+        <span aria-hidden="true">ℹ️</span>
         <strong>{CONTEST_DISCLAIMER}</strong>
       </div>
 
@@ -289,14 +296,14 @@ export const ContestMockScreen: React.FC<ContestMockScreenProps> = ({
       </header>
 
       {errorMsg && (
-        <div style={{ background: '#7f1d1d', color: '#fecaca', padding: '0.75rem 1.5rem', textAlign: 'center' }}>
+        <div className="contest-error-banner" role="alert">
           {errorMsg}
         </div>
       )}
 
       {/* 3. Main Views */}
       {viewMode === 'select' && (
-        <main className="contest-preset-container">
+        <div className="contest-preset-container">
           <div className="contest-hero">
             <h2>Luyện thi Violympic &amp; IOE Lớp 3</h2>
             <p>Trải nghiệm áp lực phòng thi thật với đồng hồ đếm ngược, cấu trúc ma trận chuẩn và không dùng gợi ý.</p>
@@ -323,14 +330,19 @@ export const ContestMockScreen: React.FC<ContestMockScreenProps> = ({
           {/* Preset Cards Grid */}
           <div className="contest-preset-grid">
             {presets.map(p => (
-              <div key={p.id} className="contest-preset-card" data-testid={`preset-card-${p.id}`}>
+              <div
+                key={p.id}
+                id={`preset-card-${p.id}`}
+                className={`contest-preset-card ${initialPresetId === p.id ? 'is-selected' : ''}`}
+                data-testid={`preset-card-${p.id}`}
+              >
                 <div className="preset-card-header">
                   <div className={`preset-card-icon ${p.subject}`}>
                     {p.subject === 'math' ? '📐' : '🇬🇧'}
                   </div>
                   <div>
                     <h3>{p.title}</h3>
-                    <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>
+                    <span className="preset-contest-sub">
                       Kỳ thi: {p.contest.toUpperCase()}
                     </span>
                   </div>
@@ -370,22 +382,22 @@ export const ContestMockScreen: React.FC<ContestMockScreenProps> = ({
 
           {/* Recent History Table */}
           {history.length > 0 && (
-            <div style={{ background: 'rgba(30, 41, 59, 0.7)', borderRadius: 16, padding: '1.5rem', border: '1px solid rgba(255,255,255,0.1)' }}>
-              <h3 style={{ margin: '0 0 1rem 0', fontSize: '1.15rem' }}>📊 Lịch sử các lần thi thử gần đây</h3>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            <div className="contest-history-card">
+              <h3>📊 Lịch sử các lần thi thử gần đây</h3>
+              <div className="contest-history-list">
                 {history.slice(0, 5).map((att, i) => (
-                  <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(15,23,42,0.6)', padding: '0.8rem 1rem', borderRadius: 10 }}>
+                  <div key={i} className="contest-history-item">
                     <div>
-                      <strong style={{ color: '#f8fafc' }}>{att.presetTitle}</strong>
-                      <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '0.2rem' }}>
+                      <strong className="contest-history-title">{att.presetTitle}</strong>
+                      <div className="contest-history-meta">
                         {new Date(att.submittedAt).toLocaleString('vi-VN')} · {Math.round(att.elapsedMs / 1000)} giây
                       </div>
                     </div>
-                    <div style={{ textAlign: 'right' }}>
-                      <span style={{ fontSize: '1.1rem', fontWeight: 800, color: att.passed ? '#34d399' : '#f87171' }}>
+                    <div>
+                      <span className={`contest-history-score ${att.passed ? 'passed' : 'failed'}`}>
                         {att.score}/{att.maxScore} ({att.percent}%)
                       </span>
-                      <div style={{ fontSize: '0.75rem', color: att.passed ? '#10b981' : '#ef4444' }}>
+                      <div className={`contest-history-status ${att.passed ? 'passed' : 'failed'}`}>
                         {att.passed ? 'ĐẠT' : 'CHƯA ĐẠT'}
                       </div>
                     </div>
@@ -394,12 +406,12 @@ export const ContestMockScreen: React.FC<ContestMockScreenProps> = ({
               </div>
             </div>
           )}
-        </main>
+        </div>
       )}
 
       {/* 4. Active Exam View */}
       {viewMode === 'exam' && activeSession && (
-        <main className="contest-exam-body">
+        <div className="contest-exam-body">
           {/* Question Navigator Bar */}
           <div className="contest-question-strip" data-testid="contest-question-strip">
             {activeSession.items.map((item, idx) => {
@@ -507,20 +519,20 @@ export const ContestMockScreen: React.FC<ContestMockScreenProps> = ({
               </div>
             </div>
           )}
-        </main>
+        </div>
       )}
 
       {/* Submit Confirmation Modal */}
       {showSubmitConfirm && activeSession && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
-          <div style={{ background: '#1e293b', border: '1.5px solid rgba(255,255,255,0.2)', borderRadius: 20, padding: '2rem', maxWidth: 450, width: '100%', textAlign: 'center' }}>
-            <h3 style={{ margin: '0 0 1rem 0', fontSize: '1.3rem', color: '#fff' }}>Xác nhận nộp bài thi</h3>
-            <p style={{ color: '#cbd5e1', fontSize: '0.95rem', lineHeight: 1.5, marginBottom: '1.5rem' }}>
+        <div className="contest-confirm-backdrop" role="dialog" aria-modal="true" aria-label="Xác nhận nộp bài thi">
+          <div className="contest-confirm-dialog">
+            <h3>Xác nhận nộp bài thi</h3>
+            <p>
               Con đã trả lời {Object.keys(answers).filter(k => answers[k] !== undefined && answers[k] !== '').length} / {activeSession.items.length} câu hỏi.
               <br />
               Con có chắc chắn muốn nộp bài ngay bây giờ không?
             </p>
-            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+            <div className="contest-confirm-actions">
               <button
                 className="action-btn secondary"
                 onClick={() => setShowSubmitConfirm(false)}
@@ -542,7 +554,7 @@ export const ContestMockScreen: React.FC<ContestMockScreenProps> = ({
 
       {/* 5. Results Screen */}
       {viewMode === 'result' && contestResult && (
-        <main style={{ padding: '1rem' }}>
+        <div className="contest-results-main">
           <div className="contest-results-card" data-testid="contest-results-card">
             <div className={`results-status-badge ${contestResult.passed ? 'passed' : 'failed'}`}>
               {contestResult.passed ? '🎉 ĐẠT YÊU CẦU' : '💪 CẦN CỐ GẮNG THÊM'}
@@ -573,7 +585,7 @@ export const ContestMockScreen: React.FC<ContestMockScreenProps> = ({
             {/* Badge Award Alert */}
             {contestResult.badgeAwarded && (
               <div className="contest-badge-award-alert">
-                <span style={{ fontSize: '1.5rem' }}>🏅</span>
+                <span>🏅</span>
                 <span>Chúc mừng con đã xuất sắc nhận được huy hiệu <strong>"Thí sinh"</strong>!</span>
               </div>
             )}
@@ -633,7 +645,7 @@ export const ContestMockScreen: React.FC<ContestMockScreenProps> = ({
               </button>
             </div>
           </div>
-        </main>
+        </div>
       )}
     </div>
   );
