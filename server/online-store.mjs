@@ -23,6 +23,7 @@ import {CONTEST_PRESETS,CONTESTANT_BADGE,sanitizeContestItem,evaluateContestSubm
 import {TOWN_BUILDING_CATALOG,TOWN_BUILDING_MAP,resolveTownSubject,getMaterialForSubject,calculateEarnedMaterialsFromAwards,calculateTotalSpentMaterials,calculateAvailableMaterials,canAffordBuilding,defaultTownState,evaluateBuildingPlacement} from './town-data.mjs';
 import {ANIMAL_CATALOG,ANIMAL_MAP,getUnlockedAnimals,validateAnimalName} from '../src/core/animal-neighbors.ts';
 import {sanitizeClassFeedEvent,verifyPrivacyCompliance} from '../src/core/class-feed.ts';
+import {normalizeIntegrationSubject} from './safetime-integration.mjs';
 
 import {OnlineError,fail,text,integer,shape} from './online-errors.mjs';
 export {OnlineError,fail,text,integer,shape};
@@ -382,7 +383,26 @@ export class OnlineStore{
       if(current?.weekId!==weekId)fail(403,'Con chỉ được chuyển từ tuần hiện tại.');if(!current.ready)fail(400,'Tất cả câu hỏi trong tuần cần đạt ít nhất 2 sao trước khi chuyển tuần.');
       const next=progress.weeks.find(week=>week.id===current.nextWeekId);if(!next)fail(400,'Đây là tuần cuối cùng đã được giao.');
       const masteredPacks=progress.weeks.find(week=>week.id===weekId).sets.map(set=>({packId:set.pack.id,contentVersion:set.pack.version}));
-      this.abandonActive(auth,student.id);this.audit(auth,'student.journey.advance',json({studentId:student.id,classId:student.class_id,weekId:next.id,position:next.position,fromWeekId:weekId,requestId,masteredPacks}));return this.studentSummary(auth,'current');
+      this.abandonActive(auth,student.id);this.audit(auth,'student.journey.advance',json({studentId:student.id,classId:student.class_id,weekId:next.id,position:next.position,fromWeekId:weekId,requestId,masteredPacks}));
+      try {
+        const completedWeek = progress.weeks.find(w => w.id === weekId);
+        if (completedWeek) {
+          const weekNum = completedWeek.position || 1;
+          const subjects = new Set();
+          for (const set of completedWeek.sets || []) {
+            const subj = normalizeIntegrationSubject(set.subjectLabel || set.pack?.subjectLabel || completedWeek.title);
+            subjects.add(subj);
+          }
+          if (subjects.size === 0) subjects.add('toan');
+          for (const subj of subjects) {
+            this.recordIntegrationEvent(auth.workspaceId, student.id, 'week_completed', {
+              subject: subj,
+              week: weekNum
+            });
+          }
+        }
+      } catch {}
+      return this.studentSummary(auth,'current');
     });
   }
   assignedPack(auth,packId,version){
@@ -706,7 +726,17 @@ export class OnlineStore{
         this.db.prepare('UPDATE gift_catalog SET stock=stock+1 WHERE workspace_id=? AND id=?').run(auth.workspaceId,previous.giftId);
       }
     }
-    this.db.prepare('UPDATE redemptions SET status=?,json=? WHERE workspace_id=? AND id=?').run(status,json(request),auth.workspaceId,requestId);this.audit(auth,`redemption.${status}`,requestId);return request;
+    this.db.prepare('UPDATE redemptions SET status=?,json=? WHERE workspace_id=? AND id=?').run(status,json(request),auth.workspaceId,requestId);
+    this.audit(auth,`redemption.${status}`,requestId);
+    if (status === 'fulfilled') {
+      try {
+        const giftTitle = previous?.title || request?.title || 'Quà tặng';
+        this.recordIntegrationEvent(auth.workspaceId, row.student_id, 'gift_delivered', {
+          giftTitle
+        });
+      } catch {}
+    }
+    return request;
   });}
   studentStreak(auth, studentId = auth.studentId, nowIso = now()){
     const row = this.db.prepare('SELECT * FROM student_streaks WHERE workspace_id=? AND student_id=?').get(auth.workspaceId, studentId);
@@ -866,6 +896,14 @@ export class OnlineStore{
       auth.workspaceId, studentId, badgeId, nowIso, json(metadata)
     );
     this.audit(auth, 'student.badge.award', json({studentId, badgeId}));
+    try {
+      const badgeDef = BADGE_CATALOG.find(b => b.id === badgeId);
+      const title = metadata?.title || badgeDef?.title || (badgeId === CONTESTANT_BADGE?.id ? CONTESTANT_BADGE.title : badgeId);
+      this.recordIntegrationEvent(auth.workspaceId, studentId, 'badge_unlocked', {
+        badgeId,
+        title
+      });
+    } catch {}
     return true;
   }
   studentBadges(auth, studentId = auth.studentId, nowIso = now()){
@@ -1006,6 +1044,32 @@ export class OnlineStore{
       }
     }
     this.evaluateAndAwardBadges(auth, studentId, completedAt);
+
+    // BAO-12: record daily study event if study minutes increased
+    try {
+      const todayMinutes = this.todayStudentStudyMinutes(auth, studentId);
+      if (todayMinutes > 0) {
+        const { dateStr } = getVietnamTimeParts();
+        const lastEvent = this.db.prepare(`
+          SELECT data_json FROM integration_events
+          WHERE workspace_id = ? AND student_id = ? AND event_type = 'daily_study'
+          ORDER BY rowid DESC LIMIT 1
+        `).get(auth.workspaceId, studentId);
+        let prevMins = -1;
+        if (lastEvent) {
+          try {
+            const parsed = parse(lastEvent.data_json);
+            if (parsed.date === dateStr) prevMins = parsed.minutes;
+          } catch {}
+        }
+        if (todayMinutes > prevMins) {
+          this.recordIntegrationEvent(auth.workspaceId, studentId, 'daily_study', {
+            date: dateStr,
+            minutes: todayMinutes
+          });
+        }
+      }
+    } catch {}
   }
   evaluateAndAwardBadges(auth, studentId, nowIso = now()){
     this.studentBadges(auth, studentId, nowIso);
@@ -1553,6 +1617,22 @@ export class OnlineStore{
           answers_json=?
         WHERE workspace_id=? AND session_id=?
       `).run(finishReason, submittedAt, evaluation.score, evaluation.maxScore, evaluation.correctCount, evaluation.totalItems, json(answers), auth.workspaceId, sessionId);
+
+      try {
+        this.recordIntegrationEvent(auth.workspaceId, auth.studentId, 'contest_submitted', {
+          sessionId,
+          presetId: row.preset_id,
+          title: row.title,
+          subject: normalizeIntegrationSubject(row.subject),
+          score: evaluation.score,
+          maxScore: evaluation.maxScore,
+          correctCount: evaluation.correctCount,
+          totalItems: evaluation.totalItems,
+          startedAt: row.started_at,
+          submittedAt,
+          status: finishReason
+        });
+      } catch {}
 
       let badgeAwarded = false;
       const existingBadge = this.db.prepare('SELECT 1 FROM badge_awards WHERE workspace_id=? AND student_id=? AND badge_id=?').get(auth.workspaceId, auth.studentId, CONTESTANT_BADGE.id);
@@ -2151,6 +2231,11 @@ export class OnlineStore{
     return row;
   }
 
+  purgeOldIntegrationEvents(maxAgeDays = 30) {
+    const cutoff = new Date(Date.now() - maxAgeDays * 24 * 3600 * 1000).toISOString();
+    return this.db.prepare('DELETE FROM integration_events WHERE created_at < ?').run(cutoff);
+  }
+
   recordIntegrationEvent(workspaceId, studentId, eventType, data) {
     const eventId = id();
     const createdAt = now();
@@ -2161,16 +2246,43 @@ export class OnlineStore{
     return { id: eventId, eventType, data, createdAt };
   }
 
-  listIntegrationEvents(workspaceId, { afterCursor = 0, limit = 100 } = {}) {
+  recordWeekCompleted(workspaceId, studentId, subject, week) {
+    return this.recordIntegrationEvent(workspaceId, studentId, 'week_completed', {
+      subject: normalizeIntegrationSubject(subject),
+      week: Number(week) || 1
+    });
+  }
+
+  recordDailyStudy(workspaceId, studentId, dateStr, minutes) {
+    return this.recordIntegrationEvent(workspaceId, studentId, 'daily_study', {
+      date: dateStr,
+      minutes: Math.round(Number(minutes) || 0)
+    });
+  }
+
+  listIntegrationEvents(workspaceId, { allowedStudentIds = null, afterCursor = 0, limit = 100 } = {}) {
+    this.purgeOldIntegrationEvents(30);
     const maxLimit = Math.min(Math.max(1, limit), 200);
     const numericCursor = Number(afterCursor) || 0;
-    const rows = this.db.prepare(`
-      SELECT rowid, id, student_id, event_type, data_json, created_at
-      FROM integration_events
-      WHERE workspace_id = ? AND rowid > ?
-      ORDER BY rowid ASC
-      LIMIT ?
-    `).all(workspaceId, numericCursor, maxLimit);
+    let rows;
+    if (Array.isArray(allowedStudentIds) && allowedStudentIds.length > 0) {
+      const placeholders = allowedStudentIds.map(() => '?').join(',');
+      rows = this.db.prepare(`
+        SELECT rowid, id, student_id, event_type, data_json, created_at
+        FROM integration_events
+        WHERE workspace_id = ? AND rowid > ? AND student_id IN (${placeholders})
+        ORDER BY rowid ASC
+        LIMIT ?
+      `).all(workspaceId, numericCursor, ...allowedStudentIds, maxLimit);
+    } else {
+      rows = this.db.prepare(`
+        SELECT rowid, id, student_id, event_type, data_json, created_at
+        FROM integration_events
+        WHERE workspace_id = ? AND rowid > ?
+        ORDER BY rowid ASC
+        LIMIT ?
+      `).all(workspaceId, numericCursor, maxLimit);
+    }
     const events = rows.map(r => ({
       id: r.id,
       studentId: r.student_id,

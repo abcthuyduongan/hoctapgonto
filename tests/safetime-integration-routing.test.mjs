@@ -5,7 +5,7 @@ import { promisify } from 'node:util';
 import { once } from 'node:events';
 import { OnlineStore } from '../server/online-store.mjs';
 import { createOnlineServer } from '../server/online-server.mjs';
-import { createSafeTimeIntegrationRouter, isLoopbackAddress, sanitizeDeepLink } from '../server/safetime-integration.mjs';
+import { createSafeTimeIntegrationRouter, isLoopbackAddress, sanitizeDeepLink, normalizeIntegrationSubject } from '../server/safetime-integration.mjs';
 import { ONLINE_RUNTIME_VERSION } from '../server/api-diagnostics.mjs';
 
 const scrypt = promisify(scryptCallback);
@@ -55,6 +55,7 @@ function mockRequestResponse({ remoteAddress = '127.0.0.1', path, method = 'GET'
     socket: { remoteAddress },
     headers: { ...headers },
     method,
+    url: path,
     async *[Symbol.asyncIterator]() {
       if (body !== null) {
         const buffer = Buffer.from(typeof body === 'string' ? body : JSON.stringify(body), 'utf8');
@@ -845,4 +846,229 @@ test('Task 3B.2, 3B.3, 3B.4 (BAO-01, BAO-05, BAO-06, BAO-07, BAO-08, BAO-09): Re
   assert.equal(res6.status, 401);
   const err6 = await res6.json();
   assert.equal(err6.error.code, 'unauthorized');
+});
+
+test('Task 3B.5 (BAO-12): normalizeIntegrationSubject helper', () => {
+  assert.equal(normalizeIntegrationSubject('toan'), 'toan');
+  assert.equal(normalizeIntegrationSubject('Toán lớp 3'), 'toan');
+  assert.equal(normalizeIntegrationSubject('math'), 'toan');
+  assert.equal(normalizeIntegrationSubject('tieng-viet'), 'tieng-viet');
+  assert.equal(normalizeIntegrationSubject('Tiếng Việt'), 'tieng-viet');
+  assert.equal(normalizeIntegrationSubject('tieng-anh'), 'tieng-anh');
+  assert.equal(normalizeIntegrationSubject('English'), 'tieng-anh');
+  assert.equal(normalizeIntegrationSubject('tin-hoc'), 'tin-hoc');
+  assert.equal(normalizeIntegrationSubject('Tin học'), 'tin-hoc');
+  assert.equal(normalizeIntegrationSubject('Công nghệ'), 'tin-hoc');
+  assert.equal(normalizeIntegrationSubject(null), 'toan');
+});
+
+test('Task 3B.5 (BAO-12, BAO-13): Store event recording and 30-day retention purge', async () => {
+  const store = new OnlineStore(':memory:');
+  const { workspaceId, student1Id, student2Id } = await setupWorkspaceWithStudents(store);
+
+  // 1. Record 5 event types
+  // Event 1: contest_submitted
+  const contestEvt = store.recordIntegrationEvent(workspaceId, student1Id, 'contest_submitted', {
+    sessionId: 'session_01',
+    presetId: 'violympic-toan-3',
+    title: 'Thi thử Violympic Toán 3',
+    subject: 'toan',
+    score: 280,
+    maxScore: 300,
+    correctCount: 28,
+    totalItems: 30,
+    startedAt: '2026-11-07T08:00:00.000Z',
+    submittedAt: '2026-11-07T08:25:00.000Z',
+    status: 'submitted'
+  });
+  assert.ok(contestEvt.id);
+  assert.equal(contestEvt.eventType, 'contest_submitted');
+  assert.equal(contestEvt.data.score, 280);
+
+  // Event 2: week_completed
+  const weekEvt = store.recordWeekCompleted(workspaceId, student1Id, 'Toán', 5);
+  assert.ok(weekEvt.id);
+  assert.equal(weekEvt.data.subject, 'toan');
+  assert.equal(weekEvt.data.week, 5);
+
+  // Event 3: badge_unlocked
+  const badgeEvt = store.recordIntegrationEvent(workspaceId, student1Id, 'badge_unlocked', {
+    badgeId: 'streak_7',
+    title: 'Chăm chỉ 7 ngày'
+  });
+  assert.ok(badgeEvt.id);
+  assert.equal(badgeEvt.data.badgeId, 'streak_7');
+
+  // Event 4: daily_study
+  const studyEvt = store.recordDailyStudy(workspaceId, student1Id, '2026-11-07', 25);
+  assert.ok(studyEvt.id);
+  assert.equal(studyEvt.data.minutes, 25);
+  assert.equal(studyEvt.data.date, '2026-11-07');
+
+  // Event 5: gift_delivered (NO stars per BAO-13!)
+  const giftEvt = store.recordIntegrationEvent(workspaceId, student1Id, 'gift_delivered', {
+    giftTitle: 'Hộp bút màu'
+  });
+  assert.ok(giftEvt.id);
+  assert.equal(giftEvt.data.giftTitle, 'Hộp bút màu');
+  assert.equal(giftEvt.data.stars, undefined); // Strictly NO stars
+
+  // Record an event for student2Id
+  store.recordDailyStudy(workspaceId, student2Id, '2026-11-07', 15);
+
+  // 2. Test listIntegrationEvents pagination
+  const page1 = store.listIntegrationEvents(workspaceId, { limit: 3 });
+  assert.equal(page1.events.length, 3);
+  assert.ok(page1.cursor > 0);
+
+  const page2 = store.listIntegrationEvents(workspaceId, { afterCursor: page1.cursor, limit: 10 });
+  assert.equal(page2.events.length, 3); // remaining 3 events
+  assert.ok(page2.cursor > page1.cursor);
+
+  // 3. Test allowedStudentIds filtering
+  const student1Only = store.listIntegrationEvents(workspaceId, { allowedStudentIds: [student1Id] });
+  assert.equal(student1Only.events.length, 5);
+  assert.ok(student1Only.events.every(e => e.studentId === student1Id));
+
+  const student2Only = store.listIntegrationEvents(workspaceId, { allowedStudentIds: [student2Id] });
+  assert.equal(student2Only.events.length, 1);
+  assert.equal(student2Only.events[0].studentId, student2Id);
+
+  // 4. Test 30-day retention purge
+  // Manually insert an event from 35 days ago
+  const oldDate = new Date(Date.now() - 35 * 24 * 3600 * 1000).toISOString();
+  store.db.prepare(`
+    INSERT INTO integration_events(id, workspace_id, student_id, event_type, data_json, created_at)
+    VALUES (?, ?, ?, ?, ?, ?)
+  `).run('old_event_id', workspaceId, student1Id, 'daily_study', JSON.stringify({ date: '2026-10-01', minutes: 10 }), oldDate);
+
+  // Purge should remove the 35-day-old event
+  store.purgeOldIntegrationEvents(30);
+  const checkOld = store.db.prepare('SELECT 1 FROM integration_events WHERE id = ?').get('old_event_id');
+  assert.equal(checkOld, undefined);
+});
+
+test('Task 3B.5 (BAO-12): GET /api/integration/safetime/v1/events router and cursor pagination', async () => {
+  const store = new OnlineStore(':memory:');
+  const { workspaceId, student1Id, student2Id } = await setupWorkspaceWithStudents(store);
+  const router = createSafeTimeIntegrationRouter({ store, db: store.db });
+
+  // 1. Create client with student1Id allowed
+  const token = 'safetime_test_token_events_12345';
+  const tokenHash = createHash('sha256').update(token).digest('hex');
+  store.createIntegrationClient(workspaceId, {
+    tokenHash,
+    deviceId: 'laptop-home-01',
+    deviceName: 'Laptop Bàn Học',
+    allowedStudentIds: [student1Id]
+  });
+
+  // Populate events for both students
+  store.recordDailyStudy(workspaceId, student1Id, '2026-11-07', 20);
+  store.recordWeekCompleted(workspaceId, student1Id, 'toan', 1);
+  store.recordDailyStudy(workspaceId, student2Id, '2026-11-07', 30); // for student 2 (should be filtered out)
+  store.recordIntegrationEvent(workspaceId, student1Id, 'badge_unlocked', { badgeId: 'speedy', title: 'Nhanh như chớp' });
+
+  // 2. Unauthorized without token
+  let mock = mockRequestResponse({ path: '/api/integration/safetime/v1/events', method: 'GET' });
+  await router.handle(mock.req, mock.res);
+  assert.equal(mock.getResult().status, 401);
+
+  // 3. Query events with valid Bearer token
+  mock = mockRequestResponse({
+    path: '/api/integration/safetime/v1/events?limit=2',
+    method: 'GET',
+    headers: { authorization: `Bearer ${token}` }
+  });
+  await router.handle(mock.req, mock.res);
+  const res1 = mock.getResult();
+  assert.equal(res1.status, 200);
+  assert.equal(res1.headers['X-Integration-Version'], '1');
+  const data1 = res1.json;
+  assert.equal(data1.events.length, 2);
+  assert.ok(data1.cursor > 0);
+  // All events belong to student1Id
+  assert.ok(data1.events.every(e => e.studentId === student1Id));
+
+  // 4. Query next page using cursor
+  mock = mockRequestResponse({
+    path: `/api/integration/safetime/v1/events?after=${data1.cursor}&limit=10`,
+    method: 'GET',
+    headers: { authorization: `Bearer ${token}` }
+  });
+  await router.handle(mock.req, mock.res);
+  const res2 = mock.getResult();
+  assert.equal(res2.status, 200);
+  const data2 = res2.json;
+  assert.equal(data2.events.length, 1);
+  assert.equal(data2.events[0].type, 'badge_unlocked');
+  assert.equal(data2.events[0].studentId, student1Id);
+
+  // 5. Query when no more events exist
+  mock = mockRequestResponse({
+    path: `/api/integration/safetime/v1/events?after=${data2.cursor}&limit=10`,
+    method: 'GET',
+    headers: { authorization: `Bearer ${token}` }
+  });
+  await router.handle(mock.req, mock.res);
+  const res3 = mock.getResult();
+  assert.equal(res3.status, 200);
+  const data3 = res3.json;
+  assert.equal(data3.events.length, 0);
+  assert.equal(data3.cursor, data2.cursor);
+});
+
+test('Task 3B.5 (BAO-12): Real HTTP Server loopback GET /events end-to-end', async () => {
+  const server = createOnlineServer({ databasePath: ':memory:' });
+  server.listen(0, '127.0.0.1');
+  await once(server, 'listening');
+  const port = server.address().port;
+  const origin = `http://127.0.0.1:${port}`;
+
+  const store = server.onlineStore;
+  const { workspaceId, student1Id } = await setupWorkspaceWithStudents(store);
+
+  // Pair client
+  const { code } = store.createIntegrationPairCode(workspaceId, [student1Id], 600);
+  const pairRes = await fetch(`${origin}/api/integration/safetime/v1/pair`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      code,
+      deviceId: 'pc-real-http-events',
+      deviceName: 'PC Kiểm Thử Events'
+    })
+  });
+  assert.equal(pairRes.status, 200);
+  const { token } = await pairRes.json();
+
+  // Record an event
+  store.recordIntegrationEvent(workspaceId, student1Id, 'contest_submitted', {
+    sessionId: 'session_http_01',
+    presetId: 'ioe-tieng-anh-3',
+    title: 'IOE Tiếng Anh lớp 3',
+    subject: 'tieng-anh',
+    score: 190,
+    maxScore: 200,
+    correctCount: 19,
+    totalItems: 20,
+    startedAt: '2026-11-07T10:00:00Z',
+    submittedAt: '2026-11-07T10:15:00Z',
+    status: 'submitted'
+  });
+
+  // Call GET /api/integration/safetime/v1/events
+  const eventsRes = await fetch(`${origin}/api/integration/safetime/v1/events?after=0&limit=10`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  assert.equal(eventsRes.status, 200);
+  assert.equal(eventsRes.headers.get('x-integration-version'), '1');
+  const body = await eventsRes.json();
+  assert.equal(body.events.length, 1);
+  assert.equal(body.events[0].type, 'contest_submitted');
+  assert.equal(body.events[0].data.presetId, 'ioe-tieng-anh-3');
+  assert.equal(body.events[0].data.score, 190);
+  assert.ok(body.cursor > 0);
+
+  server.close();
 });

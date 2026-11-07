@@ -38,6 +38,23 @@ export function sanitizeDeepLink(to) {
   return 'ban-do';
 }
 
+/**
+ * Normalizes subject identifier or label to one of the 4 standard keys (BAO-10, BAO-12):
+ * 'toan', 'tieng-viet', 'tieng-anh', 'tin-hoc'
+ */
+export function normalizeIntegrationSubject(subjectOrLabel) {
+  const raw = String(subjectOrLabel || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/đ/g, 'd');
+  if (raw.includes('toan') || raw.includes('math')) return 'toan';
+  if (raw.includes('viet')) return 'tieng-viet';
+  if (raw.includes('anh') || raw.includes('english')) return 'tieng-anh';
+  if (raw.includes('tin') || raw.includes('computing') || raw.includes('cong nghe')) return 'tin-hoc';
+  return 'toan';
+}
+
 function createDefaultAuthenticator({ store, db }) {
   const hash = value => createHash('sha256').update(value).digest('hex');
   const dummySalt = randomBytes(16).toString('hex');
@@ -254,7 +271,12 @@ export function createSafeTimeIntegrationRouter({ store, db, authenticateUserCre
     return rows;
   }
 
-  async function handle(req, res, { path, method, url, origin }) {
+  async function handle(req, res, context = {}) {
+    const parsedUrl = context.url || new URL(req.url || '/', context.origin || 'http://127.0.0.1');
+    const path = context.path || parsedUrl.pathname;
+    const method = (context.method || req.method || 'GET').toUpperCase();
+    const url = parsedUrl;
+    const origin = context.origin || parsedUrl.origin || 'http://127.0.0.1';
     // 1. Loopback enforcement (BAO-05)
     const remoteAddress = req.socket?.remoteAddress;
     if (!isLoopbackAddress(remoteAddress)) {
@@ -596,8 +618,35 @@ export function createSafeTimeIntegrationRouter({ store, db, authenticateUserCre
         return true;
       }
 
-      // Placeholders for subsequent tasks 3B.5 - 3B.6
-      if (['/events'].includes(subPath) || subPath.startsWith('/students/')) {
+      // Command 10: GET /events?after={cursor}&limit=100 (BAO-12)
+      if (subPath === '/events' && method === 'GET') {
+        const auth = authenticateBearer(req);
+        if (auth.error) {
+          sendError(res, auth.error.status, auth.error.code, auth.error.message);
+          return true;
+        }
+
+        const rawAfter = requestUrl.searchParams.get('after');
+        const rawLimit = requestUrl.searchParams.get('limit');
+        const afterCursor = rawAfter !== null ? Number(rawAfter) || 0 : 0;
+        const limit = rawLimit !== null ? Math.min(Math.max(1, parseInt(rawLimit, 10) || 100), 200) : 100;
+
+        const allowedStudentIds = Array.isArray(auth.client.allowed_student_ids) && auth.client.allowed_student_ids.length > 0
+          ? auth.client.allowed_student_ids
+          : null;
+
+        const result = store.listIntegrationEvents(auth.client.workspace_id, {
+          allowedStudentIds,
+          afterCursor,
+          limit
+        });
+
+        sendJson(res, 200, result);
+        return true;
+      }
+
+      // Placeholders for subsequent tasks 3B.6
+      if (subPath.startsWith('/students/')) {
         sendError(res, 501, 'not_implemented', 'Chức năng đang được hoàn thiện ở task tiếp theo.');
         return true;
       }

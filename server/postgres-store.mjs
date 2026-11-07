@@ -2148,4 +2148,50 @@ export class PostgresStore{
 
     return { enabled: true, events };
   }
+
+  async purgeOldIntegrationEvents(maxAgeDays = 30, client = this.pool) {
+    const cutoff = new Date(Date.now() - maxAgeDays * 24 * 3600 * 1000).toISOString();
+    return this.exec('DELETE FROM bao_an.integration_events WHERE created_at < $1', [cutoff], client);
+  }
+
+  async recordIntegrationEvent(workspaceId, studentId, eventType, data, client = this.pool) {
+    const eventId = id();
+    const createdAt = now();
+    await this.exec(`
+      INSERT INTO bao_an.integration_events(id, workspace_id, student_id, event_type, data_json, created_at)
+      VALUES ($1, $2, $3, $4, $5, $6)
+    `, [eventId, workspaceId, studentId, eventType, json(data), createdAt], client);
+    return { id: eventId, eventType, data, createdAt };
+  }
+
+  async listIntegrationEvents(workspaceId, { allowedStudentIds = null, afterCursor = 0, limit = 100 } = {}, client = this.pool) {
+    await this.purgeOldIntegrationEvents(30, client);
+    const maxLimit = Math.min(Math.max(1, limit), 200);
+    let rows;
+    if (Array.isArray(allowedStudentIds) && allowedStudentIds.length > 0) {
+      rows = await this.rows(`
+        SELECT id, student_id, event_type, data_json, created_at
+        FROM bao_an.integration_events
+        WHERE workspace_id = $1 AND student_id = ANY($2)
+        ORDER BY created_at ASC, id ASC
+        LIMIT $3
+      `, [workspaceId, allowedStudentIds, maxLimit], client);
+    } else {
+      rows = await this.rows(`
+        SELECT id, student_id, event_type, data_json, created_at
+        FROM bao_an.integration_events
+        WHERE workspace_id = $1
+        ORDER BY created_at ASC, id ASC
+        LIMIT $2
+      `, [workspaceId, maxLimit], client);
+    }
+    const events = rows.map(r => ({
+      id: r.id,
+      studentId: r.student_id,
+      type: r.event_type,
+      data: parse(r.data_json),
+      createdAt: r.created_at
+    }));
+    return { events, cursor: events.length > 0 ? events[events.length - 1].createdAt : afterCursor };
+  }
 }
