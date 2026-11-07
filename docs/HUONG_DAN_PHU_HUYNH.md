@@ -9,9 +9,9 @@ Dưới đây là tóm tắt nhanh những tính năng cha mẹ cần biết đ�
 
 ---
 
-### 1. Khu Vực Phụ Huynh & Mã PIN Bảo Mật (4 Số)
+### 1. Khu Vực Phụ Huynh & Mã PIN Bảo Mật (6 Số)
 - **Truy cập:** Bấm vào biểu tượng **"Phụ huynh"** ở góc phải thanh trên cùng của màn hình chính.
-- **Mã PIN ban đầu:** Khi kích hoạt lần đầu, hệ thống yêu cầu phụ huynh thiết lập mã PIN gồm **4 chữ số** bí mật. Mọi thay đổi về phần thưởng, đổi sao và cài đặt thời gian đều bắt buộc phải nhập mã PIN này (con không thể tự thao tác).
+- **Mã PIN ban đầu:** Khi kích hoạt lần đầu, hệ thống yêu cầu phụ huynh thiết lập mã PIN gồm **6 chữ số** bí mật. Mọi thay đổi về phần thưởng, đổi sao và cài đặt thời gian đều bắt buộc phải nhập mã PIN này (con không thể tự thao tác).
 - **Quên mã PIN:** Phụ huynh có thể đặt lại qua email phụ huynh đã xác thực trên cổng bảo mật.
 
 ---
@@ -41,6 +41,21 @@ Bảo An Learning áp dụng cơ chế **"Học thật — Tích sao — Đổi 
 - **Thị trấn & Bảng tin lớp học an toàn:**
   - Con dùng sao đạt được để xây Thị trấn ảo (không làm hao hụt sao đổi quà thật).
   - Bảng tin lớp chỉ hiển thị các sự kiện tích cực (bạn vừa nhận huy hiệu, vừa hoàn thành tuần). **Không lộ tên đăng nhập, không lộ điểm số hay đáp án sai, không có ô gõ chữ nhắn tin**, ngăn chặn hoàn toàn nguy cơ bắt nạt trên mạng.
+
+---
+
+### 5. Kết Nối Đồng Hành Cùng SafeTime (Quản Lý Máy Tính Gia Đình)
+Bảo An Learning phiên bản mới tích hợp sẵn cổng kết nối bảo mật nội bộ với phần mềm quản lý máy tính **SafeTime**:
+- **Cơ chế học tập lành mạnh:** Khi kích hoạt kết nối, con bấm "Học tập / Thi" trên SafeTime sẽ mở ngay các bài học hoặc bài thi thử Violympic/IOE của Bảo An Learning. Thời gian học được tính vào phút học riêng, **không bị trừ vào thời gian chơi** hay lượt bật máy tính.
+- **Cách thức ghép đôi an toàn:**
+  1. Phụ huynh mở Bảo An Learning $\rightarrow$ vào **Khu phụ huynh** (nhập PIN) $\rightarrow$ chọn thẻ **🛡️ Kết nối SafeTime**.
+  2. Tích chọn các bé được phép học trên máy tính này và bấm **"Tạo mã ghép đôi"**. Hệ thống sẽ cấp một mã số bí mật gồm 8 chữ số (hiệu lực trong 10 phút, tự hủy sau khi sử dụng).
+  3. Mở phần mềm SafeTime trên máy $\rightarrow$ vào Cài đặt $\rightarrow$ Kết nối Bảo An Learning và nhập mã số trên để hoàn tất kết nối.
+- **Cam kết an toàn và bảo mật dữ liệu:**
+  - *Chỉ chấp nhận kết nối nội bộ (Loopback 127.0.0.1):* Tuyệt đối không cho phép truy cập từ mạng ngoài hay Internet.
+  - *Bảo toàn trọn vẹn Ví sao:* SafeTime chỉ đọc số sao để hiển thị tiến độ cho con, **tuyệt đối không có quyền can thiệp hay đổi sao thành giờ chơi**. Sao của con chỉ dành riêng để đổi quà thực tế trên Kệ quà Bảo An.
+  - *Bảo mật tài khoản & Đăng nhập một lần (SSO):* Con dùng tài khoản học sinh Bảo An để đăng nhập, vé đăng nhập SSO có hiệu lực 60 giây và chống sử dụng lại. Mật khẩu không bao giờ bị lưu lộ.
+  - *Quản lý minh bạch:* Phụ huynh dễ dàng xem danh sách các máy tính đã ghép đôi và có thể bấm **"Ngắt kết nối"** bất cứ lúc nào trong Khu phụ huynh.
 
 ---
 
