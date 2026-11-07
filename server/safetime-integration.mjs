@@ -1,6 +1,10 @@
-import { randomBytes, createHash } from 'node:crypto';
+import { randomBytes, createHash, scrypt as scryptCallback, timingSafeEqual } from 'node:crypto';
+import { promisify } from 'node:util';
 import { parseJsonBody } from './json-body.mjs';
 import { ONLINE_RUNTIME_VERSION } from './api-diagnostics.mjs';
+
+const scrypt = promisify(scryptCallback);
+const scryptOptions = { N: 32768, r: 8, p: 1, maxmem: 64 * 1024 * 1024 };
 
 /**
  * Checks if an IP address belongs to loopback interface (BAO-05).
@@ -13,10 +17,69 @@ export function isLoopbackAddress(address) {
          address === '::ffff:127.0.0.1';
 }
 
+function createDefaultAuthenticator({ store, db }) {
+  const hash = value => createHash('sha256').update(value).digest('hex');
+  const dummySalt = randomBytes(16).toString('hex');
+
+  async function verifyPassword(value, stored) {
+    if (typeof value !== 'string' || value.length > 128) return false;
+    const [salt, expected] = (stored ?? `${dummySalt}:dummy`).split(':');
+    const result = await scrypt(value, salt, 64, scryptOptions);
+    const expectedBuf = createHash('sha256').update(String(expected ?? '')).digest();
+    const actualBuf = createHash('sha256').update(result.toString('hex')).digest();
+    return timingSafeEqual(actualBuf, expectedBuf);
+  }
+
+  function rateLimit(req, name) {
+    const address = req.socket?.remoteAddress ?? 'local';
+    const keys = [hash(`ip:${address}`), hash(`user:${name}`)];
+    const time = Date.now();
+    store.tx(() => {
+      db.prepare('DELETE FROM login_limits WHERE key IN (SELECT key FROM login_limits WHERE reset_at<=? AND key NOT IN (?,?) ORDER BY reset_at,key LIMIT 100)').run(time, ...keys);
+      for (const [index, key] of keys.entries()) {
+        const row = db.prepare('SELECT * FROM login_limits WHERE key=?').get(key);
+        const count = row && row.reset_at > time ? row.count : 0;
+        if (count >= (index === 0 ? 100 : 12)) {
+          const err = new Error('Đã thử đăng nhập quá nhiều lần. Hãy đợi 15 phút rồi thử lại.');
+          err.status = 429;
+          err.code = 'login_rate_limited';
+          throw err;
+        }
+        db.prepare('INSERT INTO login_limits VALUES(?,?,?) ON CONFLICT(key) DO UPDATE SET count=excluded.count,reset_at=excluded.reset_at').run(key, count + 1, row && row.reset_at > time ? row.reset_at : time + 900000);
+      }
+    });
+    return () => db.prepare('DELETE FROM login_limits WHERE key=?').run(keys[1]);
+  }
+
+  return async function defaultAuthenticate({ req, rawUsername, rawPassword }) {
+    const name = String(rawUsername || '').trim().toLowerCase();
+    if (!/^[a-z0-9][a-z0-9._-]{2,59}$/.test(name)) {
+      const err = new Error('Tên đăng nhập cần 3–60 chữ không dấu, số, dấu chấm, gạch dưới hoặc gạch ngang.');
+      err.status = 400;
+      err.code = 'invalid_username';
+      throw err;
+    }
+    const clear = rateLimit(req, name);
+    const user = db.prepare('SELECT * FROM users WHERE username=?').get(name);
+    const correct = await verifyPassword(rawPassword, user?.password_hash);
+    const current = user && db.prepare('SELECT * FROM users WHERE id=?').get(user.id);
+    if (!correct || !current || !current.active || current.password_hash !== user.password_hash) {
+      const err = new Error('Tên đăng nhập hoặc mật khẩu chưa đúng.');
+      err.status = 401;
+      err.code = 'invalid_credentials';
+      throw err;
+    }
+    clear();
+    return current;
+  };
+}
+
 /**
- * Creates the SafeTime Integration Router for handling /api/integration/safetime/v1 endpoints (BAO-01, BAO-05, BAO-06).
+ * Creates the SafeTime Integration Router for handling /api/integration/safetime/v1 endpoints (BAO-01, BAO-05, BAO-06, BAO-07).
  */
-export function createSafeTimeIntegrationRouter({ store, db }) {
+export function createSafeTimeIntegrationRouter({ store, db, authenticateUserCredentials }) {
+  const authFn = authenticateUserCredentials || createDefaultAuthenticator({ store, db });
+
   // In-memory rate limiting map: tokenHash -> { count, windowStart }
   const rateLimitMap = new Map();
   // Brute-force protection for pair code: 5 failed attempts locks for 15 minutes
@@ -279,8 +342,86 @@ export function createSafeTimeIntegrationRouter({ store, db }) {
         return true;
       }
 
-      // Placeholders for subsequent tasks 3B.3 - 3B.6
-      if (['/student-login', '/student-refresh', '/student-logout', '/sso', '/events'].includes(subPath) || subPath.startsWith('/students/')) {
+      // Command 5: POST /student-login (BAO-07)
+      if (subPath === '/student-login' && method === 'POST') {
+        const auth = authenticateBearer(req);
+        if (auth.error) {
+          sendError(res, auth.error.status, auth.error.code, auth.error.message);
+          return true;
+        }
+
+        const input = await parseBody(req);
+        const username = String(input?.username || '').trim();
+        const password = String(input?.password || '');
+        const studentId = String(input?.studentId || '').trim();
+        const remember = Boolean(input?.remember);
+
+        if (!username || !password || !studentId) {
+          sendError(res, 400, 'invalid_payload', 'Cần cung cấp tên đăng nhập (username), mật khẩu (password) và mã học sinh (studentId).');
+          return true;
+        }
+
+        // Check if studentId is allowed on this client (BAO-07)
+        if (Array.isArray(auth.client.allowed_student_ids) && auth.client.allowed_student_ids.length > 0) {
+          if (!auth.client.allowed_student_ids.includes(studentId)) {
+            sendError(res, 403, 'student_not_allowed', 'Học sinh này chưa được bố mẹ cấp phép trên thiết bị này.');
+            return true;
+          }
+        }
+
+        // Authenticate credentials using shared /login verification & rate-limiting logic (BAO-07)
+        let user;
+        try {
+          user = await authFn({ req, rawUsername: username, rawPassword: password });
+        } catch (err) {
+          const status = err.status || 401;
+          const code = status === 429 ? 'login_rate_limited' : 'invalid_credentials';
+          sendError(res, status, code, err.message || 'Tên đăng nhập hoặc mật khẩu chưa đúng.');
+          return true;
+        }
+
+        // Must be a student account
+        if (user.role !== 'student') {
+          sendError(res, 403, 'not_student', 'Chỉ tài khoản học sinh mới có thể đăng nhập qua cổng này.');
+          return true;
+        }
+
+        // Must match the requested studentId (BAO-07, LNK-09)
+        if (user.student_id !== studentId) {
+          sendError(res, 403, 'wrong_student', 'Tài khoản này không phải của bạn trên máy này. Hỏi bố mẹ nhé.');
+          return true;
+        }
+
+        // Fetch student record
+        const student = db.prepare('SELECT id, name FROM students WHERE workspace_id = ? AND id = ? AND active = 1').get(auth.client.workspace_id, studentId);
+        if (!student) {
+          sendError(res, 404, 'student_not_found', 'Không tìm thấy thông tin học sinh trong đơn vị.');
+          return true;
+        }
+
+        // Generate one-time 60s SSO ticket (BAO-08)
+        const { ticket } = store.createIntegrationTicket(auth.client.workspace_id, auth.client.id, student.id, 60);
+
+        // If remember is requested, generate 30-day refresh token (BAO-08)
+        let refreshToken;
+        if (remember) {
+          const result = store.createIntegrationRefreshToken(auth.client.workspace_id, auth.client.id, student.id, 30);
+          refreshToken = result.rawToken;
+        }
+
+        sendJson(res, 200, {
+          student: {
+            id: student.id,
+            displayName: student.name
+          },
+          ticket,
+          ...(refreshToken ? { refreshToken } : {})
+        });
+        return true;
+      }
+
+      // Placeholders for subsequent tasks 3B.4 - 3B.6
+      if (['/student-refresh', '/student-logout', '/sso', '/events'].includes(subPath) || subPath.startsWith('/students/')) {
         sendError(res, 501, 'not_implemented', 'Chức năng đang được hoàn thiện ở task tiếp theo.');
         return true;
       }

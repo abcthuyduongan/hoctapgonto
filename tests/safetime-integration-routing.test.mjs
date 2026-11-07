@@ -1,13 +1,23 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { randomUUID, createHash } from 'node:crypto';
+import { randomUUID, randomBytes, createHash, scrypt as scryptCallback } from 'node:crypto';
+import { promisify } from 'node:util';
 import { once } from 'node:events';
 import { OnlineStore } from '../server/online-store.mjs';
 import { createOnlineServer } from '../server/online-server.mjs';
 import { createSafeTimeIntegrationRouter, isLoopbackAddress } from '../server/safetime-integration.mjs';
 import { ONLINE_RUNTIME_VERSION } from '../server/api-diagnostics.mjs';
 
-function setupWorkspaceWithStudents(store) {
+const scrypt = promisify(scryptCallback);
+const scryptOptions = { N: 32768, r: 8, p: 1, maxmem: 64 * 1024 * 1024 };
+
+async function makePasswordHash(password) {
+  const salt = randomBytes(16).toString('hex');
+  const result = await scrypt(password, salt, 64, scryptOptions);
+  return `${salt}:${result.toString('hex')}`;
+}
+
+async function setupWorkspaceWithStudents(store) {
   const workspaceId = randomUUID();
   const now = new Date().toISOString();
   store.db.prepare('INSERT INTO workspaces(id, name, created_at) VALUES(?, ?, ?)').run(workspaceId, 'Trường Thực Nghiệm', now);
@@ -17,19 +27,63 @@ function setupWorkspaceWithStudents(store) {
 
   const student1Id = randomUUID();
   const user1Id = randomUUID();
+  const passHash1 = await makePasswordHash('MatKhauMinh123!');
   store.db.prepare('INSERT INTO users(id, workspace_id, username, password_hash, role, student_id, created_at) VALUES(?, ?, ?, ?, ?, ?, ?)')
-    .run(user1Id, workspaceId, 'hocsinh_minh', 'hash1', 'student', student1Id, now);
+    .run(user1Id, workspaceId, 'hocsinh_minh', passHash1, 'student', student1Id, now);
   store.db.prepare('INSERT INTO students(id, workspace_id, class_id, name, user_id, active, created_at) VALUES(?, ?, ?, ?, ?, 1, ?)')
     .run(student1Id, workspaceId, classId, 'Minh Hoàng', user1Id, now);
 
   const student2Id = randomUUID();
   const user2Id = randomUUID();
+  const passHash2 = await makePasswordHash('MatKhauAn123!');
   store.db.prepare('INSERT INTO users(id, workspace_id, username, password_hash, role, student_id, created_at) VALUES(?, ?, ?, ?, ?, ?, ?)')
-    .run(user2Id, workspaceId, 'hocsinh_an', 'hash2', 'student', student2Id, now);
+    .run(user2Id, workspaceId, 'hocsinh_an', passHash2, 'student', student2Id, now);
   store.db.prepare('INSERT INTO students(id, workspace_id, class_id, name, user_id, active, created_at) VALUES(?, ?, ?, ?, ?, 1, ?)')
     .run(student2Id, workspaceId, classId, 'An Nhiên', user2Id, now);
 
-  return { workspaceId, classId, student1Id, student2Id };
+  // Parent user
+  const parentUserId = randomUUID();
+  const parentPassHash = await makePasswordHash('MatKhauPhuHuynh123!');
+  store.db.prepare('INSERT INTO users(id, workspace_id, username, password_hash, role, created_at) VALUES(?, ?, ?, ?, ?, ?)')
+    .run(parentUserId, workspaceId, 'phuhuynh_test', parentPassHash, 'parent', now);
+
+  return { workspaceId, classId, student1Id, student2Id, parentUserId };
+}
+
+function mockRequestResponse({ remoteAddress = '127.0.0.1', path, method = 'GET', headers = {}, body = null }) {
+  const req = {
+    socket: { remoteAddress },
+    headers: { ...headers },
+    method,
+    async *[Symbol.asyncIterator]() {
+      if (body !== null) {
+        const buffer = Buffer.from(typeof body === 'string' ? body : JSON.stringify(body), 'utf8');
+        yield buffer;
+      }
+    }
+  };
+  let statusCode = 200;
+  const responseHeaders = {};
+  let responseBody = '';
+  const res = {
+    writeHead(code, hdrs) {
+      statusCode = code;
+      Object.assign(responseHeaders, hdrs);
+    },
+    end(chunk) {
+      if (chunk) responseBody += chunk;
+    }
+  };
+  return {
+    req,
+    res,
+    getResult: () => ({
+      status: statusCode,
+      headers: responseHeaders,
+      json: responseBody ? JSON.parse(responseBody) : null,
+      raw: responseBody
+    })
+  };
 }
 
 test('Task 3B.2 (BAO-05): Loopback address validation', () => {
@@ -47,37 +101,9 @@ test('Task 3B.2 (BAO-05): Loopback address validation', () => {
 test('Task 3B.2 (BAO-01, BAO-05, BAO-06): Direct Router unit test', async (t) => {
   const store = new OnlineStore(':memory:');
   t.after(() => store.close());
-  const { workspaceId, student1Id, student2Id } = setupWorkspaceWithStudents(store);
+  const { workspaceId, student1Id, student2Id } = await setupWorkspaceWithStudents(store);
 
   const router = createSafeTimeIntegrationRouter({ store, db: store.db });
-
-  // Helper to mock req/res
-  function mockRequestResponse({ remoteAddress = '127.0.0.1', path, method = 'GET', headers = {}, body = null }) {
-    const req = {
-      socket: { remoteAddress },
-      headers: { ...headers },
-      method,
-      async *[Symbol.asyncIterator]() {
-        if (body !== null) {
-          const buffer = Buffer.from(typeof body === 'string' ? body : JSON.stringify(body), 'utf8');
-          yield buffer;
-        }
-      }
-    };
-    let statusCode = 200;
-    const responseHeaders = {};
-    let responseBody = '';
-    const res = {
-      writeHead(code, hdrs) {
-        statusCode = code;
-        Object.assign(responseHeaders, hdrs);
-      },
-      end(chunk) {
-        if (chunk) responseBody += chunk;
-      }
-    };
-    return { req, res, getResult: () => ({ status: statusCode, headers: responseHeaders, json: responseBody ? JSON.parse(responseBody) : null, raw: responseBody }) };
-  }
 
   // 1. Remote rejection (BAO-05)
   {
@@ -180,7 +206,7 @@ test('Task 3B.2 (BAO-01, BAO-05, BAO-06): Direct Router unit test', async (t) =>
     const result = getResult();
     assert.equal(result.status, 200);
     assert.ok(result.json.token);
-    assert.equal(result.json.token.length, 64); // 32 random bytes as hex
+    assert.equal(result.json.token.length, 64);
     clientToken = result.json.token;
     assert.equal(result.json.workspace.id, workspaceId);
     assert.equal(result.json.workspace.name, 'Trường Thực Nghiệm');
@@ -322,7 +348,190 @@ test('Task 3B.2 (BAO-01, BAO-05, BAO-06): Direct Router unit test', async (t) =>
   }
 });
 
-test('Task 3B.2 (BAO-01, BAO-05, BAO-06): Real HTTP Server loopback end-to-end integration', async (t) => {
+test('Task 3B.3 (BAO-07): student-login credential check, wrong_student, rateLimit, and ticket/refreshToken generation', async (t) => {
+  const store = new OnlineStore(':memory:');
+  t.after(() => store.close());
+  const { workspaceId, student1Id, student2Id, parentUserId } = await setupWorkspaceWithStudents(store);
+
+  const router = createSafeTimeIntegrationRouter({ store, db: store.db });
+
+  // Create pair code allowing only student1 (Minh Hoàng)
+  const pairCode = store.createIntegrationPairCode(workspaceId, [student1Id], 10);
+  const { req: pairReq, res: pairRes, getResult: pairResult } = mockRequestResponse({
+    path: '/api/integration/safetime/v1/pair',
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: { code: pairCode.code, deviceName: 'PC-Hoc-Tap', deviceId: 'dev-hoc-tap-1' }
+  });
+  await router.handle(pairReq, pairRes, { path: '/api/integration/safetime/v1/pair', method: 'POST' });
+  const clientToken = pairResult().json.token;
+  assert.ok(clientToken);
+
+  // 1. Without Bearer token -> 401 unauthorized
+  {
+    const { req, res, getResult } = mockRequestResponse({
+      path: '/api/integration/safetime/v1/student-login',
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: { username: 'hocsinh_minh', password: 'MatKhauMinh123!', studentId: student1Id }
+    });
+    await router.handle(req, res, { path: '/api/integration/safetime/v1/student-login', method: 'POST' });
+    assert.equal(getResult().status, 401);
+  }
+
+  // 2. Missing required fields -> 400 invalid_payload
+  {
+    const { req, res, getResult } = mockRequestResponse({
+      path: '/api/integration/safetime/v1/student-login',
+      method: 'POST',
+      headers: { authorization: `Bearer ${clientToken}`, 'content-type': 'application/json' },
+      body: { username: 'hocsinh_minh', password: '' }
+    });
+    await router.handle(req, res, { path: '/api/integration/safetime/v1/student-login', method: 'POST' });
+    assert.equal(getResult().status, 400);
+    assert.equal(getResult().json.error.code, 'invalid_payload');
+  }
+
+  // 3. studentId not in client's allowed list -> 403 student_not_allowed (client only allowed student1Id)
+  {
+    const { req, res, getResult } = mockRequestResponse({
+      path: '/api/integration/safetime/v1/student-login',
+      method: 'POST',
+      headers: { authorization: `Bearer ${clientToken}`, 'content-type': 'application/json' },
+      body: { username: 'hocsinh_an', password: 'MatKhauAn123!', studentId: student2Id }
+    });
+    await router.handle(req, res, { path: '/api/integration/safetime/v1/student-login', method: 'POST' });
+    assert.equal(getResult().status, 403);
+    assert.equal(getResult().json.error.code, 'student_not_allowed');
+  }
+
+  // 4. Non-student account logging in -> 403 not_student
+  {
+    const { req, res, getResult } = mockRequestResponse({
+      path: '/api/integration/safetime/v1/student-login',
+      method: 'POST',
+      headers: { authorization: `Bearer ${clientToken}`, 'content-type': 'application/json' },
+      body: { username: 'phuhuynh_test', password: 'MatKhauPhuHuynh123!', studentId: student1Id }
+    });
+    await router.handle(req, res, { path: '/api/integration/safetime/v1/student-login', method: 'POST' });
+    assert.equal(getResult().status, 403);
+    assert.equal(getResult().json.error.code, 'not_student');
+  }
+
+  // 5. Wrong password -> 401 invalid_credentials
+  {
+    const { req, res, getResult } = mockRequestResponse({
+      path: '/api/integration/safetime/v1/student-login',
+      method: 'POST',
+      headers: { authorization: `Bearer ${clientToken}`, 'content-type': 'application/json' },
+      body: { username: 'hocsinh_minh', password: 'WrongPassword999!', studentId: student1Id }
+    });
+    await router.handle(req, res, { path: '/api/integration/safetime/v1/student-login', method: 'POST' });
+    assert.equal(getResult().status, 401);
+    assert.equal(getResult().json.error.code, 'invalid_credentials');
+  }
+
+  // 6. Wrong student (BAO-07, LNK-09): Child enters their sibling's account
+  // Pair another client that allows both students to test wrong_student
+  const pairCodeAll = store.createIntegrationPairCode(workspaceId, [student1Id, student2Id], 10);
+  const { req: pReq2, res: pRes2, getResult: pResult2 } = mockRequestResponse({
+    path: '/api/integration/safetime/v1/pair',
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: { code: pairCodeAll.code, deviceName: 'PC-All', deviceId: 'dev-all' }
+  });
+  await router.handle(pReq2, pRes2, { path: '/api/integration/safetime/v1/pair', method: 'POST' });
+  const clientTokenAll = pResult2().json.token;
+
+  // Student An enters credentials, but studentId is Minh's ID
+  {
+    const { req, res, getResult } = mockRequestResponse({
+      path: '/api/integration/safetime/v1/student-login',
+      method: 'POST',
+      headers: { authorization: `Bearer ${clientTokenAll}`, 'content-type': 'application/json' },
+      body: { username: 'hocsinh_an', password: 'MatKhauAn123!', studentId: student1Id }
+    });
+    await router.handle(req, res, { path: '/api/integration/safetime/v1/student-login', method: 'POST' });
+    const result = getResult();
+    assert.equal(result.status, 403);
+    assert.equal(result.json.error.code, 'wrong_student');
+    assert.equal(result.json.error.message, 'Tài khoản này không phải của bạn trên máy này. Hỏi bố mẹ nhé.');
+  }
+
+  // 7. Successful login with remember = false (BAO-07, BAO-08)
+  {
+    const { req, res, getResult } = mockRequestResponse({
+      path: '/api/integration/safetime/v1/student-login',
+      method: 'POST',
+      headers: { authorization: `Bearer ${clientTokenAll}`, 'content-type': 'application/json' },
+      body: { username: 'hocsinh_minh', password: 'MatKhauMinh123!', studentId: student1Id, remember: false }
+    });
+    await router.handle(req, res, { path: '/api/integration/safetime/v1/student-login', method: 'POST' });
+    const result = getResult();
+    assert.equal(result.status, 200);
+    assert.equal(result.json.student.id, student1Id);
+    assert.equal(result.json.student.displayName, 'Minh Hoàng');
+    assert.ok(result.json.ticket);
+    assert.equal(result.json.ticket.length, 64);
+    assert.equal(result.json.refreshToken, undefined);
+
+    // Verify ticket in DB
+    const ticketInDb = store.db.prepare('SELECT * FROM integration_tickets WHERE ticket = ?').get(result.json.ticket);
+    assert.ok(ticketInDb);
+    assert.equal(ticketInDb.student_id, student1Id);
+  }
+
+  // 8. Successful login with remember = true -> generates refreshToken (BAO-07, BAO-08)
+  {
+    const { req, res, getResult } = mockRequestResponse({
+      path: '/api/integration/safetime/v1/student-login',
+      method: 'POST',
+      headers: { authorization: `Bearer ${clientTokenAll}`, 'content-type': 'application/json' },
+      body: { username: 'hocsinh_minh', password: 'MatKhauMinh123!', studentId: student1Id, remember: true }
+    });
+    await router.handle(req, res, { path: '/api/integration/safetime/v1/student-login', method: 'POST' });
+    const result = getResult();
+    assert.equal(result.status, 200);
+    assert.equal(result.json.student.id, student1Id);
+    assert.ok(result.json.ticket);
+    assert.ok(result.json.refreshToken);
+    assert.equal(result.json.refreshToken.length, 64);
+
+    // Verify refresh token hash in DB
+    const refreshHash = createHash('sha256').update(result.json.refreshToken).digest('hex');
+    const refreshInDb = store.db.prepare('SELECT * FROM integration_refresh_tokens WHERE token_hash = ?').get(refreshHash);
+    assert.ok(refreshInDb);
+    assert.equal(refreshInDb.student_id, student1Id);
+  }
+
+  // 9. Shared rate limit test (BAO-07): 12 failed attempts for username triggers 429
+  // Clear any existing limit first
+  store.db.prepare('DELETE FROM login_limits').run();
+  for (let i = 1; i <= 12; i++) {
+    const { req, res } = mockRequestResponse({
+      path: '/api/integration/safetime/v1/student-login',
+      method: 'POST',
+      headers: { authorization: `Bearer ${clientTokenAll}`, 'content-type': 'application/json' },
+      body: { username: 'hocsinh_an', password: 'WrongPassword!', studentId: student2Id }
+    });
+    await router.handle(req, res, { path: '/api/integration/safetime/v1/student-login', method: 'POST' });
+  }
+  // 13th failure triggers 429
+  {
+    const { req, res, getResult } = mockRequestResponse({
+      path: '/api/integration/safetime/v1/student-login',
+      method: 'POST',
+      headers: { authorization: `Bearer ${clientTokenAll}`, 'content-type': 'application/json' },
+      body: { username: 'hocsinh_an', password: 'WrongPassword!', studentId: student2Id }
+    });
+    await router.handle(req, res, { path: '/api/integration/safetime/v1/student-login', method: 'POST' });
+    const result = getResult();
+    assert.equal(result.status, 429);
+    assert.equal(result.json.error.code, 'login_rate_limited');
+  }
+});
+
+test('Task 3B.2 & 3B.3 (BAO-01, BAO-05, BAO-06, BAO-07): Real HTTP Server loopback end-to-end integration', async (t) => {
   const server = createOnlineServer({ databasePath: ':memory:' });
   server.listen(0, '127.0.0.1');
   await once(server, 'listening');
@@ -333,7 +542,7 @@ test('Task 3B.2 (BAO-01, BAO-05, BAO-06): Real HTTP Server loopback end-to-end i
     server.onlineClose();
   });
 
-  const { workspaceId, student1Id, student2Id } = setupWorkspaceWithStudents(server.onlineStore);
+  const { workspaceId, student1Id, student2Id } = await setupWorkspaceWithStudents(server.onlineStore);
 
   // 1. HTTP GET /api/integration/safetime/v1/status
   const res1 = await fetch(`${origin}/api/integration/safetime/v1/status`);
@@ -372,20 +581,41 @@ test('Task 3B.2 (BAO-01, BAO-05, BAO-06): Real HTTP Server loopback end-to-end i
   assert.equal(students.length, 2);
   assert.deepEqual(students.map(s => s.displayName).sort(), ['An Nhiên', 'Minh Hoàng']);
 
-  // 5. HTTP GET /api/integration/safetime/v1/status now paired: true
+  // 5. HTTP POST /api/integration/safetime/v1/student-login (Task 3B.3)
+  const resLogin = await fetch(`${origin}/api/integration/safetime/v1/student-login`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      username: 'hocsinh_minh',
+      password: 'MatKhauMinh123!',
+      studentId: student1Id,
+      remember: true
+    })
+  });
+  assert.equal(resLogin.status, 200);
+  const loginData = await resLogin.json();
+  assert.equal(loginData.student.id, student1Id);
+  assert.equal(loginData.student.displayName, 'Minh Hoàng');
+  assert.ok(loginData.ticket);
+  assert.ok(loginData.refreshToken);
+
+  // 6. HTTP GET /api/integration/safetime/v1/status now paired: true
   const res4 = await fetch(`${origin}/api/integration/safetime/v1/status`);
   assert.equal(res4.status, 200);
   const data4 = await res4.json();
   assert.equal(data4.paired, true);
 
-  // 6. HTTP DELETE /api/integration/safetime/v1/pair
+  // 7. HTTP DELETE /api/integration/safetime/v1/pair
   const res5 = await fetch(`${origin}/api/integration/safetime/v1/pair`, {
     method: 'DELETE',
     headers: { Authorization: `Bearer ${token}` }
   });
   assert.equal(res5.status, 204);
 
-  // 7. Token is now revoked
+  // 8. Token is now revoked
   const res6 = await fetch(`${origin}/api/integration/safetime/v1/students`, {
     headers: { Authorization: `Bearer ${token}` }
   });

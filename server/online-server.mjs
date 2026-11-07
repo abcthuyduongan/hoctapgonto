@@ -40,7 +40,6 @@ export function createOnlineServer({databasePath,staticRoot=resolve('dist'),publ
     if(url.protocol!=='https:'&&!['127.0.0.1','localhost','[::1]'].includes(url.hostname))throw new Error('Website công khai cần HTTPS.');configuredOrigin=url.origin;}
   const releaseDatabaseLock=acquireOnlineDatabaseLock(databasePath);let store,db;
   try{recoverInterruptedOnlineRestore(databasePath);store=new OnlineStore(databasePath);db=store.db;}catch(error){releaseDatabaseLock();throw error;}
-  const safeTimeIntegration=createSafeTimeIntegrationRouter({store,db});
   let closed=false,recoveryBusy=false,backupRunning=false;
   const recoveryPreviews=new Map();
   const available=()=>{if(recoveryBusy)fail(503,'Máy chủ đang phục hồi dữ liệu. Hãy đợi hoàn tất rồi đăng nhập lại.');if(!store||!db)fail(503,'Phục hồi bị gián đoạn. Giữ nguyên dữ liệu, đóng rồi mở lại máy chủ để khôi phục an toàn.');};
@@ -86,6 +85,19 @@ export function createOnlineServer({databasePath,staticRoot=resolve('dist'),publ
     }});
     return()=>db.prepare('DELETE FROM login_limits WHERE key=?').run(keys[1]);
   }
+  async function authenticateUserCredentials({req,rawUsername,rawPassword}){
+    available();
+    const name=username(rawUsername);
+    const clear=rateLimit(req,name);
+    const user=db.prepare('SELECT * FROM users WHERE username=?').get(name);
+    const correct=await verifyPassword(rawPassword,user?.password_hash);
+    available();
+    const current=user&&db.prepare('SELECT * FROM users WHERE id=?').get(user.id);
+    if(!correct||!current||!current.active||current.password_hash!==user.password_hash)fail(401,'Tên đăng nhập hoặc mật khẩu chưa đúng.');
+    clear();
+    return current;
+  }
+  const safeTimeIntegration=createSafeTimeIntegrationRouter({store,db,authenticateUserCredentials});
   const reportFailure=createFailureReporter();
   const server=createServer(async(req,res)=>{
     const started=performance.now();
@@ -112,10 +124,9 @@ export function createOnlineServer({databasePath,staticRoot=resolve('dist'),publ
           return json(res,201,login(res,user,origin));
         }
         if(method==='POST'&&route==='/login'){
-          const input=shape(await body(req),['username','password']);available();const name=username(input.username),clear=rateLimit(req,name),user=db.prepare('SELECT * FROM users WHERE username=?').get(name),correct=await verifyPassword(input.password,user?.password_hash);
-          available();
-          const current=user&&db.prepare('SELECT * FROM users WHERE id=?').get(user.id);
-          if(!correct||!current||!current.active||current.password_hash!==user.password_hash)fail(401,'Tên đăng nhập hoặc mật khẩu chưa đúng.');clear();return json(res,200,login(res,current,origin));
+          const input=shape(await body(req),['username','password']);available();
+          const current=await authenticateUserCredentials({req,rawUsername:input.username,rawPassword:input.password});
+          return json(res,200,login(res,current,origin));
         }
         const auth=actor(req);if(mutable&&!sameSecret(req.headers['x-csrf-token'],auth.csrfToken))fail(403,'Phiên xác thực của biểu mẫu đã thay đổi. Hãy tải lại.');
         if(method==='GET'&&route==='/recovery'){role(auth,'admin');let supported=true,reason;try{recoveryOwner(auth);}catch(error){supported=false;reason=error.message;}return json(res,200,{supported,maxUploadBytes:MAX_RECOVERY_UPLOAD_BYTES,previewMinutes:10,...(reason?{reason}:{})});}
