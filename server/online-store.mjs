@@ -1,5 +1,6 @@
 import {DatabaseSync} from 'node:sqlite';
-import {randomUUID,createHash} from 'node:crypto';
+import {BAO_AN_GIFT_PRESET,BAO_AN_GIFT_RATE_VND,BAO_AN_GIFT_PRESET_ID,presetGiftDetails} from '../src/core/gift-presets.ts';
+import {randomUUID,createHash,randomBytes} from 'node:crypto';
 import {mkdirSync} from 'node:fs';
 import {dirname} from 'node:path';
 import {parseContentImport} from '../src/core/content-io.ts';
@@ -82,7 +83,7 @@ export class OnlineStore{
       throw new Error(`Lỗi nâng cấp cấu trúc bảng users: ${err.message}`);
     }
     this.db.exec(`PRAGMA foreign_keys=ON; PRAGMA journal_mode=WAL; PRAGMA busy_timeout=5000;
-      CREATE TABLE IF NOT EXISTS schema_version(version INTEGER PRIMARY KEY); INSERT OR IGNORE INTO schema_version VALUES(1);
+      CREATE TABLE IF NOT EXISTS schema_version(version INTEGER PRIMARY KEY); INSERT OR IGNORE INTO schema_version VALUES(2);
       CREATE TABLE IF NOT EXISTS workspaces(id TEXT PRIMARY KEY,name TEXT NOT NULL,wallet_enabled INTEGER NOT NULL DEFAULT 0,rate_vnd INTEGER NOT NULL DEFAULT 1000,created_at TEXT NOT NULL);
       CREATE TABLE IF NOT EXISTS users(id TEXT PRIMARY KEY,workspace_id TEXT NOT NULL REFERENCES workspaces(id),username TEXT NOT NULL UNIQUE,password_hash TEXT NOT NULL,role TEXT NOT NULL CHECK(role IN ('admin','student','parent')),student_id TEXT,active INTEGER NOT NULL DEFAULT 1,created_at TEXT NOT NULL);
       CREATE TABLE IF NOT EXISTS auth_sessions(token_hash TEXT PRIMARY KEY,user_id TEXT NOT NULL REFERENCES users(id),csrf_token TEXT NOT NULL,expires_at INTEGER NOT NULL);
@@ -127,10 +128,21 @@ export class OnlineStore{
       CREATE INDEX IF NOT EXISTS student_goal_gift ON student_goals(workspace_id,gift_id);
       CREATE INDEX IF NOT EXISTS badge_awards_student ON badge_awards(workspace_id,student_id);
       CREATE INDEX IF NOT EXISTS daily_missions_date ON daily_missions(workspace_id,student_id,date);
-      CREATE INDEX IF NOT EXISTS auth_expiry ON auth_sessions(expires_at);`);
+      CREATE INDEX IF NOT EXISTS auth_expiry ON auth_sessions(expires_at);
+      CREATE TABLE IF NOT EXISTS integration_clients(id TEXT PRIMARY KEY,workspace_id TEXT NOT NULL REFERENCES workspaces(id),token_hash TEXT NOT NULL UNIQUE,device_id TEXT NOT NULL,device_name TEXT NOT NULL,allowed_student_ids TEXT NOT NULL,created_at TEXT NOT NULL,last_used_at TEXT,revoked_at TEXT);
+      CREATE TABLE IF NOT EXISTS integration_pair_codes(code TEXT PRIMARY KEY,workspace_id TEXT NOT NULL REFERENCES workspaces(id),allowed_student_ids TEXT NOT NULL,created_at TEXT NOT NULL,expires_at TEXT NOT NULL,used_at TEXT);
+      CREATE TABLE IF NOT EXISTS integration_tickets(ticket TEXT PRIMARY KEY,workspace_id TEXT NOT NULL REFERENCES workspaces(id),client_id TEXT NOT NULL REFERENCES integration_clients(id),student_id TEXT NOT NULL,created_at TEXT NOT NULL,expires_at TEXT NOT NULL,used_at TEXT,FOREIGN KEY(workspace_id,student_id) REFERENCES students(workspace_id,id));
+      CREATE TABLE IF NOT EXISTS integration_refresh_tokens(token_hash TEXT PRIMARY KEY,workspace_id TEXT NOT NULL REFERENCES workspaces(id),client_id TEXT NOT NULL REFERENCES integration_clients(id),student_id TEXT NOT NULL,created_at TEXT NOT NULL,expires_at TEXT NOT NULL,revoked_at TEXT,FOREIGN KEY(workspace_id,student_id) REFERENCES students(workspace_id,id));
+      CREATE TABLE IF NOT EXISTS integration_events(id TEXT PRIMARY KEY,workspace_id TEXT NOT NULL REFERENCES workspaces(id),student_id TEXT NOT NULL,event_type TEXT NOT NULL,data_json TEXT NOT NULL,created_at TEXT NOT NULL,FOREIGN KEY(workspace_id,student_id) REFERENCES students(workspace_id,id));
+      CREATE INDEX IF NOT EXISTS integration_clients_token ON integration_clients(token_hash);
+      CREATE INDEX IF NOT EXISTS integration_pair_codes_expiry ON integration_pair_codes(expires_at);
+      CREATE INDEX IF NOT EXISTS integration_tickets_lookup ON integration_tickets(ticket,expires_at);
+      CREATE INDEX IF NOT EXISTS integration_refresh_lookup ON integration_refresh_tokens(token_hash,expires_at);
+      CREATE INDEX IF NOT EXISTS integration_events_lookup ON integration_events(workspace_id,student_id,created_at);
+      INSERT OR REPLACE INTO schema_version VALUES(2);`);
     try { this.db.prepare('ALTER TABLE classes ADD COLUMN feed_enabled INTEGER NOT NULL DEFAULT 1').run(); } catch {}
     this.db.function('baoan_fold',{deterministic:true},value=>typeof value==='string'?value.normalize('NFC').toLocaleLowerCase('vi'):value);
-    if(this.db.prepare('SELECT max(version) AS version FROM schema_version').get().version!==1)fail(500,'Phiên bản dữ liệu online chưa được hỗ trợ.');
+    if(this.db.prepare('SELECT max(version) AS version FROM schema_version').get().version!==2)fail(500,'Phiên bản dữ liệu online chưa được hỗ trợ.');
     this.lastCorrectPositions = new Map();
   }
   lastQuestionCorrectPosition(workspaceId, studentId, itemId, version, packId) {
@@ -534,7 +546,20 @@ export class OnlineStore{
     this.db.prepare('INSERT OR IGNORE INTO redemptions VALUES(?,?,?,?,?)').run(auth.workspaceId,request.requestId,auth.studentId,rewardStatus(request),json(request));this.audit(auth,'redemption.request',request.requestId);return request;
   });}
   publicGift(row){
-    return{id:row.id,workspaceId:row.workspace_id,classId:row.class_id,title:row.title,imageMediaId:row.image_media_id,priceStars:row.price_stars,kind:row.kind,weeklyLimit:row.weekly_limit,stock:row.stock,unlockAfterWeek:row.unlock_after_week,active:!!row.active,sortOrder:row.sort_order,createdAt:row.created_at};
+    return{id:row.id,workspaceId:row.workspace_id,classId:row.class_id,title:row.title,imageMediaId:row.image_media_id,priceStars:row.price_stars,kind:row.kind,weeklyLimit:row.weekly_limit,stock:row.stock,unlockAfterWeek:row.unlock_after_week,active:!!row.active,sortOrder:row.sort_order,createdAt:row.created_at,...presetGiftDetails(row.id)};
+  }
+  installGiftPreset(auth,input){
+    role(auth,'admin');shape(input,[]);
+    return this.tx(()=>{
+      let created=0;const at=now();
+      for(const [index,item] of BAO_AN_GIFT_PRESET.entries()){
+        if(this.db.prepare('SELECT 1 FROM gift_catalog WHERE workspace_id=? AND id=?').get(auth.workspaceId,item.id))continue;
+        this.db.prepare('INSERT INTO gift_catalog(workspace_id,id,class_id,title,image_media_id,price_stars,kind,weekly_limit,stock,unlock_after_week,active,sort_order,created_at) VALUES(?,?,NULL,?,NULL,?,\'item\',0,-1,0,1,?,?)').run(auth.workspaceId,item.id,item.title,item.priceStars,index,at);created++;
+      }
+      this.db.prepare('UPDATE workspaces SET rate_vnd=? WHERE id=?').run(BAO_AN_GIFT_RATE_VND,auth.workspaceId);
+      this.audit(auth,'gift.preset.install',BAO_AN_GIFT_PRESET_ID);
+      return{created,kept:BAO_AN_GIFT_PRESET.length-created,rateVnd:BAO_AN_GIFT_RATE_VND};
+    });
   }
   gifts(auth,classId=null){
     if(auth.role==='student'){
@@ -662,13 +687,18 @@ export class OnlineStore{
       return request;
     });
   }
-  transitionReward(auth,requestId,input,cancel=false){shape(input,cancel?[]:['status','note']);return this.tx(()=>{const row=this.db.prepare('SELECT * FROM redemptions WHERE workspace_id=? AND id=?').get(auth.workspaceId,requestId);if(!row||cancel&&row.student_id!==auth.studentId)fail(404,'Không tìm thấy yêu cầu đổi sao.');
+  transitionReward(auth,requestId,input,cancel=false,parentToken=null){shape(input,cancel?[]:['status','note']);return this.tx(()=>{const row=this.db.prepare('SELECT * FROM redemptions WHERE workspace_id=? AND id=?').get(auth.workspaceId,requestId);if(!row||cancel&&row.student_id!==auth.studentId)fail(404,'Không tìm thấy yêu cầu đổi sao.');
+    if(cancel&&auth.role!=='student')fail(403,'Chỉ học sinh được hủy yêu cầu của mình.');
     if(auth.role==='parent'){
       const linked=this.db.prepare('SELECT 1 FROM parent_students WHERE workspace_id=? AND parent_user_id=? AND student_id=?').get(auth.workspaceId,auth.id,row.student_id);
       if(!linked)fail(403,'Phụ huynh chỉ có thể duyệt quà cho con của mình.');
-    }
+    }else if(auth.role==='student'&&!cancel){
+      const raw=this.rawParentControls(auth.workspaceId,row.student_id);
+      if(auth.studentId!==row.student_id||!raw.pinHash||!parentToken||!verifyParentElevationToken(parentToken,{userId:auth.id,studentId:row.student_id,workspaceId:auth.workspaceId,pinHash:raw.pinHash,sessionHash:auth.tokenHash}))fail(403,'Vui lòng xác thực mã PIN phụ huynh của học sinh này trước.');
+    }else if(auth.role!=='admin'&&!cancel)fail(403,'Chỉ giáo viên hoặc phụ huynh mới có quyền duyệt quà.');
     const status=cancel?'cancelled':input.status;if(!['approved','rejected','fulfilled','cancelled'].includes(status)||!cancel&&status==='cancelled')fail(400,'Trạng thái đổi thưởng không hợp lệ.');
     const previous=parse(row.json);
+    if(rewardStatus(previous)===status)return previous;
     let request;try{request=changeRewardRequest(previous,status,now(),input.note);}catch(error){fail(409,error.message);}
     if(['cancelled','rejected'].includes(status)&&previous.giftId){
       const gift=this.db.prepare('SELECT stock FROM gift_catalog WHERE workspace_id=? AND id=?').get(auth.workspaceId,previous.giftId);
@@ -1977,5 +2007,178 @@ export class OnlineStore{
     })).filter(verifyPrivacyCompliance);
 
     return { enabled: true, events };
+  }
+
+  // ==========================================
+  // CỔNG KẾT NỐI SAFETIME (GĐ3B: BAO-04, BAO-14)
+  // ==========================================
+
+  createIntegrationPairCode(workspaceId, allowedStudentIds, expiresInMinutes = 10) {
+    if (!Array.isArray(allowedStudentIds) || allowedStudentIds.length === 0) {
+      fail(400, 'Cần chọn ít nhất một học sinh được phép kết nối.');
+    }
+    const chars = '23456789ABCDEFGHJKMNPQRSTUVWXYZ';
+    const bytes = randomBytes(8);
+    let code = '';
+    for (let i = 0; i < 8; i++) {
+      code += chars[bytes[i] % chars.length];
+    }
+    const createdAt = now();
+    const expiresAt = new Date(Date.now() + expiresInMinutes * 60 * 1000).toISOString();
+    this.db.prepare(`
+      INSERT INTO integration_pair_codes(code, workspace_id, allowed_student_ids, created_at, expires_at)
+      VALUES (?, ?, ?, ?, ?)
+    `).run(code, workspaceId, json(allowedStudentIds), createdAt, expiresAt);
+    return { code, expiresAt, allowedStudentIds };
+  }
+
+  findIntegrationPairCode(code) {
+    const row = this.db.prepare('SELECT * FROM integration_pair_codes WHERE code = ?').get(code);
+    if (!row) return null;
+    return {
+      ...row,
+      allowed_student_ids: parse(row.allowed_student_ids)
+    };
+  }
+
+  consumeIntegrationPairCode(code) {
+    const row = this.findIntegrationPairCode(code);
+    if (!row) fail(404, 'Mã ghép đôi không tồn tại.');
+    if (row.used_at) fail(400, 'Mã ghép đôi đã được sử dụng.');
+    if (new Date(row.expires_at) <= new Date()) fail(400, 'Mã ghép đôi đã hết hạn (hiệu lực 10 phút).');
+    const usedAt = now();
+    this.db.prepare('UPDATE integration_pair_codes SET used_at = ? WHERE code = ?').run(usedAt, code);
+    return { ...row, used_at: usedAt };
+  }
+
+  createIntegrationClient(workspaceId, { tokenHash, deviceId, deviceName, allowedStudentIds }) {
+    if (!tokenHash || !deviceId || !deviceName) fail(400, 'Thiếu thông tin thiết bị hoặc khóa kết nối.');
+    const clientId = id();
+    const createdAt = now();
+    this.db.prepare(`
+      INSERT INTO integration_clients(id, workspace_id, token_hash, device_id, device_name, allowed_student_ids, created_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `).run(clientId, workspaceId, tokenHash, deviceId, deviceName, json(allowedStudentIds || []), createdAt);
+    return {
+      id: clientId,
+      workspace_id: workspaceId,
+      token_hash: tokenHash,
+      device_id: deviceId,
+      device_name: deviceName,
+      allowed_student_ids: allowedStudentIds || [],
+      created_at: createdAt,
+      last_used_at: null,
+      revoked_at: null
+    };
+  }
+
+  findIntegrationClientByTokenHash(tokenHash) {
+    const row = this.db.prepare('SELECT * FROM integration_clients WHERE token_hash = ? AND revoked_at IS NULL').get(tokenHash);
+    if (!row) return null;
+    return {
+      ...row,
+      allowed_student_ids: parse(row.allowed_student_ids)
+    };
+  }
+
+  findIntegrationClientById(id) {
+    const row = this.db.prepare('SELECT * FROM integration_clients WHERE id = ?').get(id);
+    if (!row) return null;
+    return {
+      ...row,
+      allowed_student_ids: parse(row.allowed_student_ids)
+    };
+  }
+
+  listIntegrationClients(workspaceId) {
+    const rows = this.db.prepare('SELECT * FROM integration_clients WHERE workspace_id = ? ORDER BY created_at DESC').all(workspaceId);
+    return rows.map(r => ({
+      ...r,
+      allowed_student_ids: parse(r.allowed_student_ids)
+    }));
+  }
+
+  touchIntegrationClient(id) {
+    this.db.prepare('UPDATE integration_clients SET last_used_at = ? WHERE id = ?').run(now(), id);
+  }
+
+  revokeIntegrationClient(id) {
+    const revokedAt = now();
+    this.db.prepare('UPDATE integration_clients SET revoked_at = ? WHERE id = ? AND revoked_at IS NULL').run(revokedAt, id);
+    this.db.prepare('UPDATE integration_refresh_tokens SET revoked_at = ? WHERE client_id = ? AND revoked_at IS NULL').run(revokedAt, id);
+    return true;
+  }
+
+  createIntegrationTicket(workspaceId, clientId, studentId, expiresInSeconds = 60) {
+    const ticket = randomUUID().replace(/-/g, '') + randomUUID().replace(/-/g, '');
+    const createdAt = now();
+    const expiresAt = new Date(Date.now() + expiresInSeconds * 1000).toISOString();
+    this.db.prepare(`
+      INSERT INTO integration_tickets(ticket, workspace_id, client_id, student_id, created_at, expires_at)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `).run(ticket, workspaceId, clientId, studentId, createdAt, expiresAt);
+    return { ticket, expiresAt };
+  }
+
+  consumeIntegrationTicket(ticket) {
+    const row = this.db.prepare('SELECT * FROM integration_tickets WHERE ticket = ?').get(ticket);
+    if (!row) fail(404, 'Vé SSO không tồn tại.');
+    if (row.used_at) fail(400, 'Vé SSO đã được sử dụng.');
+    if (new Date(row.expires_at) <= new Date()) fail(400, 'Vé SSO đã hết hạn (hiệu lực 60 giây).');
+    const usedAt = now();
+    this.db.prepare('UPDATE integration_tickets SET used_at = ? WHERE ticket = ?').run(usedAt, ticket);
+    return { ...row, used_at: usedAt };
+  }
+
+  createIntegrationRefreshToken(workspaceId, clientId, studentId, expiresInDays = 30) {
+    const rawToken = randomUUID().replace(/-/g, '') + randomUUID().replace(/-/g, '');
+    const tokenHash = createHash('sha256').update(rawToken).digest('hex');
+    const createdAt = now();
+    const expiresAt = new Date(Date.now() + expiresInDays * 24 * 3600 * 1000).toISOString();
+    this.db.prepare(`
+      INSERT INTO integration_refresh_tokens(token_hash, workspace_id, client_id, student_id, created_at, expires_at)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `).run(tokenHash, workspaceId, clientId, studentId, createdAt, expiresAt);
+    return { rawToken, expiresAt };
+  }
+
+  consumeIntegrationRefreshToken(rawToken) {
+    const tokenHash = createHash('sha256').update(rawToken).digest('hex');
+    const row = this.db.prepare('SELECT * FROM integration_refresh_tokens WHERE token_hash = ? AND revoked_at IS NULL').get(tokenHash);
+    if (!row) fail(401, 'Mã làm mới không hợp lệ hoặc đã bị thu hồi.');
+    if (new Date(row.expires_at) <= new Date()) fail(401, 'Mã làm mới đã hết hạn.');
+    this.db.prepare('UPDATE integration_refresh_tokens SET revoked_at = ? WHERE token_hash = ?').run(now(), tokenHash);
+    return row;
+  }
+
+  recordIntegrationEvent(workspaceId, studentId, eventType, data) {
+    const eventId = id();
+    const createdAt = now();
+    this.db.prepare(`
+      INSERT INTO integration_events(id, workspace_id, student_id, event_type, data_json, created_at)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `).run(eventId, workspaceId, studentId, eventType, json(data), createdAt);
+    return { id: eventId, eventType, data, createdAt };
+  }
+
+  listIntegrationEvents(workspaceId, { afterCursor = 0, limit = 100 } = {}) {
+    const maxLimit = Math.min(Math.max(1, limit), 200);
+    const numericCursor = Number(afterCursor) || 0;
+    const rows = this.db.prepare(`
+      SELECT rowid, id, student_id, event_type, data_json, created_at
+      FROM integration_events
+      WHERE workspace_id = ? AND rowid > ?
+      ORDER BY rowid ASC
+      LIMIT ?
+    `).all(workspaceId, numericCursor, maxLimit);
+    const events = rows.map(r => ({
+      id: r.id,
+      studentId: r.student_id,
+      type: r.event_type,
+      data: parse(r.data_json),
+      createdAt: r.created_at
+    }));
+    const nextCursor = rows.length > 0 ? rows[rows.length - 1].rowid : numericCursor;
+    return { events, cursor: nextCursor };
   }
 }

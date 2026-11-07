@@ -8,7 +8,8 @@ export const CLOUD_TABLES=Object.freeze([
   'packs','weeks','week_sets','plays','attempts','awards','redemptions','audit','media',
   'gift_catalog','student_goals','badge_awards','student_streaks','daily_missions',
   'parent_controls','parent_students','contest_sessions','town_states','materials_ledger',
-  'town_animals','town_cheers','class_feed_events'
+  'town_animals','town_cheers','class_feed_events',
+  'integration_clients','integration_pair_codes','integration_tickets','integration_refresh_tokens','integration_events'
 ]);
 export const MIGRATION_FILES = Object.freeze([
   '202610150001_online.sql',
@@ -18,7 +19,8 @@ export const MIGRATION_FILES = Object.freeze([
   '202611050005_contests.sql',
   '202611050006_town.sql',
   '202611050007_town_social_feed.sql',
-  '202611050008_d02_query_optimization.sql'
+  '202611050008_d02_query_optimization.sql',
+  '202611070009_safetime_integration.sql'
 ]);
 export async function loadAllMigrations(){
   const chunks=[];
@@ -62,7 +64,7 @@ function safeFailure(error,stage){
 async function verifyDatabase(database){
   const versions=(await database.query('SELECT version FROM bao_an.schema_version ORDER BY version')).rows;
   const maxVersion = versions.length ? versions[versions.length - 1].version : 0;
-  if(maxVersion < 8 || versions.length < 8)fail('Schema bao_an chưa đúng phiên bản (yêu cầu tối thiểu phiên bản 8). Chạy cloud:setup trước.');
+  if(maxVersion < 9 || versions.length < 9)fail('Schema bao_an chưa đúng phiên bản (yêu cầu tối thiểu phiên bản 9). Chạy cloud:setup trước.');
   const tables=(await database.query("SELECT c.relname AS name,c.relrowsecurity AS rls, (r.rolsuper OR r.rolbypassrls OR pg_has_role(c.relowner,'USAGE')) AS bypass, has_table_privilege(current_user,c.oid,'SELECT') AND has_table_privilege(current_user,c.oid,'INSERT') AND has_table_privilege(current_user,c.oid,'UPDATE') AND has_table_privilege(current_user,c.oid,'DELETE') AS writable FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace JOIN pg_roles r ON r.rolname=current_user WHERE n.nspname='bao_an' AND c.relkind='r'")).rows;
   for(const name of CLOUD_TABLES){const table=tables.find(row=>row.name===name);if(!table||!table.rls||!table.bypass||!table.writable)fail(`Schema thiếu bảng/RLS ${name} hoặc tài khoản PostgreSQL của ứng dụng chưa đủ quyền. Chạy cloud:setup và kiểm tra đúng URI server.`);}
   const browser=(await database.query("SELECT rolname FROM pg_roles r WHERE rolname IN ('anon','authenticated','service_role') AND (has_schema_privilege(r.oid,'bao_an','USAGE,CREATE') OR EXISTS(SELECT 1 FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='bao_an' AND c.relkind IN ('r','p') AND (has_table_privilege(r.oid,c.oid,'SELECT,INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER') OR has_any_column_privilege(r.oid,c.oid,'SELECT,INSERT,UPDATE,REFERENCES'))) OR EXISTS(SELECT 1 FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='bao_an' AND CASE WHEN c.relkind='S' THEN has_sequence_privilege(r.oid,c.oid,'USAGE,SELECT,UPDATE') ELSE false END) OR EXISTS(SELECT 1 FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace WHERE n.nspname='bao_an' AND has_function_privilege(r.oid,p.oid,'EXECUTE')))")).rows;

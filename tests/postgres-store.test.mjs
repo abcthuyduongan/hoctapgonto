@@ -65,7 +65,7 @@ test('Supabase SQL starts empty and read-only verification detects actual privil
   assert.ok(checked[0].rows.length>=10);
   assert.deepEqual(checked[0].rows.filter(row=>!row.passed),[]);
   assert.ok(checked[1].rows.every(row=>Number(row.row_count)===0));
-  assert.equal((await f.pool.query('SELECT count(*) AS count FROM bao_an.schema_version')).rows[0].count,8);
+  assert.equal((await f.pool.query('SELECT count(*) AS count FROM bao_an.schema_version')).rows[0].count,9);
 
   await f.db.exec('GRANT USAGE ON SCHEMA bao_an TO authenticated; GRANT SELECT(username) ON bao_an.users TO authenticated;');
   const columnOnly=(await f.pool.query("SELECT has_table_privilege('authenticated','bao_an.users','SELECT') AS table_allowed,has_any_column_privilege('authenticated','bao_an.users','SELECT') AS column_allowed")).rows[0];

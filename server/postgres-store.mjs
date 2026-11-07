@@ -1,4 +1,5 @@
 import pg from 'pg';
+import {BAO_AN_GIFT_PRESET,BAO_AN_GIFT_RATE_VND,BAO_AN_GIFT_PRESET_ID,presetGiftDetails} from '../src/core/gift-presets.ts';
 import {randomUUID,createHash} from 'node:crypto';
 import {OnlineError,fail,shape,text,integer} from './online-errors.mjs';
 import {parseContentImport} from '../src/core/content-io.ts';
@@ -73,8 +74,8 @@ export class PostgresStore{
   recordQuestionCorrectPosition(workspaceId, studentId, itemId, version, pos) {}
   async ready(){
     const row=await this.one('SELECT max(version) AS version, count(*)::int AS count FROM bao_an.schema_version');
-    if(!row||row.version<8||row.count<8)fail(500,'Cần chạy migration dữ liệu online đầy đủ (phiên bản 8). Chạy cloud:setup hoặc áp dụng các migration trong supabase/migrations/.');
-    const required=['student_goals','parent_controls','parent_students','gift_catalog','badge_awards','contest_sessions','town_states'];
+    if(!row||row.version<9||row.count<9)fail(500,'Cần chạy migration dữ liệu online đầy đủ (phiên bản 9). Chạy cloud:setup hoặc áp dụng các migration trong supabase/migrations/.');
+    const required=['student_goals','parent_controls','parent_students','gift_catalog','badge_awards','contest_sessions','town_states','integration_clients','integration_pair_codes','integration_tickets','integration_refresh_tokens','integration_events'];
     const existing=(await this.rows("SELECT tablename FROM pg_tables WHERE schemaname='bao_an'")).map(r=>r.tablename);
     for(const t of required)if(!existing.includes(t))fail(500,`Cần chạy migration dữ liệu online: thiếu bảng bao_an.${t}.`);
     return this;
@@ -675,7 +676,19 @@ export class PostgresStore{
     });
   }
   publicGift(row){
-    return{id:row.id,workspaceId:row.workspace_id,classId:row.class_id,title:row.title,imageMediaId:row.image_media_id,priceStars:row.price_stars,kind:row.kind,weeklyLimit:row.weekly_limit,stock:row.stock,unlockAfterWeek:row.unlock_after_week,active:!!row.active,sortOrder:row.sort_order,createdAt:row.created_at};
+    return{id:row.id,workspaceId:row.workspace_id,classId:row.class_id,title:row.title,imageMediaId:row.image_media_id,priceStars:row.price_stars,kind:row.kind,weeklyLimit:row.weekly_limit,stock:row.stock,unlockAfterWeek:row.unlock_after_week,active:!!row.active,sortOrder:row.sort_order,createdAt:row.created_at,...presetGiftDetails(row.id)};
+  }
+  async installGiftPreset(auth,input){
+    role(auth,'admin');shape(input,[]);
+    return this.mutate(auth,async client=>{
+      let created=0;const at=now();
+      for(const [index,item] of BAO_AN_GIFT_PRESET.entries()){
+        const result=await client.query('INSERT INTO bao_an.gift_catalog(workspace_id,id,class_id,title,image_media_id,price_stars,kind,weekly_limit,stock,unlock_after_week,active,sort_order,created_at) VALUES($1,$2,NULL,$3,NULL,$4,\'item\',0,-1,0,true,$5,$6) ON CONFLICT(workspace_id,id) DO NOTHING RETURNING id',[auth.workspaceId,item.id,item.title,item.priceStars,index,at]);created+=result.rows.length;
+      }
+      await this.exec('UPDATE bao_an.workspaces SET rate_vnd=$1 WHERE id=$2',[BAO_AN_GIFT_RATE_VND,auth.workspaceId],client);
+      await this.audit(auth,'gift.preset.install',BAO_AN_GIFT_PRESET_ID,client);
+      return{created,kept:BAO_AN_GIFT_PRESET.length-created,rateVnd:BAO_AN_GIFT_RATE_VND};
+    });
   }
   async gifts(auth,classId=null,client=this.pool){
     if(auth.role==='student'){
@@ -810,17 +823,22 @@ export class PostgresStore{
       return request;
     });
   }
-  async transitionReward(auth,requestId,input,cancel=false){shape(input,cancel?[]:['status','note']);return this.mutate(auth,async client=>{
-    const row=await this.one('SELECT * FROM bao_an.redemptions WHERE workspace_id=$1 AND id=$2',[auth.workspaceId,requestId],client);if(!row||cancel&&row.student_id!==auth.studentId)fail(404,'Không tìm thấy yêu cầu đổi sao.');
+  async transitionReward(auth,requestId,input,cancel=false,parentToken=null){shape(input,cancel?[]:['status','note']);return this.mutate(auth,async client=>{
+    const row=await this.one('SELECT * FROM bao_an.redemptions WHERE workspace_id=$1 AND id=$2 FOR UPDATE',[auth.workspaceId,requestId],client);if(!row||cancel&&row.student_id!==auth.studentId)fail(404,'Không tìm thấy yêu cầu đổi sao.');
+    if(cancel&&auth.role!=='student')fail(403,'Chỉ học sinh được hủy yêu cầu của mình.');
     if(auth.role==='parent'){
       const linked=await this.one('SELECT 1 FROM bao_an.parent_students WHERE workspace_id=$1 AND parent_user_id=$2 AND student_id=$3',[auth.workspaceId,auth.id,row.student_id],client);
       if(!linked)fail(403,'Phụ huynh chỉ có thể duyệt quà cho con của mình.');
+    }else if(auth.role==='student'&&!cancel){
+      const raw=await this.rawParentControls(auth.workspaceId,row.student_id,client);
+      if(auth.studentId!==row.student_id||!raw.pinHash||!parentToken||!verifyParentElevationToken(parentToken,{userId:auth.id,studentId:row.student_id,workspaceId:auth.workspaceId,pinHash:raw.pinHash,sessionHash:auth.tokenHash}))fail(403,'Vui lòng xác thực mã PIN phụ huynh của học sinh này trước.');
     } else if (auth.role !== 'admin' && !cancel) {
       fail(403,'Chỉ giáo viên hoặc phụ huynh mới có quyền duyệt quà.');
     }
     const status=cancel?'cancelled':input.status;
     if(!['approved','rejected','fulfilled','cancelled'].includes(status)||!cancel&&status==='cancelled')fail(400,'Trạng thái đổi thưởng không hợp lệ.');
     const previous=parse(row.json);
+    if(rewardStatus(previous)===status)return previous;
     let request;try{request=changeRewardRequest(previous,status,now(),input.note);}catch(error){fail(409,error.message);}
     if(['cancelled','rejected'].includes(status)&&previous.giftId){
       const gift=await this.one('SELECT stock FROM bao_an.gift_catalog WHERE workspace_id=$1 AND id=$2',[auth.workspaceId,previous.giftId],client);

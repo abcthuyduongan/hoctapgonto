@@ -30,8 +30,8 @@ async function counts(db){const rows={};for(const table of CLOUD_TABLES)rows[tab
 
 test('cloud setup applies all migrations to twenty-nine empty private tables and creates only private bucket metadata',async t=>{
   const f=await fixture(t),report=await f.run();
-  assert.deepEqual(report,{mode:'setup',schemaVersion:8,tables:29,rls:true,browserAccessBlocked:true,configured:false,privateBucket:true,mediaMaxBytes:2097152});
-  const expected=Object.fromEntries(CLOUD_TABLES.map(name=>[name,name==='schema_version'?8:0]));assert.deepEqual(await counts(f.db),expected);
+  assert.deepEqual(report,{mode:'setup',schemaVersion:9,tables:34,rls:true,browserAccessBlocked:true,configured:false,privateBucket:true,mediaMaxBytes:2097152});
+  const expected=Object.fromEntries(CLOUD_TABLES.map(name=>[name,name==='schema_version'?9:0]));assert.deepEqual(await counts(f.db),expected);
   assert.deepEqual(f.storageCalls.map(row=>row.method),['getBucket','createBucket','getBucket']);
   assert.deepEqual(f.storageCalls[1].options,CLOUD_MEDIA_OPTIONS);
   assert.equal(new URL(f.connections[0].connectionString).username,'owner');assert.equal(f.connections[0].ssl.rejectUnauthorized,true);

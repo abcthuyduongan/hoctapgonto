@@ -45,7 +45,7 @@ export function inspectOnlineBackup(file,{maxBytes=MAX_RECOVERY_FILE_BYTES,works
     const bytes=readFileSync(file);if(bytes.subarray(0,16).toString('binary')!=='SQLite format 3\u0000')fail(400,'Tệp không phải bản sao SQLite của ứng dụng.');
     db=new DatabaseSync(file,{readOnly:true,allowExtension:false});db.exec('PRAGMA trusted_schema=OFF; PRAGMA query_only=ON;');
     if(canonical(schema(db))!==expectedSchema)fail(400,'Cấu trúc bản sao không đúng phiên bản SQLite được hỗ trợ.');
-    const versions=db.prepare('SELECT version FROM schema_version').all();if(versions.length!==1||versions[0].version!==1)fail(400,'Chỉ hỗ trợ bản sao SQLite schema 1.');
+    const versions=db.prepare('SELECT version FROM schema_version').all();if(versions.length!==1||versions[0].version!==2)fail(400,'Chỉ hỗ trợ bản sao SQLite schema 2.');
     if(db.prepare('PRAGMA integrity_check').all().some(row=>Object.values(row)[0]!=='ok')||db.prepare('PRAGMA foreign_key_check').all().length)fail(400,'Bản sao hỏng hoặc có liên kết dữ liệu không hợp lệ.');
     const workspaces=db.prepare('SELECT id,name,rate_vnd FROM workspaces ORDER BY id').all();
     if(!workspaces.length||workspaceId&&(workspaces.length!==1||workspaces[0].id!==workspaceId))fail(400,'Bản sao không thuộc đơn vị đang đăng nhập. Dùng công cụ phục hồi khi máy chủ đã dừng để chuyển sang kho khác.');
@@ -82,7 +82,7 @@ export function inspectOnlineBackup(file,{maxBytes=MAX_RECOVERY_FILE_BYTES,works
       for(const{request,step,index}of history){while(next<awards.length&&awards[next].at<=step.at)availableEarned+=awards[next++].gained;
         if(index===0)held+=request.stars;else if(['cancelled','rejected'].includes(step.status))held-=request.stars;if(held>availableEarned)fail(400,'Yêu cầu đổi thưởng dùng sao trước thời điểm học sinh đạt được.');}
     }
-    return{sha256:hash(bytes),bytes:info.size,schemaVersion:1,counts,workspaceNames:workspaces.map(row=>row.name),workspaceIds:workspaces.map(row=>row.id),activePlays,sessionsToRevoke:db.prepare('SELECT count(*) AS n FROM auth_sessions').get().n};
+    return{sha256:hash(bytes),bytes:info.size,schemaVersion:2,counts,workspaceNames:workspaces.map(row=>row.name),workspaceIds:workspaces.map(row=>row.id),activePlays,sessionsToRevoke:db.prepare('SELECT count(*) AS n FROM auth_sessions').get().n};
   }catch(error){if(error instanceof OnlineError)throw error;fail(400,'Không đọc được bản sao hoặc dữ liệu SQLite không hợp lệ.');}
   finally{db?.close();}
 }
@@ -95,7 +95,14 @@ export async function snapshotOnlineDatabase(database,outputPath){
 
 function sanitizeCandidate(file){
   const db=new DatabaseSync(file,{allowExtension:false});try{
-    db.exec('PRAGMA trusted_schema=OFF; PRAGMA foreign_keys=ON; PRAGMA journal_mode=DELETE; BEGIN IMMEDIATE; DELETE FROM auth_sessions; DELETE FROM login_limits;');
+    db.exec(`PRAGMA trusted_schema=OFF; PRAGMA foreign_keys=ON; PRAGMA journal_mode=DELETE; BEGIN IMMEDIATE;
+      DELETE FROM auth_sessions;
+      DELETE FROM login_limits;
+      DELETE FROM integration_pair_codes;
+      DELETE FROM integration_tickets;
+      DELETE FROM integration_refresh_tokens;
+      DELETE FROM integration_clients;
+    `);
     for(const row of db.prepare('SELECT id,workspace_id,json FROM plays').all()){
       const session=JSON.parse(row.json);if(session.status==='active'){const latest=db.prepare('SELECT json FROM attempts WHERE workspace_id=? AND play_id=?').all(row.workspace_id,row.id).map(event=>JSON.parse(event.json).occurredAt).reduce((at,next)=>next>at?next:at,session.startedAt);
         session.status='abandoned';session.endedAt=latest>new Date().toISOString()?latest:new Date().toISOString();db.prepare('UPDATE plays SET json=? WHERE workspace_id=? AND id=?').run(JSON.stringify(session),row.workspace_id,row.id);}
@@ -133,7 +140,7 @@ export async function restoreOnlineDatabase({databasePath,backupPath,expectedSha
     if(closeDatabase){closeDatabase();closed=true;}else{source?.close();source=undefined;closed=true;}
     removeSidecars(target);if(hadOriginal){renameSync(target,rollback);moved=true;}beforeInstall?.();renameSync(candidate,target);installed=true;
     reopenDatabase?.();completed=true;unlinkSync(journal);cleanup(folder,target);
-    return{restored:true,reauthenticate:true,schemaVersion:1,counts:preview.counts,preBackupCreated:!!preBackupPath,preBackupPath};
+    return{restored:true,reauthenticate:true,schemaVersion:preview.schemaVersion,counts:preview.counts,preBackupCreated:!!preBackupPath,preBackupPath};
   }catch(error){
     try{
       if(closed&&!completed){if(installed){closeDatabase?.();removeSidecars(target);if(existsSync(target))renameSync(target,join(folder,'failed.sqlite'));}if(moved&&existsSync(join(folder,'previous.sqlite')))renameSync(join(folder,'previous.sqlite'),target);if(reopenDatabase&&existsSync(target))reopenDatabase();}
