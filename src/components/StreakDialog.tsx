@@ -1,5 +1,6 @@
+import {useModalFocus} from '../ui/useModalFocus';
 // src/components/StreakDialog.tsx
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import type { StudentStreakState } from '../core/online-contracts';
 import '../styles/streak.css';
 
@@ -14,12 +15,35 @@ export const StreakDialog: React.FC<StreakDialogProps> = ({ streak, onClose }) =
   const todayCorrect = streak?.todayCorrectCount ?? 0;
   const target = 5;
   const progressPercent = Math.min(100, Math.floor((todayCorrect / target) * 100));
+  const modalRef = useRef<HTMLDivElement>(null);
+  useModalFocus(modalRef);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onClose();
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [onClose]);
 
   return (
-    <div className="streak-dialog-backdrop" onClick={onClose}>
-      <div className="streak-dialog" onClick={(e) => e.stopPropagation()}>
-        <div className="streak-dialog-flame">🔥</div>
-        <div className="streak-dialog-title">{currentStreak} Ngày Liên Tiếp</div>
+    <div className="streak-dialog-backdrop" onClick={onClose} role="presentation">
+      <div
+        className="streak-dialog"
+        ref={modalRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="streak-dialog-title-id"
+        tabIndex={-1}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="streak-dialog-flame" aria-hidden="true">🔥</div>
+        <div className="streak-dialog-title" id="streak-dialog-title-id">{currentStreak} Ngày Liên Tiếp</div>
         <div className="streak-dialog-sub">Kỷ lục cao nhất: {longestStreak} ngày</div>
 
         <div className="streak-progress-box">

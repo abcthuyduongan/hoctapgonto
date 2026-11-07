@@ -20,14 +20,14 @@ test('login has a bounded role-free bundle and the default lesson creates no 3D 
  await page.addInitScript(()=>{(window as any).__perfWebgl=0;const original=HTMLCanvasElement.prototype.getContext;HTMLCanvasElement.prototype.getContext=function(this:HTMLCanvasElement,...args:any[]){if(String(args[0]).includes('webgl'))(window as any).__perfWebgl++;return(original as any).apply(this,args);} as any;});
  page.on('request',r=>requests.push(r.url()));page.on('response',r=>{if(/\/assets\/.*\.(js|css)$/.test(r.url()))bodies.push(r.body().then(body=>({name:new URL(r.url()).pathname,bytes:body.length,gzip:gzipSync(body).length})));});
  try{
-  await page.goto(f.origin+'/');await expect(page.getByRole('heading',{name:'Chào mừng bạn trở lại',exact:true})).toBeVisible();
+  await page.goto(f.origin+'/?mode=list');await expect(page.getByRole('heading',{name:'Chào mừng bạn trở lại',exact:true})).toBeVisible();
   const authAssets=await Promise.all(bodies),js=authAssets.filter(row=>row.name.endsWith('.js')).reduce((n,row)=>n+row.gzip,0),css=authAssets.filter(row=>row.name.endsWith('.css')).reduce((n,row)=>n+row.gzip,0);
   expect(requests.some(url=>/OnlineAdminDashboard|OnlineStudentWorld|WorldCanvas|three-vendor|\.glb/.test(url))).toBe(false);expect(js).toBeLessThanOrEqual(100*1024);expect(css).toBeLessThanOrEqual(20*1024);
   await page.getByLabel('Tên đăng nhập',{exact:true}).fill('perf.child');await page.getByLabel('Mật khẩu',{exact:true}).fill(f.password);await page.getByRole('button',{name:'Đăng nhập',exact:true}).click();await expect(page.locator('[data-hub-mode="light"]')).toBeVisible();
   const studentAssets=await Promise.all(bodies),studentCss=studentAssets.filter(row=>row.name.endsWith('.css')).reduce((n,row)=>n+row.gzip,0);expect(studentCss).toBeLessThanOrEqual(20*1024);
   const status=await(await page.request.get(f.origin+'/api/online/status')).json();expect(status.build.sourceId).toMatch(/^[a-f0-9]{64}$/);expect(await page.locator('#root').getAttribute('data-source-id')).toBe(status.build.sourceId);expect(await page.locator('#root').getAttribute('data-app-version')).toBe(status.runtimeVersion);
   await page.screenshot({path:testInfo.outputPath('lite-hub.png'),fullPage:true});
-  await page.getByRole('button',{name:'Chơi Đảo Câu Hỏi bằng bộ được giao',exact:true}).click();await expect(page.locator('.quiz-question')).toHaveText('Câu hỏi 1');await expect(page.locator('.answer-option').first()).toBeEnabled();
+  await page.getByRole('button',{name:/^(?:Tiếp tục học ngay )?Chơi Đảo Câu Hỏi(?: bằng bộ được giao| · \d+ câu trong bộ)$/,exact:true}).click();await expect(page.locator('.quiz-question')).toHaveText('Câu hỏi 1');await expect(page.locator('.answer-option').first()).toBeEnabled();
   expect(requests.some(url=>/WorldCanvas|three-vendor|\.glb/.test(url))).toBe(false);expect(await page.evaluate(()=>(window as any).__perfWebgl)).toBe(0);await expect(page.locator('canvas')).toHaveCount(0);
   await page.locator('.immersive-dialog').screenshot({path:testInfo.outputPath('lite-quiz.png')});
   await page.getByRole('button',{name:'← Thoát trò chơi',exact:true}).click();await expect(page.locator('[data-hub-mode="light"]')).toBeVisible();
@@ -39,7 +39,7 @@ for(const game of ['memory','connect'])test(`${game} overlaps mismatch reveal wi
  const f=await fixture(page);let release=()=>{},requested=false;
  const held=new Promise<void>(resolve=>{release=resolve;});
  try{
-  await f.api('/login',{username:'perf.child',password:f.password});await page.goto(f.origin+'/');
+  await f.api('/login',{username:'perf.child',password:f.password});await page.goto(f.origin+'/?mode=list');
   await page.getByRole('button',{name:`Chơi ${game==='memory'?'Memory Match':'Nối Từ Khám Phá'} bằng bộ được giao`,exact:true}).click();
   const left=(id:number)=>page.locator(game==='memory'?`.memory-card[data-pair-id="perf-${id}"][data-pair-side="left"]`:`.connect-col-left [data-pair-id="perf-${id}"]`);
   const right=(id:number)=>page.locator(game==='memory'?`.memory-card[data-pair-id="perf-${id}"][data-pair-side="right"]`:`.connect-col-right [data-pair-id="perf-${id}"]`);
@@ -56,11 +56,11 @@ test('the 2D release ignores saved 3D preferences and frees resources over fifty
  page.on('request',r=>{if(r.url().endsWith('.glb'))models.push(r.url());if(r.url().endsWith('.js'))scripts.push(r.url());});page.on('pageerror',e=>errors.push(e.message));
  await page.addInitScript(()=>{localStorage.setItem('bao-an-display-mode-v1','3d');(window as any).__webgl=0;const original=HTMLCanvasElement.prototype.getContext;HTMLCanvasElement.prototype.getContext=function(this:HTMLCanvasElement,...args:any[]){if(String(args[0]).includes('webgl'))(window as any).__webgl++;return(original as any).apply(this,args);} as any;});
  try{
-  await f.api('/login',{username:'perf.child',password:f.password});await page.goto(f.origin+'/');await expect(page.locator('[data-hub-mode="light"]')).toBeVisible();await expect(page.getByRole('button',{name:'Khám phá 3D',exact:true})).toHaveCount(0);
+  await f.api('/login',{username:'perf.child',password:f.password});await page.goto(f.origin+'/?mode=list');await expect(page.locator('[data-hub-mode="light"]')).toBeVisible();await expect(page.getByRole('button',{name:'Khám phá 3D',exact:true})).toHaveCount(0);
   const cdp=await page.context().newCDPSession(page),samples:{cycle:number;heap:number;nodes:number}[]=[];
   try{for(let cycle=1;cycle<=50;cycle++){
-   await page.getByRole('button',{name:'Chơi Đảo Câu Hỏi bằng bộ được giao',exact:true}).click();await expect(page.locator('.answer-option').first()).toBeEnabled();
-   await page.getByRole('button',{name:'← Thoát trò chơi',exact:true}).click();await expect(page.locator('.immersive-dialog')).toHaveCount(0);await expect(page.getByRole('button',{name:'Chơi Đảo Câu Hỏi bằng bộ được giao',exact:true})).toBeEnabled();
+   await page.getByRole('button',{name:/^(?:Tiếp tục học ngay )?Chơi Đảo Câu Hỏi(?: bằng bộ được giao| · \d+ câu trong bộ)$/,exact:true}).click();await expect(page.locator('.answer-option').first()).toBeEnabled();
+   await page.getByRole('button',{name:'← Thoát trò chơi',exact:true}).click();await expect(page.locator('.immersive-dialog')).toHaveCount(0);await expect(page.getByRole('button',{name:/^(?:Tiếp tục học ngay )?Chơi Đảo Câu Hỏi(?: bằng bộ được giao| · \d+ câu trong bộ)$/,exact:true})).toBeEnabled();
    if(cycle%10===0){await cdp.send('HeapProfiler.collectGarbage');const heap=await cdp.send('Runtime.getHeapUsage');samples.push({cycle,heap:heap.usedSize,nodes:await page.locator('*').count()});}
   }}finally{await cdp.detach();}
   expect(models).toEqual([]);expect(scripts.some(url=>/WorldCanvas|three-vendor|PremiumWorldRenderer/.test(url))).toBe(false);expect(await page.evaluate(()=>(window as any).__webgl)).toBe(0);expect(errors).toEqual([]);

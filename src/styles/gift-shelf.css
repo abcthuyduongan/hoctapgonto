@@ -1,11 +1,13 @@
+/* src/styles/gift-shelf.css — Bảo An Learning 5.0 */
+
 .gift-shelf-dialog {
   width: min(880px, 94vw);
   max-height: 90vh;
-  border-radius: 20px;
-  border: 2px solid #ecd4a4;
-  background: #fdfbf7;
+  border-radius: var(--r-lg);
+  border: 1.5px solid var(--c-line);
+  background: var(--c-cream);
   padding: 0;
-  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.25);
+  box-shadow: var(--shadow-2);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -16,8 +18,8 @@
   justify-content: space-between;
   align-items: center;
   padding: 16px 24px;
-  background: linear-gradient(135deg, #fff3d6, #ffe6ad);
-  border-bottom: 2px solid #ecd4a4;
+  background: var(--c-paper);
+  border-bottom: 1.5px solid var(--c-line);
 }
 
 .gift-shelf-title-wrap {
@@ -30,19 +32,18 @@
 .gift-shelf-title-wrap h2 {
   margin: 0;
   font-size: 1.4rem;
-  color: #5c3500;
+  color: var(--c-ink);
   font-weight: 800;
 }
 
 .gift-shelf-star-badge {
-  background: #fff;
-  border: 1.5px solid #d49332;
-  color: #b25e00;
+  background: var(--c-math-soft);
+  border: 1.5px solid var(--c-star);
+  color: var(--c-ink);
   padding: 4px 12px;
-  border-radius: 999px;
+  border-radius: var(--r-pill);
   font-weight: 800;
   font-size: 0.9rem;
-  box-shadow: 0 2px 6px rgba(178, 94, 0, 0.15);
 }
 
 .gift-shelf-close {
@@ -50,23 +51,24 @@
   border: none;
   font-size: 1.3rem;
   font-weight: 700;
-  color: #8a6435;
+  color: var(--c-ink-2);
   cursor: pointer;
-  padding: 6px 10px;
-  border-radius: 8px;
+  padding: 6px 12px;
+  border-radius: var(--r-pill);
   transition: background 0.15s;
 }
 
 .gift-shelf-close:hover {
-  background: rgba(0, 0, 0, 0.08);
+  background: var(--c-leaf-soft);
+  color: var(--c-ink);
 }
 
 .gift-shelf-tabs {
   display: flex;
   gap: 8px;
   padding: 12px 24px 0;
-  background: #faf4e8;
-  border-bottom: 1px solid #ecd4a4;
+  background: var(--c-paper);
+  border-bottom: 1px solid var(--c-line);
 }
 
 .gift-tab-btn {
@@ -76,21 +78,21 @@
   padding: 8px 16px;
   font-weight: 700;
   font-size: 0.95rem;
-  color: #7b5932;
+  color: var(--c-ink-2);
   cursor: pointer;
   border-radius: 8px 8px 0 0;
   transition: all 0.15s ease;
 }
 
 .gift-tab-btn:hover {
-  background: rgba(255, 255, 255, 0.5);
-  color: #4a2c00;
+  background: var(--c-cream);
+  color: var(--c-ink);
 }
 
 .gift-tab-btn.active {
-  background: #fff;
-  border-bottom-color: #d97706;
-  color: #b45309;
+  background: var(--c-cream);
+  border-bottom-color: var(--c-leaf);
+  color: var(--c-leaf-deep);
 }
 
 .gift-shelf-body {
@@ -103,7 +105,7 @@
 .gift-shelf-empty {
   text-align: center;
   padding: 40px 20px;
-  color: #7b654e;
+  color: var(--c-ink-2);
 }
 
 .empty-shelf-icon {
@@ -119,9 +121,9 @@
 }
 
 .gift-card {
-  background: #fff;
-  border: 1.5px solid #ebd9bf;
-  border-radius: 14px;
+  background: var(--c-paper);
+  border: 1.5px solid var(--c-line);
+  border-radius: var(--r-md);
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -131,18 +133,18 @@
 
 .gift-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--shadow-1);
 }
 
 .gift-card.is-pinned {
-  border-color: #d97706;
-  box-shadow: 0 0 0 2px #f59e0b;
+  border-color: var(--c-star);
+  box-shadow: 0 0 0 2px var(--c-star);
 }
 
 .gift-card-media {
   position: relative;
   height: 130px;
-  background: #fbf5eb;
+  background: var(--c-cream);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -152,7 +154,7 @@
 .gift-card-img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
 }
 
 .gift-card-fallback-icon {
@@ -164,14 +166,13 @@
   position: absolute;
   top: 8px;
   left: 8px;
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(4px);
+  background: var(--c-paper);
   padding: 2px 8px;
-  border-radius: 999px;
-  font-size: 0.72rem;
+  border-radius: var(--r-pill);
+  font-size: var(--t-micro);
   font-weight: 700;
-  color: #6b4004;
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  color: var(--c-ink);
+  border: 1px solid var(--c-line);
 }
 
 .gift-card-content {
@@ -185,8 +186,8 @@
 .gift-card-title {
   margin: 0;
   font-size: 1rem;
-  color: #2b1c05;
-  font-weight: 700;
+  color: var(--c-ink);
+  font-weight: 800;
   line-height: 1.3;
 }
 
@@ -198,13 +199,13 @@
 }
 
 .gift-price-tag {
-  color: #d97706;
+  color: var(--c-math);
   font-weight: 800;
 }
 
 .gift-stock-tag {
-  color: #7b654e;
-  font-size: 0.78rem;
+  color: var(--c-ink-2);
+  font-size: var(--t-micro);
 }
 
 .gift-progress-block {
@@ -215,27 +216,27 @@
 
 .gift-meter-track {
   height: 8px;
-  background: #eee5d8;
-  border-radius: 999px;
+  background: var(--c-line);
+  border-radius: var(--r-pill);
   overflow: hidden;
 }
 
 .gift-meter-fill {
   height: 100%;
-  background: #f59e0b;
-  border-radius: 999px;
+  background: var(--c-star);
+  border-radius: var(--r-pill);
   transition: width 0.3s ease;
 }
 
 .gift-meter-fill.is-ready {
-  background: #10b981;
+  background: var(--c-leaf);
 }
 
 .gift-progress-text {
-  font-size: 0.72rem;
-  color: #8c735c;
+  font-size: var(--t-micro);
+  color: var(--c-ink-2);
   text-align: right;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .gift-card-actions {
@@ -249,9 +250,10 @@
 .gift-redeem-btn {
   flex: 1 1 50%;
   padding: 6px 8px;
-  border-radius: 8px;
-  font-size: 0.8rem;
-  font-weight: 700;
+  min-height: 40px;
+  border-radius: var(--r-sm);
+  font-size: var(--t-micro);
+  font-weight: 800;
   cursor: pointer;
   border: none;
   transition: background 0.15s ease;
@@ -260,30 +262,30 @@
 }
 
 .gift-pin-btn {
-  background: #f3ede2;
-  color: #5c4125;
-  border: 1px solid #ddd1bf;
+  background: var(--c-cream);
+  color: var(--c-ink);
+  border: 1px solid var(--c-line-strong);
 }
 
 .gift-pin-btn.is-active {
-  background: #fef3c7;
-  color: #92400e;
-  border-color: #f59e0b;
+  background: var(--c-math-soft);
+  color: var(--c-ink);
+  border-color: var(--c-star);
 }
 
 .gift-redeem-btn {
-  background: #10b981;
-  color: #fff;
+  background: var(--c-leaf);
+  color: var(--c-paper);
 }
 
 .gift-redeem-btn:disabled {
-  background: #e2dcd3;
-  color: #9c9183;
+  background: var(--c-line);
+  color: var(--c-ink-mute);
   cursor: not-allowed;
 }
 
 .gift-redeem-btn:not(:disabled):hover {
-  background: #059669;
+  background: var(--c-leaf-deep);
 }
 
 /* Memorial Cabinet */
@@ -297,9 +299,9 @@
 }
 
 .memorial-item {
-  background: #fff;
-  border: 1.5px solid #ebd9bf;
-  border-radius: 12px;
+  background: var(--c-paper);
+  border: 1.5px solid var(--c-line);
+  border-radius: var(--r-md);
   padding: 14px 18px;
   display: flex;
   flex-direction: column;
@@ -307,8 +309,8 @@
 }
 
 .memorial-item.is-received {
-  border-color: #a7f3d0;
-  background: #f0fdf4;
+  border-color: var(--c-leaf);
+  background: var(--c-leaf-soft);
 }
 
 .memorial-item-head {
@@ -329,12 +331,13 @@
 .memorial-title {
   display: block;
   font-size: 1.05rem;
-  color: #3b280e;
+  color: var(--c-ink);
+  font-weight: 800;
 }
 
 .memorial-meta {
-  font-size: 0.82rem;
-  color: #7b654e;
+  font-size: var(--t-micro);
+  color: var(--c-ink-2);
 }
 
 .memorial-history {
@@ -342,33 +345,33 @@
   flex-direction: column;
   gap: 2px;
   padding-left: 36px;
-  color: #8c735c;
-  font-size: 0.78rem;
+  color: var(--c-ink-2);
+  font-size: var(--t-micro);
 }
 
 .memorial-item-foot {
   display: flex;
   justify-content: flex-end;
   padding-top: 6px;
-  border-top: 1px solid #f2e9dc;
+  border-top: 1px solid var(--c-line);
 }
 
 .memorial-received-badge {
-  color: #059669;
-  font-weight: 700;
+  color: var(--c-leaf-deep);
+  font-weight: 800;
   font-size: 0.88rem;
 }
 
 .confirm-received-btn {
-  background: linear-gradient(135deg, #f59e0b, #d97706);
-  color: #fff;
+  background: var(--c-star);
+  color: var(--c-ink);
   border: none;
-  border-radius: 8px;
+  border-radius: var(--r-sm);
   padding: 8px 16px;
-  font-weight: 700;
+  font-weight: 800;
   font-size: 0.9rem;
   cursor: pointer;
-  box-shadow: 0 2px 6px rgba(217, 119, 6, 0.3);
+  box-shadow: var(--shadow-1);
   transition: transform 0.15s ease;
 }
 
@@ -378,7 +381,7 @@
 
 .memorial-waiting-text {
   font-size: 0.85rem;
-  color: #92400e;
+  color: var(--c-ink-2);
   font-style: italic;
 }
 
@@ -387,10 +390,10 @@
   justify-content: space-between;
   align-items: center;
   padding: 12px 24px;
-  background: #faf4e8;
-  border-top: 1px solid #ecd4a4;
+  background: var(--c-paper);
+  border-top: 1px solid var(--c-line);
   font-size: 0.85rem;
-  color: #7b654e;
+  color: var(--c-ink-2);
   flex-wrap: wrap;
   gap: 8px;
 }
@@ -401,15 +404,15 @@
 
 .legacy-wallet-link-btn {
   background: none;
-  border: 1px dashed #c49a5b;
-  color: #8b5314;
+  border: 1px dashed var(--c-line-strong);
+  color: var(--c-ink);
   padding: 4px 10px;
-  border-radius: 6px;
-  font-size: 0.82rem;
+  border-radius: var(--r-sm);
+  font-size: var(--t-micro);
   cursor: pointer;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .legacy-wallet-link-btn:hover {
-  background: #fff8eb;
+  background: var(--c-cream);
 }

@@ -10,6 +10,7 @@ import GameMascot from './GameMascot';
 import { saveFailureMessage } from './save-failure-message';
 import { questionClockText, useQuestionClock } from './useQuestionClock';
 import { stopSpeaking } from '../core/speech';
+import { useQuestionSpeech } from './useQuestionSpeech';
 
 export default function BalanceScale({
   pack,
@@ -41,6 +42,7 @@ export default function BalanceScale({
 
   const currentItem = content.items[index] as CompareItem;
   const correctSelected = selectedOp !== null && (serverScored ? outcome?.correct === true : selectedOp === currentItem.operator);
+  const speech = useQuestionSpeech(pack.subject, currentItem.id);
 
   const clock = useQuestionClock({
     enabled: questionMode,
@@ -175,6 +177,15 @@ export default function BalanceScale({
         summary={`Con đã hoàn thành đúng ${correctCount}/${content.items.length} câu so sánh!`}
         questionMode={questionMode}
         onExit={onExit}
+        onReplay={() => {
+          setIndex(0);
+          setSelectedOp(null);
+          setOutcome(null);
+          setCorrectCount(0);
+          setHints(0);
+          setHintText('');
+          setStatus('playing');
+        }}
       />
     );
   }
@@ -193,6 +204,15 @@ export default function BalanceScale({
         <h2 className="scale-prompt-title">
           {currentItem.prompt || 'Quan sát hai đĩa cân và chọn dấu thích hợp:'}
         </h2>
+        <button
+          type="button"
+          className="speech-trigger-btn"
+          onClick={() => speech.read(currentItem.prompt || 'Quan sát hai đĩa cân và chọn dấu thích hợp')}
+          aria-label="Nghe đọc câu hỏi"
+          title="Nghe đọc câu hỏi"
+        >
+          🔊
+        </button>
       </div>
 
       {/* Visual Balance Scale Rig */}

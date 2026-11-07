@@ -1,71 +1,31 @@
-/* src/styles/streak.css */
-
-.streak-pill-btn {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  background: linear-gradient(135deg, rgba(234, 88, 12, 0.2) 0%, rgba(180, 83, 9, 0.25) 100%);
-  border: 1px solid rgba(249, 115, 22, 0.4);
-  color: #ffedd5;
-  padding: 0.35rem 0.75rem;
-  border-radius: 9999px;
-  font-weight: 700;
-  font-size: 0.85rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.study-timer-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  background: rgba(14, 165, 233, 0.18);
-  border: 1px solid rgba(56, 189, 248, 0.4);
-  color: #e0f2fe;
-  padding: 0.35rem 0.75rem;
-  border-radius: 9999px;
-  font-weight: 700;
-  font-size: 0.85rem;
-  letter-spacing: 0.02em;
-  white-space: nowrap;
-}
-
-.streak-pill-btn:hover {
-  background: linear-gradient(135deg, rgba(234, 88, 12, 0.35) 0%, rgba(180, 83, 9, 0.4) 100%);
-  border-color: #fb923c;
-  transform: translateY(-1px);
-}
-
-.streak-flame-icon {
-  font-size: 1.1rem;
-  line-height: 1;
-  filter: drop-shadow(0 0 4px rgba(249, 115, 22, 0.6));
-}
+/* src/styles/streak.css — Bảo An Learning 5.0 (Bright Unified Theme) */
 
 .streak-dialog-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.75);
+  background: rgba(24, 52, 73, 0.45);
   backdrop-filter: blur(4px);
-  z-index: 9999;
+  z-index: var(--z-dialog, 1000);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 1rem;
+  padding: var(--s-4, 1rem);
+  animation: ui-fade-in var(--dur-normal, 0.2s) var(--ease-standard, ease);
 }
 
 .streak-dialog {
-  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-  border: 1px solid rgba(249, 115, 22, 0.3);
-  border-radius: 1.25rem;
+  background: var(--c-cream, #fffdf7);
+  border: 1px solid var(--c-line, #dce3d5);
+  border-radius: var(--r-lg, 20px);
   width: 100%;
   max-width: 480px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
-  color: #f8fafc;
+  box-shadow: var(--shadow-2);
+  color: var(--c-ink, #183449);
   overflow: hidden;
-  padding: 1.5rem;
+  padding: 1.75rem;
   text-align: center;
   position: relative;
+  animation: ui-scale-in var(--dur-normal, 0.2s) var(--ease-standard, ease);
 }
 
 .streak-dialog-flame {
@@ -76,95 +36,92 @@
 }
 
 @keyframes streakFlamePulse {
-  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 10px rgba(249, 115, 22, 0.6)); }
-  50% { transform: scale(1.08); filter: drop-shadow(0 0 18px rgba(249, 115, 22, 0.9)); }
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 10px rgba(229, 169, 60, 0.6)); }
+  50% { transform: scale(1.08); filter: drop-shadow(0 0 18px rgba(229, 169, 60, 0.9)); }
 }
 
 .streak-dialog-title {
   font-size: 1.5rem;
   font-weight: 800;
-  color: #ffedd5;
+  color: var(--c-ink, #183449);
   margin-bottom: 0.25rem;
 }
 
 .streak-dialog-sub {
   font-size: 0.95rem;
-  color: #94a3b8;
+  color: var(--c-ink-2, #5b6b5a);
   margin-bottom: 1.25rem;
 }
 
 .streak-progress-box {
-  background: rgba(15, 23, 42, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 0.85rem;
+  background: var(--c-paper, #f8f7ef);
+  border: 1px solid var(--c-line, #dce3d5);
+  border-radius: var(--r-md, 14px);
   padding: 1rem;
-  margin-bottom: 1.25rem;
+  margin-bottom: 1rem;
   text-align: left;
 }
 
 .streak-progress-label {
   display: flex;
   justify-content: space-between;
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: #cbd5e1;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--c-ink, #183449);
   margin-bottom: 0.5rem;
 }
 
 .streak-progress-track {
-  height: 8px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 9999px;
+  height: 12px;
+  background: var(--c-line, #dce3d5);
+  border-radius: var(--r-full, 9999px);
   overflow: hidden;
-  margin-bottom: 0.6rem;
+  margin-bottom: 0.5rem;
 }
 
 .streak-progress-bar {
   height: 100%;
-  background: linear-gradient(90deg, #f97316, #fb923c);
-  border-radius: 9999px;
-  transition: width 0.3s ease;
+  background: linear-gradient(90deg, var(--c-star, #e5a93c), var(--c-math, #b45309));
+  border-radius: var(--r-full, 9999px);
+  transition: width 0.4s ease;
 }
 
 .streak-status-msg {
-  font-size: 0.85rem;
-  color: #fdba74;
+  font-size: 0.825rem;
+  color: var(--c-ink-2, #5b6b5a);
   line-height: 1.4;
 }
 
 .streak-freeze-box {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
-  background: rgba(59, 130, 246, 0.1);
-  border: 1px solid rgba(59, 130, 246, 0.25);
-  border-radius: 0.75rem;
-  padding: 0.75rem;
-  font-size: 0.825rem;
-  color: #93c5fd;
+  gap: 0.75rem;
+  background: var(--c-leaf-soft, #e7efe3);
+  border: 1px solid var(--c-line, #dce3d5);
+  border-radius: var(--r-md, 14px);
+  padding: 0.85rem 1rem;
+  font-size: 0.85rem;
+  color: var(--c-leaf-deep, #2f6f3a);
   text-align: left;
-  margin-bottom: 1.25rem;
+  line-height: 1.4;
+  margin-bottom: 1.5rem;
 }
 
 .streak-dialog-close {
-  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
-  color: white;
-  border: none;
-  font-weight: 700;
-  padding: 0.6rem 1.5rem;
-  border-radius: 0.65rem;
-  cursor: pointer;
   width: 100%;
-  font-size: 0.95rem;
+  background: var(--c-leaf, #4e7250);
+  border: none;
+  color: #ffffff;
+  padding: 0.75rem 1.25rem;
+  border-radius: var(--r-md, 14px);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
 }
 
-@media (prefers-reduced-motion: reduce), (update: slow) {
-  .streak-dialog-flame {
-    animation: none !important;
-  }
-}
-
-[data-motion="off"] .streak-dialog-flame {
-  animation: none !important;
-  filter: none !important;
+.streak-dialog-close:hover {
+  background: var(--c-leaf-deep, #2f6f3a);
+  transform: translateY(-1px);
 }

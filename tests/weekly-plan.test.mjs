@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {randomUUID} from 'node:crypto';
 import {OnlineStore} from '../server/online-store.mjs';
 import {createPostgresFixture,authFor} from './helpers/postgres-fixture.mjs';
-import {weeklySubjectId,weeklyPlanErrors,createWeeklyPlan,validateWeeklyPlan,summarizeWeeklySubjects} from '../src/core/weekly-plan.ts';
+import {weeklySubjectId,weeklyPlanErrors,createWeeklyPlan,validateWeeklyPlan,summarizeWeeklySubjects,toCanonicalSubjectCode,CANONICAL_SUBJECT_CODES} from '../src/core/weekly-plan.ts';
 import {adminSummary,adminWeek,adminMedia,adminWeekCheck} from '../server/admin-data.mjs';
 import {createCloudApi} from '../server/cloud-api.mjs';
 import {createHash} from 'node:crypto';
@@ -11,12 +11,37 @@ import {DatabaseSync} from 'node:sqlite';
 import {mkdtemp,rm} from 'node:fs/promises';
 import path from 'node:path';
 import {snapshotOnlineDatabase,inspectOnlineBackup,restoreOnlineDatabase} from '../server/online-recovery.mjs';
+import {onlineIdentityHash} from '../src/core/online-import-identity.ts';
 
 const at='2026-10-17T00:00:00.000Z';
 function pack(id,n=2){return{id,version:1,title:'Bộ '+id,subject:'thinking',grade:3,kind:'quiz',source:'local',publishedAt:at,items:Array.from({length:n},(_,i)=>({id:`q${i}`,kind:'multiple-choice',objectiveId:'WEEK.PLAN',prompt:`${id}: yêu cầu ${i}`,options:[`${id} đúng ${i}`,`${id} sai A ${i}`,`${id} sai B ${i}`,`${id} sai C ${i}`],correctIndex:0,explanation:'Đáp án thứ nhất.',metadata:{knowledgeId:'WEEK.PLAN',difficulty:['easy','medium','hard'][i%3],contentRole:'practice',source:'Mẫu thử',rights:'Tự biên soạn',reviewStatus:'draft'}}))};}
 function sets(prefix='source',count=3,n=2){return['Toán','Tiếng Việt','Tiếng Anh','Khoa học','Công nghệ'].slice(0,count).map((subjectLabel,i)=>({subjectLabel,pack:pack(`${prefix}-${i}`,n)}));}
+const historicSubjectId=label=>'subject-'+onlineIdentityHash(label.normalize('NFC').trim().replace(/\s+/g,' ').toLocaleLowerCase('vi')).slice(0,24);
+function historicPlan(source){const ids=source.map(set=>['Toán học','Tin học'].includes(set.subjectLabel)?historicSubjectId(set.subjectLabel):weeklySubjectId(set.subjectLabel));return{version:1,maxQuestionsPerSubject:12,subjects:source.map((set,i)=>({id:ids[i],label:set.subjectLabel})),assignments:Object.fromEntries(source.map((set,i)=>[set.pack.id,ids[i]]))};}
+
+test('canonical subject codes survive repeat conversion and retain opaque IDs',()=>{
+  for(const code of ['toan','tieng-viet','tieng-anh','tin-hoc'])assert.equal(toCanonicalSubjectCode(code),code);
+  for(const label of ['Toán học','Tiếng Việt','Tiếng Anh','Tin học','Môn tự đặt'])assert.equal(toCanonicalSubjectCode(toCanonicalSubjectCode(label)),toCanonicalSubjectCode(label));
+  assert.equal(toCanonicalSubjectCode(historicSubjectId('Tin học')),'tin-hoc');
+});
+
+test('stored pre-alias weekly plans remain valid without relaxing new publication or accepting forged IDs',()=>{
+  const source=['Toán học','Tiếng Việt','Tiếng Anh','Tin học'].map((subjectLabel,i)=>({subjectLabel,pack:pack('historic-'+i)})),plan=historicPlan(source);
+  assert.equal(validateWeeklyPlan(plan,source),true);
+  assert.throws(()=>createWeeklyPlan(source.map(set=>({...set,subjectId:plan.assignments[set.pack.id]}))),/cần dùng mã/);
+  const forged=structuredClone(plan);forged.assignments[source[0].pack.id]='subject-000000000000000000000000';forged.subjects[0].id=forged.assignments[source[0].pack.id];assert.equal(validateWeeklyPlan(forged,source),false);
+  assert.equal(validateWeeklyPlan(plan,source.map((set,i)=>i?set:{...set,pack:pack(set.pack.id,13)})),false);
+});
 test('weekly subject IDs normalize known names, count every source set and retain explicit difficulty',()=>{
-  assert.equal(weeklySubjectId('  TOÁN '),'math');assert.equal(weeklySubjectId('toan'),'math');assert.notEqual(weeklySubjectId('Công nghệ'),weeklySubjectId('Khoa học'));
+  assert.equal(weeklySubjectId('  TOÁN '),'math');
+  assert.equal(weeklySubjectId('toan'),'math');
+  assert.equal(weeklySubjectId('Toán học'),'math');
+  assert.equal(weeklySubjectId('Tin học'),'computing');
+  assert.equal(toCanonicalSubjectCode('Toán học'),'toan');
+  assert.equal(toCanonicalSubjectCode('Tin học'),'tin-hoc');
+  assert.equal(toCanonicalSubjectCode('Tiếng Việt'),'tieng-viet');
+  assert.equal(toCanonicalSubjectCode('Tiếng Anh'),'tieng-anh');
+  assert.notEqual(weeklySubjectId('Công nghệ'),weeklySubjectId('Khoa học'));
   const source=sets('pure',3,12),plan=createWeeklyPlan(source);assert.equal(summarizeWeeklySubjects(source).length,3);assert.deepEqual(summarizeWeeklySubjects(source)[0],{id:'math',label:'Toán',questions:12,easy:4,medium:4,hard:4,sets:1});assert.equal(validateWeeklyPlan(plan,source),true);
   assert.match(weeklyPlanErrors([...sets('a',3),{subjectLabel:'TOÁN',pack:pack('extra',11)}]).join(' '),/13 câu/);
   assert.match(weeklyPlanErrors(sets('b',2)).join(' '),/3–4 môn/);assert.match(weeklyPlanErrors(sets('c',5)).join(' '),/3–4 môn/);
@@ -25,6 +50,14 @@ test('weekly subject IDs normalize known names, count every source set and retai
 async function fixture(t,engine){let store,admin;if(engine==='PostgreSQL'){({store,admin}=await createPostgresFixture(t));}else{store=new OnlineStore(':memory:');t.after(()=>store.close());const workspaceId=randomUUID(),id=randomUUID();store.db.prepare('INSERT INTO workspaces(id,name,created_at) VALUES(?,?,?)').run(workspaceId,'Kế hoạch tuần',at);store.db.prepare('INSERT INTO users(id,workspace_id,username,password_hash,role,created_at) VALUES(?,?,?,?,?,?)').run(id,workspaceId,'manager','fixture-hash','admin',at);admin={id,workspaceId,role:'admin',username:'manager'};}
   const cls=await store.createClass(admin,{name:'Lớp kế hoạch',grade:3});let seq=0;const publish=(source,title='Tuần '+ ++seq,replaceWeekId)=>store.publishWeek(admin,{requestId:randomUUID(),classId:cls.id,title,sets:source,...(replaceWeekId?{replaceWeekId}:{})});return{store,admin,cls,publish};}
 for(const engine of ['SQLite','PostgreSQL']){
+  test(`${engine}: editorial revision retains IDs in a pre-alias persisted policy`,async t=>{
+    const f=await fixture(t,engine),source=['Toán học','Tiếng Việt','Tiếng Anh','Tin học'].map((subjectLabel,i)=>({subjectLabel,pack:pack('pre-alias-'+i)})),week=await f.publish(source),plan=historicPlan(source);
+    const marker=JSON.stringify({weekId:week.id,plan});
+    if(engine==='SQLite')f.store.db.prepare("UPDATE audit SET target_id=? WHERE workspace_id=? AND action='week.policy'").run(marker,f.admin.workspaceId);
+    else await f.store.pool.query("UPDATE bao_an.audit SET target_id=$1 WHERE workspace_id=$2 AND action='week.policy'",[marker,f.admin.workspaceId]);
+    const revision=source.map(set=>({...set,pack:{...set.pack,version:2,items:set.pack.items.map(item=>({...item,explanation:'Giải thích cập nhật, giữ nguyên đáp án.'}))}}));
+    const revised=await f.publish(revision,week.title,week.id);assert.deepEqual(revised.plan,plan);assert.equal(revised.sets[0].pack.version,2);assert.equal(revised.sets[0].subjectId,plan.assignments[source[0].pack.id]);
+  });
   test(`${engine}: new weeks enforce 3–4 subjects and 12 questions per subject in the authoritative store`,async t=>{
     const f=await fixture(t,engine);await assert.rejects(async()=>f.publish(sets('too-few',2)),/3–4 môn/);await assert.rejects(async()=>f.publish(sets('too-many',5)),/3–4 môn/);
     await assert.rejects(async()=>f.publish(sets('too-long',3,13)),/13 câu/);
@@ -69,4 +102,14 @@ test('SQLite recovery retains a weekly policy snapshot and rejects corrupt or du
  t.after(async()=>{assert.equal(path.dirname(path.resolve(directory)),root);assert.match(path.basename(directory),/^weekly-recovery-/);await rm(directory,{recursive:true,force:true});});
  const backup=path.join(directory,'weekly.sqlite'),preview=await snapshotOnlineDatabase(f.store.db,backup),target=path.join(directory,'restored','weekly.sqlite');await restoreOnlineDatabase({databasePath:target,backupPath:backup,expectedSha256:preview.sha256});const restored=new OnlineStore(target);try{assert.deepEqual(restored.weeks(f.admin,f.cls.id)[0].plan,week.plan);}finally{restored.close();}
  const db=new DatabaseSync(backup);try{const row=db.prepare("SELECT rowid,target_id FROM audit WHERE action='week.policy'").get(),marker=JSON.parse(row.target_id);marker.plan.maxQuestionsPerSubject=13;db.prepare('UPDATE audit SET target_id=? WHERE rowid=?').run(JSON.stringify(marker),row.rowid);}finally{db.close();}assert.throws(()=>inspectOnlineBackup(backup),e=>e.status===400&&/Cấu hình tuần/.test(e.message));
+});
+
+test('SQLite backup and restore preserve a pre-alias weekly snapshot byte for byte',async t=>{
+  const f=await fixture(t,'SQLite'),source=['Toán học','Tiếng Việt','Tiếng Anh','Tin học'].map((subjectLabel,i)=>({subjectLabel,pack:pack('legacy-backup-'+i)})),week=await f.publish(source),plan=historicPlan(source);
+  f.store.db.prepare("UPDATE audit SET target_id=? WHERE workspace_id=? AND action='week.policy'").run(JSON.stringify({weekId:week.id,plan}),f.admin.workspaceId);
+  const root=path.resolve('test-results'),directory=await mkdtemp(path.join(root,'weekly-recovery-'));
+  t.after(async()=>{assert.equal(path.dirname(path.resolve(directory)),root);assert.match(path.basename(directory),/^weekly-recovery-/);await rm(directory,{recursive:true,force:true});});
+  const backup=path.join(directory,'legacy.sqlite'),preview=await snapshotOnlineDatabase(f.store.db,backup),target=path.join(directory,'restored','legacy.sqlite');
+  await restoreOnlineDatabase({databasePath:target,backupPath:backup,expectedSha256:preview.sha256});
+  const restored=new OnlineStore(target);try{assert.deepEqual(restored.weeks(f.admin,f.cls.id)[0].plan,plan);}finally{restored.close();}
 });

@@ -7,6 +7,7 @@ import {useQuestionSpeech} from './useQuestionSpeech';
 import {saveFailureMessage} from './save-failure-message';
 import QuestionMedia,{useNextQuestionImage} from '../components/QuestionMedia';
 import GameMascot from './GameMascot';
+import { getMascotLine } from './mascot-dialogue';
 import { useEffect, useRef, useState } from 'react';
 import { playFeedbackTone } from '../core/experience';
 import GameCompletion from './GameCompletion';
@@ -113,7 +114,14 @@ export default function MathQuest({pack,onAttempt,onComplete,onExit,questionMode
       </div>
     </div>
     <div className="math-adventure-layout">
-      <aside className="world-guide"><div className="guide-figure"><GameMascot alt="Cáo nhỏ đồng hành" mood={selected===null?'idle':correctSelected?'happy':'encourage'}/></div><div className="guide-speech">{selected===null ? "Con cứ suy nghĩ kỹ rồi chọn nhé! 🌟" : (correctSelected ? "Cậu làm tốt lắm! 🎉" : "Sai cũng là một cách học nhé! 🌱")}</div></aside>
+      <aside className="world-guide">
+        <div className="guide-figure">
+          <GameMascot alt="Cáo nhỏ đồng hành" mood={selected === null ? 'idle' : correctSelected ? 'happy' : 'encourage'} />
+        </div>
+        <div className="guide-speech">
+          {getMascotLine(selected === null ? 'idle' : correctSelected ? 'happy' : 'encourage', index)}
+        </div>
+      </aside>
       <div className="challenge-card">
         <div className="quest-progress"><span>THỬ THÁCH {index+1} / {content.items.length}</span><span>{Math.round((index+((questionMode?correctSelected:selected!==null)?1:0))/content.items.length*100)}% hành trình</span></div>
         <div className="progress-track"><div style={{width:`${(index+((questionMode?correctSelected:selected!==null)?1:0))/content.items.length*100}%`}}/></div>
@@ -146,7 +154,23 @@ export default function MathQuest({pack,onAttempt,onComplete,onExit,questionMode
         </div>
       </div>
     </div>
-    {status === 'done' && <GameCompletion questionMode={questionMode} title="Chinh phục hòn đảo!" summary={questionMode?`Con đã trả lời đúng ${correctCount}/${content.items.length} câu. Sao của từng câu đã được lưu.`:`Con trả lời đúng ${correctCount}/${content.items.length} câu ở lượt đầu. Một hành trình thật đáng nhớ!`} onExit={onExit}/>}
+    {status === 'done' && (
+      <GameCompletion
+        questionMode={questionMode}
+        title="Chinh phục hòn đảo!"
+        summary={questionMode ? `Con đã trả lời đúng ${correctCount}/${content.items.length} câu. Sao của từng câu đã được lưu.` : `Con trả lời đúng ${correctCount}/${content.items.length} câu ở lượt đầu. Một hành trình thật đáng nhớ!`}
+        onExit={onExit}
+        onReplay={() => {
+          setIndex(0);
+          setSelected(null);
+          setOutcome(null);
+          setHints(0);
+          setHintText('');
+          setCorrectCount(0);
+          setStatus('playing');
+        }}
+      />
+    )}
     <div className="world-stage-bottom"><span>{questionMode?'🌿 Mỗi câu có tối đa 3 sao • Chơi lại để nâng sao':'🌿 Học từ từ • không cần vội vàng'}</span><span>✦ Bảo An Game World</span></div>
     <div className="world-particles" aria-hidden="true"><i/><i/><i/><i/><i/><i/></div>
   </section>;

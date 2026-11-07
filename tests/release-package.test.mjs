@@ -89,7 +89,7 @@ test('SPA fallback is limited to HTML navigation; missing assets, API, other met
 test('Pilot package is a bounded dist snapshot with standalone Unicode-safe Windows entrypoint and verified ZIP/manifest hashes',async t=>{
   const {dist,output,content}=await fixture(t),result=await packageRelease({distDir:dist,outputRoot:output});
   assert.equal(result.reused,false);assert.equal(result.manifest.version,RELEASE_VERSION);assert.equal(result.manifest.pilot,true);assert.equal(result.manifest.releaseReady,false);assert.equal(result.manifest.humanPilotStatus,'UNVERIFIED');
-  assert.equal(result.manifest.databaseSchemaVersion,1);assert.deepEqual(result.manifest.storageSchemas,{localSqlite:1,cloudPostgres:1});assert.deepEqual(result.manifest.storageSchemas,RELEASE_STORAGE_SCHEMAS);assert.equal(result.manifest.buildId,'0123456789abcdef');assert.equal(result.manifest.assetCount,Object.keys(content).length);
+  assert.equal(result.manifest.databaseSchemaVersion,2);assert.deepEqual(result.manifest.storageSchemas,{localSqlite:2,cloudPostgres:9});assert.deepEqual(result.manifest.storageSchemas,RELEASE_STORAGE_SCHEMAS);assert.equal(result.manifest.buildId,'0123456789abcdef');assert.equal(result.manifest.assetCount,Object.keys(content).length);
   const archive=unzipSync(await readFile(result.zipPath)),prefix=`bao-an-learning-${RELEASE_VERSION}/`;
   assert.equal(Object.keys(archive).length,result.manifest.files.length+1);assert.deepEqual(JSON.parse(Buffer.from(archive[`${prefix}release.json`]).toString('utf8')),result.manifest);
   assert.equal(result.manifest.files.some(row=>row.path.includes('secret')),false);

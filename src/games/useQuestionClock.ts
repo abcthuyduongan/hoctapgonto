@@ -3,7 +3,7 @@ import type {GameHostProps} from '../core/contracts';
 
 type ClockReceipt=Awaited<ReturnType<NonNullable<GameHostProps['onQuestionOpen']>>>;
 type OpenQuestion=GameHostProps['onQuestionOpen'];
-type ClockState={key:string;receipt:ClockReceipt;receivedAt:number;elapsedAtReceipt:number};
+type ClockState={key:string;retryKey:number;receipt:ClockReceipt;receivedAt:number;elapsedAtReceipt:number};
 
 /** This clock is a display estimate; only the server decides the earned stars. */
 export function useQuestionClock({enabled,itemId,canOpen=true,finished=false,onQuestionOpen,requireItem=false}:{enabled:boolean;itemId:string;canOpen?:boolean;finished?:boolean;onQuestionOpen:OpenQuestion;requireItem?:boolean}){
@@ -21,7 +21,7 @@ export function useQuestionClock({enabled,itemId,canOpen=true,finished=false,onQ
         if(requireItem&&receipt.item?.id!==itemId)throw new Error('Máy chủ chưa mở được nội dung câu hỏi của bản mới. Hãy tải lại trang.');
         const elapsedAtReceipt=Math.max(0,Date.parse(receipt.serverNow)-Date.parse(receipt.openedAt));
         if(!Number.isFinite(elapsedAtReceipt)||!Number.isFinite(receipt.threeStarMs)||!Number.isFinite(receipt.twoStarMs)||receipt.threeStarMs<=0||receipt.twoStarMs<receipt.threeStarMs)throw new Error('Chưa nhận được đồng hồ câu hỏi hợp lệ.');
-        if(!cancelled)setClock({key:itemId,receipt,receivedAt:performance.now(),elapsedAtReceipt});
+        if(!cancelled)setClock({key:itemId,retryKey,receipt,receivedAt:performance.now(),elapsedAtReceipt});
       }catch(error){if(!cancelled)setFailure({key:itemId,message:error instanceof Error?error.message:'Chưa mở được đồng hồ câu hỏi.'});}
     })();
     return()=>{cancelled=true;};
@@ -35,7 +35,9 @@ export function useQuestionClock({enabled,itemId,canOpen=true,finished=false,onQ
   // Reading tick makes the display refresh without using the client's value for scoring.
   void tick;
   return {
-    ready:!enabled||!!current,
+    // A reopened question can carry a new answer presentation. Keep displaying
+    // its elapsed time, but do not submit the old choices before the new ACK.
+    ready:!enabled||!!current&&current.retryKey===retryKey,
     item:current?.receipt.item,
     passage:current?.receipt.passage,
     elapsedMs:current?Math.max(0,current.elapsedAtReceipt+performance.now()-current.receivedAt):0,

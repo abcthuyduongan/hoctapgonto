@@ -248,6 +248,7 @@ export function createSafeTimeIntegrationRouter({ store, db, authenticateUserCre
     if (!client || client.revoked_at) {
       return { error: { status: 401, code: 'unauthorized', message: 'Khóa kết nối không hợp lệ hoặc đã bị thu hồi.' } };
     }
+    if(!isIntegrationEnabled(client.workspace_id))return{error:{status:403,code:'integration_disabled',message:'Phụ huynh đã tắt kết nối.'}};
     if (!checkRateLimit(tokenHash)) {
       return { error: { status: 429, code: 'rate_limited', message: 'Vượt quá giới hạn tần suất yêu cầu (tối đa 120 yêu cầu/phút).' } };
     }
@@ -343,6 +344,9 @@ export function createSafeTimeIntegrationRouter({ store, db, authenticateUserCre
           recordPairFailure();
           sendError(res, 400, 'invalid_pair_code', 'Mã ghép đôi không đúng, đã dùng hoặc đã hết hạn.');
           return true;
+        }
+        if(!isIntegrationEnabled(pairCode.workspace_id)){
+          sendError(res,403,'integration_disabled','Kết nối của không gian này đã bị tắt.');return true;
         }
 
         recordPairSuccess();

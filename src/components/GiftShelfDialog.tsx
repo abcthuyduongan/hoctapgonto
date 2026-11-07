@@ -4,6 +4,7 @@ import {onlineApi} from '../core/online-client';
 import {newId} from '../core/utils';
 import {onlineRewardStatus, onlineTime} from '../core/online-format';
 import {rewardStatus} from '../core/reward-wallet';
+import {EmptyState} from '../ui/EmptyState';
 import '../styles/gift-shelf.css';
 
 interface GiftShelfDialogProps {
@@ -11,6 +12,7 @@ interface GiftShelfDialogProps {
   onRefresh: () => Promise<void>;
   onClose: () => void;
   onOpenLegacyWallet?: () => void;
+  onAskParentsAddGift?: () => void;
 }
 
 const KIND_LABELS: Record<string, {label: string; icon: string}> = {
@@ -20,7 +22,7 @@ const KIND_LABELS: Record<string, {label: string; icon: string}> = {
   saving: {label: 'Tiết kiệm', icon: '💰'},
 };
 
-export default function GiftShelfDialog({state, onRefresh, onClose, onOpenLegacyWallet}: GiftShelfDialogProps) {
+export default function GiftShelfDialog({state, onRefresh, onClose, onOpenLegacyWallet, onAskParentsAddGift}: GiftShelfDialogProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [activeTab, setActiveTab] = useState<'shelf' | 'memorial'>('shelf');
   const [gifts, setGifts] = useState<GiftItem[]>([]);
@@ -176,25 +178,31 @@ export default function GiftShelfDialog({state, onRefresh, onClose, onOpenLegacy
         ) : activeTab === 'shelf' ? (
           <div className="gift-shelf-grid">
             {gifts.length === 0 ? (
-              <div className="gift-shelf-empty">
-                <span className="empty-shelf-icon">📦</span>
-                <h3>Kệ quà đang được chuẩn bị</h3>
-                <p>Thầy cô đang thêm các món quà hấp dẫn lên kệ. Con tích lũy sao trước nhé!</p>
-              </div>
+              <EmptyState
+                icon="gift"
+                title="Kệ quà đang được chuẩn bị"
+                message="Thầy cô hoặc bố mẹ đang thêm các món quà hấp dẫn lên kệ. Con tích lũy sao trước nhé!"
+                actionLabel="Hỏi bố mẹ thêm quà"
+                onAction={() => {
+                  onClose();
+                  onAskParentsAddGift?.();
+                }}
+                className="gift-shelf-empty"
+              />
             ) : (
               gifts.map(gift => {
                 const kindInfo = KIND_LABELS[gift.kind] || KIND_LABELS.item;
                 const isPinned = goal?.giftId === gift.id;
                 const canAfford = state.balance.available >= gift.priceStars;
-                const isOutOfStock = gift.stock !== null && gift.stock <= 0;
+                const isOutOfStock = gift.stock === 0;
                 const percent = Math.min(100, Math.round((state.balance.available / gift.priceStars) * 100));
 
                 return (
                   <article key={gift.id} className={`gift-card ${isPinned ? 'is-pinned' : ''}`}>
                     <div className="gift-card-media">
-                      {gift.imageMediaId ? (
+                      {gift.imageMediaId||gift.imageUrl ? (
                         <img
-                          src={`/api/online/media/${encodeURIComponent(gift.imageMediaId)}`}
+                          src={gift.imageMediaId?`/api/online/media/${encodeURIComponent(gift.imageMediaId)}`:gift.imageUrl}
                           alt={gift.title}
                           className="gift-card-img"
                           loading="lazy"
@@ -209,10 +217,11 @@ export default function GiftShelfDialog({state, onRefresh, onClose, onOpenLegacy
 
                     <div className="gift-card-content">
                       <h3 className="gift-card-title">{gift.title}</h3>
+                      {gift.referencePriceVnd!==undefined&&<p className="gift-reference-price">Giá tham khảo: {gift.referencePriceVnd.toLocaleString('vi-VN')} ₫</p>}
                       <div className="gift-card-meta">
                         <span className="gift-price-tag">⭐ {gift.priceStars} sao</span>
                         <span className="gift-stock-tag">
-                          {gift.stock !== null ? (isOutOfStock ? 'Hết hàng' : `Còn ${gift.stock} món`) : 'Không giới hạn'}
+                          {gift.stock !== null&&gift.stock>=0 ? (isOutOfStock ? 'Hết hàng' : `Còn ${gift.stock} món`) : 'Bố mẹ chuẩn bị quà'}
                         </span>
                       </div>
 
@@ -257,11 +266,14 @@ export default function GiftShelfDialog({state, onRefresh, onClose, onOpenLegacy
         ) : (
           <div className="memorial-cabinet">
             {giftRedemptions.length === 0 ? (
-              <div className="gift-shelf-empty">
-                <span className="empty-shelf-icon">🏆</span>
-                <h3>Tủ kỷ niệm chưa có món quà nào</h3>
-                <p>Hãy phấn đấu tích sao và đổi quà để lưu giữ kỷ niệm vào tủ nhé!</p>
-              </div>
+              <EmptyState
+                icon="trophy"
+                title="Tủ kỷ niệm chưa có món quà nào"
+                message="Hãy phấn đấu tích sao và đổi quà để lưu giữ kỷ niệm vào tủ nhé!"
+                actionLabel="Xem Kệ quà"
+                onAction={() => setActiveTab('shelf')}
+                className="gift-shelf-empty"
+              />
             ) : (
               <ul className="memorial-list">
                 {giftRedemptions.map(req => {

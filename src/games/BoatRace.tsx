@@ -12,6 +12,7 @@ import type { AttemptInput, AttemptOutcome, GameHostProps, QuizItem, StudentQuiz
 import { stopSpeaking } from '../core/speech';
 import { useQuestionLayout } from './useQuestionLayout';
 import { useQuestionClock } from './useQuestionClock';
+import { useQuestionSpeech } from './useQuestionSpeech';
 
 export default function BoatRace({
   pack,
@@ -48,6 +49,7 @@ export default function BoatRace({
   });
 
   const question = clock.item?.kind === 'multiple-choice' ? clock.item : sourceQuestion;
+  const speech = useQuestionSpeech(pack.subject, question.id);
   const correctIndex = serverScored ? outcome?.feedback?.correctIndex : legacyQuestion.correctIndex;
   const explanation = serverScored ? outcome?.feedback?.explanation : legacyQuestion.explanation;
   const layout = useQuestionLayout({
@@ -214,11 +216,27 @@ export default function BoatRace({
           summary={`Thuyền rồng của bé đã hoàn thành đường đua! Đúng ${correctCount}/${content.items.length} câu hỏi.`}
           onExit={onExit}
           questionMode={questionMode}
+          onReplay={() => {
+            setIndex(0);
+            setSelected(null);
+            setOutcome(null);
+            setCorrectCount(0);
+            setStatus('playing');
+          }}
         />
       ) : (
         <div className="quiz-stage" style={{ textAlign: 'center', padding: '10px 0' }}>
-          <div className="question-prompt" style={{ fontSize: '20px', fontWeight: 700, color: '#0f172a', marginBottom: '20px' }}>
-            {question.prompt}
+          <div className="question-prompt" style={{ fontSize: '20px', fontWeight: 700, color: '#0f172a', marginBottom: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+            <span>{question.prompt}</span>
+            <button
+              type="button"
+              className="speech-trigger-btn"
+              onClick={() => speech.read(question.prompt)}
+              aria-label="Nghe đọc câu hỏi"
+              title="Nghe đọc câu hỏi"
+            >
+              🔊
+            </button>
           </div>
 
           <div

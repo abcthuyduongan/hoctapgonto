@@ -1,6 +1,8 @@
+import {useModalFocus} from '../ui/useModalFocus';
 // src/components/BadgeShowcaseDialog.tsx
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import type { StudentBadgeStatus } from '../core/online-contracts';
+import { EmptyState } from '../ui/EmptyState';
 import '../styles/badges.css';
 
 interface BadgeShowcaseDialogProps {
@@ -13,6 +15,21 @@ export const BadgeShowcaseDialog: React.FC<BadgeShowcaseDialogProps> = ({
   onClose,
 }) => {
   const [filter, setFilter] = useState<'all' | 'unlocked' | 'locked'>('all');
+  const modalRef = useRef<HTMLDivElement>(null);
+  useModalFocus(modalRef);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onClose();
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [onClose]);
 
   const unlockedCount = badges.filter((b) => b.unlocked).length;
   const totalCount = badges.length;
@@ -51,17 +68,25 @@ export const BadgeShowcaseDialog: React.FC<BadgeShowcaseDialogProps> = ({
   };
 
   return (
-    <div className="badge-modal-backdrop" onClick={onClose}>
-      <div className="badge-dialog" onClick={(e) => e.stopPropagation()}>
+    <div className="badge-modal-backdrop" onClick={onClose} role="presentation">
+      <div
+        className="badge-dialog"
+        ref={modalRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="badge-dialog-title-id"
+        tabIndex={-1}
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="badge-dialog-header">
-          <div className="badge-dialog-title">
+          <div className="badge-dialog-title" id="badge-dialog-title-id">
             <span>🎖️</span>
             <span>Sổ Huy Hiệu Của Con</span>
             <span className="badge-count-badge">
               {unlockedCount} / {totalCount} Đạt được
             </span>
           </div>
-          <button className="badge-close-btn" onClick={onClose}>✕</button>
+          <button className="badge-close-btn" onClick={onClose} aria-label="Đóng sổ huy hiệu">✕</button>
         </div>
 
         <div className="badge-tabs">
@@ -86,7 +111,18 @@ export const BadgeShowcaseDialog: React.FC<BadgeShowcaseDialogProps> = ({
         </div>
 
         <div className="badge-grid-container">
-          {filteredBadges.map((b) => (
+          {filteredBadges.length === 0 ? (
+            <EmptyState
+              icon="badge"
+              title="Chưa có huy hiệu phù hợp"
+              message={filter === 'unlocked' ? 'Con chưa mở khóa huy hiệu nào. Hãy tiếp tục học và rèn luyện mỗi ngày nhé!' : 'Không có huy hiệu nào trong mục này.'}
+              actionLabel={filter !== 'all' ? 'Xem tất cả huy hiệu' : 'Đi học ngay'}
+              onAction={() => {
+                if (filter !== 'all') setFilter('all');
+                else onClose();
+              }}
+            />
+          ) : filteredBadges.map((b) => (
             <div
               key={b.id}
               className={`badge-card ${b.unlocked ? 'unlocked' : 'locked'}`}

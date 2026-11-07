@@ -1,0 +1,19 @@
+{
+  "humanPilotVerified": false,
+  "safetimeAutomaticIntegrationReady": false,
+  "notes": [
+    "Runtime changed after the earlier 4.1 verification; those results are historical.",
+    "Wait for exitCode 0 and verify source ID before declaring final acceptance."
+  ],
+  "status": "RUNNING_LATEST_SOURCE_VERIFICATION",
+  "finalRunResult": "evidence/verify-latest-final-result.json",
+  "focusedUi": "PASS: PIN scope, 390/1440 widths, contrast, deep links",
+  "candidateVersion": "4.3.0-rc.1",
+  "focusedIntegrationTests": {
+    "failed": 0,
+    "passed": 35
+  },
+  "schemaVersion": 1,
+  "finalRunLog": "evidence/verify-latest-final.log",
+  "productionDeployed": false
+}

@@ -76,7 +76,7 @@ test('Tuần 10 Cổng C10: Kiểm Thử Truy Cập Dễ Dàng (A11y) & Quét T�
     const returnBtn = page.getByRole('button', {name: /Quay lại bản đồ/i});
     await expect(returnBtn).toBeVisible();
     await returnBtn.click();
-    await expect(page.locator('.online-header')).toBeVisible();
+    await expect(page.locator('.student-topbar')).toBeVisible();
 
     // 9. Verify all images in main view have alt attributes
     const imagesWithoutAlt = await page.evaluate(() => {

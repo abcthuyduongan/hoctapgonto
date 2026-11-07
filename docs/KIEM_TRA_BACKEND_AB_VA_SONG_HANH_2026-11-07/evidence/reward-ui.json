@@ -1,0 +1,433 @@
+{
+  "config": {
+    "argv": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\node_modules\\@playwright\\test\\cli.js",
+      "test",
+      "tests/visual/online-rewardflow.spec.ts",
+      "tests/visual/online-upgrade.spec.ts",
+      "tests/visual/online-a11y.spec.ts",
+      "--config=playwright.online.config.ts"
+    ],
+    "configFile": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\playwright.online.config.ts",
+    "rootDir": "D:/Phần mềm 2026/BAO_AN_LEARNING_lam lại/tests/visual",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "D:/Phần mềm 2026/BAO_AN_LEARNING_lam lại/test-results/online-browser-output",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "online-chrome",
+        "name": "online-chrome",
+        "testDir": "D:/Phần mềm 2026/BAO_AN_LEARNING_lam lại/tests/visual",
+        "testIgnore": [],
+        "testMatch": [
+          "/online(?:-[a-z0-9]+)*\\.spec\\.ts$/"
+        ],
+        "timeout": 180000
+      }
+    ],
+    "filteredProjects": [
+      {
+        "grep": {},
+        "grepInvert": null,
+        "outputDir": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\test-results\\online-browser-output",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "name": "online-chrome",
+        "testDir": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual",
+        "snapshotDir": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual",
+        "testIgnore": [],
+        "testMatch": {},
+        "timeout": 180000,
+        "use": {
+          "headless": true,
+          "actionTimeout": 30000,
+          "navigationTimeout": 30000,
+          "viewport": {
+            "width": 1440,
+            "height": 1000
+          },
+          "extraHTTPHeaders": {
+            "X-Bao-An-Question-Protocol": "1"
+          },
+          "serviceWorkers": "block",
+          "trace": "retain-on-failure",
+          "screenshot": "only-on-failure",
+          "channel": "chrome"
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": "online-chrome"
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "docs/KIEM_TRA_BACKEND_AB_VA_SONG_HANH_2026-11-07/evidence/reward-ui.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "default",
+    "updateSourceMethod": "patch",
+    "version": "1.64.0",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "online-a11y.spec.ts",
+      "file": "online-a11y.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "Tuần 10 Cổng C10: Kiểm Thử Truy Cập Dễ Dàng (A11y) & Quét Tự Động axe-core",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "online-chrome",
+              "projectName": "online-chrome",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 7362,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "Scanning OnlineStudentWorld for A11y violations...\n"
+                    },
+                    {
+                      "text": "Scanning TownScreen for A11y violations...\n"
+                    },
+                    {
+                      "text": "Scanning OnlineAdminDashboard for A11y violations (including color-contrast)...\n"
+                    },
+                    {
+                      "text": "A11y Verification PASS: 0 critical/serious violations across Student, Town, and Admin screens (including color-contrast).\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-07T09:53:32.595Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d22423fece6ce5a20ce3-cb0cae49527c4c721558",
+          "file": "online-a11y.spec.ts",
+          "line": 5,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "online-rewardflow.spec.ts",
+      "file": "online-rewardflow.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "20 photographed gifts, 500-dong conversion and PIN-protected approval complete without duplicate star deductions",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "online-chrome",
+              "projectName": "online-chrome",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 20511,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('dialog', { name: '⭐ Ví đổi sao của con', exact: true })\nExpected substring: \u001b[32m\"500\"\u001b[39m\nReceived string:    \u001b[31m\"⭐ Ví đổi sao của conĐóng ✕18 sao khả dụng0 sao đang chờ · 0 sao đã đổiCon đã tích lũy 18 sao. Mỗi câu nhận tối đa 3 sao dùng chung mọi trò; học lại chỉ cộng phần tăng thêm.Người lớn trực tiếp trao tiền hoặc quà sau khi duyệt. Ứng dụng lưu lịch sử đổi sao.Quản trị viên chưa bật đổi sao. Con vẫn giữ đầy đủ thành tích.Lịch sử đổi saoCon chưa gửi ước muốn nào.\"\u001b[39m\nTimeout: 15000ms\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" getByRole('dialog', { name: '⭐ Ví đổi sao của con', exact: true }) with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('dialog', { name: '⭐ Ví đổi sao của con', exact: true })\u001b[22m\n\u001b[2m    33 × locator resolved to <dialog open=\"\" class=\"online-dialog online-wallet\" aria-labelledby=\"online-wallet-title\">…</dialog>\u001b[22m\n\u001b[2m       - unexpected value \"⭐ Ví đổi sao của conĐóng ✕18 sao khả dụng0 sao đang chờ · 0 sao đã đổiCon đã tích lũy 18 sao. Mỗi câu nhận tối đa 3 sao dùng chung mọi trò; học lại chỉ cộng phần tăng thêm.Người lớn trực tiếp trao tiền hoặc quà sau khi duyệt. Ứng dụng lưu lịch sử đổi sao.Quản trị viên chưa bật đổi sao. Con vẫn giữ đầy đủ thành tích.Lịch sử đổi saoCon chưa gửi ước muốn nào.\"\u001b[22m\n",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('dialog', { name: '⭐ Ví đổi sao của con', exact: true })\nExpected substring: \u001b[32m\"500\"\u001b[39m\nReceived string:    \u001b[31m\"⭐ Ví đổi sao của conĐóng ✕18 sao khả dụng0 sao đang chờ · 0 sao đã đổiCon đã tích lũy 18 sao. Mỗi câu nhận tối đa 3 sao dùng chung mọi trò; học lại chỉ cộng phần tăng thêm.Người lớn trực tiếp trao tiền hoặc quà sau khi duyệt. Ứng dụng lưu lịch sử đổi sao.Quản trị viên chưa bật đổi sao. Con vẫn giữ đầy đủ thành tích.Lịch sử đổi saoCon chưa gửi ước muốn nào.\"\u001b[39m\nTimeout: 15000ms\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" getByRole('dialog', { name: '⭐ Ví đổi sao của con', exact: true }) with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('dialog', { name: '⭐ Ví đổi sao của con', exact: true })\u001b[22m\n\u001b[2m    33 × locator resolved to <dialog open=\"\" class=\"online-dialog online-wallet\" aria-labelledby=\"online-wallet-title\">…</dialog>\u001b[22m\n\u001b[2m       - unexpected value \"⭐ Ví đổi sao của conĐóng ✕18 sao khả dụng0 sao đang chờ · 0 sao đã đổiCon đã tích lũy 18 sao. Mỗi câu nhận tối đa 3 sao dùng chung mọi trò; học lại chỉ cộng phần tăng thêm.Người lớn trực tiếp trao tiền hoặc quà sau khi duyệt. Ứng dụng lưu lịch sử đổi sao.Quản trị viên chưa bật đổi sao. Con vẫn giữ đầy đủ thành tích.Lịch sử đổi saoCon chưa gửi ước muốn nào.\"\u001b[22m\n\n    at D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-rewardflow.spec.ts:25:105",
+                    "location": {
+                      "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-rewardflow.spec.ts",
+                      "column": 105,
+                      "line": 25
+                    },
+                    "snippet": "  23 |     await page.context().clearCookies();await post('/login',{username:'reward.ui.child',password:f.password});await earnRewardJourney(post,sets);\n  24 |     await page.goto(f.origin+'/?online=1');await page.getByRole('button',{name:/^Số sao của con:/}).click();\n> 25 |     const wallet=page.getByRole('dialog',{name:'⭐ Ví đổi sao của con',exact:true});await expect(wallet).toContainText('500');\n     |                                                                                                         ^\n  26 |     await wallet.getByLabel('Món quà con mong muốn',{exact:true}).fill('Tiết kiệm mua sách');await wallet.getByLabel('Mục tiêu tiền (đồng)',{exact:true}).fill('1000');await wallet.getByRole('button',{name:'Gửi ước muốn',exact:true}).click();await expect(wallet).toContainText('Đã gửi ước muốn');await wallet.getByRole('button',{name:'Đóng ✕',exact:true}).click();\n  27 |     await page.locator('.student-goal-bar').getByRole('button',{name:/Kệ quà/}).click();const shelf=page.getByRole('dialog',{name:'🎁 Kệ quà của con',exact:true});\n  28 |     await expect(shelf.locator('.gift-card')).toHaveCount(20);const snack=shelf.locator('.gift-card').filter({hasText:'Bim bim bắp ngọt Oishi 32g'});"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-rewardflow.spec.ts",
+                        "column": 105,
+                        "line": 25
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('dialog', { name: '⭐ Ví đổi sao của con', exact: true })\nExpected substring: \u001b[32m\"500\"\u001b[39m\nReceived string:    \u001b[31m\"⭐ Ví đổi sao của conĐóng ✕18 sao khả dụng0 sao đang chờ · 0 sao đã đổiCon đã tích lũy 18 sao. Mỗi câu nhận tối đa 3 sao dùng chung mọi trò; học lại chỉ cộng phần tăng thêm.Người lớn trực tiếp trao tiền hoặc quà sau khi duyệt. Ứng dụng lưu lịch sử đổi sao.Quản trị viên chưa bật đổi sao. Con vẫn giữ đầy đủ thành tích.Lịch sử đổi saoCon chưa gửi ước muốn nào.\"\u001b[39m\nTimeout: 15000ms\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" getByRole('dialog', { name: '⭐ Ví đổi sao của con', exact: true }) with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('dialog', { name: '⭐ Ví đổi sao của con', exact: true })\u001b[22m\n\u001b[2m    33 × locator resolved to <dialog open=\"\" class=\"online-dialog online-wallet\" aria-labelledby=\"online-wallet-title\">…</dialog>\u001b[22m\n\u001b[2m       - unexpected value \"⭐ Ví đổi sao của conĐóng ✕18 sao khả dụng0 sao đang chờ · 0 sao đã đổiCon đã tích lũy 18 sao. Mỗi câu nhận tối đa 3 sao dùng chung mọi trò; học lại chỉ cộng phần tăng thêm.Người lớn trực tiếp trao tiền hoặc quà sau khi duyệt. Ứng dụng lưu lịch sử đổi sao.Quản trị viên chưa bật đổi sao. Con vẫn giữ đầy đủ thành tích.Lịch sử đổi saoCon chưa gửi ước muốn nào.\"\u001b[22m\n\n\n  23 |     await page.context().clearCookies();await post('/login',{username:'reward.ui.child',password:f.password});await earnRewardJourney(post,sets);\n  24 |     await page.goto(f.origin+'/?online=1');await page.getByRole('button',{name:/^Số sao của con:/}).click();\n> 25 |     const wallet=page.getByRole('dialog',{name:'⭐ Ví đổi sao của con',exact:true});await expect(wallet).toContainText('500');\n     |                                                                                                         ^\n  26 |     await wallet.getByLabel('Món quà con mong muốn',{exact:true}).fill('Tiết kiệm mua sách');await wallet.getByLabel('Mục tiêu tiền (đồng)',{exact:true}).fill('1000');await wallet.getByRole('button',{name:'Gửi ước muốn',exact:true}).click();await expect(wallet).toContainText('Đã gửi ước muốn');await wallet.getByRole('button',{name:'Đóng ✕',exact:true}).click();\n  27 |     await page.locator('.student-goal-bar').getByRole('button',{name:/Kệ quà/}).click();const shelf=page.getByRole('dialog',{name:'🎁 Kệ quà của con',exact:true});\n  28 |     await expect(shelf.locator('.gift-card')).toHaveCount(20);const snack=shelf.locator('.gift-card').filter({hasText:'Bim bim bắp ngọt Oishi 32g'});\n    at D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-rewardflow.spec.ts:25:105"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-07T09:53:40.195Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\test-results\\online-browser-output\\online-rewardflow-20-photo-63d20-t-duplicate-star-deductions-online-chrome\\test-failed-1.png"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\test-results\\online-browser-output\\online-rewardflow-20-photo-63d20-t-duplicate-star-deductions-online-chrome\\error-context.md"
+                    },
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "path": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\test-results\\online-browser-output\\online-rewardflow-20-photo-63d20-t-duplicate-star-deductions-online-chrome\\trace.zip"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-rewardflow.spec.ts",
+                    "column": 105,
+                    "line": 25
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "ae11c46d5cc2a90ca92e-f868b849f5cb90309261",
+          "file": "online-rewardflow.spec.ts",
+          "line": 5,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "online-upgrade.spec.ts",
+      "file": "online-upgrade.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "existing 4-digit parent PIN opens the portal without replacing settings",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "online-chrome",
+              "projectName": "online-chrome",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4001,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-07T09:54:02.306Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d85694da3b1aa172a8b0-7cffee6ed8ac00de2a16",
+          "file": "online-upgrade.spec.ts",
+          "line": 5,
+          "column": 44
+        },
+        {
+          "title": "existing 5-digit parent PIN opens the portal without replacing settings",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "online-chrome",
+              "projectName": "online-chrome",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3763,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-07T09:54:06.524Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d85694da3b1aa172a8b0-65b65bf25de503888171",
+          "file": "online-upgrade.spec.ts",
+          "line": 5,
+          "column": 44
+        },
+        {
+          "title": "existing 6-digit parent PIN opens the portal without replacing settings",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "online-chrome",
+              "projectName": "online-chrome",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3738,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-07T09:54:10.303Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d85694da3b1aa172a8b0-e74d0cc51fec0a00b80d",
+          "file": "online-upgrade.spec.ts",
+          "line": 5,
+          "column": 44
+        },
+        {
+          "title": "assigned map, header, mobile navigation and modal keyboard focus work across six widths",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "online-chrome",
+              "projectName": "online-chrome",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 11786,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-07T09:54:14.055Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d85694da3b1aa172a8b0-253c2b209c1faec84f1c",
+          "file": "online-upgrade.spec.ts",
+          "line": 27,
+          "column": 1
+        },
+        {
+          "title": "shared dialog traps keyboard focus and returns focus to its opener",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "online-chrome",
+              "projectName": "online-chrome",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2327,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-07T09:54:25.856Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d85694da3b1aa172a8b0-2924485a185709c11de3",
+          "file": "online-upgrade.spec.ts",
+          "line": 63,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-11-07T09:53:30.657Z",
+    "duration": 57730.407999999996,
+    "expected": 6,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0
+  }
+}

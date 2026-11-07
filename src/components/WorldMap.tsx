@@ -1,19 +1,34 @@
 import { useState, useCallback, type CSSProperties } from 'react';
 import type { MapOverviewResponse, MapRegionId } from '../core/world-map-contracts';
+import type { OnlineStudentSummary, OnlineSummarySet, OnlinePackSummary } from '../core/online-contracts';
+import type { ModuleId } from '../core/contracts';
 import { WORLD_REGION_ORDER, REGION_METADATA } from '../core/world-map-regions';
 import { WORLD_MAP_ANCHORS } from '../core/world-map-layout';
+import { DailyJourneyCard } from './DailyJourneyCard';
 
 export interface WorldMapProps {
   overview: MapOverviewResponse;
+  currentWeek?: OnlineStudentSummary['currentWeekSummary'] | null;
+  currentSet?: OnlineSummarySet | null;
+  allSets?: OnlineSummarySet[];
   onSelectRegion: (regionId: MapRegionId) => void;
   onContinueCurrent?: () => void;
+  onPlayGame?: (moduleId: ModuleId, pack: OnlinePackSummary) => Promise<void>;
+  onOpenListView?: () => void;
+  onRefresh?: () => void;
   disabled?: boolean;
 }
 
 export default function WorldMap({
   overview,
+  currentWeek,
+  currentSet,
+  allSets = [],
   onSelectRegion,
   onContinueCurrent,
+  onPlayGame,
+  onOpenListView,
+  onRefresh,
   disabled = false,
 }: WorldMapProps) {
   const [imageError, setImageError] = useState(false);
@@ -34,6 +49,28 @@ export default function WorldMap({
           <span aria-hidden="true">🗺️</span> Bản đồ thế giới học tập
         </h2>
         <div className="map-top-actions">
+          {onRefresh && (
+            <button
+              type="button"
+              className="map-nav-btn outline"
+              disabled={disabled}
+              onClick={onRefresh}
+              title="Làm mới tiến độ học tập"
+            >
+              Làm mới tiến độ
+            </button>
+          )}
+          {onOpenListView && (
+            <button
+              type="button"
+              className="map-nav-btn outline view-toggle-btn"
+              disabled={disabled}
+              onClick={onOpenListView}
+              aria-label="📋 Danh sách"
+            >
+              📋 Danh sách
+            </button>
+          )}
           {overview.currentWeek && onContinueCurrent && (
             <button
               type="button"
@@ -135,7 +172,22 @@ export default function WorldMap({
             <span>🔒</span> {lockedToast}
           </div>
         )}
+
       </div>
+
+        {(currentWeek || currentSet) && (
+          <div className="map-daily-journey-overlay">
+            <DailyJourneyCard
+              currentWeek={currentWeek ?? null}
+              currentSet={currentSet ?? null}
+              allSets={allSets}
+              onContinue={onContinueCurrent ?? (() => {})}
+              onPlayGame={onPlayGame}
+              onOpenListView={onOpenListView ?? (() => {})}
+              disabled={disabled}
+            />
+          </div>
+        )}
     </div>
   );
 }

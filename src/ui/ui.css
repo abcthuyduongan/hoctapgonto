@@ -1,0 +1,427 @@
+/* ui.css — Kiểu dáng cho các thành phần dùng chung src/ui/
+   Tuân thủ hệ thống Design Tokens (tokens.css)
+*/
+
+/* --- 1. Button --- */
+.ui-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-2);
+  font-family: var(--font-family);
+  font-weight: 700;
+  border-radius: var(--r-md);
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
+  transition: background-color var(--dur-fast) var(--ease-standard),
+              transform var(--dur-fast) var(--ease-standard),
+              box-shadow var(--dur-fast) var(--ease-standard);
+  user-select: none;
+  box-sizing: border-box;
+}
+
+.ui-btn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.ui-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.ui-btn-primary {
+  background-color: var(--c-leaf);
+  color: #ffffff;
+  box-shadow: 0 3px 0 var(--c-leaf-deep);
+}
+
+.ui-btn-primary:hover:not(:disabled) {
+  background-color: var(--c-leaf-deep);
+}
+
+.ui-btn-secondary {
+  background-color: var(--c-paper);
+  color: var(--c-ink);
+  border: 2px solid var(--c-line);
+}
+
+.ui-btn-secondary:hover:not(:disabled) {
+  background-color: var(--c-leaf-soft);
+  border-color: var(--c-leaf);
+}
+
+.ui-btn-subtle {
+  background-color: transparent;
+  color: var(--c-leaf-deep);
+}
+
+.ui-btn-subtle:hover:not(:disabled) {
+  background-color: var(--c-leaf-soft);
+}
+
+.ui-btn-danger {
+  background-color: var(--c-danger);
+  color: #ffffff;
+}
+
+.ui-btn-danger:hover:not(:disabled) {
+  filter: brightness(0.9);
+}
+
+/* Kích cỡ Button */
+.ui-btn-size-44 {
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0 var(--s-4);
+  font-size: var(--t-body-size);
+}
+
+.ui-btn-size-56 {
+  min-height: 56px;
+  min-width: 56px;
+  padding: 0 var(--s-5);
+  font-size: var(--t-body-kid-size);
+  border-radius: var(--r-lg);
+}
+
+.ui-btn-size-64 {
+  min-height: 64px;
+  min-width: 160px;
+  padding: 0 var(--s-6);
+  font-size: var(--t-h3-size);
+  border-radius: var(--r-xl);
+  box-shadow: 0 4px 0 var(--c-leaf-deep), var(--shadow-1);
+}
+
+/* --- 2. IconButton --- */
+.ui-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: var(--r-pill);
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--c-ink);
+  cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease-standard),
+              transform var(--dur-fast) var(--ease-standard);
+}
+
+.ui-icon-btn:hover:not(:disabled) {
+  background-color: var(--c-leaf-soft);
+  color: var(--c-leaf-deep);
+}
+
+.ui-icon-btn:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.ui-icon-btn-bordered {
+  border-color: var(--c-line);
+  background: var(--c-paper);
+}
+
+/* --- 3. Card --- */
+.ui-card {
+  background-color: var(--c-paper);
+  border: 1px solid var(--c-line);
+  border-radius: var(--r-lg);
+  padding: var(--s-4);
+  box-shadow: var(--shadow-1);
+  box-sizing: border-box;
+}
+
+.ui-card-interactive {
+  cursor: pointer;
+  transition: transform var(--dur-fast) var(--ease-standard),
+              box-shadow var(--dur-fast) var(--ease-standard),
+              border-color var(--dur-fast) var(--ease-standard);
+}
+
+.ui-card-interactive:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-2);
+  border-color: var(--c-leaf);
+}
+
+/* --- 4. Dialog --- */
+.ui-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(24, 52, 73, 0.45);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--s-4);
+  z-index: var(--z-dialog);
+  animation: ui-fade-in var(--dur-normal) var(--ease-standard);
+}
+
+.ui-dialog {
+  background-color: var(--c-cream);
+  border: 1px solid var(--c-line);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-2);
+  width: 100%;
+  max-width: 560px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: ui-scale-in var(--dur-normal) var(--ease-standard);
+}
+
+.ui-dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--s-4) var(--s-5);
+  border-bottom: 1px solid var(--c-line);
+  background-color: var(--c-paper);
+}
+
+.ui-dialog-title {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  font-size: var(--t-h3-size);
+  font-weight: var(--t-h3-weight);
+  color: var(--c-ink);
+  margin: 0;
+}
+
+.ui-dialog-body {
+  padding: var(--s-5);
+  overflow-y: auto;
+  flex: 1;
+  line-height: 1.6;
+}
+
+.ui-dialog-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--s-3);
+  padding: var(--s-4) var(--s-5);
+  border-top: 1px solid var(--c-line);
+  background-color: var(--c-paper);
+}
+
+@keyframes ui-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes ui-scale-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* --- 5. Tabs --- */
+.ui-tabs {
+  display: inline-flex;
+  gap: var(--s-1);
+  padding: var(--s-1);
+  background-color: var(--c-line);
+  border-radius: var(--r-pill);
+}
+
+.ui-tab-item {
+  padding: var(--s-2) var(--s-4);
+  font-family: var(--font-family);
+  font-size: var(--t-small-size);
+  font-weight: 700;
+  border-radius: var(--r-pill);
+  border: none;
+  background: transparent;
+  color: var(--c-ink-2);
+  cursor: pointer;
+  transition: all var(--dur-fast) var(--ease-standard);
+}
+
+.ui-tab-item-active {
+  background-color: var(--c-cream);
+  color: var(--c-leaf-deep);
+  box-shadow: var(--shadow-1);
+}
+
+/* --- 6. StatChip --- */
+.ui-stat-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  padding: var(--s-1) var(--s-3);
+  background-color: var(--c-paper);
+  border: 1px solid var(--c-line);
+  border-radius: var(--r-pill);
+  font-size: var(--t-small-size);
+  font-weight: 700;
+  color: var(--c-ink);
+  height: 36px;
+  box-sizing: border-box;
+}
+
+/* --- 7. ProgressBar & StarMeter --- */
+.ui-progress-bar-track {
+  width: 100%;
+  height: 10px;
+  background-color: var(--c-line);
+  border-radius: var(--r-pill);
+  overflow: hidden;
+}
+
+.ui-progress-bar-fill {
+  height: 100%;
+  background-color: var(--c-leaf);
+  border-radius: var(--r-pill);
+  transition: width var(--dur-normal) var(--ease-standard);
+}
+
+.ui-star-meter {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-1);
+  color: var(--c-line);
+}
+
+.ui-star-meter .ui-star-active {
+  color: var(--c-star);
+  fill: var(--c-star);
+}
+
+/* --- 8. SubjectBadge --- */
+.ui-subject-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  padding: var(--s-1) var(--s-3);
+  border-radius: var(--r-pill);
+  font-size: var(--t-small-size);
+  font-weight: 700;
+}
+
+.ui-subject-badge-toan, .ui-subject-badge-math {
+  background-color: var(--c-math-soft);
+  color: var(--c-math);
+}
+
+.ui-subject-badge-tieng-viet, .ui-subject-badge-vietnamese {
+  background-color: var(--c-viet-soft);
+  color: var(--c-viet);
+}
+
+.ui-subject-badge-tieng-anh, .ui-subject-badge-english {
+  background-color: var(--c-eng-soft);
+  color: var(--c-eng);
+}
+
+.ui-subject-badge-tin-hoc, .ui-subject-badge-computing {
+  background-color: var(--c-tech-soft);
+  color: var(--c-tech);
+}
+
+/* --- 9. EmptyState --- */
+.ui-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--s-6) var(--s-4);
+  text-align: center;
+  gap: var(--s-3);
+}
+
+.ui-empty-state-icon {
+  color: var(--c-ink-2);
+  opacity: 0.7;
+}
+
+.ui-empty-state-text {
+  font-size: var(--t-body-size);
+  color: var(--c-ink-2);
+  max-width: 380px;
+  margin: 0;
+}
+
+/* --- 10. Toast --- */
+.ui-toast {
+  position: fixed;
+  bottom: var(--s-5);
+  right: var(--s-5);
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  padding: var(--s-3) var(--s-5);
+  background-color: var(--c-night);
+  color: #ffffff;
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-2);
+  z-index: var(--z-toast);
+  animation: ui-fade-in var(--dur-fast) var(--ease-standard);
+  max-width: 90vw;
+}
+
+/* --- 11. PinPad --- */
+.ui-pinpad {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s-4);
+}
+
+.ui-pinpad-dots {
+  display: flex;
+  gap: var(--s-3);
+  margin-bottom: var(--s-2);
+}
+
+.ui-pinpad-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid var(--c-leaf);
+  background: transparent;
+  transition: background-color var(--dur-fast);
+}
+
+.ui-pinpad-dot-filled {
+  background-color: var(--c-leaf);
+}
+
+.ui-pinpad-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 64px);
+  gap: var(--s-3);
+}
+
+.ui-pinpad-btn {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 1px solid var(--c-line);
+  background-color: var(--c-paper);
+  font-family: var(--font-family);
+  font-size: var(--t-h2-size);
+  font-weight: 700;
+  color: var(--c-ink);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color var(--dur-fast);
+}
+
+.ui-pinpad-btn:hover {
+  background-color: var(--c-leaf-soft);
+  border-color: var(--c-leaf);
+}
+
+.ui-pinpad-btn:active {
+  transform: scale(0.95);
+}

@@ -10,6 +10,7 @@ import GameMascot from './GameMascot';
 import { saveFailureMessage } from './save-failure-message';
 import { questionClockText, useQuestionClock } from './useQuestionClock';
 import { stopSpeaking } from '../core/speech';
+import { useQuestionSpeech } from './useQuestionSpeech';
 
 export default function BasketSort({
   pack,
@@ -41,6 +42,7 @@ export default function BasketSort({
   const currentItem = content.items[qIndex] as CategorizeItem;
   const currentElement: CategorizeElement | undefined = currentItem.elements[elemIndex];
   const allElementsSorted = elemIndex >= currentItem.elements.length;
+  const speech = useQuestionSpeech(pack.subject, currentItem.id);
 
   const clock = useQuestionClock({
     enabled: questionMode,
@@ -170,6 +172,14 @@ export default function BasketSort({
         summary={`Con đã phân loại chính xác toàn bộ các thẻ kiến thức!`}
         questionMode={questionMode}
         onExit={onExit}
+        onReplay={() => {
+          setQIndex(0);
+          setElemIndex(0);
+          setSortedCounts({});
+          setHints(0);
+          setHintText('');
+          setStatus('playing');
+        }}
       />
     );
   }
@@ -189,6 +199,15 @@ export default function BasketSort({
         <h2 className="basket-prompt-title">
           {currentItem.prompt || 'Phân loại các thẻ vào đúng giỏ:'}
         </h2>
+        <button
+          type="button"
+          className="speech-trigger-btn"
+          onClick={() => speech.read(currentItem.prompt || 'Phân loại các thẻ vào đúng giỏ')}
+          aria-label="Nghe đọc câu hỏi"
+          title="Nghe đọc câu hỏi"
+        >
+          🔊
+        </button>
       </div>
 
       {/* Current Sorting Card Tray */}

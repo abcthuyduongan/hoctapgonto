@@ -1,0 +1,10 @@
+.gift-preset-panel { margin-block: 16px; padding: 16px; border: 1px solid var(--c-line); border-radius: 16px; background: var(--c-paper); }
+.gift-preset-panel > summary { cursor: pointer; font-weight: 800; }
+.gift-preset-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,180px),1fr)); gap: 16px; margin-top: 16px; }
+.gift-preset-grid article { min-width: 0; padding: 12px; border: 1px solid var(--c-line); border-radius: 12px; background: var(--c-cream); }
+.gift-preset-grid img { display: block; width: 100%; height: 140px; object-fit: contain; background: white; border-radius: 8px; }
+.gift-preset-grid h3 { font-size: 16px; line-height: 1.45; overflow-wrap: anywhere; }
+.gift-preset-grid p { margin-block: 8px; }
+.gift-preset-grid a { font-size: 13px; }
+.gift-preset-stars { color: var(--c-star-text); font-weight: 800; }
+.gift-reference-price { font-size: 14px; color: var(--c-ink-2); }

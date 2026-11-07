@@ -1,0 +1,393 @@
+{
+  "config": {
+    "argv": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\node_modules\\@playwright\\test\\cli.js",
+      "test",
+      "tests/visual/online-upgrade.spec.ts",
+      "tests/visual/online-mapgeometry.spec.ts",
+      "--grep",
+      "assigned map|world and region|shared dialog",
+      "--config=playwright.online.config.ts"
+    ],
+    "configFile": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\playwright.online.config.ts",
+    "rootDir": "D:/Phần mềm 2026/BAO_AN_LEARNING_lam lại/tests/visual",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "D:/Phần mềm 2026/BAO_AN_LEARNING_lam lại/test-results/online-browser-output",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "online-chrome",
+        "name": "online-chrome",
+        "testDir": "D:/Phần mềm 2026/BAO_AN_LEARNING_lam lại/tests/visual",
+        "testIgnore": [],
+        "testMatch": [
+          "/online(?:-[a-z0-9]+)*\\.spec\\.ts$/"
+        ],
+        "timeout": 180000
+      }
+    ],
+    "filteredProjects": [
+      {
+        "grep": {},
+        "grepInvert": null,
+        "outputDir": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\test-results\\online-browser-output",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "name": "online-chrome",
+        "testDir": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual",
+        "snapshotDir": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual",
+        "testIgnore": [],
+        "testMatch": {},
+        "timeout": 180000,
+        "use": {
+          "headless": true,
+          "actionTimeout": 30000,
+          "navigationTimeout": 30000,
+          "viewport": {
+            "width": 1440,
+            "height": 1000
+          },
+          "extraHTTPHeaders": {
+            "X-Bao-An-Question-Protocol": "1"
+          },
+          "serviceWorkers": "block",
+          "trace": "retain-on-failure",
+          "screenshot": "only-on-failure",
+          "channel": "chrome"
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": "online-chrome"
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "docs/KIEM_TRA_BACKEND_AB_VA_SONG_HANH_2026-11-07/evidence/responsive-after.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "default",
+    "updateSourceMethod": "patch",
+    "version": "1.64.0",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "online-mapgeometry.spec.ts",
+      "file": "online-mapgeometry.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "online-mapgeometry: bounding boxes and anchor alignment without overlap",
+          "file": "online-mapgeometry.spec.ts",
+          "line": 40,
+          "column": 6,
+          "specs": [
+            {
+              "title": "world and region map geometry at 390×844 (phone-390)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 180000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "online-chrome",
+                  "projectName": "online-chrome",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1904,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "[DEBUG phone-390] worldBox: {\n  x: \u001b[33m2\u001b[39m,\n  y: \u001b[33m403.703125\u001b[39m,\n  width: \u001b[33m386\u001b[39m,\n  height: \u001b[33m514.65625\u001b[39m,\n  left: \u001b[33m2\u001b[39m,\n  right: \u001b[33m388\u001b[39m,\n  top: \u001b[33m403.703125\u001b[39m,\n  bottom: \u001b[33m918.359375\u001b[39m\n} anchor 0: {\n  x: \u001b[33m41.21875\u001b[39m,\n  y: \u001b[33m495.8046875\u001b[39m,\n  width: \u001b[33m130\u001b[39m,\n  height: \u001b[33m62.828125\u001b[39m,\n  left: \u001b[33m41.21875\u001b[39m,\n  right: \u001b[33m171.21875\u001b[39m,\n  top: \u001b[33m495.8046875\u001b[39m,\n  bottom: \u001b[33m558.6328125\u001b[39m\n}\n"
+                        },
+                        {
+                          "text": "[DEBUG phone-390] worldBox: {\n  x: \u001b[33m2\u001b[39m,\n  y: \u001b[33m403.703125\u001b[39m,\n  width: \u001b[33m386\u001b[39m,\n  height: \u001b[33m514.65625\u001b[39m,\n  left: \u001b[33m2\u001b[39m,\n  right: \u001b[33m388\u001b[39m,\n  top: \u001b[33m403.703125\u001b[39m,\n  bottom: \u001b[33m918.359375\u001b[39m\n} anchor 1: {\n  x: \u001b[33m231.6484375\u001b[39m,\n  y: \u001b[33m495.8046875\u001b[39m,\n  width: \u001b[33m104.234375\u001b[39m,\n  height: \u001b[33m62.828125\u001b[39m,\n  left: \u001b[33m231.6484375\u001b[39m,\n  right: \u001b[33m335.8828125\u001b[39m,\n  top: \u001b[33m495.8046875\u001b[39m,\n  bottom: \u001b[33m558.6328125\u001b[39m\n}\n"
+                        },
+                        {
+                          "text": "[DEBUG phone-390] worldBox: {\n  x: \u001b[33m2\u001b[39m,\n  y: \u001b[33m403.703125\u001b[39m,\n  width: \u001b[33m386\u001b[39m,\n  height: \u001b[33m514.65625\u001b[39m,\n  left: \u001b[33m2\u001b[39m,\n  right: \u001b[33m388\u001b[39m,\n  top: \u001b[33m403.703125\u001b[39m,\n  bottom: \u001b[33m918.359375\u001b[39m\n} anchor 2: {\n  x: \u001b[33m41.21875\u001b[39m,\n  y: \u001b[33m732.5390625\u001b[39m,\n  width: \u001b[33m130\u001b[39m,\n  height: \u001b[33m62.828125\u001b[39m,\n  left: \u001b[33m41.21875\u001b[39m,\n  right: \u001b[33m171.21875\u001b[39m,\n  top: \u001b[33m732.5390625\u001b[39m,\n  bottom: \u001b[33m795.3671875\u001b[39m\n}\n"
+                        },
+                        {
+                          "text": "[DEBUG phone-390] worldBox: {\n  x: \u001b[33m2\u001b[39m,\n  y: \u001b[33m403.703125\u001b[39m,\n  width: \u001b[33m386\u001b[39m,\n  height: \u001b[33m514.65625\u001b[39m,\n  left: \u001b[33m2\u001b[39m,\n  right: \u001b[33m388\u001b[39m,\n  top: \u001b[33m403.703125\u001b[39m,\n  bottom: \u001b[33m918.359375\u001b[39m\n} anchor 3: {\n  x: \u001b[33m231.6484375\u001b[39m,\n  y: \u001b[33m732.5390625\u001b[39m,\n  width: \u001b[33m104.234375\u001b[39m,\n  height: \u001b[33m62.828125\u001b[39m,\n  left: \u001b[33m231.6484375\u001b[39m,\n  right: \u001b[33m335.8828125\u001b[39m,\n  top: \u001b[33m732.5390625\u001b[39m,\n  bottom: \u001b[33m795.3671875\u001b[39m\n}\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T09:20:08.730Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "bea2ad2375c19cd7ce58-baeb560dd48ea6d9b6e3",
+              "file": "online-mapgeometry.spec.ts",
+              "line": 123,
+              "column": 5
+            },
+            {
+              "title": "world and region map geometry at 768×1024 (tablet-768)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 180000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "online-chrome",
+                  "projectName": "online-chrome",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1614,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "[DEBUG tablet-768] worldBox: {\n  x: \u001b[33m2\u001b[39m,\n  y: \u001b[33m268.40625\u001b[39m,\n  width: \u001b[33m764\u001b[39m,\n  height: \u001b[33m1018.65625\u001b[39m,\n  left: \u001b[33m2\u001b[39m,\n  right: \u001b[33m766\u001b[39m,\n  top: \u001b[33m268.40625\u001b[39m,\n  bottom: \u001b[33m1287.0625\u001b[39m\n} anchor 0: {\n  x: \u001b[33m143.265625\u001b[39m,\n  y: \u001b[33m481.4609375\u001b[39m,\n  width: \u001b[33m130\u001b[39m,\n  height: \u001b[33m62.828125\u001b[39m,\n  left: \u001b[33m143.265625\u001b[39m,\n  right: \u001b[33m273.265625\u001b[39m,\n  top: \u001b[33m481.4609375\u001b[39m,\n  bottom: \u001b[33m544.2890625\u001b[39m\n}\n"
+                        },
+                        {
+                          "text": "[DEBUG tablet-768] worldBox: {\n  x: \u001b[33m2\u001b[39m,\n  y: \u001b[33m268.40625\u001b[39m,\n  width: \u001b[33m764\u001b[39m,\n  height: \u001b[33m1018.65625\u001b[39m,\n  left: \u001b[33m2\u001b[39m,\n  right: \u001b[33m766\u001b[39m,\n  top: \u001b[33m268.40625\u001b[39m,\n  bottom: \u001b[33m1287.0625\u001b[39m\n} anchor 1: {\n  x: \u001b[33m494.71875\u001b[39m,\n  y: \u001b[33m481.4609375\u001b[39m,\n  width: \u001b[33m130\u001b[39m,\n  height: \u001b[33m62.828125\u001b[39m,\n  left: \u001b[33m494.71875\u001b[39m,\n  right: \u001b[33m624.71875\u001b[39m,\n  top: \u001b[33m481.4609375\u001b[39m,\n  bottom: \u001b[33m544.2890625\u001b[39m\n}\n"
+                        },
+                        {
+                          "text": "[DEBUG tablet-768] worldBox: {\n  x: \u001b[33m2\u001b[39m,\n  y: \u001b[33m268.40625\u001b[39m,\n  width: \u001b[33m764\u001b[39m,\n  height: \u001b[33m1018.65625\u001b[39m,\n  left: \u001b[33m2\u001b[39m,\n  right: \u001b[33m766\u001b[39m,\n  top: \u001b[33m268.40625\u001b[39m,\n  bottom: \u001b[33m1287.0625\u001b[39m\n} anchor 2: {\n  x: \u001b[33m143.265625\u001b[39m,\n  y: \u001b[33m950.0390625\u001b[39m,\n  width: \u001b[33m130\u001b[39m,\n  height: \u001b[33m62.828125\u001b[39m,\n  left: \u001b[33m143.265625\u001b[39m,\n  right: \u001b[33m273.265625\u001b[39m,\n  top: \u001b[33m950.0390625\u001b[39m,\n  bottom: \u001b[33m1012.8671875\u001b[39m\n}\n"
+                        },
+                        {
+                          "text": "[DEBUG tablet-768] worldBox: {\n  x: \u001b[33m2\u001b[39m,\n  y: \u001b[33m268.40625\u001b[39m,\n  width: \u001b[33m764\u001b[39m,\n  height: \u001b[33m1018.65625\u001b[39m,\n  left: \u001b[33m2\u001b[39m,\n  right: \u001b[33m766\u001b[39m,\n  top: \u001b[33m268.40625\u001b[39m,\n  bottom: \u001b[33m1287.0625\u001b[39m\n} anchor 3: {\n  x: \u001b[33m494.71875\u001b[39m,\n  y: \u001b[33m950.0390625\u001b[39m,\n  width: \u001b[33m130\u001b[39m,\n  height: \u001b[33m62.828125\u001b[39m,\n  left: \u001b[33m494.71875\u001b[39m,\n  right: \u001b[33m624.71875\u001b[39m,\n  top: \u001b[33m950.0390625\u001b[39m,\n  bottom: \u001b[33m1012.8671875\u001b[39m\n}\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T09:20:12.776Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "bea2ad2375c19cd7ce58-525aba2a0541e7189805",
+              "file": "online-mapgeometry.spec.ts",
+              "line": 123,
+              "column": 5
+            },
+            {
+              "title": "world and region map geometry at 1440×900 (desktop-1440)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 180000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "online-chrome",
+                  "projectName": "online-chrome",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1720,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "[DEBUG desktop-1440] worldBox: {\n  x: \u001b[33m152\u001b[39m,\n  y: \u001b[33m245.40625\u001b[39m,\n  width: \u001b[33m816\u001b[39m,\n  height: \u001b[33m459\u001b[39m,\n  left: \u001b[33m152\u001b[39m,\n  right: \u001b[33m968\u001b[39m,\n  top: \u001b[33m245.40625\u001b[39m,\n  bottom: \u001b[33m704.40625\u001b[39m\n} anchor 0: {\n  x: \u001b[33m256.765625\u001b[39m,\n  y: \u001b[33m342.2265625\u001b[39m,\n  width: \u001b[33m182.125\u001b[39m,\n  height: \u001b[33m54.203125\u001b[39m,\n  left: \u001b[33m256.765625\u001b[39m,\n  right: \u001b[33m438.890625\u001b[39m,\n  top: \u001b[33m342.2265625\u001b[39m,\n  bottom: \u001b[33m396.4296875\u001b[39m\n}\n"
+                        },
+                        {
+                          "text": "[DEBUG desktop-1440] worldBox: {\n  x: \u001b[33m152\u001b[39m,\n  y: \u001b[33m245.40625\u001b[39m,\n  width: \u001b[33m816\u001b[39m,\n  height: \u001b[33m459\u001b[39m,\n  left: \u001b[33m152\u001b[39m,\n  right: \u001b[33m968\u001b[39m,\n  top: \u001b[33m245.40625\u001b[39m,\n  bottom: \u001b[33m704.40625\u001b[39m\n} anchor 1: {\n  x: \u001b[33m662\u001b[39m,\n  y: \u001b[33m333.109375\u001b[39m,\n  width: \u001b[33m204\u001b[39m,\n  height: \u001b[33m72.4375\u001b[39m,\n  left: \u001b[33m662\u001b[39m,\n  right: \u001b[33m866\u001b[39m,\n  top: \u001b[33m333.109375\u001b[39m,\n  bottom: \u001b[33m405.546875\u001b[39m\n}\n"
+                        },
+                        {
+                          "text": "[DEBUG desktop-1440] worldBox: {\n  x: \u001b[33m152\u001b[39m,\n  y: \u001b[33m245.40625\u001b[39m,\n  width: \u001b[33m816\u001b[39m,\n  height: \u001b[33m459\u001b[39m,\n  left: \u001b[33m152\u001b[39m,\n  right: \u001b[33m968\u001b[39m,\n  top: \u001b[33m245.40625\u001b[39m,\n  bottom: \u001b[33m704.40625\u001b[39m\n} anchor 2: {\n  x: \u001b[33m230.3515625\u001b[39m,\n  y: \u001b[33m553.3671875\u001b[39m,\n  width: \u001b[33m234.953125\u001b[39m,\n  height: \u001b[33m54.203125\u001b[39m,\n  left: \u001b[33m230.3515625\u001b[39m,\n  right: \u001b[33m465.3046875\u001b[39m,\n  top: \u001b[33m553.3671875\u001b[39m,\n  bottom: \u001b[33m607.5703125\u001b[39m\n}\n"
+                        },
+                        {
+                          "text": "[DEBUG desktop-1440] worldBox: {\n  x: \u001b[33m152\u001b[39m,\n  y: \u001b[33m245.40625\u001b[39m,\n  width: \u001b[33m816\u001b[39m,\n  height: \u001b[33m459\u001b[39m,\n  left: \u001b[33m152\u001b[39m,\n  right: \u001b[33m968\u001b[39m,\n  top: \u001b[33m245.40625\u001b[39m,\n  bottom: \u001b[33m704.40625\u001b[39m\n} anchor 3: {\n  x: \u001b[33m666.8203125\u001b[39m,\n  y: \u001b[33m553.3671875\u001b[39m,\n  width: \u001b[33m194.359375\u001b[39m,\n  height: \u001b[33m54.203125\u001b[39m,\n  left: \u001b[33m666.8203125\u001b[39m,\n  right: \u001b[33m861.1796875\u001b[39m,\n  top: \u001b[33m553.3671875\u001b[39m,\n  bottom: \u001b[33m607.5703125\u001b[39m\n}\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T09:20:14.404Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "bea2ad2375c19cd7ce58-c96446a9f292fba0648c",
+              "file": "online-mapgeometry.spec.ts",
+              "line": 123,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "online-upgrade.spec.ts",
+      "file": "online-upgrade.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "assigned map, header, mobile navigation and modal keyboard focus work across six widths",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "online-chrome",
+              "projectName": "online-chrome",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 5412,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  -   1\u001b[39m\n\u001b[31m+ Received  + 202\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   Object {\u001b[39m\n\u001b[31m+     \"description\": \"Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds\",\u001b[39m\n\u001b[31m+     \"help\": \"Elements must meet minimum color contrast ratio thresholds\",\u001b[39m\n\u001b[31m+     \"helpUrl\": \"https://dequeuniversity.com/rules/axe/4.14/color-contrast?application=playwright\",\u001b[39m\n\u001b[31m+     \"id\": \"color-contrast\",\u001b[39m\n\u001b[31m+     \"impact\": \"serious\",\u001b[39m\n\u001b[31m+     \"nodes\": Array [\u001b[39m\n\u001b[31m+       Object {\u001b[39m\n\u001b[31m+         \"all\": Array [],\u001b[39m\n\u001b[31m+         \"any\": Array [\u001b[39m\n\u001b[31m+           Object {\u001b[39m\n\u001b[31m+             \"data\": Object {\u001b[39m\n\u001b[31m+               \"bgColor\": \"#fffefc\",\u001b[39m\n\u001b[31m+               \"contrastRatio\": 3.04,\u001b[39m\n\u001b[31m+               \"expectedContrastRatio\": \"4.5:1\",\u001b[39m\n\u001b[31m+               \"fgColor\": \"#8795a1\",\u001b[39m\n\u001b[31m+               \"fontSize\": \"9.8pt (13px)\",\u001b[39m\n\u001b[31m+               \"fontWeight\": \"bold\",\u001b[39m\n\u001b[31m+               \"messageKey\": null,\u001b[39m\n\u001b[31m+             },\u001b[39m\n\u001b[31m+             \"id\": \"color-contrast\",\u001b[39m\n\u001b[31m+             \"impact\": \"serious\",\u001b[39m\n\u001b[31m+             \"message\": \"Element has insufficient color contrast of 3.04 (foreground color: #8795a1, background color: #fffefc, font size: 9.8pt (13px), font weight: bold). Expected contrast ratio of 4.5:1\",\u001b[39m\n\u001b[31m+             \"relatedNodes\": Array [\u001b[39m\n\u001b[31m+               Object {\u001b[39m\n\u001b[31m+                 \"html\": \"<li class=\\\"daily-step-item is-current\\\">\",\u001b[39m\n\u001b[31m+                 \"target\": Array [\u001b[39m\n\u001b[31m+                   \".is-current\",\u001b[39m\n\u001b[31m+                 ],\u001b[39m\n\u001b[31m+               },\u001b[39m\n\u001b[31m+               Object {\u001b[39m\n\u001b[31m+                 \"html\": \"<section class=\\\"daily-journey-card\\\" data-hub-mode=\\\"light\\\" aria-labelledby=\\\"daily-journey-title\\\">\",\u001b[39m\n\u001b[31m+                 \"target\": Array [\u001b[39m\n\u001b[31m+                   \".daily-journey-card\",\u001b[39m\n\u001b[31m+                 ],\u001b[39m\n\u001b[31m+               },\u001b[39m\n\u001b[31m+               Object {\u001b[39m\n\u001b[31m+                 \"html\": \"<div class=\\\"world-map-container\\\" aria-label=\\\"Bản đồ thế giới học tập\\\">\",\u001b[39m\n\u001b[31m+                 \"target\": Array [\u001b[39m\n\u001b[31m+                   \".world-map-container\",\u001b[39m\n\u001b[31m+                 ],\u001b[39m\n\u001b[31m+               },\u001b[39m\n\u001b[31m+             ],\u001b[39m\n\u001b[31m+           },\u001b[39m\n\u001b[31m+         ],\u001b[39m\n\u001b[31m+         \"failureSummary\": \"Fix any of the following:\u001b[39m\n\u001b[31m+   Element has insufficient color contrast of 3.04 (foreground color: #8795a1, background color: #fffefc, font size: 9.8pt (13px), font weight: bold). Expected contrast ratio of 4.5:1\",\u001b[39m\n\u001b[31m+         \"html\": \"<span class=\\\"daily-step-num\\\">BƯỚC 1: HỌC</span>\",\u001b[39m\n\u001b[31m+         \"impact\": \"serious\",\u001b[39m\n\u001b[31m+         \"none\": Array [],\u001b[39m\n\u001b[31m+         \"target\": Array [\u001b[39m\n\u001b[31m+           \".is-current > .daily-step-content > .daily-step-num\",\u001b[39m\n\u001b[31m+         ],\u001b[39m\n\u001b[31m+       },\u001b[39m\n\u001b[31m+       Object {\u001b[39m\n\u001b[31m+         \"all\": Array [],\u001b[39m\n\u001b[31m+         \"any\": Array [\u001b[39m\n\u001b[31m+           Object {\u001b[39m\n\u001b[31m+             \"data\": Object {\u001b[39m\n\u001b[31m+               \"bgColor\": \"#fffefc\",\u001b[39m\n\u001b[31m+               \"contrastRatio\": 3.04,\u001b[39m\n\u001b[31m+               \"expectedContrastRatio\": \"4.5:1\",\u001b[39m\n\u001b[31m+               \"fgColor\": \"#8795a1\",\u001b[39m\n\u001b[31m+               \"fontSize\": \"9.8pt (13px)\",\u001b[39m\n\u001b[31m+               \"fontWeight\": \"bold\",\u001b[39m\n\u001b[31m+               \"messageKey\": null,\u001b[39m\n\u001b[31m+             },\u001b[39m\n\u001b[31m+             \"id\": \"color-contrast\",\u001b[39m\n\u001b[31m+             \"impact\": \"serious\",\u001b[39m\n\u001b[31m+             \"message\": \"Element has insufficient color contrast of 3.04 (foreground color: #8795a1, background color: #fffefc, font size: 9.8pt (13px), font weight: bold). Expected contrast ratio of 4.5:1\",\u001b[39m\n\u001b[31m+             \"relatedNodes\": Array [\u001b[39m\n\u001b[31m+               Object {\u001b[39m\n\u001b[31m+                 \"html\": \"<li class=\\\"daily-step-item \\\">\",\u001b[39m\n\u001b[31m+                 \"target\": Array [\u001b[39m\n\u001b[31m+                   \"li:nth-child(2)\",\u001b[39m\n\u001b[31m+                 ],\u001b[39m\n\u001b[31m+               },\u001b[39m\n\u001b[31m+               Object {\u001b[39m\n\u001b[31m+                 \"html\": \"<section class=\\\"daily-journey-card\\\" data-hub-mode=\\\"light\\\" aria-labelledby=\\\"daily-journey-title\\\">\",\u001b[39m\n\u001b[31m+                 \"target\": Array [\u001b[39m\n\u001b[31m+                   \".daily-journey-card\",\u001b[39m\n\u001b[31m+                 ],\u001b[39m\n\u001b[31m+               },\u001b[39m\n\u001b[31m+               Object {\u001b[39m\n\u001b[31m+                 \"html\": \"<div class=\\\"world-map-container\\\" aria-label=\\\"Bản đồ thế giới học tập\\\">\",\u001b[39m\n\u001b[31m+                 \"target\": Array [\u001b[39m\n\u001b[31m+                   \".world-map-container\",\u001b[39m\n\u001b[31m+                 ],\u001b[39m\n\u001b[31m+               },\u001b[39m\n\u001b[31m+             ],\u001b[39m\n\u001b[31m+           },\u001b[39m\n\u001b[31m+         ],\u001b[39m\n\u001b[31m+         \"failureSummary\": \"Fix any of the following:\u001b[39m\n\u001b[31m+   Element has insufficient color contrast of 3.04 (foreground color: #8795a1, background color: #fffefc, font size: 9.8pt (13px), font weight: bold). Expected contrast ratio of 4.5:1\",\u001b[39m\n\u001b[31m+         \"html\": \"<span class=\\\"daily-step-num\\\">BƯỚC 2: KHÁM PHÁ</span>\",\u001b[39m\n\u001b[31m+         \"impact\": \"serious\",\u001b[39m\n\u001b[31m+         \"none\": Array [],\u001b[39m\n\u001b[31m+         \"target\": Array [\u001b[39m\n\u001b[31m+           \"li:nth-child(2) > .daily-step-content > .daily-step-num\",\u001b[39m\n\u001b[31m+         ],\u001b[39m\n\u001b[31m+       },\u001b[39m\n\u001b[31m+       Object {\u001b[39m\n\u001b[31m+         \"all\": Array [],\u001b[39m\n\u001b[31m+         \"any\": Array [\u001b[39m\n\u001b[31m+           Object {\u001b[39m\n\u001b[31m+             \"data\": Object {\u001b[39m\n\u001b[31m+               \"bgColor\": \"#fffefc\",\u001b[39m\n\u001b[31m+               \"contrastRatio\": 3.04,\u001b[39m\n\u001b[31m+               \"expectedContrastRatio\": \"4.5:1\",\u001b[39m\n\u001b[31m+               \"fgColor\": \"#8795a1\",\u001b[39m\n\u001b[31m+               \"fontSize\": \"9.8pt (13px)\",\u001b[39m\n\u001b[31m+               \"fontWeight\": \"bold\",\u001b[39m\n\u001b[31m+               \"messageKey\": null,\u001b[39m\n\u001b[31m+             },\u001b[39m\n\u001b[31m+             \"id\": \"color-contrast\",\u001b[39m\n\u001b[31m+             \"impact\": \"serious\",\u001b[39m\n\u001b[31m+             \"message\": \"Element has insufficient color contrast of 3.04 (foreground color: #8795a1, background color: #fffefc, font size: 9.8pt (13px), font weight: bold). Expected contrast ratio of 4.5:1\",\u001b[39m\n\u001b[31m+             \"relatedNodes\": Array [\u001b[39m\n\u001b[31m+               Object {\u001b[39m\n\u001b[31m+                 \"html\": \"<li class=\\\"daily-step-item\\\">\",\u001b[39m\n\u001b[31m+                 \"target\": Array [\u001b[39m\n\u001b[31m+                   \"li:nth-child(3)\",\u001b[39m\n\u001b[31m+                 ],\u001b[39m\n\u001b[31m+               },\u001b[39m\n\u001b[31m+               Object {\u001b[39m\n\u001b[31m+                 \"html\": \"<section class=\\\"daily-journey-card\\\" data-hub-mode=\\\"light\\\" aria-labelledby=\\\"daily-journey-title\\\">\",\u001b[39m\n\u001b[31m+                 \"target\": Array [\u001b[39m\n\u001b[31m+                   \".daily-journey-card\",\u001b[39m\n\u001b[31m+                 ],\u001b[39m\n\u001b[31m+               },\u001b[39m\n\u001b[31m+               Object {\u001b[39m\n\u001b[31m+                 \"html\": \"<div class=\\\"world-map-container\\\" aria-label=\\\"Bản đồ thế giới học tập\\\">\",\u001b[39m\n\u001b[31m+                 \"target\": Array [\u001b[39m\n\u001b[31m+                   \".world-map-container\",\u001b[39m\n\u001b[31m+                 ],\u001b[39m\n\u001b[31m+               },\u001b[39m\n\u001b[31m+             ],\u001b[39m\n\u001b[31m+           },\u001b[39m\n\u001b[31m+         ],\u001b[39m\n\u001b[31m+         \"failureSummary\": \"Fix any of the following:\u001b[39m\n\u001b[31m+   Element has insufficient color contrast of 3.04 (foreground color: #8795a1, background color: #fffefc, font size: 9.8pt (13px), font weight: bold). Expected contrast ratio of 4.5:1\",\u001b[39m\n\u001b[31m+         \"html\": \"<span class=\\\"daily-step-num\\\">BƯỚC 3: CHƠI</span>\",\u001b[39m\n\u001b[31m+         \"impact\": \"serious\",\u001b[39m\n\u001b[31m+         \"none\": Array [],\u001b[39m\n\u001b[31m+         \"target\": Array [\u001b[39m\n\u001b[31m+           \"li:nth-child(3) > .daily-step-content > .daily-step-num\",\u001b[39m\n\u001b[31m+         ],\u001b[39m\n\u001b[31m+       },\u001b[39m\n\u001b[31m+     ],\u001b[39m\n\u001b[31m+     \"tags\": Array [\u001b[39m\n\u001b[31m+       \"cat.color\",\u001b[39m\n\u001b[31m+       \"wcag2aa\",\u001b[39m\n\u001b[31m+       \"wcag143\",\u001b[39m\n\u001b[31m+       \"TTv5\",\u001b[39m\n\u001b[31m+       \"TT13.c\",\u001b[39m\n\u001b[31m+       \"EN-301-549\",\u001b[39m\n\u001b[31m+       \"EN-9.1.4.3\",\u001b[39m\n\u001b[31m+       \"ACT\",\u001b[39m\n\u001b[31m+       \"RGAAv4\",\u001b[39m\n\u001b[31m+       \"RGAA-3.2.1\",\u001b[39m\n\u001b[31m+     ],\u001b[39m\n\u001b[31m+   },\u001b[39m\n\u001b[31m+   Object {\u001b[39m\n\u001b[31m+     \"description\": \"Ensure that elements labelled through their content must have their visible text as part of their accessible name\",\u001b[39m\n\u001b[31m+     \"help\": \"Elements must have their visible text as part of their accessible name\",\u001b[39m\n\u001b[31m+     \"helpUrl\": \"https://dequeuniversity.com/rules/axe/4.14/label-content-name-mismatch?application=playwright\",\u001b[39m\n\u001b[31m+     \"id\": \"label-content-name-mismatch\",\u001b[39m\n\u001b[31m+     \"impact\": \"serious\",\u001b[39m\n\u001b[31m+     \"nodes\": Array [\u001b[39m\n\u001b[31m+       Object {\u001b[39m\n\u001b[31m+         \"all\": Array [],\u001b[39m\n\u001b[31m+         \"any\": Array [\u001b[39m\n\u001b[31m+           Object {\u001b[39m\n\u001b[31m+             \"data\": null,\u001b[39m\n\u001b[31m+             \"id\": \"label-content-name-mismatch\",\u001b[39m\n\u001b[31m+             \"impact\": \"serious\",\u001b[39m\n\u001b[31m+             \"message\": \"Text inside the element is not included in the accessible name\",\u001b[39m\n\u001b[31m+             \"relatedNodes\": Array [],\u001b[39m\n\u001b[31m+           },\u001b[39m\n\u001b[31m+         ],\u001b[39m\n\u001b[31m+         \"failureSummary\": \"Fix any of the following:\u001b[39m\n\u001b[31m+   Text inside the element is not included in the accessible name\",\u001b[39m\n\u001b[31m+         \"html\": \"<button type=\\\"button\\\" class=\\\"daily-primary-btn\\\" aria-label=\\\"Chơi Đảo Câu Hỏi bằng bộ được giao\\\"><span class=\\\"daily-btn-icon\\\" aria-hidden=\\\"true\\\">▶</span><span class=\\\"daily-btn-text\\\"><strong>Tiếp tục học ngay</strong><small>Chơi Đảo Câu Hỏi · 2 câu trong bộ</small></span></button>\",\u001b[39m\n\u001b[31m+         \"impact\": \"serious\",\u001b[39m\n\u001b[31m+         \"none\": Array [],\u001b[39m\n\u001b[31m+         \"target\": Array [\u001b[39m\n\u001b[31m+           \".daily-primary-btn\",\u001b[39m\n\u001b[31m+         ],\u001b[39m\n\u001b[31m+       },\u001b[39m\n\u001b[31m+     ],\u001b[39m\n\u001b[31m+     \"tags\": Array [\u001b[39m\n\u001b[31m+       \"cat.semantics\",\u001b[39m\n\u001b[31m+       \"wcag21a\",\u001b[39m\n\u001b[31m+       \"wcag253\",\u001b[39m\n\u001b[31m+       \"EN-301-549\",\u001b[39m\n\u001b[31m+       \"EN-9.2.5.3\",\u001b[39m\n\u001b[31m+       \"RGAAv4\",\u001b[39m\n\u001b[31m+       \"RGAA-6.1.5\",\u001b[39m\n\u001b[31m+     ],\u001b[39m\n\u001b[31m+   },\u001b[39m\n\u001b[31m+ ]\u001b[39m",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  -   1\u001b[39m\n\u001b[31m+ Received  + 202\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   Object {\u001b[39m\n\u001b[31m+     \"description\": \"Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds\",\u001b[39m\n\u001b[31m+     \"help\": \"Elements must meet minimum color contrast ratio thresholds\",\u001b[39m\n\u001b[31m+     \"helpUrl\": \"https://dequeuniversity.com/rules/axe/4.14/color-contrast?application=playwright\",\u001b[39m\n\u001b[31m+     \"id\": \"color-contrast\",\u001b[39m\n\u001b[31m+     \"impact\": \"serious\",\u001b[39m\n\u001b[31m+     \"nodes\": Array [\u001b[39m\n\u001b[31m+       Object {\u001b[39m\n\u001b[31m+         \"all\": Array [],\u001b[39m\n\u001b[31m+         \"any\": Array [\u001b[39m\n\u001b[31m+           Object {\u001b[39m\n\u001b[31m+             \"data\": Object {\u001b[39m\n\u001b[31m+               \"bgColor\": \"#fffefc\",\u001b[39m\n\u001b[31m+               \"contrastRatio\": 3.04,\u001b[39m\n\u001b[31m+               \"expectedContrastRatio\": \"4.5:1\",\u001b[39m\n\u001b[31m+               \"fgColor\": \"#8795a1\",\u001b[39m\n\u001b[31m+               \"fontSize\": \"9.8pt (13px)\",\u001b[39m\n\u001b[31m+               \"fontWeight\": \"bold\",\u001b[39m\n\u001b[31m+               \"messageKey\": null,\u001b[39m\n\u001b[31m+             },\u001b[39m\n\u001b[31m+             \"id\": \"color-contrast\",\u001b[39m\n\u001b[31m+             \"impact\": \"serious\",\u001b[39m\n\u001b[31m+             \"message\": \"Element has insufficient color contrast of 3.04 (foreground color: #8795a1, background color: #fffefc, font size: 9.8pt (13px), font weight: bold). Expected contrast ratio of 4.5:1\",\u001b[39m\n\u001b[31m+             \"relatedNodes\": Array [\u001b[39m\n\u001b[31m+               Object {\u001b[39m\n\u001b[31m+                 \"html\": \"<li class=\\\"daily-step-item is-current\\\">\",\u001b[39m\n\u001b[31m+                 \"target\": Array [\u001b[39m\n\u001b[31m+                   \".is-current\",\u001b[39m\n\u001b[31m+                 ],\u001b[39m\n\u001b[31m+               },\u001b[39m\n\u001b[31m+               Object {\u001b[39m\n\u001b[31m+                 \"html\": \"<section class=\\\"daily-journey-card\\\" data-hub-mode=\\\"light\\\" aria-labelledby=\\\"daily-journey-title\\\">\",\u001b[39m\n\u001b[31m+                 \"target\": Array [\u001b[39m\n\u001b[31m+                   \".daily-journey-card\",\u001b[39m\n\u001b[31m+                 ],\u001b[39m\n\u001b[31m+               },\u001b[39m\n\u001b[31m+               Object {\u001b[39m\n\u001b[31m+                 \"html\": \"<div class=\\\"world-map-container\\\" aria-label=\\\"Bản đồ thế giới học tập\\\">\",\u001b[39m\n\u001b[31m+                 \"target\": Array [\u001b[39m\n\u001b[31m+                   \".world-map-container\",\u001b[39m\n\u001b[31m+                 ],\u001b[39m\n\u001b[31m+               },\u001b[39m\n\u001b[31m+             ],\u001b[39m\n\u001b[31m+           },\u001b[39m\n\u001b[31m+         ],\u001b[39m\n\u001b[31m+         \"failureSummary\": \"Fix any of the following:\u001b[39m\n\u001b[31m+   Element has insufficient color contrast of 3.04 (foreground color: #8795a1, background color: #fffefc, font size: 9.8pt (13px), font weight: bold). Expected contrast ratio of 4.5:1\",\u001b[39m\n\u001b[31m+         \"html\": \"<span class=\\\"daily-step-num\\\">BƯỚC 1: HỌC</span>\",\u001b[39m\n\u001b[31m+         \"impact\": \"serious\",\u001b[39m\n\u001b[31m+         \"none\": Array [],\u001b[39m\n\u001b[31m+         \"target\": Array [\u001b[39m\n\u001b[31m+           \".is-current > .daily-step-content > .daily-step-num\",\u001b[39m\n\u001b[31m+         ],\u001b[39m\n\u001b[31m+       },\u001b[39m\n\u001b[31m+       Object {\u001b[39m\n\u001b[31m+         \"all\": Array [],\u001b[39m\n\u001b[31m+         \"any\": Array [\u001b[39m\n\u001b[31m+           Object {\u001b[39m\n\u001b[31m+             \"data\": Object {\u001b[39m\n\u001b[31m+               \"bgColor\": \"#fffefc\",\u001b[39m\n\u001b[31m+               \"contrastRatio\": 3.04,\u001b[39m\n\u001b[31m+               \"expectedContrastRatio\": \"4.5:1\",\u001b[39m\n\u001b[31m+               \"fgColor\": \"#8795a1\",\u001b[39m\n\u001b[31m+               \"fontSize\": \"9.8pt (13px)\",\u001b[39m\n\u001b[31m+               \"fontWeight\": \"bold\",\u001b[39m\n\u001b[31m+               \"messageKey\": null,\u001b[39m\n\u001b[31m+             },\u001b[39m\n\u001b[31m+             \"id\": \"color-contrast\",\u001b[39m\n\u001b[31m+             \"impact\": \"serious\",\u001b[39m\n\u001b[31m+             \"message\": \"Element has insufficient color contrast of 3.04 (foreground color: #8795a1, background color: #fffefc, font size: 9.8pt (13px), font weight: bold). Expected contrast ratio of 4.5:1\",\u001b[39m\n\u001b[31m+             \"relatedNodes\": Array [\u001b[39m\n\u001b[31m+               Object {\u001b[39m\n\u001b[31m+                 \"html\": \"<li class=\\\"daily-step-item \\\">\",\u001b[39m\n\u001b[31m+                 \"target\": Array [\u001b[39m\n\u001b[31m+                   \"li:nth-child(2)\",\u001b[39m\n\u001b[31m+                 ],\u001b[39m\n\u001b[31m+               },\u001b[39m\n\u001b[31m+               Object {\u001b[39m\n\u001b[31m+                 \"html\": \"<section class=\\\"daily-journey-card\\\" data-hub-mode=\\\"light\\\" aria-labelledby=\\\"daily-journey-title\\\">\",\u001b[39m\n\u001b[31m+                 \"target\": Array [\u001b[39m\n\u001b[31m+                   \".daily-journey-card\",\u001b[39m\n\u001b[31m+                 ],\u001b[39m\n\u001b[31m+               },\u001b[39m\n\u001b[31m+               Object {\u001b[39m\n\u001b[31m+                 \"html\": \"<div class=\\\"world-map-container\\\" aria-label=\\\"Bản đồ thế giới học tập\\\">\",\u001b[39m\n\u001b[31m+                 \"target\": Array [\u001b[39m\n\u001b[31m+                   \".world-map-container\",\u001b[39m\n\u001b[31m+                 ],\u001b[39m\n\u001b[31m+               },\u001b[39m\n\u001b[31m+             ],\u001b[39m\n\u001b[31m+           },\u001b[39m\n\u001b[31m+         ],\u001b[39m\n\u001b[31m+         \"failureSummary\": \"Fix any of the following:\u001b[39m\n\u001b[31m+   Element has insufficient color contrast of 3.04 (foreground color: #8795a1, background color: #fffefc, font size: 9.8pt (13px), font weight: bold). Expected contrast ratio of 4.5:1\",\u001b[39m\n\u001b[31m+         \"html\": \"<span class=\\\"daily-step-num\\\">BƯỚC 2: KHÁM PHÁ</span>\",\u001b[39m\n\u001b[31m+         \"impact\": \"serious\",\u001b[39m\n\u001b[31m+         \"none\": Array [],\u001b[39m\n\u001b[31m+         \"target\": Array [\u001b[39m\n\u001b[31m+           \"li:nth-child(2) > .daily-step-content > .daily-step-num\",\u001b[39m\n\u001b[31m+         ],\u001b[39m\n\u001b[31m+       },\u001b[39m\n\u001b[31m+       Object {\u001b[39m\n\u001b[31m+         \"all\": Array [],\u001b[39m\n\u001b[31m+         \"any\": Array [\u001b[39m\n\u001b[31m+           Object {\u001b[39m\n\u001b[31m+             \"data\": Object {\u001b[39m\n\u001b[31m+               \"bgColor\": \"#fffefc\",\u001b[39m\n\u001b[31m+               \"contrastRatio\": 3.04,\u001b[39m\n\u001b[31m+               \"expectedContrastRatio\": \"4.5:1\",\u001b[39m\n\u001b[31m+               \"fgColor\": \"#8795a1\",\u001b[39m\n\u001b[31m+               \"fontSize\": \"9.8pt (13px)\",\u001b[39m\n\u001b[31m+               \"fontWeight\": \"bold\",\u001b[39m\n\u001b[31m+               \"messageKey\": null,\u001b[39m\n\u001b[31m+             },\u001b[39m\n\u001b[31m+             \"id\": \"color-contrast\",\u001b[39m\n\u001b[31m+             \"impact\": \"serious\",\u001b[39m\n\u001b[31m+             \"message\": \"Element has insufficient color contrast of 3.04 (foreground color: #8795a1, background color: #fffefc, font size: 9.8pt (13px), font weight: bold). Expected contrast ratio of 4.5:1\",\u001b[39m\n\u001b[31m+             \"relatedNodes\": Array [\u001b[39m\n\u001b[31m+               Object {\u001b[39m\n\u001b[31m+                 \"html\": \"<li class=\\\"daily-step-item\\\">\",\u001b[39m\n\u001b[31m+                 \"target\": Array [\u001b[39m\n\u001b[31m+                   \"li:nth-child(3)\",\u001b[39m\n\u001b[31m+                 ],\u001b[39m\n\u001b[31m+               },\u001b[39m\n\u001b[31m+               Object {\u001b[39m\n\u001b[31m+                 \"html\": \"<section class=\\\"daily-journey-card\\\" data-hub-mode=\\\"light\\\" aria-labelledby=\\\"daily-journey-title\\\">\",\u001b[39m\n\u001b[31m+                 \"target\": Array [\u001b[39m\n\u001b[31m+                   \".daily-journey-card\",\u001b[39m\n\u001b[31m+                 ],\u001b[39m\n\u001b[31m+               },\u001b[39m\n\u001b[31m+               Object {\u001b[39m\n\u001b[31m+                 \"html\": \"<div class=\\\"world-map-container\\\" aria-label=\\\"Bản đồ thế giới học tập\\\">\",\u001b[39m\n\u001b[31m+                 \"target\": Array [\u001b[39m\n\u001b[31m+                   \".world-map-container\",\u001b[39m\n\u001b[31m+                 ],\u001b[39m\n\u001b[31m+               },\u001b[39m\n\u001b[31m+             ],\u001b[39m\n\u001b[31m+           },\u001b[39m\n\u001b[31m+         ],\u001b[39m\n\u001b[31m+         \"failureSummary\": \"Fix any of the following:\u001b[39m\n\u001b[31m+   Element has insufficient color contrast of 3.04 (foreground color: #8795a1, background color: #fffefc, font size: 9.8pt (13px), font weight: bold). Expected contrast ratio of 4.5:1\",\u001b[39m\n\u001b[31m+         \"html\": \"<span class=\\\"daily-step-num\\\">BƯỚC 3: CHƠI</span>\",\u001b[39m\n\u001b[31m+         \"impact\": \"serious\",\u001b[39m\n\u001b[31m+         \"none\": Array [],\u001b[39m\n\u001b[31m+         \"target\": Array [\u001b[39m\n\u001b[31m+           \"li:nth-child(3) > .daily-step-content > .daily-step-num\",\u001b[39m\n\u001b[31m+         ],\u001b[39m\n\u001b[31m+       },\u001b[39m\n\u001b[31m+     ],\u001b[39m\n\u001b[31m+     \"tags\": Array [\u001b[39m\n\u001b[31m+       \"cat.color\",\u001b[39m\n\u001b[31m+       \"wcag2aa\",\u001b[39m\n\u001b[31m+       \"wcag143\",\u001b[39m\n\u001b[31m+       \"TTv5\",\u001b[39m\n\u001b[31m+       \"TT13.c\",\u001b[39m\n\u001b[31m+       \"EN-301-549\",\u001b[39m\n\u001b[31m+       \"EN-9.1.4.3\",\u001b[39m\n\u001b[31m+       \"ACT\",\u001b[39m\n\u001b[31m+       \"RGAAv4\",\u001b[39m\n\u001b[31m+       \"RGAA-3.2.1\",\u001b[39m\n\u001b[31m+     ],\u001b[39m\n\u001b[31m+   },\u001b[39m\n\u001b[31m+   Object {\u001b[39m\n\u001b[31m+     \"description\": \"Ensure that elements labelled through their content must have their visible text as part of their accessible name\",\u001b[39m\n\u001b[31m+     \"help\": \"Elements must have their visible text as part of their accessible name\",\u001b[39m\n\u001b[31m+     \"helpUrl\": \"https://dequeuniversity.com/rules/axe/4.14/label-content-name-mismatch?application=playwright\",\u001b[39m\n\u001b[31m+     \"id\": \"label-content-name-mismatch\",\u001b[39m\n\u001b[31m+     \"impact\": \"serious\",\u001b[39m\n\u001b[31m+     \"nodes\": Array [\u001b[39m\n\u001b[31m+       Object {\u001b[39m\n\u001b[31m+         \"all\": Array [],\u001b[39m\n\u001b[31m+         \"any\": Array [\u001b[39m\n\u001b[31m+           Object {\u001b[39m\n\u001b[31m+             \"data\": null,\u001b[39m\n\u001b[31m+             \"id\": \"label-content-name-mismatch\",\u001b[39m\n\u001b[31m+             \"impact\": \"serious\",\u001b[39m\n\u001b[31m+             \"message\": \"Text inside the element is not included in the accessible name\",\u001b[39m\n\u001b[31m+             \"relatedNodes\": Array [],\u001b[39m\n\u001b[31m+           },\u001b[39m\n\u001b[31m+         ],\u001b[39m\n\u001b[31m+         \"failureSummary\": \"Fix any of the following:\u001b[39m\n\u001b[31m+   Text inside the element is not included in the accessible name\",\u001b[39m\n\u001b[31m+         \"html\": \"<button type=\\\"button\\\" class=\\\"daily-primary-btn\\\" aria-label=\\\"Chơi Đảo Câu Hỏi bằng bộ được giao\\\"><span class=\\\"daily-btn-icon\\\" aria-hidden=\\\"true\\\">▶</span><span class=\\\"daily-btn-text\\\"><strong>Tiếp tục học ngay</strong><small>Chơi Đảo Câu Hỏi · 2 câu trong bộ</small></span></button>\",\u001b[39m\n\u001b[31m+         \"impact\": \"serious\",\u001b[39m\n\u001b[31m+         \"none\": Array [],\u001b[39m\n\u001b[31m+         \"target\": Array [\u001b[39m\n\u001b[31m+           \".daily-primary-btn\",\u001b[39m\n\u001b[31m+         ],\u001b[39m\n\u001b[31m+       },\u001b[39m\n\u001b[31m+     ],\u001b[39m\n\u001b[31m+     \"tags\": Array [\u001b[39m\n\u001b[31m+       \"cat.semantics\",\u001b[39m\n\u001b[31m+       \"wcag21a\",\u001b[39m\n\u001b[31m+       \"wcag253\",\u001b[39m\n\u001b[31m+       \"EN-301-549\",\u001b[39m\n\u001b[31m+       \"EN-9.2.5.3\",\u001b[39m\n\u001b[31m+       \"RGAAv4\",\u001b[39m\n\u001b[31m+       \"RGAA-6.1.5\",\u001b[39m\n\u001b[31m+     ],\u001b[39m\n\u001b[31m+   },\u001b[39m\n\u001b[31m+ ]\u001b[39m\n    at D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-upgrade.spec.ts:56:140",
+                    "location": {
+                      "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-upgrade.spec.ts",
+                      "column": 140,
+                      "line": 56
+                    },
+                    "snippet": "  54 |       await page.screenshot({path:testInfo.outputPath(`assigned-world-${width}.png`),fullPage:true});\n  55 |       if(width===390||width===1440){\n> 56 |         const scan=await new AxeBuilder({page}).analyze();expect(scan.violations.filter(v=>['critical','serious'].includes(v.impact??''))).toEqual([]);\n     |                                                                                                                                            ^\n  57 |       }\n  58 |     }\n  59 |     expect(errors).toEqual([]);"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-upgrade.spec.ts",
+                        "column": 140,
+                        "line": 56
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  -   1\u001b[39m\n\u001b[31m+ Received  + 202\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   Object {\u001b[39m\n\u001b[31m+     \"description\": \"Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds\",\u001b[39m\n\u001b[31m+     \"help\": \"Elements must meet minimum color contrast ratio thresholds\",\u001b[39m\n\u001b[31m+     \"helpUrl\": \"https://dequeuniversity.com/rules/axe/4.14/color-contrast?application=playwright\",\u001b[39m\n\u001b[31m+     \"id\": \"color-contrast\",\u001b[39m\n\u001b[31m+     \"impact\": \"serious\",\u001b[39m\n\u001b[31m+     \"nodes\": Array [\u001b[39m\n\u001b[31m+       Object {\u001b[39m\n\u001b[31m+         \"all\": Array [],\u001b[39m\n\u001b[31m+         \"any\": Array [\u001b[39m\n\u001b[31m+           Object {\u001b[39m\n\u001b[31m+             \"data\": Object {\u001b[39m\n\u001b[31m+               \"bgColor\": \"#fffefc\",\u001b[39m\n\u001b[31m+               \"contrastRatio\": 3.04,\u001b[39m\n\u001b[31m+               \"expectedContrastRatio\": \"4.5:1\",\u001b[39m\n\u001b[31m+               \"fgColor\": \"#8795a1\",\u001b[39m\n\u001b[31m+               \"fontSize\": \"9.8pt (13px)\",\u001b[39m\n\u001b[31m+               \"fontWeight\": \"bold\",\u001b[39m\n\u001b[31m+               \"messageKey\": null,\u001b[39m\n\u001b[31m+             },\u001b[39m\n\u001b[31m+             \"id\": \"color-contrast\",\u001b[39m\n\u001b[31m+             \"impact\": \"serious\",\u001b[39m\n\u001b[31m+             \"message\": \"Element has insufficient color contrast of 3.04 (foreground color: #8795a1, background color: #fffefc, font size: 9.8pt (13px), font weight: bold). Expected contrast ratio of 4.5:1\",\u001b[39m\n\u001b[31m+             \"relatedNodes\": Array [\u001b[39m\n\u001b[31m+               Object {\u001b[39m\n\u001b[31m+                 \"html\": \"<li class=\\\"daily-step-item is-current\\\">\",\u001b[39m\n\u001b[31m+                 \"target\": Array [\u001b[39m\n\u001b[31m+                   \".is-current\",\u001b[39m\n\u001b[31m+                 ],\u001b[39m\n\u001b[31m+               },\u001b[39m\n\u001b[31m+               Object {\u001b[39m\n\u001b[31m+                 \"html\": \"<section class=\\\"daily-journey-card\\\" data-hub-mode=\\\"light\\\" aria-labelledby=\\\"daily-journey-title\\\">\",\u001b[39m\n\u001b[31m+                 \"target\": Array [\u001b[39m\n\u001b[31m+                   \".daily-journey-card\",\u001b[39m\n\u001b[31m+                 ],\u001b[39m\n\u001b[31m+               },\u001b[39m\n\u001b[31m+               Object {\u001b[39m\n\u001b[31m+                 \"html\": \"<div class=\\\"world-map-container\\\" aria-label=\\\"Bản đồ thế giới học tập\\\">\",\u001b[39m\n\u001b[31m+                 \"target\": Array [\u001b[39m\n\u001b[31m+                   \".world-map-container\",\u001b[39m\n\u001b[31m+                 ],\u001b[39m\n\u001b[31m+               },\u001b[39m\n\u001b[31m+             ],\u001b[39m\n\u001b[31m+           },\u001b[39m\n\u001b[31m+         ],\u001b[39m\n\u001b[31m+         \"failureSummary\": \"Fix any of the following:\u001b[39m\n\u001b[31m+   Element has insufficient color contrast of 3.04 (foreground color: #8795a1, background color: #fffefc, font size: 9.8pt (13px), font weight: bold). Expected contrast ratio of 4.5:1\",\u001b[39m\n\u001b[31m+         \"html\": \"<span class=\\\"daily-step-num\\\">BƯỚC 1: HỌC</span>\",\u001b[39m\n\u001b[31m+         \"impact\": \"serious\",\u001b[39m\n\u001b[31m+         \"none\": Array [],\u001b[39m\n\u001b[31m+         \"target\": Array [\u001b[39m\n\u001b[31m+           \".is-current > .daily-step-content > .daily-step-num\",\u001b[39m\n\u001b[31m+         ],\u001b[39m\n\u001b[31m+       },\u001b[39m\n\u001b[31m+       Object {\u001b[39m\n\u001b[31m+         \"all\": Array [],\u001b[39m\n\u001b[31m+         \"any\": Array [\u001b[39m\n\u001b[31m+           Object {\u001b[39m\n\u001b[31m+             \"data\": Object {\u001b[39m\n\u001b[31m+               \"bgColor\": \"#fffefc\",\u001b[39m\n\u001b[31m+               \"contrastRatio\": 3.04,\u001b[39m\n\u001b[31m+               \"expectedContrastRatio\": \"4.5:1\",\u001b[39m\n\u001b[31m+               \"fgColor\": \"#8795a1\",\u001b[39m\n\u001b[31m+               \"fontSize\": \"9.8pt (13px)\",\u001b[39m\n\u001b[31m+               \"fontWeight\": \"bold\",\u001b[39m\n\u001b[31m+               \"messageKey\": null,\u001b[39m\n\u001b[31m+             },\u001b[39m\n\u001b[31m+             \"id\": \"color-contrast\",\u001b[39m\n\u001b[31m+             \"impact\": \"serious\",\u001b[39m\n\u001b[31m+             \"message\": \"Element has insufficient color contrast of 3.04 (foreground color: #8795a1, background color: #fffefc, font size: 9.8pt (13px), font weight: bold). Expected contrast ratio of 4.5:1\",\u001b[39m\n\u001b[31m+             \"relatedNodes\": Array [\u001b[39m\n\u001b[31m+               Object {\u001b[39m\n\u001b[31m+                 \"html\": \"<li class=\\\"daily-step-item \\\">\",\u001b[39m\n\u001b[31m+                 \"target\": Array [\u001b[39m\n\u001b[31m+                   \"li:nth-child(2)\",\u001b[39m\n\u001b[31m+                 ],\u001b[39m\n\u001b[31m+               },\u001b[39m\n\u001b[31m+               Object {\u001b[39m\n\u001b[31m+                 \"html\": \"<section class=\\\"daily-journey-card\\\" data-hub-mode=\\\"light\\\" aria-labelledby=\\\"daily-journey-title\\\">\",\u001b[39m\n\u001b[31m+                 \"target\": Array [\u001b[39m\n\u001b[31m+                   \".daily-journey-card\",\u001b[39m\n\u001b[31m+                 ],\u001b[39m\n\u001b[31m+               },\u001b[39m\n\u001b[31m+               Object {\u001b[39m\n\u001b[31m+                 \"html\": \"<div class=\\\"world-map-container\\\" aria-label=\\\"Bản đồ thế giới học tập\\\">\",\u001b[39m\n\u001b[31m+                 \"target\": Array [\u001b[39m\n\u001b[31m+                   \".world-map-container\",\u001b[39m\n\u001b[31m+                 ],\u001b[39m\n\u001b[31m+               },\u001b[39m\n\u001b[31m+             ],\u001b[39m\n\u001b[31m+           },\u001b[39m\n\u001b[31m+         ],\u001b[39m\n\u001b[31m+         \"failureSummary\": \"Fix any of the following:\u001b[39m\n\u001b[31m+   Element has insufficient color contrast of 3.04 (foreground color: #8795a1, background color: #fffefc, font size: 9.8pt (13px), font weight: bold). Expected contrast ratio of 4.5:1\",\u001b[39m\n\u001b[31m+         \"html\": \"<span class=\\\"daily-step-num\\\">BƯỚC 2: KHÁM PHÁ</span>\",\u001b[39m\n\u001b[31m+         \"impact\": \"serious\",\u001b[39m\n\u001b[31m+         \"none\": Array [],\u001b[39m\n\u001b[31m+         \"target\": Array [\u001b[39m\n\u001b[31m+           \"li:nth-child(2) > .daily-step-content > .daily-step-num\",\u001b[39m\n\u001b[31m+         ],\u001b[39m\n\u001b[31m+       },\u001b[39m\n\u001b[31m+       Object {\u001b[39m\n\u001b[31m+         \"all\": Array [],\u001b[39m\n\u001b[31m+         \"any\": Array [\u001b[39m\n\u001b[31m+           Object {\u001b[39m\n\u001b[31m+             \"data\": Object {\u001b[39m\n\u001b[31m+               \"bgColor\": \"#fffefc\",\u001b[39m\n\u001b[31m+               \"contrastRatio\": 3.04,\u001b[39m\n\u001b[31m+               \"expectedContrastRatio\": \"4.5:1\",\u001b[39m\n\u001b[31m+               \"fgColor\": \"#8795a1\",\u001b[39m\n\u001b[31m+               \"fontSize\": \"9.8pt (13px)\",\u001b[39m\n\u001b[31m+               \"fontWeight\": \"bold\",\u001b[39m\n\u001b[31m+               \"messageKey\": null,\u001b[39m\n\u001b[31m+             },\u001b[39m\n\u001b[31m+             \"id\": \"color-contrast\",\u001b[39m\n\u001b[31m+             \"impact\": \"serious\",\u001b[39m\n\u001b[31m+             \"message\": \"Element has insufficient color contrast of 3.04 (foreground color: #8795a1, background color: #fffefc, font size: 9.8pt (13px), font weight: bold). Expected contrast ratio of 4.5:1\",\u001b[39m\n\u001b[31m+             \"relatedNodes\": Array [\u001b[39m\n\u001b[31m+               Object {\u001b[39m\n\u001b[31m+                 \"html\": \"<li class=\\\"daily-step-item\\\">\",\u001b[39m\n\u001b[31m+                 \"target\": Array [\u001b[39m\n\u001b[31m+                   \"li:nth-child(3)\",\u001b[39m\n\u001b[31m+                 ],\u001b[39m\n\u001b[31m+               },\u001b[39m\n\u001b[31m+               Object {\u001b[39m\n\u001b[31m+                 \"html\": \"<section class=\\\"daily-journey-card\\\" data-hub-mode=\\\"light\\\" aria-labelledby=\\\"daily-journey-title\\\">\",\u001b[39m\n\u001b[31m+                 \"target\": Array [\u001b[39m\n\u001b[31m+                   \".daily-journey-card\",\u001b[39m\n\u001b[31m+                 ],\u001b[39m\n\u001b[31m+               },\u001b[39m\n\u001b[31m+               Object {\u001b[39m\n\u001b[31m+                 \"html\": \"<div class=\\\"world-map-container\\\" aria-label=\\\"Bản đồ thế giới học tập\\\">\",\u001b[39m\n\u001b[31m+                 \"target\": Array [\u001b[39m\n\u001b[31m+                   \".world-map-container\",\u001b[39m\n\u001b[31m+                 ],\u001b[39m\n\u001b[31m+               },\u001b[39m\n\u001b[31m+             ],\u001b[39m\n\u001b[31m+           },\u001b[39m\n\u001b[31m+         ],\u001b[39m\n\u001b[31m+         \"failureSummary\": \"Fix any of the following:\u001b[39m\n\u001b[31m+   Element has insufficient color contrast of 3.04 (foreground color: #8795a1, background color: #fffefc, font size: 9.8pt (13px), font weight: bold). Expected contrast ratio of 4.5:1\",\u001b[39m\n\u001b[31m+         \"html\": \"<span class=\\\"daily-step-num\\\">BƯỚC 3: CHƠI</span>\",\u001b[39m\n\u001b[31m+         \"impact\": \"serious\",\u001b[39m\n\u001b[31m+         \"none\": Array [],\u001b[39m\n\u001b[31m+         \"target\": Array [\u001b[39m\n\u001b[31m+           \"li:nth-child(3) > .daily-step-content > .daily-step-num\",\u001b[39m\n\u001b[31m+         ],\u001b[39m\n\u001b[31m+       },\u001b[39m\n\u001b[31m+     ],\u001b[39m\n\u001b[31m+     \"tags\": Array [\u001b[39m\n\u001b[31m+       \"cat.color\",\u001b[39m\n\u001b[31m+       \"wcag2aa\",\u001b[39m\n\u001b[31m+       \"wcag143\",\u001b[39m\n\u001b[31m+       \"TTv5\",\u001b[39m\n\u001b[31m+       \"TT13.c\",\u001b[39m\n\u001b[31m+       \"EN-301-549\",\u001b[39m\n\u001b[31m+       \"EN-9.1.4.3\",\u001b[39m\n\u001b[31m+       \"ACT\",\u001b[39m\n\u001b[31m+       \"RGAAv4\",\u001b[39m\n\u001b[31m+       \"RGAA-3.2.1\",\u001b[39m\n\u001b[31m+     ],\u001b[39m\n\u001b[31m+   },\u001b[39m\n\u001b[31m+   Object {\u001b[39m\n\u001b[31m+     \"description\": \"Ensure that elements labelled through their content must have their visible text as part of their accessible name\",\u001b[39m\n\u001b[31m+     \"help\": \"Elements must have their visible text as part of their accessible name\",\u001b[39m\n\u001b[31m+     \"helpUrl\": \"https://dequeuniversity.com/rules/axe/4.14/label-content-name-mismatch?application=playwright\",\u001b[39m\n\u001b[31m+     \"id\": \"label-content-name-mismatch\",\u001b[39m\n\u001b[31m+     \"impact\": \"serious\",\u001b[39m\n\u001b[31m+     \"nodes\": Array [\u001b[39m\n\u001b[31m+       Object {\u001b[39m\n\u001b[31m+         \"all\": Array [],\u001b[39m\n\u001b[31m+         \"any\": Array [\u001b[39m\n\u001b[31m+           Object {\u001b[39m\n\u001b[31m+             \"data\": null,\u001b[39m\n\u001b[31m+             \"id\": \"label-content-name-mismatch\",\u001b[39m\n\u001b[31m+             \"impact\": \"serious\",\u001b[39m\n\u001b[31m+             \"message\": \"Text inside the element is not included in the accessible name\",\u001b[39m\n\u001b[31m+             \"relatedNodes\": Array [],\u001b[39m\n\u001b[31m+           },\u001b[39m\n\u001b[31m+         ],\u001b[39m\n\u001b[31m+         \"failureSummary\": \"Fix any of the following:\u001b[39m\n\u001b[31m+   Text inside the element is not included in the accessible name\",\u001b[39m\n\u001b[31m+         \"html\": \"<button type=\\\"button\\\" class=\\\"daily-primary-btn\\\" aria-label=\\\"Chơi Đảo Câu Hỏi bằng bộ được giao\\\"><span class=\\\"daily-btn-icon\\\" aria-hidden=\\\"true\\\">▶</span><span class=\\\"daily-btn-text\\\"><strong>Tiếp tục học ngay</strong><small>Chơi Đảo Câu Hỏi · 2 câu trong bộ</small></span></button>\",\u001b[39m\n\u001b[31m+         \"impact\": \"serious\",\u001b[39m\n\u001b[31m+         \"none\": Array [],\u001b[39m\n\u001b[31m+         \"target\": Array [\u001b[39m\n\u001b[31m+           \".daily-primary-btn\",\u001b[39m\n\u001b[31m+         ],\u001b[39m\n\u001b[31m+       },\u001b[39m\n\u001b[31m+     ],\u001b[39m\n\u001b[31m+     \"tags\": Array [\u001b[39m\n\u001b[31m+       \"cat.semantics\",\u001b[39m\n\u001b[31m+       \"wcag21a\",\u001b[39m\n\u001b[31m+       \"wcag253\",\u001b[39m\n\u001b[31m+       \"EN-301-549\",\u001b[39m\n\u001b[31m+       \"EN-9.2.5.3\",\u001b[39m\n\u001b[31m+       \"RGAAv4\",\u001b[39m\n\u001b[31m+       \"RGAA-6.1.5\",\u001b[39m\n\u001b[31m+     ],\u001b[39m\n\u001b[31m+   },\u001b[39m\n\u001b[31m+ ]\u001b[39m\n\n  54 |       await page.screenshot({path:testInfo.outputPath(`assigned-world-${width}.png`),fullPage:true});\n  55 |       if(width===390||width===1440){\n> 56 |         const scan=await new AxeBuilder({page}).analyze();expect(scan.violations.filter(v=>['critical','serious'].includes(v.impact??''))).toEqual([]);\n     |                                                                                                                                            ^\n  57 |       }\n  58 |     }\n  59 |     expect(errors).toEqual([]);\n    at D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-upgrade.spec.ts:56:140"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-07T09:20:16.229Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\test-results\\online-browser-output\\online-upgrade-assigned-ma-739dd-ocus-work-across-six-widths-online-chrome\\test-failed-1.png"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\test-results\\online-browser-output\\online-upgrade-assigned-ma-739dd-ocus-work-across-six-widths-online-chrome\\error-context.md"
+                    },
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "path": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\test-results\\online-browser-output\\online-upgrade-assigned-ma-739dd-ocus-work-across-six-widths-online-chrome\\trace.zip"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-upgrade.spec.ts",
+                    "column": 140,
+                    "line": 56
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "d85694da3b1aa172a8b0-253c2b209c1faec84f1c",
+          "file": "online-upgrade.spec.ts",
+          "line": 27,
+          "column": 1
+        },
+        {
+          "title": "shared dialog traps keyboard focus and returns focus to its opener",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "online-chrome",
+              "projectName": "online-chrome",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2200,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-07T09:20:23.016Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d85694da3b1aa172a8b0-2924485a185709c11de3",
+          "file": "online-upgrade.spec.ts",
+          "line": 63,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-11-07T09:20:07.369Z",
+    "duration": 18204.047,
+    "expected": 4,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0
+  }
+}

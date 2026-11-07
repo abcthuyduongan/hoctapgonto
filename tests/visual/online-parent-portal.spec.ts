@@ -126,21 +126,25 @@ test('Tuần 6 Cổng C6: Khu Phụ Huynh, Báo Cáo Tuần, Bảo Vệ PIN, Gi�
     await expect(pinDialog).toBeVisible();
     await expect(pinDialog).toContainText('Thiết lập mã PIN phụ huynh');
 
-    // Click numeric keypad digits to setup 4-digit PIN: 1, 2, 3, 4
+    // Click numeric keypad digits to setup 6-digit PIN: 1, 2, 3, 4, 5, 6
     await pinDialog.locator('.parent-key-btn:has-text("1")').click();
     await pinDialog.locator('.parent-key-btn:has-text("2")').click();
     await pinDialog.locator('.parent-key-btn:has-text("3")').click();
     await pinDialog.locator('.parent-key-btn:has-text("4")').click();
+    await pinDialog.locator('.parent-key-btn:has-text("5")').click();
+    await pinDialog.locator('.parent-key-btn:has-text("6")').click();
 
     // Click "Tiếp tục"
     await pinDialog.locator('.parent-pin-submit').click();
     await expect(pinDialog).toContainText('Xác nhận lại mã PIN');
 
-    // Enter confirmation PIN: 1, 2, 3, 4
+    // Enter confirmation PIN: 1, 2, 3, 4, 5, 6
     await pinDialog.locator('.parent-key-btn:has-text("1")').click();
     await pinDialog.locator('.parent-key-btn:has-text("2")').click();
     await pinDialog.locator('.parent-key-btn:has-text("3")').click();
     await pinDialog.locator('.parent-key-btn:has-text("4")').click();
+    await pinDialog.locator('.parent-key-btn:has-text("5")').click();
+    await pinDialog.locator('.parent-key-btn:has-text("6")').click();
 
     // Click "Xác nhận"
     await pinDialog.locator('.parent-pin-submit').click();
@@ -181,7 +185,9 @@ test('Tuần 6 Cổng C6: Khu Phụ Huynh, Báo Cáo Tuần, Bảo Vệ PIN, Gi�
     await expect(pinDialog).toBeVisible();
     await expect(pinDialog).toContainText('Khu vực dành cho Phụ huynh');
 
-    // Enter wrong PIN: 9999
+    // Enter wrong PIN: 999999
+    await pinDialog.locator('.parent-key-btn:has-text("9")').click();
+    await pinDialog.locator('.parent-key-btn:has-text("9")').click();
     await pinDialog.locator('.parent-key-btn:has-text("9")').click();
     await pinDialog.locator('.parent-key-btn:has-text("9")').click();
     await pinDialog.locator('.parent-key-btn:has-text("9")').click();
@@ -189,13 +195,15 @@ test('Tuần 6 Cổng C6: Khu Phụ Huynh, Báo Cáo Tuần, Bảo Vệ PIN, Gi�
     await pinDialog.locator('.parent-pin-submit').click();
     await expect(pinDialog.locator('.online-notice.online-error')).toContainText('Sai mã PIN');
 
-    // Enter correct PIN: 1234
+    // Enter correct PIN: 123456
     // Click C to clear
     await pinDialog.locator('.parent-key-btn:has-text("C")').click();
     await pinDialog.locator('.parent-key-btn:has-text("1")').click();
     await pinDialog.locator('.parent-key-btn:has-text("2")').click();
     await pinDialog.locator('.parent-key-btn:has-text("3")').click();
     await pinDialog.locator('.parent-key-btn:has-text("4")').click();
+    await pinDialog.locator('.parent-key-btn:has-text("5")').click();
+    await pinDialog.locator('.parent-key-btn:has-text("6")').click();
     await pinDialog.locator('.parent-pin-submit').click();
 
     await expect(parentPortal).toBeVisible({ timeout: 10000 });

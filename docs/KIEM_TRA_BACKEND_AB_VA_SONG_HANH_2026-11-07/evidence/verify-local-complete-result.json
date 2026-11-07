@@ -1,0 +1,17 @@
+{
+  "command": "npm run verify:local",
+  "browsers": [
+    "chrome",
+    "msedge"
+  ],
+  "exitCode": 1,
+  "completedAt": "2026-11-07T10:37:14.9967042Z",
+  "buildInfo": {
+    "version": "4.1.0-rc.1",
+    "commit": "e910eaff4f0b9b60a3f4b68cb9206eeaf45c3db8",
+    "sourceId": "08b48122058e041fb1a1d4232b77365832efd4b1b897cacb59d92a3159f74865",
+    "displayMode": "2d",
+    "questionProtocolVersion": 1
+  },
+  "startedAt": "2026-11-07T10:18:51.5493226Z"
+}

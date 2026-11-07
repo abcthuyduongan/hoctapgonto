@@ -312,11 +312,14 @@ export function buildParentWeeklyReport({
       id: r.id,
       requestId: r.id,
       title: parsedJson.title || 'Quà tặng',
-      costStars: parsedJson.costStars || 0,
-      stars: parsedJson.costStars || 0,
+      costStars: parsedJson.stars ?? parsedJson.costStars ?? 0,
+      stars: parsedJson.stars ?? parsedJson.costStars ?? 0,
+      ...(parsedJson.giftId?{giftId:parsedJson.giftId}:{}),
+      ...(parsedJson.kind?{kind:parsedJson.kind}:{}),
+      ...(Number.isSafeInteger(parsedJson.amountVnd)?{amountVnd:parsedJson.amountVnd,rateVnd:parsedJson.rateVnd,goalVnd:parsedJson.goalVnd}:{}),
       status: r.status,
       requestedAt: parsedJson.requestedAt || r.requested_at || '',
-      note: parsedJson.note || r.note || '',
+      note: parsedJson.history?.at(-1)?.note || parsedJson.note || r.note || '',
     };
   });
 

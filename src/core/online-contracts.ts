@@ -233,6 +233,7 @@ export interface IntegrationClientInfo {
 }
 
 export interface ParentSafetimeStatusResponse {
+  canManageWorkspace: boolean;
   enabled: boolean;
   paired: boolean;
   clients: IntegrationClientInfo[];

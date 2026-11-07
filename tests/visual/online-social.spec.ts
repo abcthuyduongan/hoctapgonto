@@ -110,7 +110,7 @@ test('Tuần 9 Cổng C9: Hàng Xóm Động Vật, Thăm Thị Trấn Bạn, N�
 
     // 10. Close TownScreen back to world map
     await page.getByRole('button', { name: /Quay lại bản đồ/i }).click();
-    await expect(page.locator('.online-header')).toBeVisible();
+    await expect(page.locator('.student-topbar')).toBeVisible();
   } finally {
     await f.close();
   }

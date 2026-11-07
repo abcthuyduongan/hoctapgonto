@@ -10,6 +10,8 @@ export interface RegionMapProps {
   onSelectWeek: (weekId: string) => void;
   onChangeChapter: (chapter: number) => void;
   onBackToWorld: () => void;
+  onOpenListView?: () => void;
+  onRefresh?: () => void;
   disabled?: boolean;
 }
 
@@ -54,6 +56,8 @@ export default function RegionMap({
   onSelectWeek,
   onChangeChapter,
   onBackToWorld,
+  onOpenListView,
+  onRefresh,
   disabled = false,
 }: RegionMapProps) {
   const [bgError, setBgError] = useState(false);
@@ -106,22 +110,47 @@ export default function RegionMap({
           <span>{meta.label}</span>
         </h2>
 
-        {regionView.totalChapters > 1 && (
-          <nav className="chapter-nav-bar" aria-label="Chọn chương học">
-            {Array.from({ length: regionView.totalChapters }, (_, i) => i + 1).map(ch => (
-              <button
-                key={ch}
-                type="button"
-                className={`chapter-btn ${ch === regionView.chapter ? 'active' : ''}`}
-                disabled={disabled || ch === regionView.chapter}
-                onClick={() => onChangeChapter(ch)}
-                aria-label={`Chương ${ch}${ch === regionView.chapter ? ', đang chọn' : ''}`}
-              >
-                Chương {ch}
-              </button>
-            ))}
-          </nav>
-        )}
+        <div className="map-top-bar-actions">
+          {regionView.totalChapters > 1 && (
+            <nav className="chapter-nav-bar" aria-label="Chọn chương học">
+              {Array.from({ length: regionView.totalChapters }, (_, i) => i + 1).map(ch => (
+                <button
+                  key={ch}
+                  type="button"
+                  className={`chapter-btn ${ch === regionView.chapter ? 'active' : ''}`}
+                  disabled={disabled || ch === regionView.chapter}
+                  onClick={() => onChangeChapter(ch)}
+                  aria-label={`Chương ${ch}${ch === regionView.chapter ? ', đang chọn' : ''}`}
+                >
+                  Chương {ch}
+                </button>
+              ))}
+            </nav>
+          )}
+
+          {onRefresh && (
+            <button
+              type="button"
+              className="map-nav-btn outline refresh-btn"
+              disabled={disabled}
+              onClick={onRefresh}
+            >
+              Làm mới tiến độ
+            </button>
+          )}
+
+          {onOpenListView && (
+            <button
+              type="button"
+              className="map-nav-btn outline view-toggle-btn"
+              disabled={disabled}
+              onClick={onOpenListView}
+              aria-label="📋 Danh sách"
+            >
+              📋 Danh sách
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="map-view-wrapper">
@@ -214,10 +243,17 @@ export default function RegionMap({
                     🚩
                   </span>
                 )}
-                {isAllThreeStars && (
-                  <span className="map-stage-gold-badge" aria-label="Đạt 3 sao toàn bộ" title="Đạt 3 sao toàn bộ">
+                {(isCompleted || isAllThreeStars) && (
+                  <span
+                    className="map-stage-gold-badge"
+                    aria-label={isAllThreeStars ? 'Đạt 3 sao toàn bộ' : 'Đã hoàn thành chặng'}
+                    title={isAllThreeStars ? 'Đạt 3 sao toàn bộ' : 'Đã hoàn thành chặng'}
+                  >
                     🚩
                   </span>
+                )}
+                {node.state === 'current' && (
+                  <span className="map-stage-current-halo" aria-hidden="true" />
                 )}
                 {node.state === 'locked' && (
                   <div className="map-stage-fog" aria-hidden="true">

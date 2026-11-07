@@ -5,6 +5,7 @@ import '../styles/games/memory-match.css';
 import {saveFailureMessage} from './save-failure-message';
 import QuestionMedia,{QuestionImageRecovery} from '../components/QuestionMedia';
 import GameMascot from './GameMascot';
+import { getMascotLine } from './mascot-dialogue';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { AttemptInput, GameHostProps, PairsPack } from '../core/contracts';
 import { shuffle } from '../core/utils';
@@ -139,7 +140,12 @@ export default function MemoryMatch({pack, onAttempt, onComplete, onExit,questio
       {matched.length===content.items.length && status!=='done' && <button type="button" className="button primary memory-finish-button" disabled={finishing} onClick={()=>void retryCompletion()}>{finishing?'Đang lưu…':'⭐ Thử hoàn tất'}</button>}
     </div>
     <div className="memory-adventure-layout">
-      <aside className="forest-guide"><GameMascot alt="Cáo nhỏ đồng hành khu rừng" className="forest-mascot" mood={lastOutcome==='correct'?'happy':lastOutcome==='retry'?'encourage':'idle'} reactionKey={matched.length}/><div className="forest-speech">Mỗi lần lật là thêm một cơ hội ghi nhớ!</div></aside>
+      <aside className="forest-guide">
+        <GameMascot alt="Cáo nhỏ đồng hành khu rừng" className="forest-mascot" mood={lastOutcome === 'correct' ? 'happy' : lastOutcome === 'retry' ? 'encourage' : 'idle'} reactionKey={matched.length} />
+        <div className="forest-speech">
+          {getMascotLine(lastOutcome === 'correct' ? 'happy' : lastOutcome === 'retry' ? 'encourage' : 'idle', moves)}
+        </div>
+      </aside>
       <div className="forest-board">
         {rounds.length>1&&<div className="pair-round-navigation" aria-label="Tiến độ các màn ghép cặp"><span aria-live="polite">Màn {roundIndex+1}/{rounds.length} · {roundItems.length} cặp</span>{roundIndex<rounds.length-1&&<button type="button" className="button primary" disabled={!roundDone||saving||locked||!!error||finishing} onClick={nextRound}>Sang màn tiếp theo →</button>}</div>}
         <div className="memory-topline"><span>✦ BẢNG THẺ THẦN KỲ</span><strong>{moves} lượt thử</strong></div>
@@ -157,7 +163,27 @@ export default function MemoryMatch({pack, onAttempt, onComplete, onExit,questio
         </div></QuestionImageRecovery>
       </div>
     </div>
-    {status === 'done' && <GameCompletion questionMode={questionMode} title="Giải mã khu rừng!" summary={`Con đã ghép ${content.items.length} cặp sau ${moves} lượt thử. Tuyệt vời!`} onExit={onExit}/>}
+    {status === 'done' && (
+      <GameCompletion
+        questionMode={questionMode}
+        title="Giải mã khu rừng!"
+        summary={`Con đã ghép ${content.items.length} cặp sau ${moves} lượt thử. Tuyệt vời!`}
+        onExit={onExit}
+        onReplay={() => {
+          firstRef.current = null;
+          setFirst(null);
+          setSecond(null);
+          setMatched([]);
+          setMoves(0);
+          moveRef.current = 0;
+          countRef.current = 0;
+          setLastOutcome(null);
+          setStatus('playing');
+          setLocked(false);
+          setRoundIndex(0);
+        }}
+      />
+    )}
     <div className="world-particles" aria-hidden="true"><i/><i/><i/><i/><i/><i/></div>
     <div className="world-stage-bottom"><span>🦋 Quan sát • ghi nhớ • khám phá</span><span>✦ Bảo An Game World</span></div>
   </section>;

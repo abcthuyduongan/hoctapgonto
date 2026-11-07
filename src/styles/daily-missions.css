@@ -1,58 +1,40 @@
-/* src/styles/daily-missions.css */
-
-.missions-pill-btn {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(5, 150, 105, 0.25) 100%);
-  border: 1px solid rgba(16, 185, 129, 0.4);
-  color: #a7f3d0;
-  padding: 0.35rem 0.75rem;
-  border-radius: 9999px;
-  font-weight: 700;
-  font-size: 0.85rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.missions-pill-btn:hover {
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.35) 0%, rgba(5, 150, 105, 0.4) 100%);
-  border-color: #34d399;
-  transform: translateY(-1px);
-}
+/* src/styles/daily-missions.css — Bảo An Learning 5.0 (Bright Unified Theme) */
 
 .missions-modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.75);
+  background: rgba(24, 52, 73, 0.45);
   backdrop-filter: blur(4px);
-  z-index: 9999;
+  z-index: var(--z-dialog, 1000);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 1rem;
+  padding: var(--s-4, 1rem);
+  animation: ui-fade-in var(--dur-normal, 0.2s) var(--ease-standard, ease);
 }
 
 .missions-dialog {
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-  border: 1px solid rgba(16, 185, 129, 0.3);
-  border-radius: 1.25rem;
+  background: var(--c-cream, #fffdf7);
+  border: 1px solid var(--c-line, #dce3d5);
+  border-radius: var(--r-lg, 20px);
   width: 100%;
   max-width: 560px;
   max-height: 90vh;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
-  color: #f8fafc;
+  box-shadow: var(--shadow-2);
+  color: var(--c-ink, #183449);
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  animation: ui-scale-in var(--dur-normal, 0.2s) var(--ease-standard, ease);
 }
 
 .missions-dialog-header {
   padding: 1.25rem 1.5rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid var(--c-line, #dce3d5);
   display: flex;
   align-items: center;
   justify-content: space-between;
+  background: var(--c-paper, #f8f7ef);
 }
 
 .missions-dialog-title {
@@ -61,7 +43,25 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: #f1f5f9;
+  color: var(--c-ink, #183449);
+}
+
+.badge-close-btn {
+  background: transparent;
+  border: none;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--c-ink-2, #5b6b5a);
+  cursor: pointer;
+  padding: 4px 10px;
+  border-radius: var(--r-full, 9999px);
+  transition: all 0.15s ease;
+  line-height: 1;
+}
+
+.badge-close-btn:hover {
+  background: rgba(0, 0, 0, 0.08);
+  color: var(--c-ink, #183449);
 }
 
 .missions-list {
@@ -73,9 +73,9 @@
 }
 
 .mission-card {
-  background: rgba(30, 41, 59, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 0.85rem;
+  background: var(--c-paper, #f8f7ef);
+  border: 1px solid var(--c-line, #dce3d5);
+  border-radius: var(--r-md, 14px);
   padding: 1rem;
   display: flex;
   align-items: flex-start;
@@ -84,8 +84,8 @@
 }
 
 .mission-card.completed {
-  background: rgba(16, 185, 129, 0.1);
-  border-color: rgba(16, 185, 129, 0.3);
+  background: var(--c-leaf-soft, #e7efe3);
+  border-color: var(--c-leaf, #4e7250);
 }
 
 .mission-status-icon {
@@ -97,14 +97,15 @@
   justify-content: center;
   font-size: 1.1rem;
   flex-shrink: 0;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--c-cream, #fffdf7);
+  border: 1px solid var(--c-line, #dce3d5);
+  color: var(--c-ink-2, #5b6b5a);
 }
 
 .mission-card.completed .mission-status-icon {
-  background: #10b981;
-  color: white;
-  border-color: #34d399;
+  background: var(--c-success, #2f6f3a);
+  color: #ffffff;
+  border-color: var(--c-leaf-deep, #2f6f3a);
 }
 
 .mission-body {
@@ -114,13 +115,13 @@
 .mission-title {
   font-size: 0.95rem;
   font-weight: 700;
-  color: #f8fafc;
+  color: var(--c-ink, #183449);
   margin-bottom: 0.25rem;
 }
 
 .mission-desc {
   font-size: 0.825rem;
-  color: #94a3b8;
+  color: var(--c-ink-2, #5b6b5a);
   margin-bottom: 0.5rem;
   line-height: 1.35;
 }
@@ -134,38 +135,38 @@
 .mission-progress-label {
   font-size: 0.775rem;
   font-weight: 600;
-  color: #a7f3d0;
+  color: var(--c-leaf-deep, #2f6f3a);
 }
 
 .mission-riddle-btn {
-  background: #3b82f6;
+  background: var(--c-leaf, #4e7250);
   border: none;
-  color: white;
+  color: #ffffff;
   font-size: 0.8rem;
   font-weight: 600;
-  padding: 0.3rem 0.75rem;
-  border-radius: 0.4rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: var(--r-sm, 8px);
   cursor: pointer;
   transition: background 0.2s ease;
 }
 
 .mission-riddle-btn:hover {
-  background: #2563eb;
+  background: var(--c-leaf-deep, #2f6f3a);
 }
 
 /* Riddle Box */
 .riddle-card {
   margin-top: 1rem;
-  background: rgba(15, 23, 42, 0.8);
-  border: 1px solid #3b82f6;
-  border-radius: 0.85rem;
+  background: var(--c-paper, #f8f7ef);
+  border: 1px solid var(--c-line, #dce3d5);
+  border-radius: var(--r-md, 14px);
   padding: 1rem;
 }
 
 .riddle-prompt {
   font-size: 1rem;
   font-weight: 600;
-  color: #e2e8f0;
+  color: var(--c-ink, #183449);
   margin-bottom: 0.85rem;
   line-height: 1.4;
 }
@@ -177,11 +178,11 @@
 }
 
 .riddle-option-btn {
-  background: rgba(30, 41, 59, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 0.5rem;
+  background: var(--c-cream, #fffdf7);
+  border: 1px solid var(--c-line, #dce3d5);
+  border-radius: var(--r-sm, 8px);
   padding: 0.6rem 0.85rem;
-  color: #f1f5f9;
+  color: var(--c-ink, #183449);
   font-size: 0.9rem;
   text-align: left;
   cursor: pointer;
@@ -189,32 +190,32 @@
 }
 
 .riddle-option-btn:hover:not(:disabled) {
-  background: rgba(59, 130, 246, 0.2);
-  border-color: #60a5fa;
+  background: var(--c-leaf-soft, #e7efe3);
+  border-color: var(--c-leaf, #4e7250);
 }
 
 .riddle-option-btn.selected {
-  background: #2563eb;
-  border-color: #93c5fd;
-  color: white;
+  background: var(--c-leaf, #4e7250);
+  border-color: var(--c-leaf-deep, #2f6f3a);
+  color: #ffffff;
 }
 
 .riddle-feedback {
   margin-top: 0.75rem;
   padding: 0.5rem 0.75rem;
-  border-radius: 0.5rem;
+  border-radius: var(--r-sm, 8px);
   font-size: 0.85rem;
   font-weight: 600;
 }
 
 .riddle-feedback.correct {
-  background: rgba(16, 185, 129, 0.2);
-  border: 1px solid rgba(16, 185, 129, 0.4);
-  color: #34d399;
+  background: var(--c-leaf-soft, #e7efe3);
+  border: 1px solid var(--c-leaf, #4e7250);
+  color: var(--c-leaf-deep, #2f6f3a);
 }
 
 .riddle-feedback.wrong {
-  background: rgba(239, 68, 68, 0.2);
-  border: 1px solid rgba(239, 68, 68, 0.4);
-  color: #f87171;
+  background: rgba(179, 38, 30, 0.1);
+  border: 1px solid var(--c-danger, #b3261e);
+  color: var(--c-danger, #b3261e);
 }

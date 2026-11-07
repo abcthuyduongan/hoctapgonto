@@ -103,7 +103,7 @@ test('recovery rejects altered schema, broken links, changed media and changed p
     ['trigger',db=>db.exec('CREATE TRIGGER hostile_restore AFTER DELETE ON auth_sessions BEGIN DELETE FROM users; END;')],
     ['foreign-key',db=>db.exec("PRAGMA foreign_keys=OFF; UPDATE students SET class_id='missing-class';")],
     ['media',db=>db.prepare('UPDATE media SET bytes=? WHERE id=?').run(Buffer.from('changed bytes'),f.image.id)],
-    ['version',db=>db.exec('UPDATE schema_version SET version=2;')],
+    ['version',db=>db.exec('UPDATE schema_version SET version=999;')],
     ['stars',db=>db.exec('UPDATE awards SET tier=CASE WHEN tier=1 THEN 2 ELSE 1 END;')],
   ]){
     const damaged=join(f.directory,`damaged-${kind}.sqlite`);await copyFile(snapshot,damaged);const db=new DatabaseSync(damaged);try{change(db);}finally{db.close();}

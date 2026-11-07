@@ -7,6 +7,7 @@ import {useQuestionSpeech} from './useQuestionSpeech';
 import {saveFailureMessage} from './save-failure-message';
 import QuestionMedia,{QuestionImageRecovery} from '../components/QuestionMedia';
 import GameMascot from './GameMascot';
+import { getMascotLine } from './mascot-dialogue';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { AttemptInput, GameHostProps, PairsPack } from '../core/contracts';
 import { shuffle } from '../core/utils';
@@ -269,9 +270,7 @@ export default function WordConnect({ pack, onAttempt, onComplete, onExit,questi
             reactionKey={matched.length}
           />
           <div className="connect-speech">
-            {matched.length === content.items.length
-              ? 'Con giỏi lắm! Hoàn thành xuất sắc!'
-              : 'Nối từng cặp từ để mở rộng vốn tri thức!'}
+            {getMascotLine(feedback === 'correct' ? 'happy' : feedback === 'retry' ? 'encourage' : 'idle', moves)}
           </div>
         </aside>
 
@@ -341,6 +340,18 @@ export default function WordConnect({ pack, onAttempt, onComplete, onExit,questi
           title="Nhà thông thái nối từ!"
           summary={`Con đã hoàn thành ghép nối tất cả ${content.items.length} cặp thẻ sau ${moves} lượt! Rất xuất sắc!`}
           onExit={onExit}
+          onReplay={() => {
+            setSelectedLeft(null);
+            setSelectedRight(null);
+            setMatched([]);
+            setMoves(0);
+            moveRef.current = 0;
+            matchedCountRef.current = 0;
+            setFeedback(null);
+            setStatus('playing');
+            setLocked(false);
+            setRoundIndex(0);
+          }}
         />
       )}
       <div className="world-particles" aria-hidden="true"><i/><i/><i/><i/><i/><i/></div>

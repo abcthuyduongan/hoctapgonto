@@ -81,7 +81,7 @@ test.describe('online-mapgeometry: bounding boxes and anchor alignment without o
       { label: 'Tin học', id: 'comp' },
     ];
 
-    for (let w = 1; w <= 3; w++) {
+    for (let w = 1; w <= 7; w++) {
       const sets = subjects.map((sub) => ({
         subjectLabel: sub.label,
         pack: {
@@ -185,9 +185,9 @@ test.describe('online-mapgeometry: bounding boxes and anchor alignment without o
       expect(regionBox.width).toBeGreaterThan(0);
       expect(regionBox.height).toBeGreaterThan(0);
 
-      // Verify 3 stages for the 3 seeded weeks
+      // Verify every slot in a fully assigned chapter.
       const stageNodes = page.locator('.region-map-container .map-stage-node');
-      await expect(stageNodes).toHaveCount(3);
+      await expect(stageNodes).toHaveCount(7);
 
       const isTall = vp.width <= 768;
       const targetMapId = isTall ? 'map-math-tall' : 'map-math-wide';
@@ -197,7 +197,7 @@ test.describe('online-mapgeometry: bounding boxes and anchor alignment without o
       expect(slotAnchors).toBeDefined();
 
       const stageBoxes: Box[] = [];
-      for (let slot = 1; slot <= 3; slot++) {
+      for (let slot = 1; slot <= 7; slot++) {
         const stageNode = stageNodes.nth(slot - 1);
         const rawBox = await stageNode.boundingBox();
         expect(rawBox).not.toBeNull();

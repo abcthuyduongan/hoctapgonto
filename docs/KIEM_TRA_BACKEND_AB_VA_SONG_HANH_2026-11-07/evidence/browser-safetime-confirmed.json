@@ -1,0 +1,199 @@
+{
+  "config": {
+    "argv": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\node_modules\\@playwright\\test\\cli.js",
+      "test",
+      "tests/visual/online-safetime.spec.ts",
+      "--config=playwright.online.config.ts",
+      "--output=test-results/safetime-confirmed"
+    ],
+    "configFile": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\playwright.online.config.ts",
+    "rootDir": "D:/Phần mềm 2026/BAO_AN_LEARNING_lam lại/tests/visual",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "D:/Phần mềm 2026/BAO_AN_LEARNING_lam lại/test-results/safetime-confirmed",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "online-chrome",
+        "name": "online-chrome",
+        "testDir": "D:/Phần mềm 2026/BAO_AN_LEARNING_lam lại/tests/visual",
+        "testIgnore": [],
+        "testMatch": [
+          "/online(?:-[a-z0-9]+)*\\.spec\\.ts$/"
+        ],
+        "timeout": 180000
+      }
+    ],
+    "filteredProjects": [
+      {
+        "grep": {},
+        "grepInvert": null,
+        "outputDir": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\test-results\\safetime-confirmed",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "name": "online-chrome",
+        "testDir": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual",
+        "snapshotDir": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual",
+        "testIgnore": [],
+        "testMatch": {},
+        "timeout": 180000,
+        "use": {
+          "headless": true,
+          "actionTimeout": 30000,
+          "navigationTimeout": 30000,
+          "viewport": {
+            "width": 1440,
+            "height": 1000
+          },
+          "extraHTTPHeaders": {
+            "X-Bao-An-Question-Protocol": "1"
+          },
+          "serviceWorkers": "block",
+          "trace": "retain-on-failure",
+          "screenshot": "only-on-failure",
+          "channel": "chrome"
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": "online-chrome"
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "docs/KIEM_TRA_BACKEND_AB_VA_SONG_HANH_2026-11-07/evidence/browser-safetime-confirmed.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "default",
+    "updateSourceMethod": "patch",
+    "version": "1.64.0",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "online-safetime.spec.ts",
+      "file": "online-safetime.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "PIN-protected SafeTime tab shows only the permitted child, pairing code and device",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "online-chrome",
+              "projectName": "online-chrome",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 22880,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.region-map-container')\nExpected: visible\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" locator('.region-map-container') with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for locator('.region-map-container')\u001b[22m\n",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.region-map-container')\nExpected: visible\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" locator('.region-map-container') with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for locator('.region-map-container')\u001b[22m\n\n    at D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-safetime.spec.ts:31:105",
+                    "location": {
+                      "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-safetime.spec.ts",
+                      "column": 105,
+                      "line": 31
+                    },
+                    "snippet": "  29 |    await page.screenshot({path:testInfo.outputPath(`safetime-parent-${width}.png`),fullPage:true});\n  30 |   }\n> 31 |   await page.goto(f.origin+'/?mode=list#/hoc/toan');await expect(page.locator('.region-map-container')).toBeVisible();\n     |                                                                                                         ^\n  32 |   await page.evaluate(()=>{location.hash='#/ban-do';});await expect(page.locator('.world-map-container')).toBeVisible();\n  33 |   const summary=await(await page.request.get(f.origin+'/api/online/student/summary?cursor=current')).json();expect(summary.balance.earned).toBe(0);\n  34 |  }finally{await f.close();}"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-safetime.spec.ts",
+                        "column": 105,
+                        "line": 31
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.region-map-container')\nExpected: visible\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" locator('.region-map-container') with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for locator('.region-map-container')\u001b[22m\n\n\n  29 |    await page.screenshot({path:testInfo.outputPath(`safetime-parent-${width}.png`),fullPage:true});\n  30 |   }\n> 31 |   await page.goto(f.origin+'/?mode=list#/hoc/toan');await expect(page.locator('.region-map-container')).toBeVisible();\n     |                                                                                                         ^\n  32 |   await page.evaluate(()=>{location.hash='#/ban-do';});await expect(page.locator('.world-map-container')).toBeVisible();\n  33 |   const summary=await(await page.request.get(f.origin+'/api/online/student/summary?cursor=current')).json();expect(summary.balance.earned).toBe(0);\n  34 |  }finally{await f.close();}\n    at D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-safetime.spec.ts:31:105"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-07T14:13:05.871Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\test-results\\safetime-confirmed\\online-safetime-PIN-protec-1efd3-ild-pairing-code-and-device-online-chrome\\test-failed-1.png"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\test-results\\safetime-confirmed\\online-safetime-PIN-protec-1efd3-ild-pairing-code-and-device-online-chrome\\error-context.md"
+                    },
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "path": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\test-results\\safetime-confirmed\\online-safetime-PIN-protec-1efd3-ild-pairing-code-and-device-online-chrome\\trace.zip"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-safetime.spec.ts",
+                    "column": 105,
+                    "line": 31
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "39e3e18cc9204aef6dfe-ec213266a26d23ab0e88",
+          "file": "online-safetime.spec.ts",
+          "line": 5,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-11-07T14:13:04.367Z",
+    "duration": 25217.274999999998,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0
+  }
+}

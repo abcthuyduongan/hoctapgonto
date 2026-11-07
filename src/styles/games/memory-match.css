@@ -183,3 +183,65 @@
 @media (max-width: 390px) {
   .memory-card { height: 70px; }
 }
+
+/* Both faces reserve the full label and image before a card is flipped. */
+.world-memory .memory-card,
+.immersive-dialog.premium-game .world-memory .memory-card {
+  height: auto;
+  min-height: 112px;
+  align-self: stretch;
+  place-items: stretch;
+}
+.world-memory .memory-inner {
+  display: grid;
+  height: auto;
+  min-height: 0;
+}
+.world-memory .memory-face {
+  position: relative;
+  inset: auto;
+  grid-area: 1 / 1;
+  min-width: 0;
+}
+.world-memory .memory-front,
+.immersive-dialog.premium-game .world-memory .memory-front {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  font-size: clamp(14px, 1.3vw, 19px);
+  line-height: 1.4;
+}
+.world-memory .memory-card-label {
+  display: block;
+  flex: 0 0 auto;
+  width: 100%;
+  min-width: 0;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.world-memory .memory-card-media {
+  display: grid;
+  place-items: center;
+  flex: 0 0 64px;
+  height: 64px;
+  width: 100%;
+  min-width: 0;
+}
+.world-memory .memory-card-media .question-media-image-only {
+  width: 100%;
+  max-height: 64px;
+  margin: 0;
+}
+.world-memory .memory-card-media .question-media-image-only > img {
+  max-height: 64px;
+  max-width: 100%;
+}
+.premium-game .world-memory .memory-grid { align-items: stretch; }
+@media (max-width: 1024px) {
+  .premium-game .world-memory .memory-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 480px) {
+  .premium-game .world-memory .memory-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

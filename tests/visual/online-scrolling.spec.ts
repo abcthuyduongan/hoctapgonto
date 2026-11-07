@@ -30,7 +30,7 @@ for(const viewport of [{width:1366,height:768},{width:390,height:844}]){
         const pack={id:'scrolling-pack',version:1,title:'Bộ câu hỏi kiểm tra cuộn',kind:'quiz',subject:'thinking',grade:3,source:'local',publishedAt:'2026-10-17T00:00:00Z',items:[1,2,3,4].map(i=>({id:`scrolling-${i}`,objectiveId:'SCROLL',kind:'multiple-choice',prompt:`Câu hỏi ${i}`,options:['Đúng','Sai A','Sai B','Sai C'],correctIndex:0,explanation:'Đáp án đúng.'}))};
         await api('/weeks',{requestId:'scrolling-week',classId:cls.id,title:'Tuần 01',sets:[{subjectLabel:'Tư duy',pack}]});
         await page.context().clearCookies();await api('/login',{username:'scroll.child',password});
-        await page.goto(origin+'/');
+        await page.goto(origin+'/?mode=list');
         await expect(page.locator('[data-hub-mode="light"]')).toBeVisible();
         const material=page.locator('.online-week-path');
         await expect(material).toContainText(pack.title);
@@ -67,7 +67,7 @@ for(const viewport of [{width:1366,height:768},{width:390,height:844}]){
         await scrollDown();
         await page.screenshot({path:testInfo.outputPath('weekly-material-after-scroll.png')});
 
-        await page.getByRole('button',{name:'Chơi Đảo Câu Hỏi bằng bộ được giao',exact:true}).click();
+        await page.getByRole('button',{name:/^(?:Tiếp tục học ngay )?Chơi Đảo Câu Hỏi(?: bằng bộ được giao| · \d+ câu trong bộ)$/,exact:true}).click();
         await expect(page.locator('.quiz-question')).toBeVisible();
         expect(await page.evaluate(()=>getComputedStyle(document.body).overflow)).toBe('hidden');
         const lockedY=await page.evaluate(()=>window.scrollY);

@@ -1,0 +1,201 @@
+{
+  "config": {
+    "argv": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\node_modules\\@playwright\\test\\cli.js",
+      "test",
+      "tests/visual/online-media.spec.ts",
+      "--grep",
+      "memory cards contain long",
+      "--output=test-results/memory-fix-output",
+      "--config=playwright.online.config.ts"
+    ],
+    "configFile": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\playwright.online.config.ts",
+    "rootDir": "D:/Phần mềm 2026/BAO_AN_LEARNING_lam lại/tests/visual",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "D:/Phần mềm 2026/BAO_AN_LEARNING_lam lại/test-results/memory-fix-output",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "online-chrome",
+        "name": "online-chrome",
+        "testDir": "D:/Phần mềm 2026/BAO_AN_LEARNING_lam lại/tests/visual",
+        "testIgnore": [],
+        "testMatch": [
+          "/online(?:-[a-z0-9]+)*\\.spec\\.ts$/"
+        ],
+        "timeout": 180000
+      }
+    ],
+    "filteredProjects": [
+      {
+        "grep": {},
+        "grepInvert": null,
+        "outputDir": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\test-results\\memory-fix-output",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "name": "online-chrome",
+        "testDir": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual",
+        "snapshotDir": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual",
+        "testIgnore": [],
+        "testMatch": {},
+        "timeout": 180000,
+        "use": {
+          "headless": true,
+          "actionTimeout": 30000,
+          "navigationTimeout": 30000,
+          "viewport": {
+            "width": 1440,
+            "height": 1000
+          },
+          "extraHTTPHeaders": {
+            "X-Bao-An-Question-Protocol": "1"
+          },
+          "serviceWorkers": "block",
+          "trace": "retain-on-failure",
+          "screenshot": "only-on-failure",
+          "channel": "chrome"
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": "online-chrome"
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "docs/KIEM_TRA_BACKEND_AB_VA_SONG_HANH_2026-11-07/evidence/memory-fix.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "default",
+    "updateSourceMethod": "patch",
+    "version": "1.64.0",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "online-media.spec.ts",
+      "file": "online-media.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "memory cards contain long labels and images without clipping at short, mobile and desktop viewports",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "online-chrome",
+              "projectName": "online-chrome",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 4197,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32mtrue\u001b[39m\nReceived: \u001b[31mfalse\u001b[39m",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32mtrue\u001b[39m\nReceived: \u001b[31mfalse\u001b[39m\n    at contained (D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-media.spec.ts:94:87)\n    at D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-media.spec.ts:112:75",
+                    "location": {
+                      "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-media.spec.ts",
+                      "column": 87,
+                      "line": 94
+                    },
+                    "snippet": "  92 |     }),`The complete memory card content must fit for ${label}`).toBe(true);\n  93 |     expect(await page.locator('.memory-grid').evaluate(grid=>{const rect=grid.getBoundingClientRect();return grid.scrollWidth<=grid.clientWidth+1&&rect.left>=0&&rect.right<=innerWidth+1;})).toBe(true);\n> 94 |     expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);\n     |                                                                                       ^\n  95 |   }\n  96 |   try{\n  97 |     expect(imageLabel).toHaveLength(120);expect(plainLabel).toHaveLength(120);"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-media.spec.ts",
+                        "column": 87,
+                        "line": 94
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32mtrue\u001b[39m\nReceived: \u001b[31mfalse\u001b[39m\n\n  92 |     }),`The complete memory card content must fit for ${label}`).toBe(true);\n  93 |     expect(await page.locator('.memory-grid').evaluate(grid=>{const rect=grid.getBoundingClientRect();return grid.scrollWidth<=grid.clientWidth+1&&rect.left>=0&&rect.right<=innerWidth+1;})).toBe(true);\n> 94 |     expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);\n     |                                                                                       ^\n  95 |   }\n  96 |   try{\n  97 |     expect(imageLabel).toHaveLength(120);expect(plainLabel).toHaveLength(120);\n    at contained (D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-media.spec.ts:94:87)\n    at D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-media.spec.ts:112:75"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-07T10:05:13.677Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\test-results\\memory-fix-output\\online-media-memory-cards--0346d-obile-and-desktop-viewports-online-chrome\\test-failed-1.png"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\test-results\\memory-fix-output\\online-media-memory-cards--0346d-obile-and-desktop-viewports-online-chrome\\error-context.md"
+                    },
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "path": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\test-results\\memory-fix-output\\online-media-memory-cards--0346d-obile-and-desktop-viewports-online-chrome\\trace.zip"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-media.spec.ts",
+                    "column": 87,
+                    "line": 94
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "71d69712328d088f6c36-99b33812f4a16a1d1d08",
+          "file": "online-media.spec.ts",
+          "line": 74,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-11-07T10:05:12.707Z",
+    "duration": 5784.5380000000005,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0
+  }
+}

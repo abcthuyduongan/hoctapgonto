@@ -1,6 +1,8 @@
-import { useEffect, useState, useCallback } from 'react';
+import {useModalFocus} from '../ui/useModalFocus';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import type { PackDiscoveryCard } from '../core/contracts';
 import { speakText, stopSpeaking } from '../core/speech';
+import { EmptyState } from '../ui/EmptyState';
 
 export interface DiscoveryDialogProps {
   discovery: PackDiscoveryCard;
@@ -19,6 +21,8 @@ export function DiscoveryCardDialog({
 }: DiscoveryDialogProps) {
   const [speaking, setSpeaking] = useState(false);
   const [speechError, setSpeechError] = useState<string | null>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
+  useModalFocus(modalRef);
 
   const handleSpeak = useCallback(() => {
     setSpeechError(null);
@@ -36,13 +40,22 @@ export function DiscoveryCardDialog({
   }, [discovery.text]);
 
   useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        stopSpeaking();
+        onClose();
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
     if (soundOn) {
       handleSpeak();
     }
     return () => {
+      document.removeEventListener('keydown', handleKeyDown);
       stopSpeaking();
     };
-  }, [soundOn, handleSpeak]);
+  }, [soundOn, handleSpeak, onClose]);
 
   const handleClose = () => {
     stopSpeaking();
@@ -53,8 +66,10 @@ export function DiscoveryCardDialog({
     <div className="overlay discovery-overlay" role="presentation">
       <div
         className="discovery-dialog"
+        ref={modalRef}
         role="dialog"
         aria-modal="true"
+        tabIndex={-1}
         aria-label={`Thẻ khám phá: ${discovery.title}`}
       >
         <div className="discovery-header">
@@ -125,13 +140,31 @@ export interface DiscoveryNotebookItem {
 export interface DiscoveryNotebookDialogProps {
   cards: DiscoveryNotebookItem[];
   onClose: () => void;
+  onExplore?: () => void;
 }
 
-export function DiscoveryNotebookDialog({ cards, onClose }: DiscoveryNotebookDialogProps) {
+export function DiscoveryNotebookDialog({ cards, onClose, onExplore }: DiscoveryNotebookDialogProps) {
   const [selectedCard, setSelectedCard] = useState<DiscoveryNotebookItem | null>(
     cards[0] ?? null
   );
   const [speaking, setSpeaking] = useState(false);
+  const modalRef = useRef<HTMLDivElement>(null);
+  useModalFocus(modalRef);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        stopSpeaking();
+        onClose();
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      stopSpeaking();
+    };
+  }, [onClose]);
 
   const handleSpeak = (text: string) => {
     stopSpeaking();
@@ -153,8 +186,10 @@ export function DiscoveryNotebookDialog({ cards, onClose }: DiscoveryNotebookDia
     <div className="overlay discovery-overlay" role="presentation">
       <div
         className="discovery-notebook-dialog"
+        ref={modalRef}
         role="dialog"
         aria-modal="true"
+        tabIndex={-1}
         aria-label="Sổ khám phá"
       >
         <div className="discovery-notebook-head">
@@ -165,9 +200,17 @@ export function DiscoveryNotebookDialog({ cards, onClose }: DiscoveryNotebookDia
         </div>
 
         {cards.length === 0 ? (
-          <div className="discovery-notebook-empty">
-            <p>Con chưa mở thẻ khám phá nào. Hãy phiêu lưu các chặng trên bản đồ để thu thập nhé!</p>
-          </div>
+          <EmptyState
+            icon="compass"
+            title="Sổ khám phá chưa có thẻ nào"
+            message="Con chưa mở thẻ khám phá nào. Hãy phiêu lưu các chặng trên bản đồ để thu thập nhé!"
+            actionLabel="Đi khám phá"
+            onAction={() => {
+              handleClose();
+              onExplore?.();
+            }}
+            className="discovery-notebook-empty"
+          />
         ) : (
           <div className="discovery-notebook-layout">
             <div className="discovery-notebook-list" role="list">

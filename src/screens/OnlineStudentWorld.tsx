@@ -117,6 +117,7 @@ export default function OnlineStudentWorld({identity,onLogout,onPasswordChanged}
   const handleDeepLink = useCallback((route: DeepLinkRoute) => {
     switch (route.target) {
       case 'hoc': {
+        setMapMode('map');
         setContestOpen(false);
         setTownOpen(false);
         setGiftShelfOpen(false);
@@ -162,6 +163,7 @@ export default function OnlineStudentWorld({identity,onLogout,onPasswordChanged}
       }
       case 'ban-do':
       default: {
+        setMapMode('map');
         setContestOpen(false);
         setTownOpen(false);
         setGiftShelfOpen(false);

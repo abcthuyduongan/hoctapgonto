@@ -1,5 +1,6 @@
+import {useModalFocus} from '../ui/useModalFocus';
 // src/components/DailyMissionDialog.tsx
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import type { DailyMission, DailyRiddleQuestion } from '../core/online-contracts';
 import { onlineApi } from '../core/online-client';
 import '../styles/daily-missions.css';
@@ -21,6 +22,21 @@ export const DailyMissionDialog: React.FC<DailyMissionDialogProps> = ({
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [feedback, setFeedback] = useState<{ correct: boolean; message: string } | null>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
+  useModalFocus(modalRef);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onClose();
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [onClose]);
 
   const handleAnswerSubmit = async () => {
     if (selectedAnswer === null || !riddle) return;
@@ -50,14 +66,22 @@ export const DailyMissionDialog: React.FC<DailyMissionDialogProps> = ({
   };
 
   return (
-    <div className="missions-modal-backdrop" onClick={onClose}>
-      <div className="missions-dialog" onClick={(e) => e.stopPropagation()}>
+    <div className="missions-modal-backdrop" onClick={onClose} role="presentation">
+      <div
+        className="missions-dialog"
+        ref={modalRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="missions-dialog-title-id"
+        tabIndex={-1}
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="missions-dialog-header">
-          <div className="missions-dialog-title">
+          <div className="missions-dialog-title" id="missions-dialog-title-id">
             <span>📋</span>
             <span>Nhiệm Vụ Ngày (15 Phút)</span>
           </div>
-          <button className="badge-close-btn" onClick={onClose}>✕</button>
+          <button className="badge-close-btn" onClick={onClose} aria-label="Đóng nhiệm vụ ngày">✕</button>
         </div>
 
         <div className="missions-list">

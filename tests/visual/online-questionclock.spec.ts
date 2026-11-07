@@ -25,8 +25,9 @@ test.beforeAll(async()=>{
     const sentences={...base,kind:'sentences',items:[1,2].map(i=>({id:'order-'+i,kind:'sentence',objectiveId:'ORDER',prompt:'Xếp câu '+i,words:['Con','học','vui'],hint:'Bắt đầu bằng Con.'}))};
     const pairs={...base,kind:'pairs',items:[1,2,3].map(i=>({id:'pair-'+i,kind:'pair',objectiveId:'PAIR',left:'Trái '+i,right:'Phải '+i}))};
     let openFailures=Number(params.get('openFailure')||0),saveFailures=Number(params.get('saveFailure')||0),release=null;
-    const harness=window.clockHarness={opens:[],attempts:[],committed:[],completed:0,exited:0,releaseClock(){release?.();},unmount(){root.unmount();}};
-    async function onQuestionOpen(id){harness.opens.push(id);if(openFailures-->0)throw new Error('Mạng đang gián đoạn.');await new Promise(resolve=>release=resolve);const now=new Date().toISOString();return{openedAt:new Date(Date.parse(now)-20000).toISOString(),serverNow:now,threeStarMs:30000,twoStarMs:60000};}
+    const openedAtById=new Map();
+    const harness=window.clockHarness={opens:[],receipts:[],attempts:[],committed:[],completed:0,exited:0,releaseClock(){release?.();},unmount(){root.unmount();}};
+    async function onQuestionOpen(id){harness.opens.push(id);if(openFailures-->0)throw new Error('Mạng đang gián đoạn.');await new Promise(resolve=>release=resolve);const now=new Date().toISOString();if(!openedAtById.has(id))openedAtById.set(id,new Date(Date.parse(now)-20000).toISOString());const receipt={openedAt:openedAtById.get(id),serverNow:now,threeStarMs:30000,twoStarMs:60000};harness.receipts.push(receipt);return receipt;}
     async function onAttempt(input){harness.attempts.push(structuredClone(input));if(saveFailures-->0)throw new Error('Chưa lưu được đáp án.');harness.committed.push(structuredClone(input));}
     const props={pack:kind==='quiz'||kind==='legacy'?quiz:kind==='listening'?listening:kind==='sentence'||kind==='sequence'?sentences:kind==='memory'||kind==='connect'?pairs:numeric,onAttempt,onQuestionOpen,questionMode:kind!=='legacy',onComplete:async()=>{harness.completed++;},onExit:()=>harness.exited++};
     const root=createRoot(document.getElementById('root'));
@@ -45,7 +46,7 @@ test.beforeAll(async()=>{
 });
 test.afterAll(async()=>{if(!server)return;server.closeAllConnections?.();await new Promise<void>(resolve=>server.close(()=>resolve()));});
 
-async function snapshot(page:Page){return page.evaluate(()=>{const h=(window as any).clockHarness;return{opens:h.opens,attempts:h.attempts,committed:h.committed,completed:h.completed};});}
+async function snapshot(page:Page){return page.evaluate(()=>{const h=(window as any).clockHarness;return{opens:h.opens,receipts:h.receipts,attempts:h.attempts,committed:h.committed,completed:h.completed};});}
 async function releaseClock(page:Page){await expect.poll(async()=>(await snapshot(page)).opens.length).toBeGreaterThan(0);await page.evaluate(()=>(window as any).clockHarness.releaseClock());await expect(page.locator('.question-clock')).toContainText('Đã dùng khoảng');}
 
 test('quiz waits for the clock ACK and only advances after a saved correct answer',async({page})=>{
@@ -53,10 +54,10 @@ test('quiz waits for the clock ACK and only advances after a saved correct answe
   await expect(stage.getByRole('button',{name:'A Đúng',exact:true})).toBeDisabled();await releaseClock(page);
   await stage.getByRole('button',{name:'B Sai',exact:true}).click();await expect(stage.getByRole('button',{name:'Trả lời lại',exact:true})).toBeVisible();
   await expect(stage.getByRole('button',{name:'Đến trạm kế tiếp ➜',exact:true})).toHaveCount(0);await expect(stage.locator('.answer-option.correct')).toHaveCount(0);await expect(stage.locator('.result-copy')).not.toContainText('Lời giải');
-  await stage.getByRole('button',{name:'Trả lời lại',exact:true}).click();await stage.getByRole('button',{name:'A Đúng',exact:true}).click();
-  let saved=await snapshot(page);expect(saved.attempts.map((row:any)=>row.attemptKey)).toEqual(['clock-1:answer:1','clock-1:answer:2']);expect(saved.opens).toEqual(['clock-1']);
+  await stage.getByRole('button',{name:'Trả lời lại',exact:true}).click();await expect.poll(async()=>(await snapshot(page)).opens).toEqual(['clock-1','clock-1']);await expect(stage.getByRole('button',{name:'A Đúng',exact:true})).toBeDisabled();await releaseClock(page);await stage.getByRole('button',{name:'A Đúng',exact:true}).click();
+  let saved=await snapshot(page);expect(saved.attempts.map((row:any)=>row.attemptKey)).toEqual(['clock-1:answer:1','clock-1:answer:2']);expect(saved.receipts).toHaveLength(2);expect(saved.receipts[1].openedAt).toBe(saved.receipts[0].openedAt);
   await stage.getByRole('button',{name:'Đến trạm kế tiếp ➜',exact:true}).click();await expect(stage.locator('.quiz-question')).toHaveText('Câu hỏi 2');await expect(stage.getByRole('button',{name:'A Đúng',exact:true})).toBeDisabled();
-  saved=await snapshot(page);expect(saved.opens).toEqual(['clock-1','clock-2']);
+  saved=await snapshot(page);expect(saved.opens).toEqual(['clock-1','clock-1','clock-2']);
 });
 
 test('quiz retries the exact saved attempt after a failed response and can retry opening the clock',async({page})=>{
@@ -73,8 +74,9 @@ test('rich exercise keeps its clock and hints across wrong answers and freezes a
   await expect(stage.getByRole('textbox')).toBeDisabled();await releaseClock(page);await stage.getByRole('button',{name:'Xem gợi ý',exact:true}).click();await stage.getByRole('textbox').fill('3');await stage.getByRole('button',{name:'Kiểm tra đáp án',exact:true}).click();
   await expect(stage.getByRole('button',{name:'Thử gửi lại đáp án',exact:true})).toBeVisible();await expect(stage.getByRole('textbox')).toBeDisabled();await stage.getByRole('button',{name:'Thử gửi lại đáp án',exact:true}).click();
   await expect(stage.getByRole('button',{name:'Trả lời lại',exact:true})).toBeVisible();await expect(stage.locator('.online-exercise-feedback')).not.toContainText('Đáp án:');await stage.getByRole('button',{name:'Trả lời lại',exact:true}).click();
+  await expect.poll(async()=>(await snapshot(page)).opens).toEqual(['clock-number','clock-number']);await expect(stage.getByRole('textbox')).toBeDisabled();await releaseClock(page);
   await expect(stage.getByRole('button',{name:'Đã xem gợi ý',exact:true})).toBeDisabled();await stage.getByRole('textbox').fill('4');await stage.getByRole('button',{name:'Kiểm tra đáp án',exact:true}).click();
-  await stage.getByRole('button',{name:'Hoàn thành & lưu thành tích',exact:true}).click();const saved=await snapshot(page);expect(saved.attempts).toHaveLength(3);expect(saved.attempts[0]).toEqual(saved.attempts[1]);expect(saved.attempts[2].attemptKey).toBe('clock-number:answer:2');expect(saved.attempts[2].hintsUsed).toBe(1);expect(saved.opens).toEqual(['clock-number']);expect(saved.completed).toBe(1);
+  await stage.getByRole('button',{name:'Hoàn thành & lưu thành tích',exact:true}).click();const saved=await snapshot(page);expect(saved.attempts).toHaveLength(3);expect(saved.attempts[0]).toEqual(saved.attempts[1]);expect(saved.attempts[2].attemptKey).toBe('clock-number:answer:2');expect(saved.attempts[2].hintsUsed).toBe(1);expect(saved.receipts[1].openedAt).toBe(saved.receipts[0].openedAt);expect(saved.completed).toBe(1);
 });
 
 test('listening opens its clock after audio ends and requires the clock ACK before answering',async({page})=>{

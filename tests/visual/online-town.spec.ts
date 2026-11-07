@@ -48,7 +48,7 @@ test('Tuần 8 Cổng C8: Thị Trấn Của Con, Lưới 10x10, Vật Liệu Th
 
     // Wait for world map screen to load
     await expect(page.locator('.online-student')).toBeVisible({ timeout: 15000 });
-    await expect(page.locator('.online-header')).toBeVisible({ timeout: 10000 });
+    await expect(page.locator('.student-topbar')).toBeVisible({ timeout: 10000 });
 
     // 4. Header has "🏡 Thị trấn" button (unique role & accessible name)
     const townBtn = page.getByRole('button', { name: 'Mở thị trấn của con' });
@@ -110,7 +110,7 @@ test('Tuần 8 Cổng C8: Thị Trấn Của Con, Lưới 10x10, Vật Liệu Th
     const backBtn = page.locator('.town-back-btn');
     await backBtn.click();
     await expect(townScreen).not.toBeVisible();
-    await expect(page.locator('.online-header')).toBeVisible();
+    await expect(page.locator('.student-topbar')).toBeVisible();
   } finally {
     await f.close();
   }

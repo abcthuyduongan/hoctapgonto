@@ -1,0 +1,56 @@
+{
+  "checkedAt": "2026-11-07T09:02:39.093Z",
+  "readOnly": true,
+  "results": [
+    {
+      "path": "/build-info.json",
+      "status": 200,
+      "contentType": "application/json",
+      "cacheControl": "no-cache",
+      "body": {
+        "version": "4.0.2",
+        "commit": "3ff86b5cf5ba85cdcd7ddde402546828acb83d22",
+        "sourceId": "556aba824efa09aa0766549a2ed91c02349cca5150f7e6c05b21e7d3f3bd89c0",
+        "displayMode": "2d",
+        "questionProtocolVersion": 1
+      }
+    },
+    {
+      "path": "/api/online/status",
+      "status": 200,
+      "contentType": "application/json; charset=utf-8",
+      "cacheControl": "no-store,private",
+      "body": {
+        "available": true,
+        "configured": true,
+        "mediaMaxBytes": 2097152,
+        "runtimeVersion": "4.0.2",
+        "questionProtocolVersion": 1,
+        "mediaUploadEncoding": "gzip",
+        "build": {
+          "version": "4.0.2",
+          "sourceId": "556aba824efa09aa0766549a2ed91c02349cca5150f7e6c05b21e7d3f3bd89c0",
+          "commit": "3ff86b5cf5ba85cdcd7ddde402546828acb83d22",
+          "displayMode": "2d",
+          "questionProtocolVersion": 1
+        }
+      }
+    },
+    {
+      "path": "/api/online/me",
+      "status": 401,
+      "contentType": "application/json; charset=utf-8",
+      "cacheControl": "no-store,private",
+      "body": {
+        "error": "Hãy đăng nhập để tiếp tục."
+      }
+    },
+    {
+      "path": "/api/integration/safetime/v1/status",
+      "status": 200,
+      "contentType": "text/html; charset=UTF-8",
+      "cacheControl": "no-store,private",
+      "body": "<!doctype html>\n<html lang=\"vi\">\n  <head>\n    <meta charset=\"UTF-8\" />\n<!-- This site is hosted on N"
+    }
+  ]
+}

@@ -1,0 +1,1478 @@
+{
+  "config": {
+    "argv": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\node_modules\\@playwright\\test\\cli.js",
+      "test",
+      "--config=playwright.online.config.ts",
+      "tests/visual/online-questionclock.spec.ts",
+      "tests/visual/online-password.spec.ts",
+      "tests/visual/online-performance.spec.ts",
+      "tests/visual/online-startup.spec.ts",
+      "tests/visual/online-studentflow.spec.ts",
+      "tests/visual/online-upgrade.spec.ts",
+      "tests/visual/online-rewardflow.spec.ts"
+    ],
+    "configFile": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\playwright.online.config.ts",
+    "rootDir": "D:/Phần mềm 2026/BAO_AN_LEARNING_lam lại/tests/visual",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "D:/Phần mềm 2026/BAO_AN_LEARNING_lam lại/test-results/online-browser-output",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "online-chrome",
+        "name": "online-chrome",
+        "testDir": "D:/Phần mềm 2026/BAO_AN_LEARNING_lam lại/tests/visual",
+        "testIgnore": [],
+        "testMatch": [
+          "/online(?:-[a-z0-9]+)*\\.spec\\.ts$/"
+        ],
+        "timeout": 180000
+      }
+    ],
+    "filteredProjects": [
+      {
+        "grep": {},
+        "grepInvert": null,
+        "outputDir": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\test-results\\online-browser-output",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "name": "online-chrome",
+        "testDir": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual",
+        "snapshotDir": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual",
+        "testIgnore": [],
+        "testMatch": {},
+        "timeout": 180000,
+        "use": {
+          "headless": true,
+          "actionTimeout": 30000,
+          "navigationTimeout": 30000,
+          "viewport": {
+            "width": 1440,
+            "height": 1000
+          },
+          "extraHTTPHeaders": {
+            "X-Bao-An-Question-Protocol": "1"
+          },
+          "serviceWorkers": "block",
+          "trace": "retain-on-failure",
+          "screenshot": "only-on-failure",
+          "channel": "chrome"
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": "online-chrome"
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "docs/KIEM_TRA_BACKEND_AB_VA_SONG_HANH_2026-11-07/evidence/browser-repairs.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "default",
+    "updateSourceMethod": "patch",
+    "version": "1.64.0",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "online-password.spec.ts",
+      "file": "online-password.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "opening password change cancels a pending journey read and closing resumes it",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "online-chrome",
+              "projectName": "online-chrome",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3722,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-07T10:14:16.296Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e5355c8d25bdbf4a961d-5ff5cc5dcf5e5270c89e",
+          "file": "online-password.spec.ts",
+          "line": 19,
+          "column": 1
+        },
+        {
+          "title": "student changes their password in a lazy accessible dialog at 1440px",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "online-chrome",
+              "projectName": "online-chrome",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 5604,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-07T10:14:20.250Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e5355c8d25bdbf4a961d-c86ed221e1e3833fc11e",
+          "file": "online-password.spec.ts",
+          "line": 29,
+          "column": 3
+        },
+        {
+          "title": "student changes their password in a lazy accessible dialog at 390px",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "online-chrome",
+              "projectName": "online-chrome",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 5041,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-07T10:14:25.867Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e5355c8d25bdbf4a961d-a64bad107019955a0610",
+          "file": "online-password.spec.ts",
+          "line": 29,
+          "column": 3
+        }
+      ]
+    },
+    {
+      "title": "online-performance.spec.ts",
+      "file": "online-performance.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "login has a bounded role-free bundle and the default lesson creates no 3D requests or contexts",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "online-chrome",
+              "projectName": "online-chrome",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 3995,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: <= \u001b[32m20480\u001b[39m\nReceived:    \u001b[31m20831\u001b[39m",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: <= \u001b[32m20480\u001b[39m\nReceived:    \u001b[31m20831\u001b[39m\n    at D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-performance.spec.ts:27:162",
+                    "location": {
+                      "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-performance.spec.ts",
+                      "column": 162,
+                      "line": 27
+                    },
+                    "snippet": "  25 |   expect(requests.some(url=>/OnlineAdminDashboard|OnlineStudentWorld|WorldCanvas|three-vendor|\\.glb/.test(url))).toBe(false);expect(js).toBeLessThanOrEqual(100*1024);expect(css).toBeLessThanOrEqual(20*1024);\n  26 |   await page.getByLabel('Tên đăng nhập',{exact:true}).fill('perf.child');await page.getByLabel('Mật khẩu',{exact:true}).fill(f.password);await page.getByRole('button',{name:'Đăng nhập',exact:true}).click();await expect(page.locator('[data-hub-mode=\"light\"]')).toBeVisible();\n> 27 |   const studentAssets=await Promise.all(bodies),studentCss=studentAssets.filter(row=>row.name.endsWith('.css')).reduce((n,row)=>n+row.gzip,0);expect(studentCss).toBeLessThanOrEqual(20*1024);\n     |                                                                                                                                                                  ^\n  28 |   const status=await(await page.request.get(f.origin+'/api/online/status')).json();expect(status.build.sourceId).toMatch(/^[a-f0-9]{64}$/);expect(await page.locator('#root').getAttribute('data-source-id')).toBe(status.build.sourceId);expect(await page.locator('#root').getAttribute('data-app-version')).toBe(status.runtimeVersion);\n  29 |   await page.screenshot({path:testInfo.outputPath('lite-hub.png'),fullPage:true});\n  30 |   await page.getByRole('button',{name:/^(?:Tiếp tục học ngay )?Chơi Đảo Câu Hỏi(?: bằng bộ được giao| · \\d+ câu trong bộ)$/,exact:true}).click();await expect(page.locator('.quiz-question')).toHaveText('Câu hỏi 1');await expect(page.locator('.answer-option').first()).toBeEnabled();"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-performance.spec.ts",
+                        "column": 162,
+                        "line": 27
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: <= \u001b[32m20480\u001b[39m\nReceived:    \u001b[31m20831\u001b[39m\n\n  25 |   expect(requests.some(url=>/OnlineAdminDashboard|OnlineStudentWorld|WorldCanvas|three-vendor|\\.glb/.test(url))).toBe(false);expect(js).toBeLessThanOrEqual(100*1024);expect(css).toBeLessThanOrEqual(20*1024);\n  26 |   await page.getByLabel('Tên đăng nhập',{exact:true}).fill('perf.child');await page.getByLabel('Mật khẩu',{exact:true}).fill(f.password);await page.getByRole('button',{name:'Đăng nhập',exact:true}).click();await expect(page.locator('[data-hub-mode=\"light\"]')).toBeVisible();\n> 27 |   const studentAssets=await Promise.all(bodies),studentCss=studentAssets.filter(row=>row.name.endsWith('.css')).reduce((n,row)=>n+row.gzip,0);expect(studentCss).toBeLessThanOrEqual(20*1024);\n     |                                                                                                                                                                  ^\n  28 |   const status=await(await page.request.get(f.origin+'/api/online/status')).json();expect(status.build.sourceId).toMatch(/^[a-f0-9]{64}$/);expect(await page.locator('#root').getAttribute('data-source-id')).toBe(status.build.sourceId);expect(await page.locator('#root').getAttribute('data-app-version')).toBe(status.runtimeVersion);\n  29 |   await page.screenshot({path:testInfo.outputPath('lite-hub.png'),fullPage:true});\n  30 |   await page.getByRole('button',{name:/^(?:Tiếp tục học ngay )?Chơi Đảo Câu Hỏi(?: bằng bộ được giao| · \\d+ câu trong bộ)$/,exact:true}).click();await expect(page.locator('.quiz-question')).toHaveText('Câu hỏi 1');await expect(page.locator('.answer-option').first()).toBeEnabled();\n    at D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-performance.spec.ts:27:162"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-07T10:14:30.942Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\test-results\\online-browser-output\\online-performance-login-h-6abd3--no-3D-requests-or-contexts-online-chrome\\test-failed-1.png"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\test-results\\online-browser-output\\online-performance-login-h-6abd3--no-3D-requests-or-contexts-online-chrome\\error-context.md"
+                    },
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "path": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\test-results\\online-browser-output\\online-performance-login-h-6abd3--no-3D-requests-or-contexts-online-chrome\\trace.zip"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-performance.spec.ts",
+                    "column": 162,
+                    "line": 27
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "9449c91e7b3cca18549a-5f48a76a51988ebdbc1f",
+          "file": "online-performance.spec.ts",
+          "line": 18,
+          "column": 1
+        },
+        {
+          "title": "memory overlaps mismatch reveal with slow ACK without unlocking before receipt",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "online-chrome",
+              "projectName": "online-chrome",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 5261,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-07T10:14:36.493Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "9449c91e7b3cca18549a-b8aea02f2a6ca8d2c0d3",
+          "file": "online-performance.spec.ts",
+          "line": 38,
+          "column": 40
+        },
+        {
+          "title": "connect overlaps mismatch reveal with slow ACK without unlocking before receipt",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "online-chrome",
+              "projectName": "online-chrome",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4660,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-07T10:14:41.957Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "9449c91e7b3cca18549a-4b65a15d355f554adf62",
+          "file": "online-performance.spec.ts",
+          "line": 38,
+          "column": 40
+        },
+        {
+          "title": "the 2D release ignores saved 3D preferences and frees resources over fifty lesson visits",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "online-chrome",
+              "projectName": "online-chrome",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 14640,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-07T10:14:46.631Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "fifty-2d-lesson-visits",
+                      "contentType": "application/json",
+                      "body": "eyJzYW1wbGVzIjpbeyJjeWNsZSI6MTAsImhlYXAiOjQ3MzUxOTIsIm5vZGVzIjoyODF9LHsiY3ljbGUiOjIwLCJoZWFwIjo0ODgzNTcyLCJub2RlcyI6MjgxfSx7ImN5Y2xlIjozMCwiaGVhcCI6NDk1NTY0MCwibm9kZXMiOjI4MX0seyJjeWNsZSI6NDAsImhlYXAiOjUwMDAzMDQsIm5vZGVzIjoyODF9LHsiY3ljbGUiOjUwLCJoZWFwIjo1MDQ0NTUyLCJub2RlcyI6MjgxfV0sIm1vZGVsUmVxdWVzdHMiOjAsIndlYmdsQ29udGV4dHMiOjB9"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "9449c91e7b3cca18549a-3dcbc4a8521aa258ea39",
+          "file": "online-performance.spec.ts",
+          "line": 54,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "online-questionclock.spec.ts",
+      "file": "online-questionclock.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "quiz waits for the clock ACK and only advances after a saved correct answer",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "online-chrome",
+              "projectName": "online-chrome",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1287,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-07T10:15:01.305Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "1ec801ffda2027a2131d-a32de71fdb1f7fc7e0d7",
+          "file": "online-questionclock.spec.ts",
+          "line": 52,
+          "column": 1
+        },
+        {
+          "title": "quiz retries the exact saved attempt after a failed response and can retry opening the clock",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "online-chrome",
+              "projectName": "online-chrome",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 750,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-07T10:15:02.673Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "1ec801ffda2027a2131d-78911da22edf1f42e8b4",
+          "file": "online-questionclock.spec.ts",
+          "line": 63,
+          "column": 1
+        },
+        {
+          "title": "rich exercise keeps its clock and hints across wrong answers and freezes a failed save for exact retry",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "online-chrome",
+              "projectName": "online-chrome",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1004,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-07T10:15:03.434Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "1ec801ffda2027a2131d-89d422c9bc1c64e696df",
+          "file": "online-questionclock.spec.ts",
+          "line": 72,
+          "column": 1
+        },
+        {
+          "title": "listening opens its clock after audio ends and requires the clock ACK before answering",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "online-chrome",
+              "projectName": "online-chrome",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1035,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-07T10:15:04.448Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "1ec801ffda2027a2131d-e3a31469296b1e349b11",
+          "file": "online-questionclock.spec.ts",
+          "line": 82,
+          "column": 1
+        },
+        {
+          "title": "legacy quiz keeps its original attempt key and may advance after a wrong answer",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "online-chrome",
+              "projectName": "online-chrome",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 670,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-07T10:15:05.495Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "1ec801ffda2027a2131d-0c2f0348bd7798d1b6e2",
+          "file": "online-questionclock.spec.ts",
+          "line": 89,
+          "column": 1
+        },
+        {
+          "title": "sentence preserves pending order submissions and only advances committed attempt keys",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "online-chrome",
+              "projectName": "online-chrome",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2064,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-07T10:15:06.177Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "1ec801ffda2027a2131d-3430413ebb098d5f9495",
+          "file": "online-questionclock.spec.ts",
+          "line": 94,
+          "column": 43
+        },
+        {
+          "title": "sequence preserves pending order submissions and only advances committed attempt keys",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "online-chrome",
+              "projectName": "online-chrome",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1319,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-07T10:15:08.251Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "1ec801ffda2027a2131d-9c553ec5870a3376f83b",
+          "file": "online-questionclock.spec.ts",
+          "line": 94,
+          "column": 43
+        },
+        {
+          "title": "memory freezes a failed pair save and retries the exact pair without minting a move",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "online-chrome",
+              "projectName": "online-chrome",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2334,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-07T10:15:09.580Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "1ec801ffda2027a2131d-b46cbd1119429aa35bab",
+          "file": "online-questionclock.spec.ts",
+          "line": 106,
+          "column": 40
+        },
+        {
+          "title": "connect freezes a failed pair save and retries the exact pair without minting a move",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "online-chrome",
+              "projectName": "online-chrome",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2345,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-07T10:15:11.925Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "1ec801ffda2027a2131d-dc1ef930cb4ebc3833c8",
+          "file": "online-questionclock.spec.ts",
+          "line": 106,
+          "column": 40
+        }
+      ]
+    },
+    {
+      "title": "online-rewardflow.spec.ts",
+      "file": "online-rewardflow.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "20 photographed gifts, 500-dong conversion and PIN-protected approval complete without duplicate star deductions",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "online-chrome",
+              "projectName": "online-chrome",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 8122,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-07T10:15:14.302Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "ae11c46d5cc2a90ca92e-f868b849f5cb90309261",
+          "file": "online-rewardflow.spec.ts",
+          "line": 5,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "online-startup.spec.ts",
+      "file": "online-startup.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "startup overlaps status and identity without an incorrect auth screen (logged out)",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "online-chrome",
+              "projectName": "online-chrome",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2570,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-07T10:15:22.453Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "startup-overlap",
+                      "contentType": "application/json",
+                      "body": "eyJhdXRoZW50aWNhdGVkIjpmYWxzZSwiYm90aFJlcXVlc3RzU3RhcnRlZEJlZm9yZUVpdGhlclJlc3BvbnNlIjp0cnVlLCJzdGFydEdhcE1zIjowLCJyZXF1ZXN0cyI6W3sicGF0aCI6Im1lIiwiYXQiOjE3OTQwNDY1MjQzMTl9LHsicGF0aCI6InN0YXR1cyIsImF0IjoxNzk0MDQ2NTI0MzE5fV19"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "b26bf13f87de34f2c9b4-2df970cf0c1e6e8d45df",
+          "file": "online-startup.spec.ts",
+          "line": 16,
+          "column": 40
+        },
+        {
+          "title": "startup overlaps status and identity without an incorrect auth screen (existing session)",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "online-chrome",
+              "projectName": "online-chrome",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2884,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-07T10:15:25.031Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "startup-overlap",
+                      "contentType": "application/json",
+                      "body": "eyJhdXRoZW50aWNhdGVkIjp0cnVlLCJib3RoUmVxdWVzdHNTdGFydGVkQmVmb3JlRWl0aGVyUmVzcG9uc2UiOnRydWUsInN0YXJ0R2FwTXMiOjAsInJlcXVlc3RzIjpbeyJwYXRoIjoibWUiLCJhdCI6MTc5NDA0NjUyNzEyOX0seyJwYXRoIjoic3RhdHVzIiwiYXQiOjE3OTQwNDY1MjcxMjl9XX0="
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "b26bf13f87de34f2c9b4-9f3576cf88b0d5eb4e28",
+          "file": "online-startup.spec.ts",
+          "line": 16,
+          "column": 40
+        },
+        {
+          "title": "an unconfigured server opens setup without waiting for the speculative identity check",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "online-chrome",
+              "projectName": "online-chrome",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2416,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-07T10:15:27.925Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "b26bf13f87de34f2c9b4-28438792ee272a92af69",
+          "file": "online-startup.spec.ts",
+          "line": 43,
+          "column": 1
+        },
+        {
+          "title": "startup preserves status failures and a retry can recover",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "online-chrome",
+              "projectName": "online-chrome",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2904,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-07T10:15:30.351Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "b26bf13f87de34f2c9b4-df54986d892e2e1bc1ae",
+          "file": "online-startup.spec.ts",
+          "line": 56,
+          "column": 52
+        },
+        {
+          "title": "startup preserves identity failures and a retry can recover",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "online-chrome",
+              "projectName": "online-chrome",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2934,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-07T10:15:33.265Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "b26bf13f87de34f2c9b4-c8a42c2ba4210ac8bbea",
+          "file": "online-startup.spec.ts",
+          "line": 56,
+          "column": 52
+        },
+        {
+          "title": "admin coalesces focus reads but fetches fresh data after a write instead of reusing an older response",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "online-chrome",
+              "projectName": "online-chrome",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3205,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-07T10:15:36.208Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "admin-read-deduplication",
+                      "contentType": "application/json",
+                      "body": "eyJmb2N1c0J1cnN0UmVhZHMiOjEsInRvdGFsUmVhZHNJbmNsdWRpbmdGb3JjZWRQb3N0V3JpdGVSZWZyZXNoIjoyLCJzdHVkZW50c0FmdGVyV3JpdGUiOjEsInN0YWxlU25hcHNob3RDYW5ub3RSZXBsYWNlTmV3RGF0YSI6dHJ1ZX0="
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "b26bf13f87de34f2c9b4-73d5b8deb804b9dfd894",
+          "file": "online-startup.spec.ts",
+          "line": 69,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "online-studentflow.spec.ts",
+      "file": "online-studentflow.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "the lightweight exploration map and wallet remain usable on phone and desktop",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "online-chrome",
+              "projectName": "online-chrome",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 2460,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: <= \u001b[32m620\u001b[39m\nReceived:    \u001b[31m631\u001b[39m",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: <= \u001b[32m620\u001b[39m\nReceived:    \u001b[31m631\u001b[39m\n    at D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-studentflow.spec.ts:47:77",
+                    "location": {
+                      "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-studentflow.spec.ts",
+                      "column": 77,
+                      "line": 47
+                    },
+                    "snippet": "  45 |       await page.getByRole('button',{name:'Đóng ✕',exact:true}).click();await expect(wallet).toBeFocused();\n  46 |       await expect(page.locator('canvas,.ba37-mascot-window img')).toHaveCount(0);\n> 47 |       expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);\n     |                                                                             ^\n  48 |       await page.screenshot({path:testInfo.outputPath(`student-home-${width}.png`),fullPage:true});\n  49 |     }\n  50 |   }finally{await f.close();}"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-studentflow.spec.ts",
+                        "column": 77,
+                        "line": 47
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: <= \u001b[32m620\u001b[39m\nReceived:    \u001b[31m631\u001b[39m\n\n  45 |       await page.getByRole('button',{name:'Đóng ✕',exact:true}).click();await expect(wallet).toBeFocused();\n  46 |       await expect(page.locator('canvas,.ba37-mascot-window img')).toHaveCount(0);\n> 47 |       expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);\n     |                                                                             ^\n  48 |       await page.screenshot({path:testInfo.outputPath(`student-home-${width}.png`),fullPage:true});\n  49 |     }\n  50 |   }finally{await f.close();}\n    at D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-studentflow.spec.ts:47:77"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-07T10:15:39.443Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\test-results\\online-browser-output\\online-studentflow-the-lig-2e146-usable-on-phone-and-desktop-online-chrome\\test-failed-1.png"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\test-results\\online-browser-output\\online-studentflow-the-lig-2e146-usable-on-phone-and-desktop-online-chrome\\error-context.md"
+                    },
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "path": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\test-results\\online-browser-output\\online-studentflow-the-lig-2e146-usable-on-phone-and-desktop-online-chrome\\trace.zip"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-studentflow.spec.ts",
+                    "column": 77,
+                    "line": 47
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "f6775b9df8c5f756e23f-ea18290950f9cd5bc66b",
+          "file": "online-studentflow.spec.ts",
+          "line": 34,
+          "column": 1
+        },
+        {
+          "title": "choosing a map destination opens its own assigned questions without awarding stars",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "online-chrome",
+              "projectName": "online-chrome",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3636,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-07T10:15:42.962Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "f6775b9df8c5f756e23f-d0d1c8c08f580f396597",
+          "file": "online-studentflow.spec.ts",
+          "line": 53,
+          "column": 1
+        },
+        {
+          "title": "slow start and exit show feedback, block duplicate exits and restore the original control focus",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "online-chrome",
+              "projectName": "online-chrome",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2949,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-07T10:15:46.811Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "f6775b9df8c5f756e23f-8089c25536713df1b588",
+          "file": "online-studentflow.spec.ts",
+          "line": 73,
+          "column": 1
+        },
+        {
+          "title": "saving an answer and completing a lesson keep the exit disabled until server confirmation",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "online-chrome",
+              "projectName": "online-chrome",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3853,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-07T10:15:49.772Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "f6775b9df8c5f756e23f-d1161c60b10e999e361a",
+          "file": "online-studentflow.spec.ts",
+          "line": 94,
+          "column": 1
+        },
+        {
+          "title": "a refresh snapshot requested before play cannot replace newly saved stars",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "online-chrome",
+              "projectName": "online-chrome",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3365,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-07T10:15:53.637Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "f6775b9df8c5f756e23f-921a8b8be51b7171abf9",
+          "file": "online-studentflow.spec.ts",
+          "line": 119,
+          "column": 1
+        },
+        {
+          "title": "a failed answer or exit clears the busy state and allows a safe retry",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "online-chrome",
+              "projectName": "online-chrome",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2959,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-07T10:15:57.013Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "f6775b9df8c5f756e23f-18bf31ef4def767ee791",
+          "file": "online-studentflow.spec.ts",
+          "line": 140,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "online-upgrade.spec.ts",
+      "file": "online-upgrade.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "existing 4-digit parent PIN opens the portal without replacing settings",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "online-chrome",
+              "projectName": "online-chrome",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4695,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-07T10:16:00.262Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d85694da3b1aa172a8b0-7cffee6ed8ac00de2a16",
+          "file": "online-upgrade.spec.ts",
+          "line": 5,
+          "column": 44
+        },
+        {
+          "title": "existing 5-digit parent PIN opens the portal without replacing settings",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "online-chrome",
+              "projectName": "online-chrome",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4106,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-07T10:16:04.969Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d85694da3b1aa172a8b0-65b65bf25de503888171",
+          "file": "online-upgrade.spec.ts",
+          "line": 5,
+          "column": 44
+        },
+        {
+          "title": "existing 6-digit parent PIN opens the portal without replacing settings",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "online-chrome",
+              "projectName": "online-chrome",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4291,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-07T10:16:09.087Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d85694da3b1aa172a8b0-e74d0cc51fec0a00b80d",
+          "file": "online-upgrade.spec.ts",
+          "line": 5,
+          "column": 44
+        },
+        {
+          "title": "assigned map, header, mobile navigation and modal keyboard focus work across six widths",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "online-chrome",
+              "projectName": "online-chrome",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 12406,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  -  1\u001b[39m\n\u001b[31m+ Received  + 58\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   Object {\u001b[39m\n\u001b[31m+     \"description\": \"Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds\",\u001b[39m\n\u001b[31m+     \"help\": \"Elements must meet minimum color contrast ratio thresholds\",\u001b[39m\n\u001b[31m+     \"helpUrl\": \"https://dequeuniversity.com/rules/axe/4.14/color-contrast?application=playwright\",\u001b[39m\n\u001b[31m+     \"id\": \"color-contrast\",\u001b[39m\n\u001b[31m+     \"impact\": \"serious\",\u001b[39m\n\u001b[31m+     \"nodes\": Array [\u001b[39m\n\u001b[31m+       Object {\u001b[39m\n\u001b[31m+         \"all\": Array [],\u001b[39m\n\u001b[31m+         \"any\": Array [\u001b[39m\n\u001b[31m+           Object {\u001b[39m\n\u001b[31m+             \"data\": Object {\u001b[39m\n\u001b[31m+               \"bgColor\": \"#e7efe3\",\u001b[39m\n\u001b[31m+               \"contrastRatio\": 1.17,\u001b[39m\n\u001b[31m+               \"expectedContrastRatio\": \"4.5:1\",\u001b[39m\n\u001b[31m+               \"fgColor\": \"#ffffff\",\u001b[39m\n\u001b[31m+               \"fontSize\": \"12.0pt (16px)\",\u001b[39m\n\u001b[31m+               \"fontWeight\": \"normal\",\u001b[39m\n\u001b[31m+               \"messageKey\": null,\u001b[39m\n\u001b[31m+             },\u001b[39m\n\u001b[31m+             \"id\": \"color-contrast\",\u001b[39m\n\u001b[31m+             \"impact\": \"serious\",\u001b[39m\n\u001b[31m+             \"message\": \"Element has insufficient color contrast of 1.17 (foreground color: #ffffff, background color: #e7efe3, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1\",\u001b[39m\n\u001b[31m+             \"relatedNodes\": Array [\u001b[39m\n\u001b[31m+               Object {\u001b[39m\n\u001b[31m+                 \"html\": \"<button type=\\\"button\\\" class=\\\"student-nav-btn missions-pill-btn\\\" title=\\\"Xem nhiệm vụ ngày\\\">\",\u001b[39m\n\u001b[31m+                 \"target\": Array [\u001b[39m\n\u001b[31m+                   \".missions-pill-btn\",\u001b[39m\n\u001b[31m+                 ],\u001b[39m\n\u001b[31m+               },\u001b[39m\n\u001b[31m+             ],\u001b[39m\n\u001b[31m+           },\u001b[39m\n\u001b[31m+         ],\u001b[39m\n\u001b[31m+         \"failureSummary\": \"Fix any of the following:\u001b[39m\n\u001b[31m+   Element has insufficient color contrast of 1.17 (foreground color: #ffffff, background color: #e7efe3, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1\",\u001b[39m\n\u001b[31m+         \"html\": \"<span>Nhiệm vụ (0/3)</span>\",\u001b[39m\n\u001b[31m+         \"impact\": \"serious\",\u001b[39m\n\u001b[31m+         \"none\": Array [],\u001b[39m\n\u001b[31m+         \"target\": Array [\u001b[39m\n\u001b[31m+           \".missions-pill-btn > span\",\u001b[39m\n\u001b[31m+         ],\u001b[39m\n\u001b[31m+       },\u001b[39m\n\u001b[31m+     ],\u001b[39m\n\u001b[31m+     \"tags\": Array [\u001b[39m\n\u001b[31m+       \"cat.color\",\u001b[39m\n\u001b[31m+       \"wcag2aa\",\u001b[39m\n\u001b[31m+       \"wcag143\",\u001b[39m\n\u001b[31m+       \"TTv5\",\u001b[39m\n\u001b[31m+       \"TT13.c\",\u001b[39m\n\u001b[31m+       \"EN-301-549\",\u001b[39m\n\u001b[31m+       \"EN-9.1.4.3\",\u001b[39m\n\u001b[31m+       \"ACT\",\u001b[39m\n\u001b[31m+       \"RGAAv4\",\u001b[39m\n\u001b[31m+       \"RGAA-3.2.1\",\u001b[39m\n\u001b[31m+     ],\u001b[39m\n\u001b[31m+   },\u001b[39m\n\u001b[31m+ ]\u001b[39m",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  -  1\u001b[39m\n\u001b[31m+ Received  + 58\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   Object {\u001b[39m\n\u001b[31m+     \"description\": \"Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds\",\u001b[39m\n\u001b[31m+     \"help\": \"Elements must meet minimum color contrast ratio thresholds\",\u001b[39m\n\u001b[31m+     \"helpUrl\": \"https://dequeuniversity.com/rules/axe/4.14/color-contrast?application=playwright\",\u001b[39m\n\u001b[31m+     \"id\": \"color-contrast\",\u001b[39m\n\u001b[31m+     \"impact\": \"serious\",\u001b[39m\n\u001b[31m+     \"nodes\": Array [\u001b[39m\n\u001b[31m+       Object {\u001b[39m\n\u001b[31m+         \"all\": Array [],\u001b[39m\n\u001b[31m+         \"any\": Array [\u001b[39m\n\u001b[31m+           Object {\u001b[39m\n\u001b[31m+             \"data\": Object {\u001b[39m\n\u001b[31m+               \"bgColor\": \"#e7efe3\",\u001b[39m\n\u001b[31m+               \"contrastRatio\": 1.17,\u001b[39m\n\u001b[31m+               \"expectedContrastRatio\": \"4.5:1\",\u001b[39m\n\u001b[31m+               \"fgColor\": \"#ffffff\",\u001b[39m\n\u001b[31m+               \"fontSize\": \"12.0pt (16px)\",\u001b[39m\n\u001b[31m+               \"fontWeight\": \"normal\",\u001b[39m\n\u001b[31m+               \"messageKey\": null,\u001b[39m\n\u001b[31m+             },\u001b[39m\n\u001b[31m+             \"id\": \"color-contrast\",\u001b[39m\n\u001b[31m+             \"impact\": \"serious\",\u001b[39m\n\u001b[31m+             \"message\": \"Element has insufficient color contrast of 1.17 (foreground color: #ffffff, background color: #e7efe3, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1\",\u001b[39m\n\u001b[31m+             \"relatedNodes\": Array [\u001b[39m\n\u001b[31m+               Object {\u001b[39m\n\u001b[31m+                 \"html\": \"<button type=\\\"button\\\" class=\\\"student-nav-btn missions-pill-btn\\\" title=\\\"Xem nhiệm vụ ngày\\\">\",\u001b[39m\n\u001b[31m+                 \"target\": Array [\u001b[39m\n\u001b[31m+                   \".missions-pill-btn\",\u001b[39m\n\u001b[31m+                 ],\u001b[39m\n\u001b[31m+               },\u001b[39m\n\u001b[31m+             ],\u001b[39m\n\u001b[31m+           },\u001b[39m\n\u001b[31m+         ],\u001b[39m\n\u001b[31m+         \"failureSummary\": \"Fix any of the following:\u001b[39m\n\u001b[31m+   Element has insufficient color contrast of 1.17 (foreground color: #ffffff, background color: #e7efe3, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1\",\u001b[39m\n\u001b[31m+         \"html\": \"<span>Nhiệm vụ (0/3)</span>\",\u001b[39m\n\u001b[31m+         \"impact\": \"serious\",\u001b[39m\n\u001b[31m+         \"none\": Array [],\u001b[39m\n\u001b[31m+         \"target\": Array [\u001b[39m\n\u001b[31m+           \".missions-pill-btn > span\",\u001b[39m\n\u001b[31m+         ],\u001b[39m\n\u001b[31m+       },\u001b[39m\n\u001b[31m+     ],\u001b[39m\n\u001b[31m+     \"tags\": Array [\u001b[39m\n\u001b[31m+       \"cat.color\",\u001b[39m\n\u001b[31m+       \"wcag2aa\",\u001b[39m\n\u001b[31m+       \"wcag143\",\u001b[39m\n\u001b[31m+       \"TTv5\",\u001b[39m\n\u001b[31m+       \"TT13.c\",\u001b[39m\n\u001b[31m+       \"EN-301-549\",\u001b[39m\n\u001b[31m+       \"EN-9.1.4.3\",\u001b[39m\n\u001b[31m+       \"ACT\",\u001b[39m\n\u001b[31m+       \"RGAAv4\",\u001b[39m\n\u001b[31m+       \"RGAA-3.2.1\",\u001b[39m\n\u001b[31m+     ],\u001b[39m\n\u001b[31m+   },\u001b[39m\n\u001b[31m+ ]\u001b[39m\n    at D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-upgrade.spec.ts:56:140",
+                    "location": {
+                      "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-upgrade.spec.ts",
+                      "column": 140,
+                      "line": 56
+                    },
+                    "snippet": "  54 |       await page.screenshot({path:testInfo.outputPath(`assigned-world-${width}.png`),fullPage:true});\n  55 |       if(width===390||width===1440){\n> 56 |         const scan=await new AxeBuilder({page}).analyze();expect(scan.violations.filter(v=>['critical','serious'].includes(v.impact??''))).toEqual([]);\n     |                                                                                                                                            ^\n  57 |       }\n  58 |     }\n  59 |     expect(errors).toEqual([]);"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-upgrade.spec.ts",
+                        "column": 140,
+                        "line": 56
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  -  1\u001b[39m\n\u001b[31m+ Received  + 58\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   Object {\u001b[39m\n\u001b[31m+     \"description\": \"Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds\",\u001b[39m\n\u001b[31m+     \"help\": \"Elements must meet minimum color contrast ratio thresholds\",\u001b[39m\n\u001b[31m+     \"helpUrl\": \"https://dequeuniversity.com/rules/axe/4.14/color-contrast?application=playwright\",\u001b[39m\n\u001b[31m+     \"id\": \"color-contrast\",\u001b[39m\n\u001b[31m+     \"impact\": \"serious\",\u001b[39m\n\u001b[31m+     \"nodes\": Array [\u001b[39m\n\u001b[31m+       Object {\u001b[39m\n\u001b[31m+         \"all\": Array [],\u001b[39m\n\u001b[31m+         \"any\": Array [\u001b[39m\n\u001b[31m+           Object {\u001b[39m\n\u001b[31m+             \"data\": Object {\u001b[39m\n\u001b[31m+               \"bgColor\": \"#e7efe3\",\u001b[39m\n\u001b[31m+               \"contrastRatio\": 1.17,\u001b[39m\n\u001b[31m+               \"expectedContrastRatio\": \"4.5:1\",\u001b[39m\n\u001b[31m+               \"fgColor\": \"#ffffff\",\u001b[39m\n\u001b[31m+               \"fontSize\": \"12.0pt (16px)\",\u001b[39m\n\u001b[31m+               \"fontWeight\": \"normal\",\u001b[39m\n\u001b[31m+               \"messageKey\": null,\u001b[39m\n\u001b[31m+             },\u001b[39m\n\u001b[31m+             \"id\": \"color-contrast\",\u001b[39m\n\u001b[31m+             \"impact\": \"serious\",\u001b[39m\n\u001b[31m+             \"message\": \"Element has insufficient color contrast of 1.17 (foreground color: #ffffff, background color: #e7efe3, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1\",\u001b[39m\n\u001b[31m+             \"relatedNodes\": Array [\u001b[39m\n\u001b[31m+               Object {\u001b[39m\n\u001b[31m+                 \"html\": \"<button type=\\\"button\\\" class=\\\"student-nav-btn missions-pill-btn\\\" title=\\\"Xem nhiệm vụ ngày\\\">\",\u001b[39m\n\u001b[31m+                 \"target\": Array [\u001b[39m\n\u001b[31m+                   \".missions-pill-btn\",\u001b[39m\n\u001b[31m+                 ],\u001b[39m\n\u001b[31m+               },\u001b[39m\n\u001b[31m+             ],\u001b[39m\n\u001b[31m+           },\u001b[39m\n\u001b[31m+         ],\u001b[39m\n\u001b[31m+         \"failureSummary\": \"Fix any of the following:\u001b[39m\n\u001b[31m+   Element has insufficient color contrast of 1.17 (foreground color: #ffffff, background color: #e7efe3, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1\",\u001b[39m\n\u001b[31m+         \"html\": \"<span>Nhiệm vụ (0/3)</span>\",\u001b[39m\n\u001b[31m+         \"impact\": \"serious\",\u001b[39m\n\u001b[31m+         \"none\": Array [],\u001b[39m\n\u001b[31m+         \"target\": Array [\u001b[39m\n\u001b[31m+           \".missions-pill-btn > span\",\u001b[39m\n\u001b[31m+         ],\u001b[39m\n\u001b[31m+       },\u001b[39m\n\u001b[31m+     ],\u001b[39m\n\u001b[31m+     \"tags\": Array [\u001b[39m\n\u001b[31m+       \"cat.color\",\u001b[39m\n\u001b[31m+       \"wcag2aa\",\u001b[39m\n\u001b[31m+       \"wcag143\",\u001b[39m\n\u001b[31m+       \"TTv5\",\u001b[39m\n\u001b[31m+       \"TT13.c\",\u001b[39m\n\u001b[31m+       \"EN-301-549\",\u001b[39m\n\u001b[31m+       \"EN-9.1.4.3\",\u001b[39m\n\u001b[31m+       \"ACT\",\u001b[39m\n\u001b[31m+       \"RGAAv4\",\u001b[39m\n\u001b[31m+       \"RGAA-3.2.1\",\u001b[39m\n\u001b[31m+     ],\u001b[39m\n\u001b[31m+   },\u001b[39m\n\u001b[31m+ ]\u001b[39m\n\n  54 |       await page.screenshot({path:testInfo.outputPath(`assigned-world-${width}.png`),fullPage:true});\n  55 |       if(width===390||width===1440){\n> 56 |         const scan=await new AxeBuilder({page}).analyze();expect(scan.violations.filter(v=>['critical','serious'].includes(v.impact??''))).toEqual([]);\n     |                                                                                                                                            ^\n  57 |       }\n  58 |     }\n  59 |     expect(errors).toEqual([]);\n    at D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-upgrade.spec.ts:56:140"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-07T10:16:13.390Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\test-results\\online-browser-output\\online-upgrade-assigned-ma-739dd-ocus-work-across-six-widths-online-chrome\\test-failed-1.png"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\test-results\\online-browser-output\\online-upgrade-assigned-ma-739dd-ocus-work-across-six-widths-online-chrome\\error-context.md"
+                    },
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "path": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\test-results\\online-browser-output\\online-upgrade-assigned-ma-739dd-ocus-work-across-six-widths-online-chrome\\trace.zip"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-upgrade.spec.ts",
+                    "column": 140,
+                    "line": 56
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "d85694da3b1aa172a8b0-253c2b209c1faec84f1c",
+          "file": "online-upgrade.spec.ts",
+          "line": 27,
+          "column": 1
+        },
+        {
+          "title": "shared dialog traps keyboard focus and returns focus to its opener",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "online-chrome",
+              "projectName": "online-chrome",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2401,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-07T10:16:27.824Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d85694da3b1aa172a8b0-2924485a185709c11de3",
+          "file": "online-upgrade.spec.ts",
+          "line": 63,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-11-07T10:14:14.561Z",
+    "duration": 136061.93,
+    "expected": 31,
+    "skipped": 0,
+    "unexpected": 3,
+    "flaky": 0
+  }
+}

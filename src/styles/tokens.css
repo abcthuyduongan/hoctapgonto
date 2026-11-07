@@ -1,0 +1,154 @@
+/**
+ * tokens.css — Hệ thống Design Tokens Bảo An Learning 5.0
+ * Định nghĩa chuẩn màu sắc, phông chữ, khoảng cách, bo góc, bóng đổ, z-index và chuyển động
+ * Quy chuẩn: 02_DINH_HUONG_VA_HE_THONG_THIET_KE.md (Mục 3)
+ */
+
+@import './fonts.css';
+
+:root {
+  /* --- 1. MÀU SẮC CHỦ ĐẠO (Brand Colors) --- */
+  --c-leaf: #4e7250;           /* Màu xanh lá chính (Nút chính, mục chọn, tỉ lệ 5.5:1) */
+  --c-leaf-deep: #2f6f3a;      /* Xanh lá đậm (Chữ trên nền lá nhạt, nhấn, tỉ lệ 6.1:1) */
+  --c-leaf-soft: #e7efe3;      /* Xanh lá nhạt (Nền mục chọn, khối thông tin) */
+  --c-ink: #183449;            /* Chữ chính (Tỉ lệ tương phản 12.9:1) */
+  --c-ink-2: #5b6b5a;          /* Chữ phụ (Tỉ lệ tương phản 5.7:1) */
+  --c-cream: #fffdf7;          /* Nền trang học sinh (Thế giới) */
+  --c-paper: #f8f7ef;          /* Nền thẻ, khối nội dung */
+  --c-line: #dce3d5;           /* Viền ngăn cách */
+  --c-water: #1f7a7a;          /* Xanh nước (Thông tin, trạng thái đang làm, tỉ lệ 5.1:1) */
+  --c-star: #e5a93c;           /* Màu sao vàng (Tô sao, phần thưởng) */
+  --c-star-text: #8a5a00;      /* Chữ số sao (Tỉ lệ 5.9:1) */
+  --c-success: #2f6f3a;        /* Phản hồi đúng, hoàn thành (6.1:1) */
+  --c-danger: #b3261e;         /* Phản hồi sai (dùng nhẹ nhàng), báo lỗi (6.5:1) */
+  --c-night: #183449;          /* Nền tối (Hoạt cảnh mở khóa, màn tập trung) */
+
+  /* --- 2. MÀU MÔN HỌC (Subject Colors — Đồng bộ SafeTime) --- */
+  --c-math: #b45309;           /* Toán — Đảo Số (5.0:1) */
+  --c-math-soft: #fdf1e4;
+  --c-viet: #3f7d3a;           /* Tiếng Việt — Rừng Chữ (5.0:1) */
+  --c-viet-soft: #e9f3e6;
+  --c-vn: #b3261e;
+  --c-vn-soft: #fce8e6;
+  --c-eng: #0e7490;            /* Tiếng Anh — Cảng English (5.4:1) */
+  --c-eng-soft: #e3f3f6;
+  --c-en: #0e7490;
+  --c-en-soft: #e3f3f6;
+  --c-sky: #0e7490;
+  --c-sky-soft: #e3f3f6;
+  --c-tech: #6d28d9;           /* Tin học — Phố Robot (7.1:1) */
+  --c-tech-soft: #f1ecfd;
+  --c-sci: #6d28d9;
+  --c-sci-soft: #f1ecfd;
+  --c-line-strong: #b8c7b3;
+  --c-ink-mute: #5b6b5a;
+  --c-scrim: rgba(24, 52, 73, 0.55);
+  --c-desk-bg: #f4f6f3;
+
+  /* --- 3. PHÔNG CHỮ & CỠ CHỮ (Typography — 9 bậc chuẩn) --- */
+  --font-family: 'Nunito', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-sans: var(--font-family);
+  --t-h1: 2rem;
+  --t-h2: 1.5rem;
+  --t-h3: 1.25rem;
+  --t-answer: 1.25rem;
+  --t-body: 1rem;
+  --t-small: 0.875rem;
+  --t-micro: 0.8125rem;
+
+  --t-hero-size: clamp(32px, 4vw, 40px);
+  --t-hero-line: 1.2;
+  --t-hero-weight: 800;
+
+  --t-h1-size: 32px;
+  --t-h1-line: 40px;
+  --t-h1-weight: 800;
+
+  --t-h2-size: 24px;
+  --t-h2-line: 32px;
+  --t-h2-weight: 700;
+
+  --t-h3-size: 20px;
+  --t-h3-line: 28px;
+  --t-h3-weight: 700;
+
+  --t-answer-size: 20px;
+  --t-answer-line: 28px;
+  --t-answer-weight: 700;
+
+  --t-body-kid-size: 18px;
+  --t-body-kid-line: 28px;
+  --t-body-kid-weight: 400;
+
+  --t-body-size: 16px;
+  --t-body-line: 24px;
+  --t-body-weight: 400;
+
+  --t-small-size: 14px;
+  --t-small-line: 20px;
+  --t-small-weight: 600;
+
+  --t-tiny-size: 13px;         /* Nhỏ nhất được phép cho số liệu phụ */
+  --t-tiny-line: 18px;
+  --t-tiny-weight: 600;
+
+  /* --- 4. KHOẢNG CÁCH (Spacing — Lưới 4px chuẩn) --- */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 24px;
+  --s-6: 32px;
+  --s-7: 48px;
+  --s-8: 64px;
+
+  /* --- 5. BO GÓC (Border Radius — 5 kiểu chuẩn) --- */
+  --r-sm: 8px;                 /* Nút nhỏ, ô nhập */
+  --r-md: 14px;                /* Nút thường, thẻ nhỏ */
+  --r-lg: 20px;                /* Thẻ chính, hộp thoại */
+  --r-xl: 28px;                /* Khung lớn */
+  --r-pill: 9999px;            /* Nút tròn, chip viên thuốc */
+
+  /* --- 6. BÓNG ĐỔ (Box Shadow — 2 mức chuẩn) --- */
+  --shadow-1: 0 2px 8px rgba(24, 52, 73, 0.08);
+  --shadow-2: 0 8px 24px rgba(24, 52, 73, 0.16);
+
+  /* --- 7. LỚP HIỂN THỊ (Z-index — 5 mốc cố định) --- */
+  --z-map: 0;
+  --z-hud: 100;
+  --z-nav: 200;
+  --z-dialog: 1000;
+  --z-toast: 1100;
+
+  /* --- 8. CHUYỂN ĐỘNG (Motion) --- */
+  --dur-fast: 150ms;           /* Nhấp chuột, hover */
+  --dur-normal: 250ms;         /* Mở hộp thoại, trượt tab */
+  --dur-slow: 400ms;           /* Hoạt cảnh mở khóa, sao bay */
+  --ease-standard: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* --- CHỦ ĐỀ 1: HỌC SINH (Thế giới Bảo An) --- */
+[data-theme="world"],
+body:not([data-theme="desk"]) {
+  background-color: var(--c-cream);
+  color: var(--c-ink);
+  font-family: var(--font-family);
+}
+
+/* --- CHỦ ĐỀ 2: PHỤ HUYNH & GIÁO VIÊN (Bàn làm việc) --- */
+[data-theme="desk"] {
+  background-color: #f4f6f3;
+  color: #19384e;
+  font-family: var(--font-family);
+  --c-paper: #ffffff;
+  --c-line: #d3ded0;
+}
+
+/* Tôn trọng giảm chuyển động */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-fast: 0ms;
+    --dur-normal: 0ms;
+    --dur-slow: 0ms;
+  }
+}

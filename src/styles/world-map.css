@@ -96,6 +96,19 @@
   align-items: center;
 }
 
+@media (max-width: 480px) {
+  .map-top-actions {
+    flex-wrap: wrap;
+    width: 100%;
+  }
+  .map-top-actions > button {
+    flex: 1 1 40%;
+  }
+  .map-top-actions > .primary {
+    flex-basis: 100%;
+  }
+}
+
 .map-nav-btn {
   display: inline-flex;
   align-items: center;
@@ -131,6 +144,7 @@
 .map-interactive-layer {
   position: absolute;
   inset: 0;
+  z-index: 25;
   pointer-events: none;
 }
 
@@ -142,6 +156,7 @@
   top: var(--y-wide, 50%);
   transform: translate(-50%, -50%);
   pointer-events: auto;
+  z-index: 26;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -279,18 +294,40 @@
 }
 
 .map-landmark-img {
-  width: 128px;
-  height: 128px;
+  width: clamp(52px, 8cqw, 96px);
+  height: clamp(52px, 8cqw, 96px);
   object-fit: contain;
   filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.2));
   transition: filter 0.2s ease;
   user-select: none;
 }
 
+.region-map-container .map-view-wrapper {
+  container-type: inline-size;
+}
+
 @media (max-width: 768px) {
   .map-landmark-img {
-    width: 88px;
-    height: 88px;
+    width: clamp(44px, 12cqw, 72px);
+    height: clamp(44px, 12cqw, 72px);
+  }
+  .online-app .map-stage-node {
+    width: 22cqw;
+    min-width: 44px;
+  }
+  .map-stage-label {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    justify-content: center;
+    padding-inline: 6px;
+  }
+  .map-stage-label > span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .map-stage-label small {
+    display: none;
   }
 }
 
@@ -315,6 +352,46 @@
   border-color: #d7aa50;
   background: #fffdf5;
   color: #8c6414;
+}
+
+.map-stage-node.is-current .map-landmark-img {
+  filter: drop-shadow(0 0 10px rgba(229, 169, 60, 0.9)) drop-shadow(0 0 4px var(--c-star, #e5a93c));
+  animation: stage-current-glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes stage-current-glow {
+  0% {
+    filter: drop-shadow(0 0 6px rgba(229, 169, 60, 0.7)) drop-shadow(0 0 2px var(--c-star, #e5a93c));
+  }
+  100% {
+    filter: drop-shadow(0 0 14px rgba(229, 169, 60, 1)) drop-shadow(0 0 6px var(--c-star, #e5a93c)) brightness(1.1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .map-stage-node.is-current .map-landmark-img {
+    animation: none !important;
+  }
+}
+
+.map-stage-current-halo {
+  position: absolute;
+  inset: -8px;
+  border-radius: var(--r-pill, 9999px);
+  border: 2px dashed var(--c-star, #e5a93c);
+  pointer-events: none;
+  animation: rotate-slow 12s linear infinite;
+}
+
+@keyframes rotate-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .map-stage-current-halo {
+    animation: none !important;
+  }
 }
 
 .map-stage-node.is-closed .map-stage-label {
@@ -695,12 +772,85 @@ html[data-motion="off"] .map-stage-gold-badge,
   color: #fff;
 }
 
-/* Map Week Details Panel */
-.map-week-panel {
-  background: #fff;
-  border-top: 2px solid #e2dac2;
-  padding: 1.25rem;
-  border-radius: 0 0 16px 16px;
+.map-top-bar-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2, 8px);
+  flex-wrap: wrap;
+}
+
+/* Map Week Details Panel - Side Panel on Desktop, Bottom Sheet on Mobile */
+.region-map-layout {
+  position: relative;
+  width: 100%;
+}
+
+@media (min-width: 1024px) {
+  .region-map-layout {
+    display: flex;
+    flex-direction: row;
+    gap: var(--s-4, 16px);
+    align-items: flex-start;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .region-map-layout .region-map-container {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+  }
+
+  .region-map-layout .map-week-panel {
+    width: 360px;
+    flex-shrink: 0;
+    max-height: calc(100vh - 140px);
+    overflow-y: auto;
+    position: sticky;
+    top: 76px;
+    border-radius: var(--r-lg, 20px);
+    box-shadow: var(--shadow-2, 0 8px 24px rgba(24, 52, 73, 0.16));
+  }
+
+  .map-week-panel-backdrop {
+    display: none;
+  }
+}
+
+@media (max-width: 1023px) {
+  .map-week-panel {
+    position: fixed;
+    bottom: 56px;
+    left: 0;
+    right: 0;
+    max-height: 80vh;
+    z-index: 100;
+    overflow-y: auto;
+    border-radius: var(--r-lg, 20px) var(--r-lg, 20px) 0 0;
+    border-bottom: none;
+    box-shadow: 0 -8px 30px rgba(24, 52, 73, 0.25);
+    animation: sheet-slide-up 0.25s ease-out;
+  }
+
+  .map-week-panel-backdrop {
+    position: fixed;
+    inset: 0;
+    bottom: 56px;
+    background: rgba(24, 52, 73, 0.45);
+    backdrop-filter: blur(2px);
+    z-index: 99;
+  }
+}
+
+@keyframes sheet-slide-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .map-week-panel {
+    animation: none !important;
+  }
 }
 
 .map-week-panel-header {
@@ -715,44 +865,44 @@ html[data-motion="off"] .map-stage-gold-badge,
 .map-week-panel-header h3 {
   margin: 0;
   font-size: 1.15rem;
-  color: #2e4435;
+  color: var(--c-ink, #183449);
 }
 
 .map-week-status-tag {
   display: inline-block;
   padding: 0.25rem 0.6rem;
-  border-radius: 6px;
-  font-size: 0.8rem;
+  border-radius: var(--r-sm, 8px);
+  font-size: 0.8125rem;
   font-weight: 700;
 }
 
 .map-week-status-tag.current {
-  background: #fcf4dd;
-  color: #8a6515;
+  background: var(--c-leaf-soft, #e7efe3);
+  color: var(--c-leaf-deep, #2f6f3a);
 }
 
 .map-week-status-tag.closed {
   background: #f0f0f0;
-  color: #666;
+  color: var(--c-ink-2, #5b6b5a);
 }
 
 .map-week-status-tag.locked {
   background: #fbebee;
-  color: #b71c1c;
+  color: var(--c-danger, #b3261e);
 }
 
 .map-sets-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: 1fr;
   gap: 1rem;
   margin-top: 1rem;
 }
 
 .map-set-card {
-  border: 1.5px solid #e2dac2;
-  border-radius: 12px;
+  border: 1.5px solid var(--c-line, #dce3d5);
+  border-radius: var(--r-md, 14px);
   padding: 1rem;
-  background: #faf8f2;
+  background: var(--c-cream, #fffdf7);
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
@@ -760,25 +910,25 @@ html[data-motion="off"] .map-stage-gold-badge,
 }
 
 .map-set-card:hover {
-  border-color: #405747;
-  box-shadow: 0 4px 12px rgba(64, 87, 71, 0.08);
+  border-color: var(--c-leaf, #4e7250);
+  box-shadow: var(--shadow-1, 0 2px 8px rgba(24, 52, 73, 0.08));
 }
 
 .map-set-title {
   font-weight: 700;
-  color: #2e4435;
+  color: var(--c-ink, #183449);
   font-size: 0.95rem;
 }
 
 .map-set-meta {
   font-size: 0.85rem;
-  color: #5f7466;
+  color: var(--c-ink-2, #5b6b5a);
 }
 
 .map-set-games {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem;
+  flex-direction: column;
+  gap: 0.5rem;
   margin-top: auto;
 }
 
@@ -787,29 +937,76 @@ html[data-motion="off"] .map-stage-gold-badge,
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  padding: 0.4rem 0.75rem;
-  border-radius: 8px;
-  background: #405747;
+  padding: 0.5rem 0.85rem;
+  border-radius: var(--r-md, 14px);
+  background: var(--c-leaf, #4e7250);
   color: #fff;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   font-weight: 600;
   border: none;
   cursor: pointer;
   width: 100%;
-  min-height: 44px;
-}
-
-.map-game-card-thumb {
-  width: 44px;
-  height: 32px;
-  object-fit: cover;
-  border-radius: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  flex-shrink: 0;
+  min-height: 48px;
+  transition: background-color 0.15s ease, transform 0.15s ease;
 }
 
 .map-play-btn:hover:not(:disabled) {
-  background: #2e4435;
+  background: var(--c-leaf-deep, #2f6f3a);
+}
+
+.map-play-btn.map-game-card-large {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--s-3, 12px);
+  padding: var(--s-2, 8px) var(--s-3, 12px);
+  border-radius: var(--r-md, 14px);
+  background: var(--c-cream, #fffdf7);
+  border: 1.5px solid var(--c-line, #dce3d5);
+  color: var(--c-ink, #183449);
+  width: 100%;
+  min-height: 56px;
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  text-align: left;
+}
+
+.map-play-btn.map-game-card-large:hover:not(:disabled) {
+  transform: translateY(-2px);
+  border-color: var(--c-leaf, #4e7250);
+  box-shadow: var(--shadow-1, 0 2px 8px rgba(24, 52, 73, 0.08));
+  background: #ffffff;
+}
+
+.map-game-card-large-thumb {
+  width: 56px;
+  height: 42px;
+  object-fit: cover;
+  border-radius: var(--r-sm, 8px);
+  border: 1px solid var(--c-line, #dce3d5);
+  flex-shrink: 0;
+}
+
+.map-game-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.map-game-card-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--c-leaf-deep, #2f6f3a);
+}
+
+.map-game-card-cta {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--c-leaf, #4e7250);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
 
 /* View Mode Switcher (Map vs List) */
@@ -848,4 +1045,337 @@ html[data-motion="off"] .map-stage-gold-badge,
 
 .view-toggle-btn:hover:not(.active) {
   background: rgba(255, 255, 255, 0.6);
+}
+
+/* ==========================================================================
+   Task B2: Thẻ Hành trình hôm nay & Khung Bản đồ thế giới toàn màn hình 1440x900
+   ========================================================================== */
+
+/* Single-screen layout on Desktop (1440x900) */
+@media (min-width: 1024px) {
+  .site-main-gameworld.is-map-mode {
+    padding-bottom: var(--s-2, 8px);
+  }
+
+  .world-map-container {
+    max-width: 1140px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 320px;
+    align-items: start;
+  }
+
+  .world-map-container > .map-top-bar {
+    grid-column: 1 / -1;
+  }
+
+  .world-map-container .map-view-wrapper {
+    aspect-ratio: 16 / 9;
+  }
+}
+
+/* Daily Journey Overlay Card */
+.map-daily-journey-overlay {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  padding: var(--s-3, 12px);
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .map-daily-journey-overlay {
+    position: relative;
+    bottom: auto;
+    left: auto;
+    transform: none;
+    max-width: 100%;
+    width: 100%;
+    margin-top: var(--s-3, 12px);
+    padding: 0 var(--s-2, 8px);
+  }
+}
+
+.daily-journey-card {
+  min-width: 0;
+  box-sizing: border-box;
+  background: var(--c-surface, #fdfbf7);
+  background: rgba(254, 252, 246, 0.96);
+  backdrop-filter: blur(12px);
+  border: 2px solid var(--c-sand, #e8dfcf);
+  border-radius: var(--r-lg, 16px);
+  padding: var(--s-4, 16px);
+  box-shadow: var(--sh-elevated, 0 10px 25px -5px rgba(32, 62, 80, 0.15));
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3, 12px);
+  font-family: var(--f-family, 'Nunito', sans-serif);
+}
+
+.daily-journey-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-2, 8px);
+}
+
+.daily-journey-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-1, 4px);
+  background: var(--c-leaf-soft, #eef5ef);
+  color: var(--c-leaf, #4e7250);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  padding: 3px 10px;
+  border-radius: var(--r-full, 9999px);
+  position: relative;
+}
+
+.daily-tag-pulse {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--c-leaf, #4e7250);
+  animation: pulse-ring 1.8s infinite;
+}
+
+.daily-week-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--c-sand-soft, #f7f3e8);
+  color: var(--c-ink-light, #5c6b73);
+  font-size: 13px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: var(--r-full, 9999px);
+}
+
+.daily-journey-title-group h3 {
+  margin: 0;
+  font-size: 1.15rem;
+  color: var(--c-ink, #203e50);
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.daily-journey-sub {
+  margin: 2px 0 0;
+  font-size: 13px;
+  color: var(--c-ink-light, #5c6b73);
+}
+
+/* 3 Steps */
+.daily-steps-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2, 8px);
+}
+
+.daily-step-item {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2, 8px);
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid var(--c-sand, #e8dfcf);
+  border-radius: var(--r-md, 12px);
+  padding: 8px 12px;
+}
+
+.daily-step-badge {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--c-sand-soft, #f7f3e8);
+  color: var(--c-ink, #203e50);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.daily-step-item.is-in-progress .daily-step-badge,
+.daily-step-item.is-current .daily-step-badge {
+  background: var(--c-leaf-soft, #eef5ef);
+  color: var(--c-leaf, #4e7250);
+}
+
+.daily-step-item.is-unlocked .daily-step-badge {
+  background: var(--c-gold-soft, #fff9e6);
+  color: var(--c-gold, #f39c12);
+}
+
+.daily-step-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.daily-step-num {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--c-ink-2);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.daily-step-content strong {
+  font-size: 14px;
+  color: var(--c-ink, #203e50);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.daily-step-content small {
+  font-size: 13px;
+  color: var(--c-ink-light, #5c6b73);
+}
+
+.daily-progress-meter {
+  height: 6px;
+  background: var(--c-sand, #e8dfcf);
+  border-radius: var(--r-full, 9999px);
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+.daily-progress-fill {
+  height: 100%;
+  background: var(--c-leaf, #4e7250);
+  border-radius: var(--r-full, 9999px);
+  transition: width 0.3s ease;
+}
+
+/* Actions */
+.daily-journey-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2, 8px);
+  margin-top: var(--s-1, 4px);
+}
+
+.daily-primary-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-2, 8px);
+  background: var(--c-leaf, #4e7250);
+  color: #fff;
+  border: none;
+  border-radius: var(--r-md, 12px);
+  padding: 10px 16px;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 4px 0 #3a573c, var(--sh-hover, 0 4px 12px rgba(64, 87, 71, 0.2));
+  transition: all 0.15s ease;
+  min-height: 48px;
+}
+
+.daily-primary-btn:hover:not(:disabled) {
+  background: var(--c-leaf-hover, #426344);
+  transform: translateY(-1px);
+  box-shadow: 0 5px 0 #3a573c, var(--sh-hover, 0 6px 16px rgba(64, 87, 71, 0.25));
+}
+
+.daily-primary-btn:active:not(:disabled) {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 #3a573c;
+}
+
+.daily-btn-icon {
+  font-size: 16px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.daily-btn-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+}
+
+.daily-btn-text strong {
+  font-size: 15px;
+  line-height: 1.2;
+}
+
+.daily-btn-text small {
+  font-size: 13px;
+  font-weight: 500;
+  opacity: 0.9;
+}
+
+.daily-secondary-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: transparent;
+  color: var(--c-ink-light, #5c6b73);
+  border: 1px dashed var(--c-sand-dark, #d8cebb);
+  border-radius: var(--r-sm, 8px);
+  padding: 8px 12px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  min-height: 38px;
+  transition: all 0.15s ease;
+}
+
+.daily-secondary-btn:hover:not(:disabled) {
+  background: var(--c-sand-soft, #f7f3e8);
+  color: var(--c-ink, #203e50);
+  border-style: solid;
+}
+
+/* List Mode Top Nav Banner */
+.list-mode-nav-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  background: var(--c-surface, #fdfbf7);
+  border: 1px solid var(--c-sand, #e8dfcf);
+  border-radius: var(--r-md, 12px);
+  margin-bottom: var(--s-3, 12px);
+  box-shadow: var(--sh-card, 0 2px 8px rgba(64, 87, 71, 0.06));
+}
+
+.back-to-map-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--c-leaf, #4e7250);
+  color: #fff;
+  border: none;
+  border-radius: var(--r-full, 9999px);
+  padding: 6px 14px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  min-height: 38px;
+  box-shadow: 0 2px 0 #3a573c;
+  transition: all 0.15s ease;
+}
+
+.back-to-map-btn:hover {
+  background: var(--c-leaf-hover, #426344);
 }

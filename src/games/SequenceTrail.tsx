@@ -6,6 +6,7 @@ import {useQuestionSpeech} from './useQuestionSpeech';
 import {saveFailureMessage} from './save-failure-message';
 import QuestionMedia from '../components/QuestionMedia';
 import GameMascot from './GameMascot';
+import { getMascotLine } from './mascot-dialogue';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { AttemptInput, GameHostProps, SentencePack } from '../core/contracts';
 import { shuffle } from '../core/utils';
@@ -143,9 +144,7 @@ export default function SequenceTrail({ pack, onAttempt, onComplete, onExit, que
             mood={feedback === 'correct' ? 'happy' : feedback === 'retry' ? 'encourage' : 'idle'}
           />
           <div className="trail-speech">
-            {feedback === 'correct'
-              ? 'Tuyệt lắm! Con đã tìm đúng quy luật!'
-              : 'Xếp các thẻ lên bậc thang theo đúng thứ tự nhé! ✨'}
+            {getMascotLine(feedback === 'correct' ? 'happy' : feedback === 'retry' ? 'encourage' : 'idle', index)}
           </div>
         </aside>
 
@@ -308,6 +307,16 @@ export default function SequenceTrail({ pack, onAttempt, onComplete, onExit, que
           title="Nhà thám hiểm quy luật!"
           summary={`${firstTry}/${content.items.length} bậc thang đúng ngay lần đầu. Con đã kiên trì chinh phục đỉnh núi tri thức!`}
           onExit={onExit}
+          onReplay={() => {
+            setIndex(0);
+            setPlaced([]);
+            setRetries(0);
+            setFeedback(null);
+            setHint(false);
+            setHintText('');
+            setFirstTry(0);
+            setDone(false);
+          }}
         />
       )}
       <div className="world-particles" aria-hidden="true"><i/><i/><i/><i/><i/><i/></div>

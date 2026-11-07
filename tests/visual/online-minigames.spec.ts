@@ -172,7 +172,7 @@ test('Tuần 5 (Cổng C5): balance-scale and basket-sort games run smoothly, co
     await api('/login', { username: 'baoan.student', password: 'Baoan-password-2026!' });
     await page.goto(origin + '/?online=1&controls=1');
     await expect(page.locator('.online-student')).toBeVisible({ timeout: 15000 });
-    await expect(page.locator('.online-header')).toBeVisible({ timeout: 10000 });
+    await expect(page.locator('.student-topbar')).toBeVisible({ timeout: 10000 });
 
     // 4. Test Balance Scale game via server-scored attempt
     const me = await api('/me');

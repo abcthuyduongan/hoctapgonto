@@ -1,0 +1,710 @@
+{
+  "config": {
+    "argv": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\node_modules\\@playwright\\test\\cli.js",
+      "test",
+      "tests/visual/online-upgrade.spec.ts",
+      "tests/visual/online-hints.spec.ts",
+      "tests/visual/online-journey.spec.ts",
+      "tests/visual/online-mapgeometry.spec.ts",
+      "tests/visual/online-management.spec.ts",
+      "--config=playwright.online.config.ts"
+    ],
+    "configFile": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\playwright.online.config.ts",
+    "rootDir": "D:/Phần mềm 2026/BAO_AN_LEARNING_lam lại/tests/visual",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "D:/Phần mềm 2026/BAO_AN_LEARNING_lam lại/test-results/online-browser-output",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "online-chrome",
+        "name": "online-chrome",
+        "testDir": "D:/Phần mềm 2026/BAO_AN_LEARNING_lam lại/tests/visual",
+        "testIgnore": [],
+        "testMatch": [
+          "/online(?:-[a-z0-9]+)*\\.spec\\.ts$/"
+        ],
+        "timeout": 180000
+      }
+    ],
+    "filteredProjects": [
+      {
+        "grep": {},
+        "grepInvert": null,
+        "outputDir": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\test-results\\online-browser-output",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "name": "online-chrome",
+        "testDir": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual",
+        "snapshotDir": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual",
+        "testIgnore": [],
+        "testMatch": {},
+        "timeout": 180000,
+        "use": {
+          "headless": true,
+          "actionTimeout": 30000,
+          "navigationTimeout": 30000,
+          "viewport": {
+            "width": 1440,
+            "height": 1000
+          },
+          "extraHTTPHeaders": {
+            "X-Bao-An-Question-Protocol": "1"
+          },
+          "serviceWorkers": "block",
+          "trace": "retain-on-failure",
+          "screenshot": "only-on-failure",
+          "channel": "chrome"
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": "online-chrome"
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "docs/KIEM_TRA_BACKEND_AB_VA_SONG_HANH_2026-11-07/evidence/focused-browser.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "default",
+    "updateSourceMethod": "patch",
+    "version": "1.64.0",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "online-hints.spec.ts",
+      "file": "online-hints.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "sentence-builder waits for the server hint receipt and charges one star",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "online-chrome",
+              "projectName": "online-chrome",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4642,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-07T09:11:54.077Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6db1b8b1ce8c4e08671d-cd7b5c284c0a2dd3ae48",
+          "file": "online-hints.spec.ts",
+          "line": 4,
+          "column": 57
+        },
+        {
+          "title": "sequence-trail waits for the server hint receipt and charges one star",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "online-chrome",
+              "projectName": "online-chrome",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4268,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-07T09:11:58.920Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6db1b8b1ce8c4e08671d-c2b2e2f1161fc5b7a0af",
+          "file": "online-hints.spec.ts",
+          "line": 4,
+          "column": 57
+        }
+      ]
+    },
+    {
+      "title": "online-journey.spec.ts",
+      "file": "online-journey.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "each question keeps its highest stars across games, then the student explicitly closes a mastered week",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "online-chrome",
+              "projectName": "online-chrome",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 23524,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: getByLabel('Tiến độ tuần hiện tại')\nExpected substring: \u001b[32m\"Tuần 02: 0/4 câu đạt yêu cầu\"\u001b[39m\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" getByLabel('Tiến độ tuần hiện tại') with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByLabel('Tiến độ tuần hiện tại')\u001b[22m\n",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: getByLabel('Tiến độ tuần hiện tại')\nExpected substring: \u001b[32m\"Tuần 02: 0/4 câu đạt yêu cầu\"\u001b[39m\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" getByLabel('Tiến độ tuần hiện tại') with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByLabel('Tiến độ tuần hiện tại')\u001b[22m\n\n    at D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-journey.spec.ts:59:80",
+                    "location": {
+                      "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-journey.spec.ts",
+                      "column": 80,
+                      "line": 59
+                    },
+                    "snippet": "  57 |     expect((await api('/student/advance-week',advanceBody)).currentWeekSummary.weekId).toBe(week2.id);expect((await api('/student/summary?cursor=current')).balance.earned).toBe(12);\n  58 |     expect((await request('/play/compact',originalStart)).status()).toBe(403);expect((await request(`/play/${originalPlay.session.sessionId}/question-open`,{itemId:packs[0].items[0].id})).status()).toBe(403);\n> 59 |     await page.reload();await expect(page.getByLabel('Tiến độ tuần hiện tại')).toContainText('Tuần 02: 0/4 câu đạt yêu cầu');expect(errors).toEqual([]);await page.screenshot({path:testInfo.outputPath('journey-closed-week-one.png'),fullPage:true});\n     |                                                                                ^\n  60 |   }finally{await page.unrouteAll({behavior:'ignoreErrors'});server.closeAllConnections?.();await new Promise<void>(resolve=>server.close(()=>resolve()));server.onlineClose();expect(path.dirname(path.resolve(directory))).toBe(root);expect(path.basename(directory)).toMatch(/^question-journey-/);await rm(directory,{recursive:true,force:true});}\n  61 | });\n  62 |"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-journey.spec.ts",
+                        "column": 80,
+                        "line": 59
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: getByLabel('Tiến độ tuần hiện tại')\nExpected substring: \u001b[32m\"Tuần 02: 0/4 câu đạt yêu cầu\"\u001b[39m\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" getByLabel('Tiến độ tuần hiện tại') with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByLabel('Tiến độ tuần hiện tại')\u001b[22m\n\n\n  57 |     expect((await api('/student/advance-week',advanceBody)).currentWeekSummary.weekId).toBe(week2.id);expect((await api('/student/summary?cursor=current')).balance.earned).toBe(12);\n  58 |     expect((await request('/play/compact',originalStart)).status()).toBe(403);expect((await request(`/play/${originalPlay.session.sessionId}/question-open`,{itemId:packs[0].items[0].id})).status()).toBe(403);\n> 59 |     await page.reload();await expect(page.getByLabel('Tiến độ tuần hiện tại')).toContainText('Tuần 02: 0/4 câu đạt yêu cầu');expect(errors).toEqual([]);await page.screenshot({path:testInfo.outputPath('journey-closed-week-one.png'),fullPage:true});\n     |                                                                                ^\n  60 |   }finally{await page.unrouteAll({behavior:'ignoreErrors'});server.closeAllConnections?.();await new Promise<void>(resolve=>server.close(()=>resolve()));server.onlineClose();expect(path.dirname(path.resolve(directory))).toBe(root);expect(path.basename(directory)).toMatch(/^question-journey-/);await rm(directory,{recursive:true,force:true});}\n  61 | });\n  62 |\n    at D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-journey.spec.ts:59:80"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-07T09:12:03.221Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\test-results\\online-browser-output\\online-journey-each-questi-c3e9d-itly-closes-a-mastered-week-online-chrome\\test-failed-1.png"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\test-results\\online-browser-output\\online-journey-each-questi-c3e9d-itly-closes-a-mastered-week-online-chrome\\error-context.md"
+                    },
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "path": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\test-results\\online-browser-output\\online-journey-each-questi-c3e9d-itly-closes-a-mastered-week-online-chrome\\trace.zip"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-journey.spec.ts",
+                    "column": 80,
+                    "line": 59
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "1c4b17f238bf62bded14-fe64cfbd1516da36435a",
+          "file": "online-journey.spec.ts",
+          "line": 8,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "online-management.spec.ts",
+      "file": "online-management.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "M2: a fresh child starts empty; Word and Excel preview every question in eight types and reject unusable media",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [
+                {
+                  "type": "serial",
+                  "location": {
+                    "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-management.spec.ts",
+                    "line": 0,
+                    "column": 0
+                  }
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "online-chrome",
+              "projectName": "online-chrome",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 11957,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-07T09:12:28.414Z",
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-management.spec.ts",
+                        "line": 0,
+                        "column": 0
+                      }
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "ea7564a898d00dc0f38c-cef7c04c5ab9f1dca227",
+          "file": "online-management.spec.ts",
+          "line": 52,
+          "column": 1
+        },
+        {
+          "title": "M2 M3: an explicit same-source revision preserves stars and history; backup preview is read-only and restore requires reauthentication",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [
+                {
+                  "type": "serial",
+                  "location": {
+                    "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-management.spec.ts",
+                    "line": 0,
+                    "column": 0
+                  }
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "online-chrome",
+              "projectName": "online-chrome",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 12217,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-07T09:12:40.738Z",
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-management.spec.ts",
+                        "line": 0,
+                        "column": 0
+                      }
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "ea7564a898d00dc0f38c-e680d4e44d3236944eb4",
+          "file": "online-management.spec.ts",
+          "line": 77,
+          "column": 1
+        },
+        {
+          "title": "import safety: all-invalid questions cannot publish, multiple documents clear selection, and incomplete revisions cannot replace a week",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [
+                {
+                  "type": "serial",
+                  "location": {
+                    "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-management.spec.ts",
+                    "line": 0,
+                    "column": 0
+                  }
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "online-chrome",
+              "projectName": "online-chrome",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3860,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-07T09:12:52.967Z",
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual\\online-management.spec.ts",
+                        "line": 0,
+                        "column": 0
+                      }
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "ea7564a898d00dc0f38c-586f0814f9c798be5fe6",
+          "file": "online-management.spec.ts",
+          "line": 103,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "online-mapgeometry.spec.ts",
+      "file": "online-mapgeometry.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "online-mapgeometry: bounding boxes and anchor alignment without overlap",
+          "file": "online-mapgeometry.spec.ts",
+          "line": 40,
+          "column": 6,
+          "specs": [
+            {
+              "title": "world and region map geometry at 390×844 (phone-390)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 180000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "online-chrome",
+                  "projectName": "online-chrome",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1756,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "[DEBUG phone-390] worldBox: {\n  x: \u001b[33m2\u001b[39m,\n  y: \u001b[33m396.09375\u001b[39m,\n  width: \u001b[33m386\u001b[39m,\n  height: \u001b[33m514.65625\u001b[39m,\n  left: \u001b[33m2\u001b[39m,\n  right: \u001b[33m388\u001b[39m,\n  top: \u001b[33m396.09375\u001b[39m,\n  bottom: \u001b[33m910.75\u001b[39m\n} anchor 0: {\n  x: \u001b[33m41.21875\u001b[39m,\n  y: \u001b[33m488.1953125\u001b[39m,\n  width: \u001b[33m130\u001b[39m,\n  height: \u001b[33m62.828125\u001b[39m,\n  left: \u001b[33m41.21875\u001b[39m,\n  right: \u001b[33m171.21875\u001b[39m,\n  top: \u001b[33m488.1953125\u001b[39m,\n  bottom: \u001b[33m551.0234375\u001b[39m\n}\n"
+                        },
+                        {
+                          "text": "[DEBUG phone-390] worldBox: {\n  x: \u001b[33m2\u001b[39m,\n  y: \u001b[33m396.09375\u001b[39m,\n  width: \u001b[33m386\u001b[39m,\n  height: \u001b[33m514.65625\u001b[39m,\n  left: \u001b[33m2\u001b[39m,\n  right: \u001b[33m388\u001b[39m,\n  top: \u001b[33m396.09375\u001b[39m,\n  bottom: \u001b[33m910.75\u001b[39m\n} anchor 1: {\n  x: \u001b[33m231.6484375\u001b[39m,\n  y: \u001b[33m488.1953125\u001b[39m,\n  width: \u001b[33m104.234375\u001b[39m,\n  height: \u001b[33m62.828125\u001b[39m,\n  left: \u001b[33m231.6484375\u001b[39m,\n  right: \u001b[33m335.8828125\u001b[39m,\n  top: \u001b[33m488.1953125\u001b[39m,\n  bottom: \u001b[33m551.0234375\u001b[39m\n}\n"
+                        },
+                        {
+                          "text": "[DEBUG phone-390] worldBox: {\n  x: \u001b[33m2\u001b[39m,\n  y: \u001b[33m396.09375\u001b[39m,\n  width: \u001b[33m386\u001b[39m,\n  height: \u001b[33m514.65625\u001b[39m,\n  left: \u001b[33m2\u001b[39m,\n  right: \u001b[33m388\u001b[39m,\n  top: \u001b[33m396.09375\u001b[39m,\n  bottom: \u001b[33m910.75\u001b[39m\n} anchor 2: {\n  x: \u001b[33m41.21875\u001b[39m,\n  y: \u001b[33m724.9296875\u001b[39m,\n  width: \u001b[33m130\u001b[39m,\n  height: \u001b[33m62.828125\u001b[39m,\n  left: \u001b[33m41.21875\u001b[39m,\n  right: \u001b[33m171.21875\u001b[39m,\n  top: \u001b[33m724.9296875\u001b[39m,\n  bottom: \u001b[33m787.7578125\u001b[39m\n}\n"
+                        },
+                        {
+                          "text": "[DEBUG phone-390] worldBox: {\n  x: \u001b[33m2\u001b[39m,\n  y: \u001b[33m396.09375\u001b[39m,\n  width: \u001b[33m386\u001b[39m,\n  height: \u001b[33m514.65625\u001b[39m,\n  left: \u001b[33m2\u001b[39m,\n  right: \u001b[33m388\u001b[39m,\n  top: \u001b[33m396.09375\u001b[39m,\n  bottom: \u001b[33m910.75\u001b[39m\n} anchor 3: {\n  x: \u001b[33m231.6484375\u001b[39m,\n  y: \u001b[33m724.9296875\u001b[39m,\n  width: \u001b[33m104.234375\u001b[39m,\n  height: \u001b[33m62.828125\u001b[39m,\n  left: \u001b[33m231.6484375\u001b[39m,\n  right: \u001b[33m335.8828125\u001b[39m,\n  top: \u001b[33m724.9296875\u001b[39m,\n  bottom: \u001b[33m787.7578125\u001b[39m\n}\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T09:12:57.063Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "bea2ad2375c19cd7ce58-baeb560dd48ea6d9b6e3",
+              "file": "online-mapgeometry.spec.ts",
+              "line": 123,
+              "column": 5
+            },
+            {
+              "title": "world and region map geometry at 768×1024 (tablet-768)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 180000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "online-chrome",
+                  "projectName": "online-chrome",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1632,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "[DEBUG tablet-768] worldBox: {\n  x: \u001b[33m2\u001b[39m,\n  y: \u001b[33m268.40625\u001b[39m,\n  width: \u001b[33m764\u001b[39m,\n  height: \u001b[33m1018.65625\u001b[39m,\n  left: \u001b[33m2\u001b[39m,\n  right: \u001b[33m766\u001b[39m,\n  top: \u001b[33m268.40625\u001b[39m,\n  bottom: \u001b[33m1287.0625\u001b[39m\n} anchor 0: {\n  x: \u001b[33m143.265625\u001b[39m,\n  y: \u001b[33m481.4609375\u001b[39m,\n  width: \u001b[33m130\u001b[39m,\n  height: \u001b[33m62.828125\u001b[39m,\n  left: \u001b[33m143.265625\u001b[39m,\n  right: \u001b[33m273.265625\u001b[39m,\n  top: \u001b[33m481.4609375\u001b[39m,\n  bottom: \u001b[33m544.2890625\u001b[39m\n}\n"
+                        },
+                        {
+                          "text": "[DEBUG tablet-768] worldBox: {\n  x: \u001b[33m2\u001b[39m,\n  y: \u001b[33m268.40625\u001b[39m,\n  width: \u001b[33m764\u001b[39m,\n  height: \u001b[33m1018.65625\u001b[39m,\n  left: \u001b[33m2\u001b[39m,\n  right: \u001b[33m766\u001b[39m,\n  top: \u001b[33m268.40625\u001b[39m,\n  bottom: \u001b[33m1287.0625\u001b[39m\n} anchor 1: {\n  x: \u001b[33m494.71875\u001b[39m,\n  y: \u001b[33m481.4609375\u001b[39m,\n  width: \u001b[33m130\u001b[39m,\n  height: \u001b[33m62.828125\u001b[39m,\n  left: \u001b[33m494.71875\u001b[39m,\n  right: \u001b[33m624.71875\u001b[39m,\n  top: \u001b[33m481.4609375\u001b[39m,\n  bottom: \u001b[33m544.2890625\u001b[39m\n}\n"
+                        },
+                        {
+                          "text": "[DEBUG tablet-768] worldBox: {\n  x: \u001b[33m2\u001b[39m,\n  y: \u001b[33m268.40625\u001b[39m,\n  width: \u001b[33m764\u001b[39m,\n  height: \u001b[33m1018.65625\u001b[39m,\n  left: \u001b[33m2\u001b[39m,\n  right: \u001b[33m766\u001b[39m,\n  top: \u001b[33m268.40625\u001b[39m,\n  bottom: \u001b[33m1287.0625\u001b[39m\n} anchor 2: {\n  x: \u001b[33m143.265625\u001b[39m,\n  y: \u001b[33m950.0390625\u001b[39m,\n  width: \u001b[33m130\u001b[39m,\n  height: \u001b[33m62.828125\u001b[39m,\n  left: \u001b[33m143.265625\u001b[39m,\n  right: \u001b[33m273.265625\u001b[39m,\n  top: \u001b[33m950.0390625\u001b[39m,\n  bottom: \u001b[33m1012.8671875\u001b[39m\n}\n"
+                        },
+                        {
+                          "text": "[DEBUG tablet-768] worldBox: {\n  x: \u001b[33m2\u001b[39m,\n  y: \u001b[33m268.40625\u001b[39m,\n  width: \u001b[33m764\u001b[39m,\n  height: \u001b[33m1018.65625\u001b[39m,\n  left: \u001b[33m2\u001b[39m,\n  right: \u001b[33m766\u001b[39m,\n  top: \u001b[33m268.40625\u001b[39m,\n  bottom: \u001b[33m1287.0625\u001b[39m\n} anchor 3: {\n  x: \u001b[33m494.71875\u001b[39m,\n  y: \u001b[33m950.0390625\u001b[39m,\n  width: \u001b[33m130\u001b[39m,\n  height: \u001b[33m62.828125\u001b[39m,\n  left: \u001b[33m494.71875\u001b[39m,\n  right: \u001b[33m624.71875\u001b[39m,\n  top: \u001b[33m950.0390625\u001b[39m,\n  bottom: \u001b[33m1012.8671875\u001b[39m\n}\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T09:13:00.900Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "bea2ad2375c19cd7ce58-525aba2a0541e7189805",
+              "file": "online-mapgeometry.spec.ts",
+              "line": 123,
+              "column": 5
+            },
+            {
+              "title": "world and region map geometry at 1440×900 (desktop-1440)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 180000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "online-chrome",
+                  "projectName": "online-chrome",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1703,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "[DEBUG desktop-1440] worldBox: {\n  x: \u001b[33m152\u001b[39m,\n  y: \u001b[33m245.40625\u001b[39m,\n  width: \u001b[33m816\u001b[39m,\n  height: \u001b[33m459\u001b[39m,\n  left: \u001b[33m152\u001b[39m,\n  right: \u001b[33m968\u001b[39m,\n  top: \u001b[33m245.40625\u001b[39m,\n  bottom: \u001b[33m704.40625\u001b[39m\n} anchor 0: {\n  x: \u001b[33m256.765625\u001b[39m,\n  y: \u001b[33m342.2265625\u001b[39m,\n  width: \u001b[33m182.125\u001b[39m,\n  height: \u001b[33m54.203125\u001b[39m,\n  left: \u001b[33m256.765625\u001b[39m,\n  right: \u001b[33m438.890625\u001b[39m,\n  top: \u001b[33m342.2265625\u001b[39m,\n  bottom: \u001b[33m396.4296875\u001b[39m\n}\n"
+                        },
+                        {
+                          "text": "[DEBUG desktop-1440] worldBox: {\n  x: \u001b[33m152\u001b[39m,\n  y: \u001b[33m245.40625\u001b[39m,\n  width: \u001b[33m816\u001b[39m,\n  height: \u001b[33m459\u001b[39m,\n  left: \u001b[33m152\u001b[39m,\n  right: \u001b[33m968\u001b[39m,\n  top: \u001b[33m245.40625\u001b[39m,\n  bottom: \u001b[33m704.40625\u001b[39m\n} anchor 1: {\n  x: \u001b[33m662\u001b[39m,\n  y: \u001b[33m333.109375\u001b[39m,\n  width: \u001b[33m204\u001b[39m,\n  height: \u001b[33m72.4375\u001b[39m,\n  left: \u001b[33m662\u001b[39m,\n  right: \u001b[33m866\u001b[39m,\n  top: \u001b[33m333.109375\u001b[39m,\n  bottom: \u001b[33m405.546875\u001b[39m\n}\n"
+                        },
+                        {
+                          "text": "[DEBUG desktop-1440] worldBox: {\n  x: \u001b[33m152\u001b[39m,\n  y: \u001b[33m245.40625\u001b[39m,\n  width: \u001b[33m816\u001b[39m,\n  height: \u001b[33m459\u001b[39m,\n  left: \u001b[33m152\u001b[39m,\n  right: \u001b[33m968\u001b[39m,\n  top: \u001b[33m245.40625\u001b[39m,\n  bottom: \u001b[33m704.40625\u001b[39m\n} anchor 2: {\n  x: \u001b[33m230.3515625\u001b[39m,\n  y: \u001b[33m553.3671875\u001b[39m,\n  width: \u001b[33m234.953125\u001b[39m,\n  height: \u001b[33m54.203125\u001b[39m,\n  left: \u001b[33m230.3515625\u001b[39m,\n  right: \u001b[33m465.3046875\u001b[39m,\n  top: \u001b[33m553.3671875\u001b[39m,\n  bottom: \u001b[33m607.5703125\u001b[39m\n}\n"
+                        },
+                        {
+                          "text": "[DEBUG desktop-1440] worldBox: {\n  x: \u001b[33m152\u001b[39m,\n  y: \u001b[33m245.40625\u001b[39m,\n  width: \u001b[33m816\u001b[39m,\n  height: \u001b[33m459\u001b[39m,\n  left: \u001b[33m152\u001b[39m,\n  right: \u001b[33m968\u001b[39m,\n  top: \u001b[33m245.40625\u001b[39m,\n  bottom: \u001b[33m704.40625\u001b[39m\n} anchor 3: {\n  x: \u001b[33m666.8203125\u001b[39m,\n  y: \u001b[33m553.3671875\u001b[39m,\n  width: \u001b[33m194.359375\u001b[39m,\n  height: \u001b[33m54.203125\u001b[39m,\n  left: \u001b[33m666.8203125\u001b[39m,\n  right: \u001b[33m861.1796875\u001b[39m,\n  top: \u001b[33m553.3671875\u001b[39m,\n  bottom: \u001b[33m607.5703125\u001b[39m\n}\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-07T09:13:02.544Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "bea2ad2375c19cd7ce58-c96446a9f292fba0648c",
+              "file": "online-mapgeometry.spec.ts",
+              "line": 123,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "online-upgrade.spec.ts",
+      "file": "online-upgrade.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "existing 4-digit parent PIN opens the portal without replacing settings",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "online-chrome",
+              "projectName": "online-chrome",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3874,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-07T09:13:04.304Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d85694da3b1aa172a8b0-7cffee6ed8ac00de2a16",
+          "file": "online-upgrade.spec.ts",
+          "line": 4,
+          "column": 44
+        },
+        {
+          "title": "existing 5-digit parent PIN opens the portal without replacing settings",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "online-chrome",
+              "projectName": "online-chrome",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3804,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-07T09:13:08.189Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d85694da3b1aa172a8b0-65b65bf25de503888171",
+          "file": "online-upgrade.spec.ts",
+          "line": 4,
+          "column": 44
+        },
+        {
+          "title": "existing 6-digit parent PIN opens the portal without replacing settings",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "online-chrome",
+              "projectName": "online-chrome",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3637,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-07T09:13:12.004Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d85694da3b1aa172a8b0-e74d0cc51fec0a00b80d",
+          "file": "online-upgrade.spec.ts",
+          "line": 4,
+          "column": 44
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-11-07T09:11:52.440Z",
+    "duration": 83455.42599999999,
+    "expected": 11,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0
+  }
+}

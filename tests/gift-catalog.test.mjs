@@ -3,6 +3,9 @@ import assert from 'node:assert/strict';
 import {randomUUID} from 'node:crypto';
 import {OnlineStore} from '../server/online-store.mjs';
 import {createPostgresFixture, authFor} from './helpers/postgres-fixture.mjs';
+import {BAO_AN_GIFT_PRESET} from '../src/core/gift-presets.ts';
+import {readFile} from 'node:fs/promises';
+import sharp from 'sharp';
 
 const at = '2026-11-23T00:00:00.000Z';
 
@@ -368,4 +371,19 @@ test('PostgreSQL: Concurrency test - 2 students concurrently redeem last stock i
   const giftsList = await f.store.gifts(f.admin, f.cls.id);
   const finalGift = giftsList.find(g => g.id === gift.id);
   assert.equal(finalGift.stock, 0);
+});
+
+for(const engine of ['SQLite','PostgreSQL'])test(engine+': installing 20 priced gifts is repeatable and preserves custom gifts, edits and wallet history',async t=>{
+ const f=await fixture(t,engine),custom=await f.store.createGift(f.admin,{title:'Quà riêng của gia đình',priceStars:3,stock:2});
+ await f.store.configureWallet(f.admin,{enabled:false,rateVnd:900});const [one,two]=await Promise.all([Promise.resolve().then(()=>f.store.installGiftPreset(f.admin,{})),Promise.resolve().then(()=>f.store.installGiftPreset(f.admin,{}))]);assert.equal(one.created+two.created,20);
+ const gifts=await f.store.gifts(f.admin);assert.equal(gifts.length,21);assert.deepEqual(gifts.find(g=>g.id===custom.id),custom);assert.equal((await f.store.workspace(f.admin.workspaceId)).rate_vnd,500);
+ for(const item of BAO_AN_GIFT_PRESET){const gift=gifts.find(g=>g.id===item.id);assert.ok(gift);assert.equal(gift.priceStars*500>=item.referencePriceVnd,true);assert.ok(gift.priceStars*500-item.referencePriceVnd<500);assert.equal(gift.imageUrl,item.imageUrl);}
+ const first=BAO_AN_GIFT_PRESET[0];await f.store.updateGift(f.admin,first.id,{title:'Bố mẹ đã chỉnh',priceStars:7,stock:1,active:false});await f.store.installGiftPreset(f.admin,{});const kept=(await f.store.gifts(f.admin)).find(g=>g.id===first.id);assert.equal(kept.title,'Bố mẹ đã chỉnh');assert.equal(kept.priceStars,7);assert.equal(kept.stock,1);assert.equal(kept.active,false);
+ await assert.rejects(async()=>f.store.installGiftPreset({...f.admin,role:'student'},{}),e=>e.status===403);assert.equal((await f.store.gifts(f.admin)).length,21);
+});
+
+test('20 preset photos are decodable local images with a bounded download size',async()=>{
+ assert.equal(BAO_AN_GIFT_PRESET.length,20);assert.equal(new Set(BAO_AN_GIFT_PRESET.map(g=>g.id)).size,20);let total=0;
+ for(const item of BAO_AN_GIFT_PRESET){assert.match(item.imageUrl,/^\/art\/gifts\/bao-an-20\/[a-z-]+\.webp$/);const bytes=await readFile(new URL('../public'+item.imageUrl,import.meta.url));total+=bytes.length;const meta=await sharp(bytes).metadata();assert.equal(meta.width,280);assert.equal(meta.height,220);assert.equal(meta.format,'webp');assert.equal(new URL(item.sourceUrl).protocol,'https:');}
+ assert.ok(total<200000,'All 20 images stay under 200 KB together');
 });

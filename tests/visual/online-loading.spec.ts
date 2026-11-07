@@ -31,7 +31,7 @@ test('a student with an old 3D preference starts directly in 2D, warms the game 
   await page.route('**/api/online/play/compact',async route=>{playRequested=true;await playHeld;await route.continue();});
   try{
     await page.addInitScript(()=>localStorage.setItem('bao-an-display-mode-v1','3d'));await page.goto(f.origin+'/');
-    const host=page.locator('.ba3d-render-host'),start=page.getByRole('button',{name:'Chơi Đảo Câu Hỏi bằng bộ được giao',exact:true});
+    const host=page.locator('.ba3d-render-host'),start=page.getByRole('button',{name:/^(?:Tiếp tục học ngay )?Chơi Đảo Câu Hỏi(?: bằng bộ được giao| · \d+ câu trong bộ)$/,exact:true});
     await expect(host).toHaveCount(0);await expect(start).toBeVisible();
     expect(modelRequests).toBe(0);
     const started=Date.now();await start.click();await expect.poll(()=>playRequested).toBe(true);
@@ -62,9 +62,9 @@ test('unavailable legacy models never block the 2D lesson',async({page})=>{
   await page.route('**/*.glb',route=>route.fulfill({status:404,contentType:'text/plain',body:'Fixture scene unavailable'}));
   try{
     await page.goto(f.origin+'/');await expect(page.locator('[data-hub-mode="light"]')).toBeVisible();await expect(page.locator('.ba3d-render-host')).toHaveCount(0);
-    await page.getByRole('button',{name:'Chơi Đảo Câu Hỏi bằng bộ được giao',exact:true}).click();
+    await page.getByRole('button',{name:/^(?:Tiếp tục học ngay )?Chơi Đảo Câu Hỏi(?: bằng bộ được giao| · \d+ câu trong bộ)$/,exact:true}).click();
     await expect(page.locator('.quiz-question')).toHaveText('Chọn câu trả lời 1');await page.locator('.answer-option',{hasText:'Đúng 1'}).click();await expect(page.locator('.feedback-win')).toBeVisible();
-    await page.getByRole('button',{name:'← Thoát trò chơi',exact:true}).click();await expect(page.getByRole('button',{name:'Chơi Đảo Câu Hỏi bằng bộ được giao',exact:true})).toBeEnabled();
+    await page.getByRole('button',{name:'← Thoát trò chơi',exact:true}).click();await expect(page.getByRole('button',{name:/^(?:Tiếp tục học ngay )?Chơi Đảo Câu Hỏi(?: bằng bộ được giao| · \d+ câu trong bộ)$/,exact:true})).toBeEnabled();
   }finally{await f.close();}
 });
 
@@ -73,11 +73,11 @@ test('an interrupted game chunk displays recovery controls and reload can start 
   await page.route('**/*.glb',route=>route.fulfill({status:404,contentType:'text/plain',body:'Fixture scene unavailable'}));
   await page.route('**/assets/MathQuest-*.js',route=>route.abort('failed'));
   try{
-    await page.goto(f.origin+'/');await page.getByRole('button',{name:'Chơi Đảo Câu Hỏi bằng bộ được giao',exact:true}).click();
+    await page.goto(f.origin+'/');await page.getByRole('button',{name:/^(?:Tiếp tục học ngay )?Chơi Đảo Câu Hỏi(?: bằng bộ được giao| · \d+ câu trong bộ)$/,exact:true}).click();
     await expect(page.getByRole('heading',{name:'Không tải được trò chơi',exact:true})).toBeVisible();
     await expect(page.getByRole('button',{name:'Thoát về màn hình chính',exact:true})).toBeEnabled();
     await page.unroute('**/assets/MathQuest-*.js');await page.getByRole('button',{name:'Tải lại ứng dụng',exact:true}).click();
-    await page.getByRole('button',{name:'Chơi Đảo Câu Hỏi bằng bộ được giao',exact:true}).click();await expect(page.locator('.quiz-question')).toHaveText('Chọn câu trả lời 1');
+    await page.getByRole('button',{name:/^(?:Tiếp tục học ngay )?Chơi Đảo Câu Hỏi(?: bằng bộ được giao| · \d+ câu trong bộ)$/,exact:true}).click();await expect(page.locator('.quiz-question')).toHaveText('Chọn câu trả lời 1');
     await page.getByRole('button',{name:'← Thoát trò chơi',exact:true}).click();
   }finally{await f.close();}
 });
@@ -88,7 +88,7 @@ test('the first image downloads while the game chunk is held and does not start 
  await page.route('**/assets/MathQuest-*.js',async route=>{await held;await route.continue();});
  page.on('request',request=>{if(request.url().includes('/media/11111111'))images++;if(request.url().endsWith('/question-open'))opens++;});
  try{
-  await page.goto(f.origin+'/');await page.getByRole('button',{name:'Chơi Đảo Câu Hỏi bằng bộ được giao',exact:true}).click();await expect.poll(()=>images).toBe(1);expect(opens).toBe(0);
+  await page.goto(f.origin+'/');await page.getByRole('button',{name:/^(?:Tiếp tục học ngay )?Chơi Đảo Câu Hỏi(?: bằng bộ được giao| · \d+ câu trong bộ)$/,exact:true}).click();await expect.poll(()=>images).toBe(1);expect(opens).toBe(0);
   release();await expect(page.locator('.answer-option').first()).toBeEnabled();expect(images).toBe(1);expect(opens).toBe(1);
   await page.getByRole('button',{name:'← Thoát trò chơi',exact:true}).click();
  }finally{release();await page.unrouteAll({behavior:'ignoreErrors'});await f.close();}

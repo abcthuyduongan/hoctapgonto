@@ -245,6 +245,8 @@ test('Tuần 2 Cổng C2: Màn chơi tranh vùng, địa danh góc, chặng hoà
     await expect(goldBadge).toHaveText('🚩');
 
     // Motion settings check: toggle "Hiệu ứng tắt"
+    const menuTrigger = page.locator('.account-menu-trigger');
+    if (await menuTrigger.isVisible()) await menuTrigger.click();
     const motionToggle = page.locator('button:has-text("Hiệu ứng")');
     await motionToggle.click();
     const appShell = page.locator('.online-app');

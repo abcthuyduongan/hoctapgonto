@@ -18,6 +18,7 @@ test('each question keeps its highest stars across games, then the student expli
     const packs=[1,2].map(week=>({id:`journey-pack-${week}`,version:1,title:`Bộ tuần ${week}`,kind:'quiz',subject:'thinking',grade:3,source:'local',publishedAt:'2026-10-17T00:00:00Z',items:[1,2,3,4].map(i=>({id:`journey-${week}-${i}`,objectiveId:'JOURNEY',kind:'multiple-choice',prompt:`Tuần ${week}: câu hỏi ${i}`,options:[`Đáp án ${week}.${i}`,'Sai A','Sai B','Sai C'],correctIndex:0,explanation:'Đáp án đã được giáo viên xác định.'}))}));
     const week1=await api('/weeks',{requestId:'journey-week-1',classId:cls.id,title:'Tuần 01',sets:[{subjectLabel:'Hành trình',pack:packs[0]}]});const week2=await api('/weeks',{requestId:'journey-week-2',classId:cls.id,title:'Tuần 02',sets:[{subjectLabel:'Hành trình tiếp',pack:packs[1]}]});
     await page.context().clearCookies();await api('/login',{username:'journey.child',password});await page.goto(origin+'/?online=1&controls=1');
+    await page.getByRole('button',{name:'📋 Danh sách',exact:true}).click();
     await expect(page.getByLabel('Tiến độ tuần hiện tại')).toContainText('Tuần 01: 0/4 câu đạt yêu cầu');await expect(page.getByRole('button',{name:'Sang Tuần 02',exact:true})).toHaveCount(0);
     expect((await request('/play/compact',{requestId:'future-denied',moduleId:'math-quest',packId:packs[1].id,contentVersion:1})).status()).toBe(403);
     expect((await request('/student/advance-week',{requestId:'premature-advance',weekId:week1.id})).status()).toBe(400);
@@ -30,7 +31,7 @@ test('each question keeps its highest stars across games, then the student expli
         const clock=await response.json();await route.fulfill({response,json:{...clock,openedAt:session.questionClocks[input.itemId]}});return;
       }await route.fulfill({response});
     });
-    const firstStart=page.waitForResponse(response=>new URL(response.url()).pathname==='/api/online/play/compact');await page.getByRole('button',{name:'Chơi Đảo Câu Hỏi bằng bộ được giao',exact:true}).click();const originalResponse=await firstStart,originalPlay=await originalResponse.json(),originalStart=originalResponse.request().postDataJSON();
+    const firstStart=page.waitForResponse(response=>new URL(response.url()).pathname==='/api/online/play/compact');await page.getByRole('button',{name:/^(?:Tiếp tục học ngay )?Chơi Đảo Câu Hỏi(?: bằng bộ được giao| · \d+ câu trong bộ)$/,exact:true}).click();const originalResponse=await firstStart,originalPlay=await originalResponse.json(),originalStart=originalResponse.request().postDataJSON();
     for(let i=0;i<4;i++){
       await expect(page.locator('.quiz-question')).toHaveText(packs[0].items[i].prompt);
       await page.locator('.answer-option',{hasText:packs[0].items[i].options[0]}).click();
@@ -55,6 +56,6 @@ test('each question keeps its highest stars across games, then the student expli
     page.on('request',request=>{if(new URL(request.url()).pathname==='/api/online/student/advance-week')advanceBody=request.postDataJSON();});await expect(dialog).toContainText('0 câu 2 sao');await expect(dialog).toContainText('4 câu 3 sao');await dialog.getByRole('button',{name:'Xác nhận sang tuần mới',exact:true}).click();await expect(page.getByLabel('Tiến độ tuần hiện tại')).toContainText('Tuần 02: 0/4 câu đạt yêu cầu');const expandJourneyBtn=page.getByRole('button',{name:/Xem cả hành trình/i});if(await expandJourneyBtn.isVisible())await expandJourneyBtn.click();await page.getByRole('button',{name:'Xem tóm tắt các bộ trước',exact:true}).click();await expect(page.locator('.online-week-path > li.is-done')).toContainText('Tuần này đã khóa');await expect(sourceSet.locator('details')).toHaveCount(0);
     expect((await api('/student/advance-week',advanceBody)).currentWeekSummary.weekId).toBe(week2.id);expect((await api('/student/summary?cursor=current')).balance.earned).toBe(12);
     expect((await request('/play/compact',originalStart)).status()).toBe(403);expect((await request(`/play/${originalPlay.session.sessionId}/question-open`,{itemId:packs[0].items[0].id})).status()).toBe(403);
-    await page.reload();await expect(page.getByLabel('Tiến độ tuần hiện tại')).toContainText('Tuần 02: 0/4 câu đạt yêu cầu');expect(errors).toEqual([]);await page.screenshot({path:testInfo.outputPath('journey-closed-week-one.png'),fullPage:true});
+    await page.reload();await page.getByRole('button',{name:'📋 Danh sách',exact:true}).click();await expect(page.getByLabel('Tiến độ tuần hiện tại')).toContainText('Tuần 02: 0/4 câu đạt yêu cầu');expect(errors).toEqual([]);await page.screenshot({path:testInfo.outputPath('journey-closed-week-one.png'),fullPage:true});
   }finally{await page.unrouteAll({behavior:'ignoreErrors'});server.closeAllConnections?.();await new Promise<void>(resolve=>server.close(()=>resolve()));server.onlineClose();expect(path.dirname(path.resolve(directory))).toBe(root);expect(path.basename(directory)).toMatch(/^question-journey-/);await rm(directory,{recursive:true,force:true});}
 });

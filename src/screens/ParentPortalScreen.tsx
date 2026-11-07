@@ -836,7 +836,7 @@ export default function ParentPortalScreen({
                 <div>
                   <h2>Kết nối SafeTime với Bảo An Learning</h2>
                   <p>
-                    Cho phép SafeTime giám sát phiên học, mở bài học trực tiếp và tự động ghi nhận kết quả thi thử Violympic / IOE.
+                    Ghép SafeTime với Bảo An đang chạy trên cùng máy tính để mở bài học và nhận kết quả thi thử. Kết nối tự động từ trang Netlify chưa được hỗ trợ.
                   </p>
                 </div>
               </div>

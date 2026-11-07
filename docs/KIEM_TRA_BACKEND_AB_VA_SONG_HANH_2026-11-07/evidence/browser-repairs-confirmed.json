@@ -1,0 +1,252 @@
+{
+  "config": {
+    "argv": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\node_modules\\@playwright\\test\\cli.js",
+      "test",
+      "--config=playwright.online.config.ts",
+      "tests/visual/online-performance.spec.ts",
+      "tests/visual/online-studentflow.spec.ts",
+      "tests/visual/online-upgrade.spec.ts",
+      "--grep",
+      "bounded role-free|lightweight exploration map|assigned map"
+    ],
+    "configFile": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\playwright.online.config.ts",
+    "rootDir": "D:/Phần mềm 2026/BAO_AN_LEARNING_lam lại/tests/visual",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "D:/Phần mềm 2026/BAO_AN_LEARNING_lam lại/test-results/online-browser-output",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "online-chrome",
+        "name": "online-chrome",
+        "testDir": "D:/Phần mềm 2026/BAO_AN_LEARNING_lam lại/tests/visual",
+        "testIgnore": [],
+        "testMatch": [
+          "/online(?:-[a-z0-9]+)*\\.spec\\.ts$/"
+        ],
+        "timeout": 180000
+      }
+    ],
+    "filteredProjects": [
+      {
+        "grep": {},
+        "grepInvert": null,
+        "outputDir": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\test-results\\online-browser-output",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "name": "online-chrome",
+        "testDir": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual",
+        "snapshotDir": "D:\\Phần mềm 2026\\BAO_AN_LEARNING_lam lại\\tests\\visual",
+        "testIgnore": [],
+        "testMatch": {},
+        "timeout": 180000,
+        "use": {
+          "headless": true,
+          "actionTimeout": 30000,
+          "navigationTimeout": 30000,
+          "viewport": {
+            "width": 1440,
+            "height": 1000
+          },
+          "extraHTTPHeaders": {
+            "X-Bao-An-Question-Protocol": "1"
+          },
+          "serviceWorkers": "block",
+          "trace": "retain-on-failure",
+          "screenshot": "only-on-failure",
+          "channel": "chrome"
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": "online-chrome"
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "docs/KIEM_TRA_BACKEND_AB_VA_SONG_HANH_2026-11-07/evidence/browser-repairs-confirmed.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "default",
+    "updateSourceMethod": "patch",
+    "version": "1.64.0",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "online-performance.spec.ts",
+      "file": "online-performance.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "login has a bounded role-free bundle and the default lesson creates no 3D requests or contexts",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "online-chrome",
+              "projectName": "online-chrome",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4662,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-07T10:17:32.175Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "role-bundle-and-lite",
+                      "contentType": "application/json",
+                      "body": "ewogICJhdXRoQXNzZXRzIjogWwogICAgewogICAgICAibmFtZSI6ICIvYXNzZXRzL2luZGV4LUw2MkVjelhRLmNzcyIsCiAgICAgICJieXRlcyI6IDM3MTYsCiAgICAgICJnemlwIjogMTU1MgogICAgfSwKICAgIHsKICAgICAgIm5hbWUiOiAiL2Fzc2V0cy9pbmRleC1CMTZlRWVHbi5qcyIsCiAgICAgICJieXRlcyI6IDIyNjgxMSwKICAgICAgImd6aXAiOiA3MTM4NAogICAgfSwKICAgIHsKICAgICAgIm5hbWUiOiAiL2Fzc2V0cy9PbmxpbmVTY3JlZW4tQmhFWFVZNXIuanMiLAogICAgICAiYnl0ZXMiOiAxOTgxNCwKICAgICAgImd6aXAiOiA3NTM0CiAgICB9LAogICAgewogICAgICAibmFtZSI6ICIvYXNzZXRzL09ubGluZVNjcmVlbi1ENU04RzlNMi5jc3MiLAogICAgICAiYnl0ZXMiOiAzMDIxMiwKICAgICAgImd6aXAiOiA2MjQ1CiAgICB9CiAgXSwKICAianNHemlwIjogNzg5MTgsCiAgImNzc0d6aXAiOiA3Nzk3LAogICJzdHVkZW50Q3NzR3ppcCI6IDE5NDE1LAogICJzb3VyY2VJZCI6ICI3YTAwMGE5ZjRjZDBiNjJlZThjNjYyNjhiMWViZWIwZmI0M2NmNGUxZGRmMjI0YmI1ZjZlNmFhYzNjYWFkOWU0IiwKICAiZ2xiUmVxdWVzdHMiOiAwLAogICJ3ZWJnbENvbnRleHRzIjogMAp9"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "9449c91e7b3cca18549a-5f48a76a51988ebdbc1f",
+          "file": "online-performance.spec.ts",
+          "line": 18,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "online-studentflow.spec.ts",
+      "file": "online-studentflow.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "the lightweight exploration map and wallet remain usable on phone and desktop",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "online-chrome",
+              "projectName": "online-chrome",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3547,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-07T10:17:37.067Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "f6775b9df8c5f756e23f-ea18290950f9cd5bc66b",
+          "file": "online-studentflow.spec.ts",
+          "line": 34,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "online-upgrade.spec.ts",
+      "file": "online-upgrade.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "assigned map, header, mobile navigation and modal keyboard focus work across seven widths",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "online-chrome",
+              "projectName": "online-chrome",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 14536,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-07T10:17:40.694Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d85694da3b1aa172a8b0-9a554099fb58f1d39ca7",
+          "file": "online-upgrade.spec.ts",
+          "line": 27,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-11-07T10:17:30.678Z",
+    "duration": 24779.561,
+    "expected": 3,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

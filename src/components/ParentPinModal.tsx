@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { onlineApi } from '../core/online-client';
 import type { ParentDashboardResponse } from '../core/online-contracts';
+import { PinPad } from '../ui/PinPad';
 
 interface ParentPinModalProps {
   studentId?: string;
@@ -18,6 +19,7 @@ export default function ParentPinModal({ studentId, hasPin = true, onSuccess, on
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const [lockoutSec, setLockoutSec] = useState(0);
+  const validPin = isSetupMode ? /^\d{6}$/.test(pin) : /^\d{4,6}$/.test(pin);
 
   useEffect(() => {
     dialogRef.current?.showModal();
@@ -34,24 +36,10 @@ export default function ParentPinModal({ studentId, hasPin = true, onSuccess, on
     return () => clearInterval(timer);
   }, [lockoutSec]);
 
-  const handleKeyClick = (val: string) => {
-    if (busy || lockoutSec > 0) return;
-    if (val === 'clear') {
-      setPin('');
-      return;
-    }
-    if (val === 'backspace') {
-      setPin(p => p.slice(0, -1));
-      return;
-    }
-    if (pin.length < 6) {
-      setPin(p => p + val);
-    }
-  };
-
   const handleVerify = async (enteredPin: string) => {
-    if (enteredPin.length < 4) {
-      setError('Mã PIN cần có từ 4 đến 6 chữ số.');
+    if (busy || lockoutSec > 0) return;
+    if (!/^\d{4,6}$/.test(enteredPin)) {
+      setError('Nhập mã PIN hiện có gồm 4–6 chữ số.');
       return;
     }
     setBusy(true);
@@ -73,8 +61,8 @@ export default function ParentPinModal({ studentId, hasPin = true, onSuccess, on
   };
 
   const handleSetupNext = () => {
-    if (pin.length < 4) {
-      setError('Mã PIN cần có từ 4 đến 6 chữ số.');
+    if (pin.length < 6) {
+      setError('Mã PIN cần có đủ 6 chữ số.');
       return;
     }
     setConfirmPin(pin);
@@ -105,6 +93,7 @@ export default function ParentPinModal({ studentId, hasPin = true, onSuccess, on
   };
 
   const handleSubmit = () => {
+    if (busy || lockoutSec > 0 || !validPin) return;
     if (isSetupMode) {
       if (step === 'enter') handleSetupNext();
       else handleSetupSubmit(pin);
@@ -130,8 +119,8 @@ export default function ParentPinModal({ studentId, hasPin = true, onSuccess, on
           </h2>
           <p className="parent-pin-desc">
             {isSetupMode
-              ? (step === 'enter' ? 'Nhập mã PIN gồm 4–6 số để quản lý giờ học và duyệt quà' : 'Nhập lại mã PIN vừa chọn để xác nhận')
-              : 'Nhập mã PIN phụ huynh để xem báo cáo và duyệt quà'}
+              ? (step === 'enter' ? 'Nhập mã PIN gồm 6 số để quản lý giờ học và duyệt quà' : 'Nhập lại mã PIN 6 số vừa chọn để xác nhận')
+              : 'Nhập mã PIN hiện có (4–6 số) để xem báo cáo và duyệt quà. Mã PIN mới gồm 6 số.'}
           </p>
           <button
             type="button"
@@ -149,21 +138,6 @@ export default function ParentPinModal({ studentId, hasPin = true, onSuccess, on
             {error}
           </div>
         )}
-
-        {lockoutSec > 0 && (
-          <div className="parent-pin-lockout" role="alert">
-            ⏳ Mã PIN bị tạm khóa. Vui lòng đợi {Math.floor(lockoutSec / 60)}:{('0' + (lockoutSec % 60)).slice(-2)}
-          </div>
-        )}
-
-        <div className="parent-pin-display" aria-live="polite">
-          {[0, 1, 2, 3, 4, 5].map(idx => (
-            <span
-              key={idx}
-              className={`parent-pin-dot ${idx < pin.length ? 'filled' : ''}`}
-            />
-          ))}
-        </div>
 
         <input
           type="password"
@@ -184,52 +158,24 @@ export default function ParentPinModal({ studentId, hasPin = true, onSuccess, on
           aria-label="Mã PIN"
         />
 
-        <div className="parent-pin-keypad" role="group" aria-label="Bàn phím số PIN">
-          {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => (
-            <button
-              key={num}
-              type="button"
-              className="parent-key-btn"
-              onClick={() => handleKeyClick(String(num))}
-              disabled={busy || lockoutSec > 0}
-            >
-              {num}
-            </button>
-          ))}
-          <button
-            type="button"
-            className="parent-key-btn parent-key-action"
-            onClick={() => handleKeyClick('clear')}
-            disabled={busy || lockoutSec > 0}
-            title="Xóa hết"
-          >
-            C
-          </button>
-          <button
-            type="button"
-            className="parent-key-btn"
-            onClick={() => handleKeyClick('0')}
-            disabled={busy || lockoutSec > 0}
-          >
-            0
-          </button>
-          <button
-            type="button"
-            className="parent-key-btn parent-key-action"
-            onClick={() => handleKeyClick('backspace')}
-            disabled={busy || lockoutSec > 0}
-            title="Xóa ký tự cuối"
-          >
-            ⌫
-          </button>
-        </div>
+        <PinPad
+          pinLength={6}
+          value={pin}
+          onChange={setPin}
+          disabled={busy || lockoutSec > 0}
+          lockedNotice={
+            lockoutSec > 0
+              ? `⏳ Mã PIN bị tạm khóa. Vui lòng đợi ${Math.floor(lockoutSec / 60)}:${('0' + (lockoutSec % 60)).slice(-2)}`
+              : undefined
+          }
+        />
 
         <div className="parent-pin-actions">
           <button
             type="button"
             className="online-btn online-primary parent-pin-submit"
             onClick={handleSubmit}
-            disabled={busy || lockoutSec > 0 || pin.length < 4}
+            disabled={busy || lockoutSec > 0 || !validPin}
           >
             {busy ? 'Đang kiểm tra…' : (isSetupMode && step === 'enter' ? 'Tiếp tục ➔' : 'Xác nhận')}
           </button>

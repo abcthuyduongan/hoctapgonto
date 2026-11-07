@@ -9,7 +9,7 @@ import {BROWSER_NOTICE_PACKAGES,thirdPartyNotices} from './thirdPartyNotices.mjs
 import metadata from '../package.json' with {type:'json'};
 
 export const RELEASE_VERSION=metadata.version;
-export const RELEASE_STORAGE_SCHEMAS=Object.freeze({localSqlite:1,cloudPostgres:1});
+export const RELEASE_STORAGE_SCHEMAS=Object.freeze({localSqlite:2,cloudPostgres:9});
 const PROJECT_ROOT=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const MAX_FILES=3000,MAX_FILE_BYTES=64*1024*1024,MAX_TOTAL_BYTES=256*1024*1024;
 const hash=bytes=>createHash('sha256').update(bytes).digest('hex');
@@ -67,7 +67,7 @@ async function checkExisting(folder,zipPath,expected){
   if((await lstat(folder)).isSymbolicLink()||!(await stat(folder)).isDirectory())throw new Error('Gói đích không phải thư mục thường; không ghi đè.');
   const raw=await readFile(join(folder,'release.json'),'utf8');let manifest;try{manifest=JSON.parse(raw);}catch{throw new Error('Gói đích đã tồn tại nhưng manifest không hợp lệ; không ghi đè.');}
   if(manifest.schemaVersion!==1||manifest.version!==RELEASE_VERSION||manifest.buildId!==expected.buildId||manifest.payloadSha256!==expected.payloadHash||
-    manifest.databaseSchemaVersion!==1||JSON.stringify(manifest.storageSchemas)!==JSON.stringify(RELEASE_STORAGE_SCHEMAS)||manifest.assetCount!==expected.assetCount||manifest.humanPilotStatus!=='UNVERIFIED'||
+    manifest.databaseSchemaVersion!==RELEASE_STORAGE_SCHEMAS.localSqlite||JSON.stringify(manifest.storageSchemas)!==JSON.stringify(RELEASE_STORAGE_SCHEMAS)||manifest.assetCount!==expected.assetCount||manifest.humanPilotStatus!=='UNVERIFIED'||
     manifest.pilot!==true||manifest.releaseReady!==false||JSON.stringify(manifest.files)!==JSON.stringify(expected.entries))
     throw new Error('Đích đã có gói khác build/nội dung. Không ghi đè; dùng phiên bản phát hành mới.');
   for(const item of manifest.files){const bytes=await readFile(join(folder,...item.path.split('/')));if(bytes.length!==item.bytes||hash(bytes)!==item.sha256)throw new Error(`Gói đích đã bị thay đổi: ${item.path}; không ghi đè.`);}
@@ -99,7 +99,7 @@ export async function packageRelease({distDir=join(PROJECT_ROOT,'dist'),outputRo
   await mkdir(temporary);
   const manifest={schemaVersion:1,version:RELEASE_VERSION,pilot:true,releaseReady:false,
     humanPilotStatus:'UNVERIFIED',humanPilotTarget:'Quản lý và học sinh, Windows Edge/Chrome: Excel, tám dạng câu, năm game, đổi sao, sao lưu và khôi phục',
-    createdAt:new Date().toISOString(),buildId:expected.buildId,databaseSchemaVersion:1,storageSchemas:RELEASE_STORAGE_SCHEMAS,
+    createdAt:new Date().toISOString(),buildId:expected.buildId,databaseSchemaVersion:RELEASE_STORAGE_SCHEMAS.localSqlite,storageSchemas:RELEASE_STORAGE_SCHEMAS,
     assetCount:expected.assetCount,payloadSha256:expected.payloadHash,files:expected.entries};
   const manifestBytes=Buffer.from(JSON.stringify(manifest,null,2)+'\n','utf8');
   try{

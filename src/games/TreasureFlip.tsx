@@ -8,6 +8,9 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { AttemptInput, GameHostProps, PairsPack } from '../core/contracts';
 import { shuffle } from '../core/utils';
 import { playFeedbackTone } from '../core/experience';
+import { stopSpeaking } from '../core/speech';
+import { useQuestionSpeech } from './useQuestionSpeech';
+import { getMascotLine } from './mascot-dialogue';
 import GameCompletion from './GameCompletion';
 import FeedbackEffects from './FeedbackEffects';
 import { useQuestionLayout } from './useQuestionLayout';
@@ -39,6 +42,7 @@ export default function TreasureFlip({
   const [rounds] = useState(() => createPairRounds(content.items, initialPairRoundLimit()));
   const [roundIndex, setRoundIndex] = useState(0);
   const roundItems = rounds[roundIndex] ?? [];
+  const speech = useQuestionSpeech(pack.subject, `${pack.id}:${roundIndex}`);
   const layout = useQuestionLayout({
     kind: 'memory-match',
     questionKey: `${content.id}@${content.version}:${roundIndex}`,
@@ -88,12 +92,30 @@ export default function TreasureFlip({
     setRoundIndex((index) => index + 1);
   }
 
+  function handleReplay() {
+    firstRef.current = null;
+    setFirst(null);
+    setSecond(null);
+    setMatched([]);
+    setMoves(0);
+    moveRef.current = 0;
+    countRef.current = 0;
+    setLastOutcome(null);
+    setStatus('playing');
+    setLocked(false);
+    setError('');
+    setFinishing(false);
+    setSaving(false);
+    setRoundIndex(0);
+  }
+
   useEffect(() => {
     closed.current = false;
     busyRef.current = false;
     firstRef.current = null;
     return () => {
       closed.current = true;
+      stopSpeaking();
       if (timerRef.current) clearTimeout(timerRef.current);
       timerRef.current = null;
     };
@@ -195,117 +217,140 @@ export default function TreasureFlip({
         }
       } else {
         timerRef.current = setTimeout(() => {
-          if (!closed.current) {
-            firstRef.current = null;
-            setFirst(null);
-            setSecond(null);
-            setLocked(false);
-            setLastOutcome(null);
-            busyRef.current = false;
-          }
-        }, 900);
+          if (closed.current) return;
+          firstRef.current = null;
+          setFirst(null);
+          setSecond(null);
+          setLocked(false);
+          busyRef.current = false;
+          timerRef.current = null;
+        }, Math.max(0, 700 - (performance.now() - revealedAt)));
       }
     },
     [content.items.length, deck, error, locked, matched, onAttempt, onComplete, questionMode, status]
   );
 
+  const mascotMood = lastOutcome === 'correct' ? 'happy' : lastOutcome === 'retry' ? 'encourage' : 'idle';
+  const mascotSpeech = getMascotLine(mascotMood, moves);
+
   return (
-    <section ref={layout.ref} {...layout.layoutProps} className="game-card treasure-flip-board play-panel">
-      <div className="game-card-header">
-        <div className="game-meta">
-          <button type="button" className="meta-badge clickable" onClick={onExit}>
-            🚪 Thoát
+    <section ref={layout.ref} {...layout.layoutProps} className="play-panel treasure-flip-stage world-stage world-math">
+      <div className="stage-backdrop" aria-hidden="true" />
+      <div className="stage-overlay" aria-hidden="true" />
+
+      {speech.notice && <p className="notice speech-notice" role="status">{speech.notice}</p>}
+
+      <div className="world-hud">
+        <span className="hud-label">
+          <span className="ba37-hud-symbol" aria-hidden="true">💎</span> LẬT THẺ KHO BÁU
+        </span>
+        <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+          <button
+            type="button"
+            className="speech-trigger-btn"
+            onClick={() => speech.read('Lật các rương kho báu để tìm cặp từ tương ứng nhé!')}
+            aria-label="Nghe đọc hướng dẫn"
+            title="Nghe hướng dẫn"
+          >
+            🔊
           </button>
-          <span className="meta-badge">💎 Lật Thẻ Kho Báu</span>
-          <span className="meta-badge">
-            Kho báu: {matched.length}/{content.items.length}
+          <span className="hud-score">
+            <span aria-hidden="true">★</span> {matched.length}/{content.items.length} kho báu
           </span>
-          <span className="meta-badge">Lượt lật: {moves}</span>
         </div>
-        <GameMascot
-          alt="Cáo tìm kho báu"
-          mood={lastOutcome === 'correct' ? 'happy' : lastOutcome === 'retry' ? 'encourage' : 'idle'}
-          reactionKey={matched.length}
-        />
       </div>
 
-      <FeedbackEffects
-        result={lastOutcome === null ? null : lastOutcome === 'correct' ? 'success' : 'retry'}
-        eventKey={`treasure-${moves}`}
-      />
+      <div className="stable-response-zone" aria-live="polite">
+        <FeedbackEffects
+          result={lastOutcome === null ? null : lastOutcome === 'correct' ? 'success' : 'retry'}
+          eventKey={`treasure-${moves}`}
+        />
+        {error ? (
+          <div className="notice error" role="alert">
+            {error}
+            {pending && (
+              <button type="button" className="button secondary" onClick={() => choose(pending.card, true)}>
+                Thử lưu lại
+              </button>
+            )}
+          </div>
+        ) : (
+          <span className="feedback-message">
+            {saving
+              ? '⏳ Đang lưu kết quả…'
+              : locked && second && lastOutcome === 'retry'
+              ? '🌱 Hai thẻ chưa khớp — hãy thử lại nhé!'
+              : matched.length === content.items.length
+              ? '🎉 Xuất sắc! Con đã mở toàn bộ rương kho báu!'
+              : lastOutcome === 'correct'
+              ? '✨ Tuyệt vời! Cặp rương mở ra kho báu!'
+              : '💎 Chạm mở 2 rương để tìm các cặp ghép đôi.'}
+          </span>
+        )}
+      </div>
 
-      {error && (
-        <div className="game-error-banner" role="alert">
-          {error}
-          {pending && (
-            <button type="button" className="button-secondary" onClick={() => choose(pending.card, true)}>
-              Thử lưu lại
-            </button>
+      <div className="adventure-layout" style={{ display: 'flex', gap: '1.25rem', alignItems: 'flex-start' }}>
+        <aside className="world-guide">
+          <div className="guide-figure">
+            <GameMascot
+              alt="Cáo tìm kho báu"
+              mood={mascotMood}
+              reactionKey={matched.length}
+            />
+          </div>
+          <div className="guide-speech">{mascotSpeech}</div>
+        </aside>
+
+        <div style={{ flex: 1 }}>
+          <div className="treasure-grid">
+            {deck.map((card) => {
+              const isRevealed = card.id === first || card.id === second || matched.includes(card.pairId);
+              const isMatched = matched.includes(card.pairId);
+              return (
+                <button
+                  key={card.id}
+                  type="button"
+                  className={`treasure-chest ${isRevealed ? 'open' : 'closed'} ${isMatched ? 'matched' : ''}`}
+                  onClick={() => choose(card)}
+                  disabled={isMatched || locked || saving}
+                  aria-label={isRevealed ? card.label : 'Rương đóng, chạm để mở'}
+                  aria-pressed={isRevealed}
+                >
+                  <span className="treasure-chest-icon" aria-hidden="true">
+                    {isMatched ? '✨' : isRevealed ? '💎' : '🧰'}
+                  </span>
+                  <span className="treasure-chest-label">
+                    {isRevealed ? card.label : 'Mở rương'}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          {roundDone && roundIndex < rounds.length - 1 && (
+            <div style={{ textAlign: 'center', marginTop: '16px' }}>
+              <button type="button" className="button primary" onClick={nextRound}>
+                Sang phòng kho báu tiếp theo ➜
+              </button>
+            </div>
           )}
         </div>
-      )}
+      </div>
 
-      {status === 'done' ? (
+      {status === 'done' && (
         <GameCompletion
           title="Kho Báu Đã Khai Mở!"
-          summary={`Bé đã xuất sắc mở toàn bộ ${content.items.length} cặp thẻ kho báu chỉ sau ${moves} lượt!`}
+          summary={`Con đã xuất sắc mở toàn bộ ${content.items.length} cặp thẻ kho báu chỉ sau ${moves} lượt!`}
           onExit={onExit}
           questionMode={questionMode}
+          onReplay={handleReplay}
         />
-      ) : (
-        <div className="treasure-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '12px', padding: '16px 0' }}>
-          {deck.map((card) => {
-            const isRevealed = card.id === first || card.id === second || matched.includes(card.pairId);
-            const isMatched = matched.includes(card.pairId);
-            return (
-              <button
-                key={card.id}
-                type="button"
-                className={`card-interactive treasure-chest ${isRevealed ? 'open' : 'closed'} ${isMatched ? 'matched' : ''}`}
-                style={{
-                  minHeight: '110px',
-                  borderRadius: '16px',
-                  border: isMatched ? '2px solid #10b981' : isRevealed ? '2px solid #f59e0b' : '2px solid #d97706',
-                  background: isMatched ? '#ecfdf5' : isRevealed ? '#fffbeb' : 'linear-gradient(135deg, #d97706, #b45309)',
-                  color: isRevealed ? '#1f2937' : '#ffffff',
-                  fontSize: '15px',
-                  fontWeight: 600,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  padding: '10px',
-                  cursor: isMatched ? 'default' : 'pointer',
-                  boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-                  transition: 'all 0.2s ease',
-                }}
-                onClick={() => choose(card)}
-                disabled={isMatched || locked || saving}
-              >
-                {isRevealed ? (
-                  <>
-                    <span style={{ fontSize: '20px', marginBottom: '4px' }}>{isMatched ? '✨' : '💎'}</span>
-                    <span style={{ textAlign: 'center', wordBreak: 'break-word' }}>{card.label}</span>
-                  </>
-                ) : (
-                  <>
-                    <span style={{ fontSize: '28px', marginBottom: '4px' }}>🧰</span>
-                    <span style={{ fontSize: '12px', opacity: 0.9 }}>Mở rương</span>
-                  </>
-                )}
-              </button>
-            );
-          })}
-        </div>
       )}
 
-      {roundDone && roundIndex < rounds.length - 1 && (
-        <div style={{ textAlign: 'center', marginTop: '16px' }}>
-          <button type="button" className="button-primary" onClick={nextRound}>
-            Sang phòng kho báu tiếp theo ➜
-          </button>
-        </div>
-      )}
+      <div className="world-stage-bottom">
+        <span>💎 Lật thẻ chuẩn xác • Tìm kho báu trí tuệ</span>
+        <span>✦ Bảo An Game World</span>
+      </div>
     </section>
   );
 }

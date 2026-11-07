@@ -21,7 +21,7 @@ test('opening password change cancels a pending journey read and closing resumes
   const held=new Promise<void>(resolve=>{release=resolve;});
   page.on('requestfailed',request=>{if(['/api/online/student/summary','/api/online/student/journey'].includes(new URL(request.url()).pathname))aborted++;});
   await page.route(/\/api\/online\/student\/(?:summary|journey)(?:\?.*)?$/,async route=>{intercepted++;if(intercepted===1)await held;await route.continue().catch(()=>{});});
-  try{await page.goto(f.origin+'/');await expect.poll(()=>intercepted).toBe(1);await page.getByRole('button',{name:'Đổi mật khẩu',exact:true}).click();await expect(page.getByRole('dialog',{name:'Đổi mật khẩu',exact:true})).toBeVisible();await expect.poll(()=>aborted).toBe(1);release();await page.getByRole('dialog').getByRole('button',{name:'Đóng ✕',exact:true}).click();await expect.poll(()=>intercepted).toBe(2);await expect(page.getByRole('heading',{name:'Chờ bộ câu hỏi của thầy cô',exact:true})).toBeVisible();}
+  try{await page.goto(f.origin+'/');await expect.poll(()=>intercepted).toBe(1);const menuTrigger = page.locator('.account-menu-trigger');if (await menuTrigger.isVisible()) await menuTrigger.click();await page.getByRole('button',{name:'Đổi mật khẩu',exact:true}).click();await expect(page.getByRole('dialog',{name:'Đổi mật khẩu',exact:true})).toBeVisible();await expect.poll(()=>aborted).toBe(1);release();await page.getByRole('dialog').getByRole('button',{name:'Đóng ✕',exact:true}).click();await expect.poll(()=>intercepted).toBe(2);await expect(page.getByRole('heading',{name:'Chờ bộ câu hỏi của thầy cô',exact:true})).toBeVisible();}
   finally{release();await page.unrouteAll({behavior:'ignoreErrors'});await f.close();}
 });
 
@@ -32,7 +32,10 @@ for(const viewport of [{width:1440,height:1000},{width:390,height:844}]){
     page.on('request',request=>{if(/\/assets\/OnlinePasswordDialog-[^/]+\.js$/.test(request.url()))dialogLoads++;});
     await page.route('**/models/*.glb',route=>route.fulfill({status:404,contentType:'text/plain',body:'Fixture scene unavailable'}));
     try{
-      await page.goto(f.origin+'/');const open=page.getByRole('button',{name:'Đổi mật khẩu',exact:true});await expect(open).toBeVisible();expect(dialogLoads).toBe(0);
+      await page.goto(f.origin+'/');
+      const menuTrigger = page.locator('.account-menu-trigger');
+      await menuTrigger.click();
+      const open=page.getByRole('button',{name:'Đổi mật khẩu',exact:true});await expect(open).toBeVisible();expect(dialogLoads).toBe(0);
       await open.click();const dialog=page.getByRole('dialog',{name:'Đổi mật khẩu',exact:true});await expect(dialog).toBeVisible();await expect.poll(()=>dialogLoads).toBe(1);
       await dialog.getByLabel('Mật khẩu hiện tại',{exact:true}).fill('Incorrect-password-2026');
       await dialog.getByLabel('Mật khẩu mới',{exact:true}).fill(newPassword);await dialog.getByLabel('Nhập lại mật khẩu mới',{exact:true}).fill('Different-confirmation-2026');
@@ -52,7 +55,7 @@ for(const viewport of [{width:1440,height:1000},{width:390,height:844}]){
       await dialog.getByRole('button',{name:'Đăng nhập lại',exact:true}).click();await expect(page.getByRole('heading',{name:'Chào mừng bạn trở lại',exact:true})).toBeVisible();
       await page.getByLabel('Tên đăng nhập',{exact:true}).fill('password.child');await page.getByLabel('Mật khẩu',{exact:true}).fill(f.password);await page.getByRole('button',{name:'Đăng nhập',exact:true}).click();
       await expect(page.getByRole('alert')).toContainText('Tên đăng nhập hoặc mật khẩu chưa đúng');
-      await page.getByLabel('Mật khẩu',{exact:true}).fill(newPassword);await page.getByRole('button',{name:'Đăng nhập',exact:true}).click();await expect(open).toBeVisible();
+      await page.getByLabel('Mật khẩu',{exact:true}).fill(newPassword);await page.getByRole('button',{name:'Đăng nhập',exact:true}).click();await expect(menuTrigger).toBeVisible();await menuTrigger.click();await expect(open).toBeVisible();
       const privateStorage=await page.evaluate(()=>JSON.stringify({local:{...localStorage},session:{...sessionStorage}}));expect(privateStorage).not.toContain(newPassword);expect(privateStorage).not.toContain(f.password);
     }finally{release();await page.unrouteAll({behavior:'ignoreErrors'});await f.close();}
   });

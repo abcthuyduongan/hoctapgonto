@@ -2449,8 +2449,12 @@ export class PostgresStore{
     if (!row) fail(404, 'Vé SSO không tồn tại.');
     if (row.used_at) fail(400, 'Vé SSO đã được sử dụng.');
     if (new Date(row.expires_at) <= new Date()) fail(400, 'Vé SSO đã hết hạn (hiệu lực 60 giây).');
+    const device=await this.findIntegrationClientById(row.client_id,client);
+    if(!device||device.revoked_at||device.workspace_id!==row.workspace_id||!await this.isIntegrationEnabled(row.workspace_id,client))fail(400,'Kết nối của vé SSO đã bị tắt hoặc thu hồi.');
+    if(device.allowed_student_ids?.length&&!device.allowed_student_ids.includes(row.student_id))fail(400,'Học sinh không thuộc thiết bị của vé SSO.');
     const usedAt = now();
-    await this.exec('UPDATE bao_an.integration_tickets SET used_at = $1 WHERE ticket = $2', [usedAt, ticket], client);
+    const consumed=await this.one('UPDATE bao_an.integration_tickets SET used_at = $1 WHERE ticket = $2 AND used_at IS NULL RETURNING ticket', [usedAt, ticket], client);
+    if(!consumed)fail(400,'Vé SSO đã được sử dụng.');
     return { ...row, used_at: usedAt };
   }
 
@@ -2488,6 +2492,7 @@ export class PostgresStore{
       const sId = studentId || auth.studentId;
       if (auth.studentId !== sId) fail(403, 'Không có quyền truy cập học sinh khác.');
       const currentRaw = await this.rawParentControls(auth.workspaceId, sId, client);
+      if(!currentRaw?.pinHash)fail(403,'Cần thiết lập và xác thực PIN phụ huynh trước khi quản lý kết nối.');
       if (currentRaw?.pinHash) {
         const tokenOk = parentToken && verifyParentElevationToken(parentToken, {
           userId: auth.id,
@@ -2559,10 +2564,14 @@ export class PostgresStore{
       `, [auth.workspaceId, auth.studentId], client);
     }
 
+    const allowed=new Set(availableStudents.map(s=>s.id));
+    const visible=ids=>auth.role==='admin'||Array.isArray(ids)&&ids.length>0&&ids.every(id=>allowed.has(id));
+    const visibleClients=clients.filter(c=>visible(c.allowed_student_ids));
     return {
+      canManageWorkspace:auth.role==='admin',
       enabled: await this.isIntegrationEnabled(auth.workspaceId, client),
-      paired: activeClients.length > 0,
-      clients: clients.map(c => ({
+      paired: visibleClients.some(c=>!c.revoked_at),
+      clients: visibleClients.map(c => ({
         id: c.id,
         deviceName: c.device_name,
         deviceId: c.device_id,
@@ -2571,16 +2580,19 @@ export class PostgresStore{
         lastUsedAt: c.last_used_at,
         revokedAt: c.revoked_at
       })),
-      activePairCode,
+      activePairCode:activePairCode&&visible(activePairCode.allowedStudentIds)?activePairCode:null,
       availableStudents
     };
   }
 
   async parentCreatePairCode(auth, studentIds, parentToken = null, client = this.pool) {
-    await this.assertParentElevation(auth, null, parentToken, client);
+    const status=await this.parentSafetimeStatus(auth,null,parentToken,client);
     if (!Array.isArray(studentIds) || studentIds.length === 0) {
       fail(400, 'Cần chọn ít nhất một học sinh được phép kết nối.');
     }
+    const allowed=new Set(status.availableStudents.map(s=>s.id));
+    if(studentIds.length>100||studentIds.some(id=>!allowed.has(id)))fail(403,'Không có quyền ghép đôi học sinh được chọn.');
+    studentIds=[...new Set(studentIds)];
     const result = await this.createIntegrationPairCode(auth.workspaceId, studentIds, 10, client);
     await this.audit(auth, 'integration.pair_code_create', json({
       code: result.code,
@@ -2591,11 +2603,12 @@ export class PostgresStore{
   }
 
   async parentRevokeClient(auth, clientId, parentToken = null, client = this.pool) {
-    await this.assertParentElevation(auth, null, parentToken, client);
+    const status=await this.parentSafetimeStatus(auth,null,parentToken,client);
     const clientRecord = await this.findIntegrationClientById(clientId, client);
     if (!clientRecord || clientRecord.workspace_id !== auth.workspaceId) {
       fail(404, 'Không tìm thấy thiết bị kết nối.');
     }
+    if(!status.clients.some(c=>c.id===clientRecord.id))fail(403,'Không có quyền quản lý thiết bị của học sinh khác.');
     await this.revokeIntegrationClient(clientId, client);
     await this.audit(auth, 'integration.client_revoke', json({
       clientId: clientRecord.id,
@@ -2608,6 +2621,7 @@ export class PostgresStore{
 
   async parentToggleIntegration(auth, enabled, parentToken = null, client = this.pool) {
     await this.assertParentElevation(auth, null, parentToken, client);
+    if(auth.role!=='admin')fail(403,'Chỉ quản trị viên được bật hoặc tắt kết nối cho toàn bộ không gian.');
     const isEnabled = Boolean(enabled);
     await this.audit(auth, 'integration.toggle', json({ enabled: isEnabled }), client);
     return { success: true, enabled: isEnabled };

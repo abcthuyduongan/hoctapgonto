@@ -1,7 +1,7 @@
 {
   "name": "bao-an-learning",
   "private": true,
-  "version": "4.1.0-rc.1",
+  "version": "4.3.0-rc.1",
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0",

@@ -78,7 +78,7 @@ test('Tuần 4 Cổng C4: Chuỗi ngày học, Nhiệm vụ ngày và Sổ huy h
     await api('/login', { username: 'tuan4.child', password: f.password });
     await page.goto(f.origin + '/?online=1&controls=1');
     await expect(page.locator('.online-student')).toBeVisible({ timeout: 15000 });
-    await expect(page.locator('.online-header')).toBeVisible({ timeout: 10000 });
+    await expect(page.locator('.student-topbar')).toBeVisible({ timeout: 10000 });
 
     // 2. Check Streak pill in header
     const streakBtn = page.locator('button.streak-pill-btn');
@@ -124,7 +124,9 @@ test('Tuần 4 Cổng C4: Chuỗi ngày học, Nhiệm vụ ngày và Sổ huy h
     await page.click('.missions-dialog-header .badge-close-btn');
     await expect(page.locator('.missions-dialog')).not.toBeVisible();
 
-    // 4. Check Badges button in header
+    // 4. Check Badges button in header / account menu
+    const menuTrigger = page.locator('.account-menu-trigger');
+    if (await menuTrigger.isVisible()) await menuTrigger.click();
     const badgesBtn = page.locator('button:has-text("Huy hiệu")');
     await expect(badgesBtn).toBeVisible();
 

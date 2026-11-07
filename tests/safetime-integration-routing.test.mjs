@@ -1242,7 +1242,8 @@ test('Task 3B.6 (BAO-11): Real HTTP Server loopback GET /students/{id}/today end
 test('Task 3B.8 (BAO-16): Audit logging for pairing, revocation and failed logins', async () => {
   const store = new OnlineStore(':memory:');
   const db = store.db;
-  const { workspaceId, student1Id, student2Id } = await setupWorkspaceWithStudents(store);
+  const { workspaceId, student1Id, student2Id, parentUserId } = await setupWorkspaceWithStudents(store);
+  db.prepare('INSERT INTO parent_students(workspace_id,parent_user_id,student_id,created_at) VALUES(?,?,?,?)').run(workspaceId,parentUserId,student1Id,new Date().toISOString());
 
   const router = createSafeTimeIntegrationRouter({
     store,
@@ -1256,7 +1257,7 @@ test('Task 3B.8 (BAO-16): Audit logging for pairing, revocation and failed login
   });
 
   // 1. Audit on pair code creation
-  const parentAuth = { workspaceId, id: 'parent-u1', role: 'parent' };
+  const parentAuth = { workspaceId, id: parentUserId, role: 'parent' };
   const pairCodeResult = store.parentCreatePairCode(parentAuth, [student1Id]);
   assert.equal(pairCodeResult.code.length, 8);
   const auditPairCode = db.prepare("SELECT * FROM audit WHERE action = 'integration.pair_code_create'").get();

@@ -2205,6 +2205,9 @@ export class OnlineStore{
     if (!row) fail(404, 'Vé SSO không tồn tại.');
     if (row.used_at) fail(400, 'Vé SSO đã được sử dụng.');
     if (new Date(row.expires_at) <= new Date()) fail(400, 'Vé SSO đã hết hạn (hiệu lực 60 giây).');
+    const client=this.findIntegrationClientById(row.client_id);
+    if(!client||client.revoked_at||client.workspace_id!==row.workspace_id||!this.isIntegrationEnabled(row.workspace_id))fail(400,'Kết nối của vé SSO đã bị tắt hoặc thu hồi.');
+    if(client.allowed_student_ids?.length&&!client.allowed_student_ids.includes(row.student_id))fail(400,'Học sinh không thuộc thiết bị của vé SSO.');
     const usedAt = now();
     this.db.prepare('UPDATE integration_tickets SET used_at = ? WHERE ticket = ?').run(usedAt, ticket);
     return { ...row, used_at: usedAt };
@@ -2448,6 +2451,7 @@ export class OnlineStore{
       const sId = studentId || auth.studentId;
       if (auth.studentId !== sId) fail(403, 'Không có quyền truy cập học sinh khác.');
       const currentRaw = this.rawParentControls(auth.workspaceId, sId);
+      if(!currentRaw?.pinHash)fail(403,'Cần thiết lập và xác thực PIN phụ huynh trước khi quản lý kết nối.');
       if (currentRaw?.pinHash) {
         const tokenOk = parentToken && verifyParentElevationToken(parentToken, {
           userId: auth.id,
@@ -2519,10 +2523,14 @@ export class OnlineStore{
       `).all(auth.workspaceId, auth.studentId);
     }
 
+    const allowed=new Set(availableStudents.map(s=>s.id));
+    const visible=ids=>auth.role==='admin'||Array.isArray(ids)&&ids.length>0&&ids.every(id=>allowed.has(id));
+    const visibleClients=clients.filter(c=>visible(c.allowed_student_ids));
     return {
+      canManageWorkspace:auth.role==='admin',
       enabled: this.isIntegrationEnabled(auth.workspaceId),
-      paired: activeClients.length > 0,
-      clients: clients.map(c => ({
+      paired: visibleClients.some(c=>!c.revoked_at),
+      clients: visibleClients.map(c => ({
         id: c.id,
         deviceName: c.device_name,
         deviceId: c.device_id,
@@ -2531,16 +2539,19 @@ export class OnlineStore{
         lastUsedAt: c.last_used_at,
         revokedAt: c.revoked_at
       })),
-      activePairCode,
+      activePairCode:activePairCode&&visible(activePairCode.allowedStudentIds)?activePairCode:null,
       availableStudents
     };
   }
 
   parentCreatePairCode(auth, studentIds, parentToken = null) {
-    this.assertParentElevation(auth, null, parentToken);
+    const status=this.parentSafetimeStatus(auth,null,parentToken);
     if (!Array.isArray(studentIds) || studentIds.length === 0) {
       fail(400, 'Cần chọn ít nhất một học sinh được phép kết nối.');
     }
+    const allowed=new Set(status.availableStudents.map(s=>s.id));
+    if(studentIds.length>100||studentIds.some(id=>!allowed.has(id)))fail(403,'Không có quyền ghép đôi học sinh được chọn.');
+    studentIds=[...new Set(studentIds)];
     const result = this.createIntegrationPairCode(auth.workspaceId, studentIds, 10);
     this.audit(auth, 'integration.pair_code_create', json({
       code: result.code,
@@ -2551,11 +2562,12 @@ export class OnlineStore{
   }
 
   parentRevokeClient(auth, clientId, parentToken = null) {
-    this.assertParentElevation(auth, null, parentToken);
+    const status=this.parentSafetimeStatus(auth,null,parentToken);
     const client = this.findIntegrationClientById(clientId);
     if (!client || client.workspace_id !== auth.workspaceId) {
       fail(404, 'Không tìm thấy thiết bị kết nối.');
     }
+    if(!status.clients.some(c=>c.id===client.id))fail(403,'Không có quyền quản lý thiết bị của học sinh khác.');
     this.revokeIntegrationClient(clientId);
     this.audit(auth, 'integration.client_revoke', json({
       clientId: client.id,
@@ -2568,6 +2580,7 @@ export class OnlineStore{
 
   parentToggleIntegration(auth, enabled, parentToken = null) {
     this.assertParentElevation(auth, null, parentToken);
+    if(auth.role!=='admin')fail(403,'Chỉ quản trị viên được bật hoặc tắt kết nối cho toàn bộ không gian.');
     const isEnabled = Boolean(enabled);
     this.audit(auth, 'integration.toggle', json({ enabled: isEnabled }));
     return { success: true, enabled: isEnabled };

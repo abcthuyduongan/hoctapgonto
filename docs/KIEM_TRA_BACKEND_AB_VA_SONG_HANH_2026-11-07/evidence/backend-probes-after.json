@@ -1,0 +1,90 @@
+{
+  "checkedAt": "2026-11-07T13:59:09.673Z",
+  "identity": {
+    "version": "4.1.0-rc.1",
+    "commit": "bed43c253b6a94f217337c02992790f5169c30b8",
+    "sourceId": "b65e1bc1e2929e4e3be391e3c5cb4e726eeeb4d7cd0a27aa029f19bfda536728",
+    "displayMode": "2d",
+    "questionProtocolVersion": 1
+  },
+  "canonicalRoundTrips": [
+    {
+      "input": "toan",
+      "storedId": "math",
+      "canonical": "toan",
+      "roundTrip": "toan"
+    },
+    {
+      "input": "tieng-viet",
+      "storedId": "subject-a678e72416a1f5b23b6aebac",
+      "canonical": "tieng-viet",
+      "roundTrip": "tieng-viet"
+    },
+    {
+      "input": "tieng-anh",
+      "storedId": "subject-b33d82c1557907c071f3ccf4",
+      "canonical": "tieng-anh",
+      "roundTrip": "tieng-anh"
+    },
+    {
+      "input": "tin-hoc",
+      "storedId": "subject-383bb5177284d31f9a119ff1",
+      "canonical": "tin-hoc",
+      "roundTrip": "tin-hoc"
+    },
+    {
+      "input": "Toán học",
+      "storedId": "math",
+      "canonical": "toan",
+      "roundTrip": "toan"
+    },
+    {
+      "input": "Tiếng Việt",
+      "storedId": "vietnamese",
+      "canonical": "tieng-viet",
+      "roundTrip": "tieng-viet"
+    },
+    {
+      "input": "Tiếng Anh",
+      "storedId": "english",
+      "canonical": "tieng-anh",
+      "roundTrip": "tieng-anh"
+    },
+    {
+      "input": "Tin học",
+      "storedId": "computing",
+      "canonical": "tin-hoc",
+      "roundTrip": "tin-hoc"
+    }
+  ],
+  "oldSnapshot": {
+    "sourceCommit": "bed43c253b6a94f217337c02992790f5169c30b8",
+    "oldSubjectIds": [
+      "subject-3694970d6ba86cbbc1b2156e",
+      "vietnamese",
+      "english",
+      "subject-3bcc877cbb318dd1f1f8ee13"
+    ],
+    "validOnPrior": true,
+    "validOnCurrent": true,
+    "sets": [
+      {
+        "subjectLabel": "Toán học",
+        "packId": "audit-pack-0"
+      },
+      {
+        "subjectLabel": "Tiếng Việt",
+        "packId": "audit-pack-1"
+      },
+      {
+        "subjectLabel": "Tiếng Anh",
+        "packId": "audit-pack-2"
+      },
+      {
+        "subjectLabel": "Tin học",
+        "packId": "audit-pack-3"
+      }
+    ]
+  },
+  "scope": "Local deterministic reproduction only; no production data changed"
+}

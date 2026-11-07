@@ -6,6 +6,7 @@ import {onlinePackQuestionKind} from '../core/online-import-identity';
 import {assertQuestionMediaSelectionBudget,optimizeQuestionImage,validateQuestionMediaFile} from '../core/online-media-check';
 import OnlineQuestionReview,{OnlineQuestionDisclosure,onlinePackKindLabel} from './OnlineQuestionReview';
 import OnlineRecoveryPanel from './OnlineRecoveryPanel';
+import GiftPresetPanel from '../components/GiftPresetPanel';
 import {rewardStatus} from '../core/reward-wallet';
 import {newId} from '../core/utils';
 import {DEFAULT_WEEKLY_SUBJECTS,summarizeWeeklySubjects,weeklySubjectId,weeklyPlanErrors} from '../core/weekly-plan';
@@ -165,7 +166,7 @@ export default function AdminDashboard({identity,onLogout,onRestored}:{identity:
     if(status==='fulfilled'&&!window.confirm(`Xác nhận đã trao ${onlineMoney(request.amountVnd)} tiền hoặc quà cho ${request.studentName}, yêu cầu “${request.title}”? ${request.stars} sao sẽ được ghi là đã đổi.`))return;
     await run(async()=>{await onlineApi.transitionRedemption(request.requestId,{status,note:notes[request.requestId]?.trim()});return status==='fulfilled'?'Đã lưu xác nhận trao tiền / quà.':status==='rejected'?'Đã từ chối và trả lại sao khả dụng cho học sinh.':'Đã duyệt yêu cầu; chờ người lớn trao tiền / quà.';});
   }
-  return <div className="online-app online-admin"><header className="online-header"><a href="?online=1" className="online-brand">✦ BẢO AN <span>LEARNING</span></a><div><strong>{identity.workspace.name}</strong><span>Quản trị viên · {identity.user.username}</span></div><button disabled={busy} onClick={()=>void onLogout().catch(error=>setError(messageOf(error)))}>Đăng xuất</button></header>
+  return <div className="online-app online-admin" data-theme="desk"><header className="online-header"><a href="?online=1" className="online-brand">✦ BẢO AN <span>LEARNING</span></a><div><strong>{identity.workspace.name}</strong><span>Quản trị viên · {identity.user.username}</span></div><button disabled={busy} onClick={()=>void onLogout().catch(error=>setError(messageOf(error)))}>Đăng xuất</button></header>
     <main className="online-admin-main"><section className="online-intro"><div><p className="online-eyebrow">KHÔNG GIAN QUẢN TRỊ</p><h1>Lớp học & hành trình mỗi tuần</h1><p>Bạn quyết định môn học và nội dung. Ứng dụng kiểm tra cấu trúc câu hỏi, mở trò phù hợp và lưu tiến độ theo tài khoản.</p></div><button disabled={busy} onClick={()=>void run(async()=> 'Đã cập nhật dữ liệu từ máy chủ.')}>Làm mới dữ liệu</button></section>
       {error&&<div className="online-notice online-error" role="alert">{error}<button disabled={busy} onClick={()=>void run(async()=> 'Đã kết nối lại máy chủ.')}>Thử lại</button></div>}{notice&&<p className="online-notice" role="status">{notice}</p>}
       {credentials&&<section className="online-credentials" aria-label="Thông tin tài khoản mới" role="status"><div><h2>Tài khoản của {credentials.name}</h2><p>Chỉ hiển thị ở lần cấp này. Sao chép và gửi riêng cho học sinh.</p><dl><dt>Tên đăng nhập</dt><dd><code>{credentials.username}</code></dd><dt>Mật khẩu</dt><dd><code>{credentials.password}</code></dd></dl></div><button onClick={()=>setCredentials(null)}>Đã lưu · Đóng thông tin</button></section>}
@@ -247,6 +248,7 @@ export default function AdminDashboard({identity,onLogout,onRestored}:{identity:
         {tab==='gifts'&&<div className="online-two-column">
           <section className="online-card">
             <h2>{editingGiftId?'Sửa món quà':'Thêm món quà lên Kệ'}</h2>
+            <GiftPresetPanel busy={busy} onInstall={()=>void run(async()=>{const result=await onlineApi.installGiftPreset();await loadGifts();return `Đã thêm ${result.created} món quà; giữ nguyên ${result.kept} món đã có. Tỷ lệ cho yêu cầu mới: 1 sao = 500 đồng.`;})}/>
             <p>Học sinh dùng sao đạt được từ các bài học để ghim mục tiêu và đổi quà.</p>
             <form className="online-form" onSubmit={event=>{event.preventDefault();void run(async()=>{
               const payload: Partial<GiftItem> = {
@@ -315,11 +317,13 @@ export default function AdminDashboard({identity,onLogout,onRestored}:{identity:
             </div>
             {gifts.length?<ul className="online-list">
               {gifts.map(gift=><li key={gift.id}>
+                {(gift.imageMediaId||gift.imageUrl)&&<img src={gift.imageMediaId?`/api/online/media/${encodeURIComponent(gift.imageMediaId)}`:gift.imageUrl} alt={gift.title} width={140} height={110} loading="lazy" style={{objectFit:'contain'}}/>}
                 <div className="online-section-head">
                   <strong>{gift.title}</strong>
                   <span className={`online-badge ${gift.active?'':'is-muted'}`}>{gift.active?'Đang hiển thị':'Đã ẩn'}</span>
                 </div>
-                <span>⭐ {gift.priceStars} sao · {gift.kind==='item'?'Vật phẩm':gift.kind==='experience'?'Trải nghiệm':gift.kind==='privilege'?'Đặc quyền':'Tiết kiệm'} · {gift.stock!==null?`Kho: ${gift.stock}`:'Kho: ∞'}</span>
+                <span>⭐ {gift.priceStars} sao · {gift.kind==='item'?'Vật phẩm':gift.kind==='experience'?'Trải nghiệm':gift.kind==='privilege'?'Đặc quyền':'Tiết kiệm'} · {gift.stock!==null&&gift.stock>=0?`Kho: ${gift.stock}`:'Bố mẹ chuẩn bị quà'}</span>
+                {gift.referencePriceVnd!==undefined&&<small>Giá tham khảo: {onlineMoney(gift.referencePriceVnd)}</small>}
                 <small>{gift.weeklyLimit?`Tối đa ${gift.weeklyLimit} lần/tuần`:''} {gift.unlockAfterWeek?`· Sau tuần ${gift.unlockAfterWeek}`:''} {gift.classId?`· Lớp: ${data.classes.find(c=>c.id===gift.classId)?.name??gift.classId}`:'· Mọi lớp'}</small>
                 <div className="online-actions">
                   <button disabled={busy} onClick={()=>editGift(gift)}>Sửa quà</button>

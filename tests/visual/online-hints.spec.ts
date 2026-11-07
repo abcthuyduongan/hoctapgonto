@@ -12,6 +12,7 @@ for(const game of ['sentence-builder','sequence-trail'])test(`${game} waits for 
   const en={...vi,id:'hint-english',title:'Xếp câu tiếng Anh',items:[['Birds','can','fly'],['We','read','books']].map((words,i)=>({id:'hint-en-'+i,kind:'sentence',objectiveId:'HINT.EN',prompt:'Xếp đúng thứ tự '+i,words,hint:'Đặt chủ ngữ ở đầu câu '+i+'.'}))};
   await api('/weeks',{requestId:'hint-week',classId:cls.id,title:'Tuần 01',sets:[{subjectLabel:'Toán',pack:math},{subjectLabel:'Tiếng Việt',pack:vi},{subjectLabel:'Tiếng Anh',pack:en}]});
   await page.context().clearCookies();await api('/login',{username:'hint.child',password:f.password});await page.goto(f.origin+'/?online=1&controls=1');
+  await page.getByRole('button',{name:'📋 Danh sách',exact:true}).click();
   const pack=game==='sentence-builder'?vi:en,set=page.locator('.online-week-path > li > ul > li').filter({hasText:pack.title}),details=set.locator('details');if(await details.getAttribute('open')===null)await details.locator('summary').click();
   await set.getByRole('button',{name:'Chọn trò để học hoặc ôn lại',exact:true}).click();await set.getByRole('combobox').selectOption(game);
   const starting=page.waitForResponse(r=>r.url().endsWith('/api/online/play/compact'));await set.getByRole('button',{name:/^Học bộ này ·/}).click();const started=await(await starting).json();expect(started.presentation.items.every((item:any)=>!Object.hasOwn(item,'hint'))).toBe(true);

@@ -14,6 +14,7 @@ import {
 import { canAffordBuilding } from '../core/town-materials.ts';
 import { validateAnimalName } from '../core/animal-neighbors.ts';
 import { ClassFeedDialog } from './ClassFeedDialog.tsx';
+import { StatChip } from '../ui/StatChip.tsx';
 import '../styles/town.css';
 
 interface TownScreenProps {
@@ -323,18 +324,14 @@ export const TownScreen: React.FC<TownScreenProps> = ({ onBack, studentId }) => 
         {!visiting ? (
           <div className="town-material-bar">
             {(['stone', 'wood', 'fish', 'component'] as MaterialType[]).map((mat) => (
-              <div key={mat} className={`material-chip ${mat}`} title={`Vật liệu kiếm từ môn học`}>
-                <span className="material-icon">{MATERIAL_ICONS[mat]}</span>
-                <span className="material-label">
-                  {MATERIAL_LABELS[mat]}
-                  {mat === 'stone' && ' (Toán)'}
-                  {mat === 'wood' && ' (Tiếng Việt)'}
-                  {mat === 'fish' && ' (Tiếng Anh)'}
-                  {mat === 'component' && ' (Tin học)'}
-                  :
-                </span>
-                <span className="material-count">{materials[mat] || 0}</span>
-              </div>
+              <StatChip
+                key={mat}
+                className={`material-chip ${mat}`}
+                customIcon={MATERIAL_ICONS[mat]}
+                label={`${MATERIAL_LABELS[mat]}${mat === 'stone' ? ' (Toán)' : mat === 'wood' ? ' (Tiếng Việt)' : mat === 'fish' ? ' (Tiếng Anh)' : ' (Tin học)'}:`}
+                value={materials[mat] || 0}
+                title="Vật liệu kiếm từ môn học"
+              />
             ))}
 
             <button
@@ -415,7 +412,7 @@ export const TownScreen: React.FC<TownScreenProps> = ({ onBack, studentId }) => 
         </div>
       )}
 
-      <main className="town-body">
+      <div className="town-body">
         {/* Left Arena: 10x10 Grid */}
         <section className="town-grid-card">
           <div className="town-grid-header">
@@ -630,7 +627,7 @@ export const TownScreen: React.FC<TownScreenProps> = ({ onBack, studentId }) => 
             </div>
           </aside>
         )}
-      </main>
+      </div>
 
       {/* Confirmation Modal when cell and building are both picked */}
       {selectedBuilding && targetCell && !visiting && (

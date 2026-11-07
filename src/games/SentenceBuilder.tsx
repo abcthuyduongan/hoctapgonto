@@ -7,6 +7,7 @@ import {useQuestionSpeech} from './useQuestionSpeech';
 import {saveFailureMessage} from './save-failure-message';
 import QuestionMedia from '../components/QuestionMedia';
 import GameMascot from './GameMascot';
+import { getMascotLine } from './mascot-dialogue';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { AttemptInput, GameHostProps, SentencePack } from '../core/contracts';
 import { shuffle } from '../core/utils';
@@ -123,7 +124,13 @@ export default function SentenceBuilder({pack,onAttempt,onComplete,onExit,questi
         </div>
       </div>
     )}
-    <div className="sentence-adventure-layout"><aside className="sentence-guide"><GameMascot alt="Cáo nhỏ dẫn đường" mood={feedback==='correct'?'happy':feedback==='retry'?'encourage':'idle'}/><div className="guide-speech">Chạm hoặc kéo từ vào ô để tạo câu nhé! ✨</div></aside>
+    <div className="sentence-adventure-layout">
+      <aside className="sentence-guide">
+        <GameMascot alt="Cáo nhỏ dẫn đường" mood={feedback === 'correct' ? 'happy' : feedback === 'retry' ? 'encourage' : 'idle'} />
+        <div className="guide-speech">
+          {getMascotLine(feedback === 'correct' ? 'happy' : feedback === 'retry' ? 'encourage' : 'idle', index)}
+        </div>
+      </aside>
       <div className="sentence-scroll">
         <div className="quest-progress"><span>CÂU {index+1}/{content.items.length}</span><span>✎ GHÉP CÂU VUI</span></div>
         <div className="progress-track"><div style={{width:`${(index+(feedback==='correct'?1:0))/content.items.length*100}%`}}/></div>
@@ -163,7 +170,24 @@ export default function SentenceBuilder({pack,onAttempt,onComplete,onExit,questi
         <p className="small-note">{questionMode?'Sao riêng từng câu: 3 sao khi đúng ngay và không xem gợi ý; mỗi lần sai hoặc xem gợi ý giảm 1 mức, tối thiểu 1 sao khi đúng. ':' '}Hệ thống đang sử dụng một đáp án mẫu, chưa đánh giá đầy đủ các biến thể ngôn ngữ.</p>
       </div>
     </div>
-    {done && <GameCompletion questionMode={questionMode} title="Nhà thám hiểm ngôn từ!" summary={`${firstTry}/${content.items.length} câu đúng ngay lần đầu và không cần gợi ý. Con đã kiên trì hoàn thành các câu còn lại.`} onExit={onExit}/>}
+    {done && (
+      <GameCompletion
+        questionMode={questionMode}
+        title="Nhà thám hiểm ngôn từ!"
+        summary={`${firstTry}/${content.items.length} câu đúng ngay lần đầu và không cần gợi ý. Con đã kiên trì hoàn thành các câu còn lại.`}
+        onExit={onExit}
+        onReplay={() => {
+          setIndex(0);
+          setPlaced([]);
+          setRetries(0);
+          setHint(false);
+          setHintText('');
+          setFeedback(null);
+          setFirstTry(0);
+          setDone(false);
+        }}
+      />
+    )}
     <div className="world-particles" aria-hidden="true"><i/><i/><i/><i/><i/><i/></div>
     <div className="world-stage-bottom"><span>🌈 Từng từ một, con sẽ tạo nên điều hay!</span><span>✦ Bảo An Game World</span></div>
   </section>;

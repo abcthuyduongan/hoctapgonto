@@ -1,10 +1,16 @@
 > **Cập nhật khắc phục sau đánh giá độc lập (06/11/2026):** Toàn bộ các lỗi bảo mật P0/P1 phát hiện tại đợt kiểm thử độc lập 05/11/2026 (L01–L07) đã được sửa triệt để và nghiệm thu thành công trên bản **4.0.1**. Chi tiết xem [Ma trận nghiệm thu 4.0.1](docs/DANH_GIA_4_0_0_2026-11-05/03_MA_TRAN_NGHIEM_THU.md) và [Kết quả nghiệm thu JSON](docs/DANH_GIA_4_0_0_2026-11-05/KET_QUA_NGHIEM_THU_4_0_1.json).
 
-# Bảo An Learning · Phiên bản 4.0.1 (Bản hoàn thiện đã qua nghiệm thu)
+# Bảo An Learning · 4.3.0-rc.1 (Ứng viên đang nghiệm thu)
 
-> **Trạng thái:** Bản phát hành hoàn thiện 4.0.1 — Đã khắc phục 100% các lỗi bảo mật máy chủ, quyền PIN, sao lưu cloud, migration DDL, xáo đáp án ngẫu nhiên và cuộn giao diện di động.  
+> **Cập nhật mới nhất:** Dự án đã bổ sung SafeTime sau đợt A–B. Xem [các lỗi kết nối đã sửa và trạng thái kiểm tra bản mới](docs/KIEM_TRA_BACKEND_AB_VA_SONG_HANH_2026-11-07/06_CAP_NHAT_SAFETIME_MOI.md). Kết quả/gói 4.1 cũ không chứng nhận bản 4.3 hiện tại. Chưa cập nhật Netlify.
+
+> **Trạng thái hiện hành 07/11/2026:** Kiểm tra lại backend/frontend A–B, sửa lỗi tương thích và giao diện; xem [báo cáo khắc phục](docs/KIEM_TRA_BACKEND_AB_VA_SONG_HANH_2026-11-07/01_BAO_CAO_KIEM_TRA_VA_SUA_LOI.md), [kết quả nghiệm thu](docs/KIEM_TRA_BACKEND_AB_VA_SONG_HANH_2026-11-07/03_KET_QUA_NGHIEM_THU.json) và [kế hoạch song hành SafeTime](docs/KIEM_TRA_BACKEND_AB_VA_SONG_HANH_2026-11-07/02_CHOT_PHUONG_AN_SONG_HANH.md). Đây là phiên bản mã nguồn tại máy; chưa tự triển khai lên Netlify.
 > **Bộ học liệu:** Khung 8 tuần học kỳ 2 lớp 3 (`data/curriculum/hoc-ky-2-8-tuan.json`) đạt chuẩn kỹ thuật; xáo đáp án tự động độc lập với vị trí nguồn.  
-> **Kiểm thử nghiệm thu:** 100% automated tests đạt (263 online, 47 cloud, 26 bản đồ, 12 release, 28/28 Playwright browser visual tests, 0 lỗi P0/P1).
+> **Kiểm thử:** Số ca và trạng thái cuối trong hồ sơ nghiệm thu nêu trên. Thử nghiệm với trẻ, thiết bị thật và kết nối tự động SafeTime có cổng nghiệm thu riêng, chưa được chứng nhận bằng kiểm thử mã nguồn.
+
+> **Bộ quà của gia đình:** [20 món có ảnh, giá tiền và số sao](docs/BO_QUA_BAO_AN_20_MON/DANH_MUC_QUA.html), tạm tính **1 sao = 500 đồng**. Thêm trong **Quản trị → Kệ quà → Bộ 20 món quà dành cho Bảo An**; yêu cầu đổi thưởng đã gửi vẫn giữ tỷ lệ cũ.
+
+> **Bàn giao sử dụng và cập nhật web:** [Cách thêm quà, kiểm tra bản mới, sao lưu và thử cùng Bảo An](docs/KIEM_TRA_BACKEND_AB_VA_SONG_HANH_2026-11-07/05_BAN_GIAO_THUC_HIEN.md).
 
 Ứng dụng học tập thông minh dành cho học sinh tiểu học (Lớp 3) kết hợp gia đình và nhà trường:
 - **Bản đồ thế giới học tập 2D:** 4 vùng môn học (Toán học, Tiếng Việt, Tiếng Anh, Tin học), 28 tranh cảnh quan và địa danh văn hóa Việt Nam, chặng học tập mở theo tuần, có sương mù và thẻ khám phá kể chuyện.

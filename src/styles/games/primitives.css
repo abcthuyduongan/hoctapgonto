@@ -191,6 +191,41 @@ input:focus-visible {
   font-weight: 950;
 }
 
+/* GF02: Standard typography for question and answer zones across all 10 minigames */
+.quiz-question,
+.basket-prompt-title,
+.scale-prompt-title,
+.boat-prompt-title,
+.kitchen-prompt-title,
+.treasure-prompt-title,
+.sentence-prompt-title,
+.sequence-prompt-title,
+.word-connect-prompt-title {
+  font-size: var(--t-h2-size, 24px);
+  line-height: var(--t-h2-line, 32px);
+  font-weight: var(--t-h2-weight, 700);
+  color: var(--c-ink, #183449);
+}
+
+.answer-option,
+.basket-target,
+.scale-choice,
+.boat-choice,
+.kitchen-choice,
+.treasure-choice {
+  font-size: var(--t-answer-size, 20px);
+  line-height: var(--t-answer-line, 28px);
+  font-weight: var(--t-answer-weight, 700);
+  min-height: 56px; /* Primary kid touch targets >= 56px (A11Y02 & GF02) */
+}
+
+/* GF04: Stable response zone to prevent CLS */
+.stable-response-zone {
+  min-height: 140px;
+  border-radius: var(--r-md, 14px);
+  box-sizing: border-box;
+}
+
 /* Base keyframes */
 @keyframes gw-float {
   0%, 100% { transform: translateY(0); }

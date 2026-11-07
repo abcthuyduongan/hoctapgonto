@@ -12,6 +12,7 @@ import { playFeedbackTone } from '../core/experience';
 import GameCompletion from './GameCompletion';
 import FeedbackEffects from './FeedbackEffects';
 import { useQuestionLayout } from './useQuestionLayout';
+import { useQuestionSpeech } from './useQuestionSpeech';
 
 const INGREDIENT_ICONS = ['🥕', '🍄', '🍅', '🧅', '🥦', '🌽', '🥔', '🧀', '🧄', '🌿'];
 
@@ -39,6 +40,7 @@ export default function FoxKitchen({
   const started = useRef(performance.now());
   const submitting = useRef(false);
   const item = content.items[index];
+  const speech = useQuestionSpeech(pack.subject, item.id);
   const layout = useQuestionLayout({
     kind: 'sequence-trail',
     questionKey: item.id,
@@ -198,11 +200,29 @@ export default function FoxKitchen({
           summary={`Bé đã nấu thành công toàn bộ ${content.items.length} món ngon cùng Đầu bếp Cáo!`}
           onExit={onExit}
           questionMode={questionMode}
+          onReplay={() => {
+            setIndex(0);
+            setPlaced([]);
+            setRetries(0);
+            setHint(false);
+            setHintText('');
+            setFeedback(null);
+            setDone(false);
+          }}
         />
       ) : (
         <div className="kitchen-stage" style={{ padding: '16px 0', textAlign: 'center' }}>
-          <div className="recipe-prompt" style={{ fontSize: '18px', fontWeight: 600, color: '#9a3412', marginBottom: '16px' }}>
-            📜 Công thức: {item.prompt}
+          <div className="recipe-prompt" style={{ fontSize: '18px', fontWeight: 600, color: '#9a3412', marginBottom: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+            <span>📜 Công thức: {item.prompt}</span>
+            <button
+              type="button"
+              className="speech-trigger-btn"
+              onClick={() => speech.read(item.prompt)}
+              aria-label="Nghe đọc công thức"
+              title="Nghe đọc công thức"
+            >
+              🔊
+            </button>
           </div>
 
           {/* Cooking Pot Area */}

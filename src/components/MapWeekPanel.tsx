@@ -148,7 +148,7 @@ export default function MapWeekPanel({
                         <button
                           key={g.id}
                           type="button"
-                          className="map-play-btn"
+                          className="map-play-btn map-game-card-large"
                           disabled={disabled}
                           onClick={() => onPlayGame(g.id, pack)}
                           aria-label={`Bắt đầu chơi ${g.label} cho bài ${nodeSet.title}`}
@@ -157,12 +157,15 @@ export default function MapWeekPanel({
                             <img
                               src={GAME_CARD_IMAGES[g.id]}
                               alt=""
-                              className="map-game-card-thumb"
+                              className="map-game-card-thumb map-game-card-large-thumb"
                               aria-hidden="true"
                               loading="lazy"
                             />
                           )}
-                          <span>▶ {g.label}</span>
+                          <div className="map-game-card-info">
+                            <span className="map-game-card-title">▶ {g.label}</span>
+                            <span className="map-game-card-cta">Chơi ngay</span>
+                          </div>
                         </button>
                       ))}
                     </div>

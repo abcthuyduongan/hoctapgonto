@@ -24,10 +24,10 @@ for(const authenticated of[false,true])test(`startup overlaps status and identit
     // This cannot pass if /me is only sent after the held /status response.
     await expect.poll(()=>starts.map(row=>row.path).sort()).toEqual(['me','status']);
     expect(statusDone).toBe(false);expect(identityDone).toBe(false);
-    await expect(page.getByText('Đang kết nối máy chủ…',{exact:true})).toBeVisible();
+    await expect(page.getByText('Đang mở không gian học tập…',{exact:true})).toBeVisible();
     await expect(page.getByRole('heading',{name:'Chào mừng bạn trở lại',exact:true})).toHaveCount(0);
     identity.release();await expect.poll(()=>identityDone).toBe(true);
-    await expect(page.getByText('Đang kết nối máy chủ…',{exact:true})).toBeVisible();
+    await expect(page.getByText('Đang mở không gian học tập…',{exact:true})).toBeVisible();
     status.release();
     if(authenticated){
       await expect(page.getByRole('heading',{name:'Lớp học & hành trình mỗi tuần',exact:true})).toBeVisible();
