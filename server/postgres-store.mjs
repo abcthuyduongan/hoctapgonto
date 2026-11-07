@@ -23,6 +23,7 @@ import {CONTEST_PRESETS,CONTESTANT_BADGE,sanitizeContestItem,evaluateContestSubm
 import {TOWN_BUILDING_CATALOG,TOWN_BUILDING_MAP,resolveTownSubject,getMaterialForSubject,calculateEarnedMaterialsFromAwards,calculateTotalSpentMaterials,calculateAvailableMaterials,canAffordBuilding,defaultTownState,evaluateBuildingPlacement} from './town-data.mjs';
 import {ANIMAL_CATALOG,ANIMAL_MAP,getUnlockedAnimals,validateAnimalName} from '../src/core/animal-neighbors.ts';
 import {sanitizeClassFeedEvent,verifyPrivacyCompliance} from '../src/core/class-feed.ts';
+import {normalizeIntegrationSubject} from './safetime-integration.mjs';
 
 const now=()=>new Date().toISOString(),id=()=>randomUUID(),json=JSON.stringify;
 const parse=value=>typeof value==='string'?JSON.parse(value):value;
@@ -2193,5 +2194,146 @@ export class PostgresStore{
       createdAt: r.created_at
     }));
     return { events, cursor: events.length > 0 ? events[events.length - 1].createdAt : afterCursor };
+  }
+
+  async getStudentTodayData(workspaceId, studentId, client = this.pool) {
+    const student = await this.one(`
+      SELECT s.id, s.user_id, s.name AS "displayName", s.class_id, c.name AS "className", c.grade
+      FROM bao_an.students s
+      JOIN bao_an.classes c ON c.workspace_id = s.workspace_id AND c.id = s.class_id
+      WHERE s.workspace_id = $1 AND s.id = $2 AND s.active = true
+    `, [workspaceId, studentId], client);
+    if (!student) return null;
+
+    const auth = { workspaceId, studentId, id: student.user_id || studentId, role: 'student' };
+    const { dateStr } = getVietnamTimeParts();
+
+    // 1. Stars balance
+    const rewards = await this.rewards(auth, studentId, client);
+    const requests = await this.requests(auth, studentId, client);
+    const balance = rewardBalance(earnedQuestionRewardStars(rewards), { requests });
+    const stars = {
+      available: balance.available,
+      note: 'Chỉ đổi vật phẩm trên Kệ quà'
+    };
+
+    // 2. Streak
+    const streakObj = await this.studentStreak(auth, studentId, undefined, client);
+    const streakDays = streakObj?.currentStreak ?? streakObj?.days ?? 0;
+
+    // 3. Parent Controls & Daily screen time limit
+    const controls = await this.rawParentControls(workspaceId, studentId, client);
+    const usedMinutes = await this.todayStudentStudyMinutes(auth, studentId, client);
+    const allowedStartHour = controls?.allowedStartHour ?? 0;
+    const allowedEndHour = controls?.allowedEndHour ?? 24;
+    const maxMinutesPerDay = controls?.maxMinutesPerDay ?? 0;
+    const baoAnLimit = {
+      maxMinutesPerDay,
+      usedMinutes,
+      allowedStartHour,
+      allowedEndHour
+    };
+    const curfew = checkCurfewHours(allowedStartHour, allowedEndHour);
+    const isTimeLocked = !curfew.allowed || (maxMinutesPerDay > 0 && usedMinutes >= maxMinutesPerDay);
+
+    // 4. Subjects progress
+    const STANDARD_SUBJECTS = [
+      { key: 'toan', label: 'Toán' },
+      { key: 'tieng-viet', label: 'Tiếng Việt' },
+      { key: 'tieng-anh', label: 'Tiếng Anh' },
+      { key: 'tin-hoc', label: 'Tin học' }
+    ];
+    const progress = await this.summaryProgress(auth, student, client, rewards);
+    let currentWeek = null;
+    if (progress?.currentWeekSummary?.weekId) {
+      currentWeek = progress.weeks.find(w => w.id === progress.currentWeekSummary.weekId);
+    }
+    if (!currentWeek && progress?.weeks?.length) {
+      currentWeek = progress.weeks.find(w => !w.done) || progress.weeks[progress.weeks.length - 1];
+    }
+
+    const subjects = STANDARD_SUBJECTS.map(subj => {
+      if (!currentWeek) {
+        return {
+          key: subj.key,
+          label: subj.label,
+          week: 0,
+          packsPassed: 0,
+          packsTotal: 0,
+          state: 'none'
+        };
+      }
+      const weekNum = currentWeek.position ?? 1;
+      const matchingSets = (currentWeek.sets || []).filter(s => {
+        const raw = s.subjectLabel || s.pack?.subjectLabel || s.pack?.subject;
+        return normalizeIntegrationSubject(raw) === subj.key;
+      });
+      const packsTotal = matchingSets.length;
+      const packsPassed = matchingSets.filter(s => (s.stars ?? 0) >= 2 || s.done).length;
+      let state = 'todo';
+      if (isTimeLocked) {
+        state = 'locked';
+      } else if (packsTotal === 0) {
+        state = 'none';
+      } else if (packsPassed >= packsTotal) {
+        state = 'done';
+      } else {
+        state = 'todo';
+      }
+      return {
+        key: subj.key,
+        label: subj.label,
+        week: weekNum,
+        packsPassed,
+        packsTotal,
+        state
+      };
+    });
+
+    // 5. Daily missions
+    const missions = await this.studentDailyMissions(auth, studentId, undefined, client);
+    const dailyMissions = missions.map(m => ({
+      id: m.id,
+      title: m.title,
+      done: !!m.completed
+    }));
+
+    // 6. Contests
+    const studentGrade = student.grade || 3;
+    const presets = Object.values(CONTEST_PRESETS).filter(p => !p.grade || p.grade === studentGrade);
+    const contests = await Promise.all(presets.map(async p => {
+      const lastSession = await this.one(`
+        SELECT score, max_score, submitted_at
+        FROM bao_an.contest_sessions
+        WHERE workspace_id = $1 AND student_id = $2 AND preset_id = $3 AND status IN ('submitted', 'timeout')
+        ORDER BY created_at DESC LIMIT 1
+      `, [workspaceId, studentId, p.id], client);
+      return {
+        presetId: p.id,
+        title: p.title,
+        subject: normalizeIntegrationSubject(p.subject),
+        durationMinutes: Math.round(p.durationSeconds / 60),
+        last: lastSession ? {
+          score: lastSession.score,
+          maxScore: lastSession.max_score,
+          submittedAt: lastSession.submitted_at
+        } : null
+      };
+    }));
+
+    return {
+      student: {
+        id: student.id,
+        displayName: student.displayName,
+        className: student.className
+      },
+      date: dateStr,
+      stars,
+      streakDays,
+      baoAnLimit,
+      subjects,
+      dailyMissions,
+      contests
+    };
   }
 }

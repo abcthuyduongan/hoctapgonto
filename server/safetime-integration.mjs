@@ -645,9 +645,35 @@ export function createSafeTimeIntegrationRouter({ store, db, authenticateUserCre
         return true;
       }
 
-      // Placeholders for subsequent tasks 3B.6
-      if (subPath.startsWith('/students/')) {
-        sendError(res, 501, 'not_implemented', 'Chức năng đang được hoàn thiện ở task tiếp theo.');
+      // Command 9: GET /students/{id}/today (BAO-11)
+      const studentTodayMatch = subPath.match(/^\/students\/([^/]+)\/today$/);
+      if (studentTodayMatch && method === 'GET') {
+        const auth = authenticateBearer(req);
+        if (auth.error) {
+          sendError(res, auth.error.status, auth.error.code, auth.error.message);
+          return true;
+        }
+
+        const studentId = decodeURIComponent(studentTodayMatch[1]).trim();
+        if (!studentId) {
+          sendError(res, 400, 'invalid_student_id', 'Mã học sinh không hợp lệ.');
+          return true;
+        }
+
+        if (Array.isArray(auth.client.allowed_student_ids) && auth.client.allowed_student_ids.length > 0) {
+          if (!auth.client.allowed_student_ids.includes(studentId)) {
+            sendError(res, 403, 'student_not_allowed', 'Học sinh này chưa được bố mẹ cấp phép trên thiết bị này.');
+            return true;
+          }
+        }
+
+        const todayData = store.getStudentTodayData(auth.client.workspace_id, studentId);
+        if (!todayData) {
+          sendError(res, 404, 'student_not_found', 'Không tìm thấy thông tin học sinh trong đơn vị.');
+          return true;
+        }
+
+        sendJson(res, 200, todayData);
         return true;
       }
 

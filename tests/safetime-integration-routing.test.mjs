@@ -1072,3 +1072,164 @@ test('Task 3B.5 (BAO-12): Real HTTP Server loopback GET /events end-to-end', asy
 
   server.close();
 });
+
+test('Task 3B.6 (BAO-11): store.getStudentTodayData aggregation', async () => {
+  const store = new OnlineStore(':memory:');
+  const { workspaceId, student1Id } = await setupWorkspaceWithStudents(store);
+
+  const todayData = store.getStudentTodayData(workspaceId, student1Id);
+  assert.ok(todayData);
+
+  // 1. Student identity
+  assert.equal(todayData.student.id, student1Id);
+  assert.equal(todayData.student.displayName, 'Minh Hoàng');
+  assert.equal(todayData.student.className, '3A');
+
+  // 2. Date
+  assert.match(todayData.date, /^\d{4}-\d{2}-\d{2}$/);
+
+  // 3. Stars (read-only balance, with note)
+  assert.equal(typeof todayData.stars.available, 'number');
+  assert.equal(todayData.stars.note, 'Chỉ đổi vật phẩm trên Kệ quà');
+
+  // 4. Streak
+  assert.equal(typeof todayData.streakDays, 'number');
+
+  // 5. Parent limits & screen time
+  assert.equal(typeof todayData.baoAnLimit.maxMinutesPerDay, 'number');
+  assert.equal(typeof todayData.baoAnLimit.usedMinutes, 'number');
+  assert.equal(typeof todayData.baoAnLimit.allowedStartHour, 'number');
+  assert.equal(typeof todayData.baoAnLimit.allowedEndHour, 'number');
+
+  // 6. Subjects (4 standard subjects)
+  assert.equal(todayData.subjects.length, 4);
+  const keys = todayData.subjects.map(s => s.key);
+  assert.deepEqual(keys, ['toan', 'tieng-viet', 'tieng-anh', 'tin-hoc']);
+  for (const s of todayData.subjects) {
+    assert.ok(s.label);
+    assert.equal(typeof s.week, 'number');
+    assert.equal(typeof s.packsPassed, 'number');
+    assert.equal(typeof s.packsTotal, 'number');
+    assert.ok(['todo', 'done', 'none', 'locked'].includes(s.state));
+  }
+
+  // 7. Daily missions
+  assert.ok(Array.isArray(todayData.dailyMissions));
+  for (const m of todayData.dailyMissions) {
+    assert.ok(m.id);
+    assert.ok(m.title);
+    assert.equal(typeof m.done, 'boolean');
+  }
+
+  // 8. Contests
+  assert.ok(Array.isArray(todayData.contests));
+  for (const c of todayData.contests) {
+    assert.ok(c.presetId);
+    assert.ok(c.title);
+    assert.ok(c.subject);
+    assert.equal(typeof c.durationMinutes, 'number');
+  }
+});
+
+test('Task 3B.6 (BAO-11, BAO-13): GET /api/integration/safetime/v1/students/{id}/today router endpoint', async () => {
+  const store = new OnlineStore(':memory:');
+  const { workspaceId, student1Id, student2Id } = await setupWorkspaceWithStudents(store);
+  const router = createSafeTimeIntegrationRouter({ store, db: store.db });
+
+  // Create client paired ONLY for student1Id
+  const token = 'safetime_test_token_today_12345';
+  const tokenHash = createHash('sha256').update(token).digest('hex');
+  store.createIntegrationClient(workspaceId, {
+    tokenHash,
+    deviceId: 'tablet-today-01',
+    deviceName: 'Tablet Hôm Nay',
+    allowedStudentIds: [student1Id]
+  });
+
+  // 1. Missing Authorization header -> 401
+  let mock = mockRequestResponse({
+    path: `/api/integration/safetime/v1/students/${student1Id}/today`,
+    method: 'GET'
+  });
+  await router.handle(mock.req, mock.res);
+  assert.equal(mock.getResult().status, 401);
+
+  // 2. Requesting student2Id (not allowed for this client) -> 403 student_not_allowed (BAO-13)
+  mock = mockRequestResponse({
+    path: `/api/integration/safetime/v1/students/${student2Id}/today`,
+    method: 'GET',
+    headers: { authorization: `Bearer ${token}` }
+  });
+  await router.handle(mock.req, mock.res);
+  const resForbidden = mock.getResult();
+  assert.equal(resForbidden.status, 403);
+  assert.equal(resForbidden.json.error.code, 'student_not_allowed');
+
+  // 3. Requesting non-existent studentId -> 404
+  mock = mockRequestResponse({
+    path: '/api/integration/safetime/v1/students/non_existent_id/today',
+    method: 'GET',
+    headers: { authorization: `Bearer ${token}` }
+  });
+  await router.handle(mock.req, mock.res);
+  assert.equal(mock.getResult().status, 403); // blocked because not in allowedStudentIds
+
+  // 4. Requesting allowed student1Id -> 200 with today payload
+  mock = mockRequestResponse({
+    path: `/api/integration/safetime/v1/students/${student1Id}/today`,
+    method: 'GET',
+    headers: { authorization: `Bearer ${token}` }
+  });
+  await router.handle(mock.req, mock.res);
+  const resSuccess = mock.getResult();
+  assert.equal(resSuccess.status, 200);
+  assert.equal(resSuccess.headers['X-Integration-Version'], '1');
+  const payload = resSuccess.json;
+  assert.equal(payload.student.id, student1Id);
+  assert.equal(payload.student.displayName, 'Minh Hoàng');
+  assert.equal(payload.student.className, '3A');
+  assert.ok(payload.date);
+  assert.equal(payload.stars.note, 'Chỉ đổi vật phẩm trên Kệ quà');
+  assert.equal(payload.subjects.length, 4);
+  assert.ok(Array.isArray(payload.dailyMissions));
+  assert.ok(Array.isArray(payload.contests));
+});
+
+test('Task 3B.6 (BAO-11): Real HTTP Server loopback GET /students/{id}/today end-to-end', async () => {
+  const server = createOnlineServer({ databasePath: ':memory:' });
+  server.listen(0, '127.0.0.1');
+  await once(server, 'listening');
+  const port = server.address().port;
+  const origin = `http://127.0.0.1:${port}`;
+
+  const store = server.onlineStore;
+  const { workspaceId, student1Id } = await setupWorkspaceWithStudents(store);
+
+  // Pair client
+  const { code } = store.createIntegrationPairCode(workspaceId, [student1Id], 600);
+  const pairRes = await fetch(`${origin}/api/integration/safetime/v1/pair`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      code,
+      deviceId: 'pc-real-http-today',
+      deviceName: 'PC Kiểm Thử Today'
+    })
+  });
+  assert.equal(pairRes.status, 200);
+  const { token } = await pairRes.json();
+
+  // Call GET /api/integration/safetime/v1/students/{id}/today
+  const todayRes = await fetch(`${origin}/api/integration/safetime/v1/students/${student1Id}/today`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  assert.equal(todayRes.status, 200);
+  assert.equal(todayRes.headers.get('x-integration-version'), '1');
+  const body = await todayRes.json();
+  assert.equal(body.student.id, student1Id);
+  assert.equal(body.student.displayName, 'Minh Hoàng');
+  assert.equal(body.stars.note, 'Chỉ đổi vật phẩm trên Kệ quà');
+  assert.equal(body.subjects.length, 4);
+
+  server.close();
+});
