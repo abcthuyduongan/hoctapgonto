@@ -12,6 +12,7 @@ import {promisify} from 'node:util';
 import {OnlineStore,OnlineError,fail,shape,text,integer} from './online-store.mjs';
 import {MAX_RECOVERY_UPLOAD_BYTES,acquireOnlineDatabaseLock,recoverInterruptedOnlineRestore,inspectOnlineBackup,snapshotOnlineDatabase,restoreOnlineDatabase,createRecoveryTemporary,createRecoveryUpload} from './online-recovery.mjs';
 import {revokeParentElevationToken} from './parent-data.mjs';
+import {createSafeTimeIntegrationRouter} from './safetime-integration.mjs';
 
 const scrypt=promisify(scryptCallback),scryptOptions={N:32768,r:8,p:1,maxmem:64*1024*1024};
 const COOKIE='baoan_online_session',MAX_BODY=2*1024*1024;
@@ -39,6 +40,7 @@ export function createOnlineServer({databasePath,staticRoot=resolve('dist'),publ
     if(url.protocol!=='https:'&&!['127.0.0.1','localhost','[::1]'].includes(url.hostname))throw new Error('Website công khai cần HTTPS.');configuredOrigin=url.origin;}
   const releaseDatabaseLock=acquireOnlineDatabaseLock(databasePath);let store,db;
   try{recoverInterruptedOnlineRestore(databasePath);store=new OnlineStore(databasePath);db=store.db;}catch(error){releaseDatabaseLock();throw error;}
+  const safeTimeIntegration=createSafeTimeIntegrationRouter({store,db});
   let closed=false,recoveryBusy=false,backupRunning=false;
   const recoveryPreviews=new Map();
   const available=()=>{if(recoveryBusy)fail(503,'Máy chủ đang phục hồi dữ liệu. Hãy đợi hoàn tất rồi đăng nhập lại.');if(!store||!db)fail(503,'Phục hồi bị gián đoạn. Giữ nguyên dữ liệu, đóng rồi mở lại máy chủ để khôi phục an toàn.');};
@@ -92,6 +94,9 @@ export function createOnlineServer({databasePath,staticRoot=resolve('dist'),publ
       if((req.url??'').length>4096)fail(414,'Đường dẫn quá dài.');const origin=originFor(req),url=new URL(req.url,origin),path=url.pathname,method=req.method??'GET';
       if(path.startsWith('/api/')){
         available();
+        if(path.startsWith('/api/integration/safetime/')){
+          return await safeTimeIntegration.handle(req,res,{path,method,url,origin});
+        }
         if(!path.startsWith('/api/online/'))fail(404,'Không có API này.');
         const mutable=!['GET','HEAD','OPTIONS'].includes(method);
         if(mutable&&(req.headers.origin!==origin||req.headers['sec-fetch-site']==='cross-site'))fail(403,'Yêu cầu phải xuất phát từ chính website này.');
@@ -201,10 +206,13 @@ export function createOnlineServer({databasePath,staticRoot=resolve('dist'),publ
           if(playMatch[2]==='attempt')return json(res,200,store.attempt(current,playId,input,true));if(playMatch[2]==='question-hint')return json(res,200,store.questionHint(current,playId,input));if(playMatch[2]==='question-open')return json(res,200,store.openQuestion(current,playId,input,true));shape(input,[]);return json(res,200,store.finishPlay(current,playId,playMatch[2]==='abandon',true,true));
         }
         if(method==='POST'&&route==='/redemptions'){role(auth,'student');const{input,auth:current}=await authenticatedBody(req,'student');return json(res,201,store.requestReward(current,input));}
+        const parentRedemption=route.match(/^\/parent\/redemptions\/([^/]+)\/transition$/);
+        if(method==='POST'&&parentRedemption){const{input,auth:current}=await authenticatedBody(req,['admin','parent','student']);return json(res,200,store.transitionReward(current,decodeURIComponent(parentRedemption[1]),input,false,req.headers['x-parent-token']||null));}
         const redemption=route.match(/^\/redemptions\/([^/]+)\/(transition|cancel)$/);
         if(method==='POST'&&redemption){const expected=redemption[2]==='cancel'?'student':(auth.role==='parent'?'parent':'admin');role(auth,expected);const{input,auth:current}=await authenticatedBody(req,expected);return json(res,200,store.transitionReward(current,decodeURIComponent(redemption[1]),input,redemption[2]==='cancel'));}
         if(method==='GET'&&route==='/gifts'){return json(res,200,store.gifts(auth,url.searchParams.get('classId')));}
         if(method==='POST'&&route==='/gifts'){role(auth,'admin');const{input,auth:current}=await authenticatedBody(req,'admin');return json(res,201,store.createGift(current,input));}
+        if(method==='POST'&&route==='/gifts/preset/bao-an-20'){role(auth,'admin');const{input,auth:current}=await authenticatedBody(req,'admin');return json(res,200,store.installGiftPreset(current,input));}
         const giftMatch=route.match(/^\/gifts\/([^/]+)$/);
         if(giftMatch&&(method==='PATCH'||method==='PUT'||method==='POST')){role(auth,'admin');const{input,auth:current}=await authenticatedBody(req,'admin');return json(res,200,store.updateGift(current,decodeURIComponent(giftMatch[1]),input));}
         if(method==='GET'&&route==='/student/goal'){role(auth,'student');return json(res,200,store.studentGoal(auth));}
@@ -342,7 +350,7 @@ export function createOnlineServer({databasePath,staticRoot=resolve('dist'),publ
         fail(404,'Không có thao tác API này.');
       }
       if(!['GET','HEAD'].includes(method))fail(405,'Phương thức không được hỗ trợ.');
-      if(path==='/'&&!url.searchParams.has('online')){res.writeHead(302,{Location:'/?online=1','Cache-Control':'no-store'});res.end();return;}
+      if(path==='/'&&!url.searchParams.has('online')&&!url.searchParams.has('ui')){const nextUrl=new URL(url.toString());nextUrl.searchParams.set('online','1');res.writeHead(302,{Location:nextUrl.pathname+nextUrl.search,'Cache-Control':'no-store'});res.end();return;}
       let decoded;try{decoded=decodeURIComponent(path);}catch{fail(400,'Đường dẫn không hợp lệ.');}if(/[\\\u0000-\u001f]/.test(decoded)||decoded.split('/').some(part=>part==='..'||part.startsWith('.')))fail(404,'Không tìm thấy tệp.');
       let file=resolve(root,`.${decoded==='/'?'/index.html':decoded}`);if(!within(root,file))fail(404,'Không tìm thấy tệp.');
       let info;try{file=await realpath(file);if(!within(root,file))fail(404,'Không tìm thấy tệp.');info=await stat(file);if(!info.isFile())fail(404,'Không tìm thấy tệp.');}catch(error){if(error instanceof OnlineError)throw error;if(req.headers.accept?.includes('text/html')&&!extname(decoded)){file=resolve(root,'index.html');info=await stat(file);}else fail(404,'Không tìm thấy tệp.');}
@@ -352,5 +360,5 @@ export function createOnlineServer({databasePath,staticRoot=resolve('dist'),publ
     }catch(error){if(res.headersSent){res.destroy();return;}const status=error instanceof OnlineError?error.status:error instanceof URIError?400:500,supportId=reportFailure(req.url,req.method,status,performance.now()-started);json(res,status,{error:error instanceof OnlineError?error.message:error instanceof URIError?'Đường dẫn không hợp lệ.':'Máy chủ chưa xử lý được yêu cầu. Vui lòng thử lại.',...(supportId?{supportId}:{})});}
   });
   server.requestTimeout=30000;server.headersTimeout=15000;server.maxHeadersCount=80;
-  server.onlineStore=store;server.onlineClose=()=>{if(!closed){closed=true;try{store?.close();}finally{for(const preview of recoveryPreviews.values())preview.temporary.remove();recoveryPreviews.clear();releaseDatabaseLock();}}};return server;
+  server.onlineStore=store;server.safeTimeIntegration=safeTimeIntegration;server.onlineClose=()=>{if(!closed){closed=true;try{store?.close();}finally{for(const preview of recoveryPreviews.values())preview.temporary.remove();recoveryPreviews.clear();releaseDatabaseLock();}}};return server;
 }
