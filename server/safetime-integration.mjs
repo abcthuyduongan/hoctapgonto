@@ -17,6 +17,27 @@ export function isLoopbackAddress(address) {
          address === '::ffff:127.0.0.1';
 }
 
+/**
+ * Sanitizes and validates deep-link targets according to BAO-09 and ket-noi-bao-an.md section 5.1.
+ * Supported targets:
+ * - hoc/toan, hoc/tieng-viet, hoc/tieng-anh, hoc/tin-hoc
+ * - nhiem-vu
+ * - thi/{presetId}
+ * - ban-do
+ * - qua
+ * Any other value falls back safely to 'ban-do'.
+ */
+export function sanitizeDeepLink(to) {
+  if (!to || typeof to !== 'string') return 'ban-do';
+  const trimmed = to.trim().replace(/^#\/?/, '').replace(/^\//, '');
+  if (/^hoc\/(toan|tieng-viet|tieng-anh|tin-hoc)$/.test(trimmed)) return trimmed;
+  if (trimmed === 'nhiem-vu') return trimmed;
+  if (/^thi\/[a-zA-Z0-9_-]{1,64}$/.test(trimmed)) return trimmed;
+  if (trimmed === 'ban-do') return trimmed;
+  if (trimmed === 'qua') return trimmed;
+  return 'ban-do';
+}
+
 function createDefaultAuthenticator({ store, db }) {
   const hash = value => createHash('sha256').update(value).digest('hex');
   const dummySalt = randomBytes(16).toString('hex');
@@ -74,11 +95,23 @@ function createDefaultAuthenticator({ store, db }) {
   };
 }
 
+function defaultCreateSession(res, user, origin, db) {
+  const token = randomBytes(32).toString('base64url');
+  const csrfToken = randomBytes(32).toString('base64url');
+  const tokenHash = createHash('sha256').update(token).digest('hex');
+  db.prepare('DELETE FROM auth_sessions WHERE expires_at < ?').run(Date.now());
+  db.prepare('INSERT INTO auth_sessions VALUES (?, ?, ?, ?)').run(tokenHash, user.id, csrfToken, Date.now() + 43200000);
+  const secure = origin?.startsWith('https:') ? '; Secure' : '';
+  res.setHeader('Set-Cookie', `baoan_online_session=${token}; HttpOnly; SameSite=Lax; Path=/; Max-Age=43200${secure}`);
+  return { token, csrfToken };
+}
+
 /**
- * Creates the SafeTime Integration Router for handling /api/integration/safetime/v1 endpoints (BAO-01, BAO-05, BAO-06, BAO-07).
+ * Creates the SafeTime Integration Router for handling /api/integration/safetime/v1 endpoints (BAO-01, BAO-05, BAO-06, BAO-07, BAO-08, BAO-09).
  */
-export function createSafeTimeIntegrationRouter({ store, db, authenticateUserCredentials }) {
+export function createSafeTimeIntegrationRouter({ store, db, authenticateUserCredentials, createStudentSession }) {
   const authFn = authenticateUserCredentials || createDefaultAuthenticator({ store, db });
+  const sessionFn = createStudentSession || ((res, user, origin) => defaultCreateSession(res, user, origin, db));
 
   // In-memory rate limiting map: tokenHash -> { count, windowStart }
   const rateLimitMap = new Map();
@@ -221,7 +254,7 @@ export function createSafeTimeIntegrationRouter({ store, db, authenticateUserCre
     return rows;
   }
 
-  async function handle(req, res, { path, method }) {
+  async function handle(req, res, { path, method, url, origin }) {
     // 1. Loopback enforcement (BAO-05)
     const remoteAddress = req.socket?.remoteAddress;
     if (!isLoopbackAddress(remoteAddress)) {
@@ -237,6 +270,7 @@ export function createSafeTimeIntegrationRouter({ store, db, authenticateUserCre
     }
 
     const subPath = path.slice(prefix.length) || '/';
+    const requestUrl = url || new URL(req.url, origin || 'http://127.0.0.1');
 
     try {
       // Command 1: GET /status
@@ -420,8 +454,150 @@ export function createSafeTimeIntegrationRouter({ store, db, authenticateUserCre
         return true;
       }
 
-      // Placeholders for subsequent tasks 3B.4 - 3B.6
-      if (['/student-refresh', '/student-logout', '/sso', '/events'].includes(subPath) || subPath.startsWith('/students/')) {
+      // Command 6: POST /student-refresh (BAO-08)
+      if (subPath === '/student-refresh' && method === 'POST') {
+        const auth = authenticateBearer(req);
+        if (auth.error) {
+          sendError(res, auth.error.status, auth.error.code, auth.error.message);
+          return true;
+        }
+
+        const input = await parseBody(req);
+        const refreshToken = String(input?.refreshToken || '').trim();
+        const studentId = String(input?.studentId || '').trim();
+
+        if (!refreshToken || !studentId) {
+          sendError(res, 400, 'invalid_payload', 'Cần cung cấp mã làm mới (refreshToken) và mã học sinh (studentId).');
+          return true;
+        }
+
+        if (Array.isArray(auth.client.allowed_student_ids) && auth.client.allowed_student_ids.length > 0) {
+          if (!auth.client.allowed_student_ids.includes(studentId)) {
+            sendError(res, 403, 'student_not_allowed', 'Học sinh này chưa được bố mẹ cấp phép trên thiết bị này.');
+            return true;
+          }
+        }
+
+        const tokenHash = createHash('sha256').update(refreshToken).digest('hex');
+        const tokenRow = db.prepare('SELECT * FROM integration_refresh_tokens WHERE token_hash = ? AND revoked_at IS NULL').get(tokenHash);
+        if (!tokenRow) {
+          sendError(res, 401, 'invalid_refresh_token', 'Mã làm mới không hợp lệ hoặc đã bị thu hồi.');
+          return true;
+        }
+        if (new Date(tokenRow.expires_at) <= new Date()) {
+          sendError(res, 401, 'invalid_refresh_token', 'Mã làm mới đã hết hạn.');
+          return true;
+        }
+        if (tokenRow.client_id !== auth.client.id || tokenRow.student_id !== studentId) {
+          sendError(res, 403, 'token_mismatch', 'Mã làm mới không thuộc về học sinh hoặc thiết bị này.');
+          return true;
+        }
+
+        // Consume the refresh token now that ownership is confirmed (BAO-08)
+        db.prepare('UPDATE integration_refresh_tokens SET revoked_at = ? WHERE token_hash = ?').run(new Date().toISOString(), tokenHash);
+
+        // Mint new SSO ticket (60s) and new rotated refresh token (30 days) (BAO-08)
+        const { ticket } = store.createIntegrationTicket(auth.client.workspace_id, auth.client.id, studentId, 60);
+        const { rawToken: newRefreshToken } = store.createIntegrationRefreshToken(auth.client.workspace_id, auth.client.id, studentId, 30);
+
+        sendJson(res, 200, {
+          ticket,
+          refreshToken: newRefreshToken
+        });
+        return true;
+      }
+
+      // Command 7: POST /student-logout (BAO-08)
+      if (subPath === '/student-logout' && method === 'POST') {
+        const auth = authenticateBearer(req);
+        if (auth.error) {
+          sendError(res, auth.error.status, auth.error.code, auth.error.message);
+          return true;
+        }
+
+        let input = null;
+        try {
+          input = await parseBody(req);
+        } catch {
+          // Body is optional
+        }
+
+        const refreshToken = input?.refreshToken ? String(input.refreshToken).trim() : null;
+        const nowIso = new Date().toISOString();
+
+        if (refreshToken) {
+          const tokenHash = createHash('sha256').update(refreshToken).digest('hex');
+          db.prepare('UPDATE integration_refresh_tokens SET revoked_at = ? WHERE token_hash = ? AND client_id = ? AND revoked_at IS NULL')
+            .run(nowIso, tokenHash, auth.client.id);
+        } else {
+          db.prepare('UPDATE integration_refresh_tokens SET revoked_at = ? WHERE client_id = ? AND revoked_at IS NULL')
+            .run(nowIso, auth.client.id);
+        }
+
+        res.writeHead(204, {
+          'Cache-Control': 'no-store, private',
+          'Pragma': 'no-cache',
+          'X-Integration-Version': '1'
+        });
+        res.end();
+        return true;
+      }
+
+      // Command 8: GET /sso?ticket=...&to=... (BAO-08, BAO-09)
+      if (subPath === '/sso' && method === 'GET') {
+        const ticket = String(requestUrl.searchParams.get('ticket') || '').trim();
+        const rawTo = requestUrl.searchParams.get('to');
+
+        if (!ticket) {
+          sendError(res, 400, 'missing_ticket', 'Cần cung cấp vé SSO (ticket).');
+          return true;
+        }
+
+        let ticketRecord;
+        try {
+          ticketRecord = store.consumeIntegrationTicket(ticket);
+        } catch (err) {
+          sendError(res, 400, 'invalid_ticket', err.message || 'Vé SSO không đúng hoặc đã hết hạn.');
+          return true;
+        }
+
+        const student = db.prepare(`
+          SELECT s.*, u.id AS user_id, u.username, u.role
+          FROM students s
+          JOIN users u ON u.id = s.user_id
+          WHERE s.workspace_id = ? AND s.id = ? AND s.active = 1
+        `).get(ticketRecord.workspace_id, ticketRecord.student_id);
+
+        if (!student) {
+          sendError(res, 404, 'student_not_found', 'Không tìm thấy thông tin học sinh trong đơn vị.');
+          return true;
+        }
+
+        const cleanTo = sanitizeDeepLink(rawTo);
+        const userObj = {
+          id: student.user_id,
+          workspace_id: ticketRecord.workspace_id,
+          username: student.username,
+          role: student.role,
+          student_id: student.id
+        };
+
+        // Create standard student session (cookie + auth_sessions) (BAO-09)
+        sessionFn(res, userObj, origin);
+
+        // Redirect 302 to destination (BAO-09)
+        res.writeHead(302, {
+          Location: `/?online=1#/${cleanTo}`,
+          'Cache-Control': 'no-store, private',
+          'Pragma': 'no-cache',
+          'X-Integration-Version': '1'
+        });
+        res.end();
+        return true;
+      }
+
+      // Placeholders for subsequent tasks 3B.5 - 3B.6
+      if (['/events'].includes(subPath) || subPath.startsWith('/students/')) {
         sendError(res, 501, 'not_implemented', 'Chức năng đang được hoàn thiện ở task tiếp theo.');
         return true;
       }

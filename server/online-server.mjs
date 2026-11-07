@@ -97,7 +97,8 @@ export function createOnlineServer({databasePath,staticRoot=resolve('dist'),publ
     clear();
     return current;
   }
-  const safeTimeIntegration=createSafeTimeIntegrationRouter({store,db,authenticateUserCredentials});
+  function createStudentSession(res,user,origin){const token=secret(),csrfToken=secret();db.prepare('DELETE FROM auth_sessions WHERE expires_at<?').run(Date.now());db.prepare('INSERT INTO auth_sessions VALUES(?,?,?,?)').run(hash(token),user.id,csrfToken,Date.now()+43200000);cookie(res,token,origin);return{token,csrfToken};}
+  const safeTimeIntegration=createSafeTimeIntegrationRouter({store,db,authenticateUserCredentials,createStudentSession});
   const reportFailure=createFailureReporter();
   const server=createServer(async(req,res)=>{
     const started=performance.now();

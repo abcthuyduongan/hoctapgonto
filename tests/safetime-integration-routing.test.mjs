@@ -5,7 +5,7 @@ import { promisify } from 'node:util';
 import { once } from 'node:events';
 import { OnlineStore } from '../server/online-store.mjs';
 import { createOnlineServer } from '../server/online-server.mjs';
-import { createSafeTimeIntegrationRouter, isLoopbackAddress } from '../server/safetime-integration.mjs';
+import { createSafeTimeIntegrationRouter, isLoopbackAddress, sanitizeDeepLink } from '../server/safetime-integration.mjs';
 import { ONLINE_RUNTIME_VERSION } from '../server/api-diagnostics.mjs';
 
 const scrypt = promisify(scryptCallback);
@@ -66,9 +66,12 @@ function mockRequestResponse({ remoteAddress = '127.0.0.1', path, method = 'GET'
   const responseHeaders = {};
   let responseBody = '';
   const res = {
+    setHeader(name, value) {
+      responseHeaders[name] = value;
+    },
     writeHead(code, hdrs) {
       statusCode = code;
-      Object.assign(responseHeaders, hdrs);
+      if (hdrs) Object.assign(responseHeaders, hdrs);
     },
     end(chunk) {
       if (chunk) responseBody += chunk;
@@ -531,7 +534,186 @@ test('Task 3B.3 (BAO-07): student-login credential check, wrong_student, rateLim
   }
 });
 
-test('Task 3B.2 & 3B.3 (BAO-01, BAO-05, BAO-06, BAO-07): Real HTTP Server loopback end-to-end integration', async (t) => {
+test('Task 3B.4 (BAO-09): Deep-link sanitizer validation', () => {
+  assert.equal(sanitizeDeepLink('hoc/toan'), 'hoc/toan');
+  assert.equal(sanitizeDeepLink('hoc/tieng-viet'), 'hoc/tieng-viet');
+  assert.equal(sanitizeDeepLink('hoc/tieng-anh'), 'hoc/tieng-anh');
+  assert.equal(sanitizeDeepLink('hoc/tin-hoc'), 'hoc/tin-hoc');
+  assert.equal(sanitizeDeepLink('nhiem-vu'), 'nhiem-vu');
+  assert.equal(sanitizeDeepLink('thi/violympic-toan-3'), 'thi/violympic-toan-3');
+  assert.equal(sanitizeDeepLink('thi/ioe-tieng-anh-3'), 'thi/ioe-tieng-anh-3');
+  assert.equal(sanitizeDeepLink('ban-do'), 'ban-do');
+  assert.equal(sanitizeDeepLink('qua'), 'qua');
+  // Hash prefix removal
+  assert.equal(sanitizeDeepLink('#/hoc/toan'), 'hoc/toan');
+  assert.equal(sanitizeDeepLink('#qua'), 'qua');
+  // Invalid values fallback to ban-do
+  assert.equal(sanitizeDeepLink('evil.com'), 'ban-do');
+  assert.equal(sanitizeDeepLink('../hack'), 'ban-do');
+  assert.equal(sanitizeDeepLink('javascript:alert(1)'), 'ban-do');
+  assert.equal(sanitizeDeepLink(''), 'ban-do');
+  assert.equal(sanitizeDeepLink(null), 'ban-do');
+  assert.equal(sanitizeDeepLink(undefined), 'ban-do');
+});
+
+test('Task 3B.4 (BAO-08, BAO-09): Refresh token rotation, SSO ticket redemption, and student logout', async (t) => {
+  const store = new OnlineStore(':memory:');
+  t.after(() => store.close());
+  const { workspaceId, student1Id, student2Id } = await setupWorkspaceWithStudents(store);
+
+  const router = createSafeTimeIntegrationRouter({ store, db: store.db });
+
+  // Pair client
+  const pairCode = store.createIntegrationPairCode(workspaceId, [student1Id, student2Id], 10);
+  const { req: pReq, res: pRes, getResult: pResult } = mockRequestResponse({
+    path: '/api/integration/safetime/v1/pair',
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: { code: pairCode.code, deviceName: 'PC-Test', deviceId: 'dev-001' }
+  });
+  await router.handle(pReq, pRes, { path: '/api/integration/safetime/v1/pair', method: 'POST' });
+  const clientToken = pResult().json.token;
+
+  // Log in student1 with remember = true
+  const { req: lReq, res: lRes, getResult: lResult } = mockRequestResponse({
+    path: '/api/integration/safetime/v1/student-login',
+    method: 'POST',
+    headers: { authorization: `Bearer ${clientToken}`, 'content-type': 'application/json' },
+    body: { username: 'hocsinh_minh', password: 'MatKhauMinh123!', studentId: student1Id, remember: true }
+  });
+  await router.handle(lReq, lRes, { path: '/api/integration/safetime/v1/student-login', method: 'POST' });
+  const { ticket: initialTicket, refreshToken: initialRefreshToken } = lResult().json;
+  assert.ok(initialTicket);
+  assert.ok(initialRefreshToken);
+
+  // 1. GET /sso without ticket -> 400 missing_ticket (BAO-08)
+  {
+    const { req, res, getResult } = mockRequestResponse({
+      path: '/api/integration/safetime/v1/sso',
+      method: 'GET'
+    });
+    await router.handle(req, res, { path: '/api/integration/safetime/v1/sso', method: 'GET', url: new URL('http://127.0.0.1/api/integration/safetime/v1/sso') });
+    assert.equal(getResult().status, 400);
+    assert.equal(getResult().json.error.code, 'missing_ticket');
+  }
+
+  // 2. GET /sso with valid ticket -> 302 redirect + Set-Cookie (BAO-08, BAO-09)
+  {
+    const ssoUrl = new URL(`http://127.0.0.1/api/integration/safetime/v1/sso?ticket=${initialTicket}&to=hoc/toan`);
+    const { req, res, getResult } = mockRequestResponse({
+      path: '/api/integration/safetime/v1/sso',
+      method: 'GET'
+    });
+    await router.handle(req, res, { path: '/api/integration/safetime/v1/sso', method: 'GET', url: ssoUrl, origin: 'http://127.0.0.1' });
+    const result = getResult();
+    assert.equal(result.status, 302);
+    assert.equal(result.headers.Location, '/?online=1#/hoc/toan');
+    assert.ok(result.headers['Set-Cookie']);
+    assert.match(result.headers['Set-Cookie'], /baoan_online_session=[a-zA-Z0-9_-]+/);
+    assert.match(result.headers['Set-Cookie'], /HttpOnly/);
+    assert.match(result.headers['Set-Cookie'], /SameSite=Lax/);
+
+    // Verify session in auth_sessions table
+    const sessions = store.db.prepare('SELECT * FROM auth_sessions').all();
+    assert.ok(sessions.length > 0);
+  }
+
+  // 3. Ticket is one-time use only (BAO-08) -> second attempt fails with 400
+  {
+    const ssoUrl = new URL(`http://127.0.0.1/api/integration/safetime/v1/sso?ticket=${initialTicket}&to=hoc/toan`);
+    const { req, res, getResult } = mockRequestResponse({
+      path: '/api/integration/safetime/v1/sso',
+      method: 'GET'
+    });
+    await router.handle(req, res, { path: '/api/integration/safetime/v1/sso', method: 'GET', url: ssoUrl });
+    assert.equal(getResult().status, 400);
+    assert.equal(getResult().json.error.code, 'invalid_ticket');
+  }
+
+  // 4. POST /student-refresh with invalid/mismatched refreshToken -> 401 or 403 (BAO-08)
+  {
+    const { req, res, getResult } = mockRequestResponse({
+      path: '/api/integration/safetime/v1/student-refresh',
+      method: 'POST',
+      headers: { authorization: `Bearer ${clientToken}`, 'content-type': 'application/json' },
+      body: { refreshToken: initialRefreshToken, studentId: student2Id } // wrong student
+    });
+    await router.handle(req, res, { path: '/api/integration/safetime/v1/student-refresh', method: 'POST' });
+    assert.equal(getResult().status, 403);
+    assert.equal(getResult().json.error.code, 'token_mismatch');
+  }
+
+  // 5. POST /student-refresh with valid refreshToken -> 200 { ticket, refreshToken } with rotation (BAO-08)
+  let secondTicket = '';
+  let secondRefreshToken = '';
+  {
+    const { req, res, getResult } = mockRequestResponse({
+      path: '/api/integration/safetime/v1/student-refresh',
+      method: 'POST',
+      headers: { authorization: `Bearer ${clientToken}`, 'content-type': 'application/json' },
+      body: { refreshToken: initialRefreshToken, studentId: student1Id }
+    });
+    await router.handle(req, res, { path: '/api/integration/safetime/v1/student-refresh', method: 'POST' });
+    const result = getResult();
+    assert.equal(result.status, 200);
+    assert.ok(result.json.ticket);
+    assert.ok(result.json.refreshToken);
+    assert.notEqual(result.json.refreshToken, initialRefreshToken); // rotated
+    secondTicket = result.json.ticket;
+    secondRefreshToken = result.json.refreshToken;
+  }
+
+  // 6. Old refresh token was consumed (rotation) -> cannot be reused (BAO-08)
+  {
+    const { req, res, getResult } = mockRequestResponse({
+      path: '/api/integration/safetime/v1/student-refresh',
+      method: 'POST',
+      headers: { authorization: `Bearer ${clientToken}`, 'content-type': 'application/json' },
+      body: { refreshToken: initialRefreshToken, studentId: student1Id }
+    });
+    await router.handle(req, res, { path: '/api/integration/safetime/v1/student-refresh', method: 'POST' });
+    assert.equal(getResult().status, 401);
+    assert.equal(getResult().json.error.code, 'invalid_refresh_token');
+  }
+
+  // 7. New ticket works with /sso and sanitizes destination
+  {
+    const ssoUrl = new URL(`http://127.0.0.1/api/integration/safetime/v1/sso?ticket=${secondTicket}&to=evil.com/phishing`);
+    const { req, res, getResult } = mockRequestResponse({
+      path: '/api/integration/safetime/v1/sso',
+      method: 'GET'
+    });
+    await router.handle(req, res, { path: '/api/integration/safetime/v1/sso', method: 'GET', url: ssoUrl, origin: 'http://127.0.0.1' });
+    const result = getResult();
+    assert.equal(result.status, 302);
+    // Malicious destination safely redirected to ban-do
+    assert.equal(result.headers.Location, '/?online=1#/ban-do');
+  }
+
+  // 8. POST /student-logout revokes refresh token (BAO-08)
+  {
+    const { req, res, getResult } = mockRequestResponse({
+      path: '/api/integration/safetime/v1/student-logout',
+      method: 'POST',
+      headers: { authorization: `Bearer ${clientToken}`, 'content-type': 'application/json' },
+      body: { refreshToken: secondRefreshToken }
+    });
+    await router.handle(req, res, { path: '/api/integration/safetime/v1/student-logout', method: 'POST' });
+    assert.equal(getResult().status, 204);
+
+    // Refresh token is now revoked
+    const { req: rReq, res: rRes, getResult: rResult } = mockRequestResponse({
+      path: '/api/integration/safetime/v1/student-refresh',
+      method: 'POST',
+      headers: { authorization: `Bearer ${clientToken}`, 'content-type': 'application/json' },
+      body: { refreshToken: secondRefreshToken, studentId: student1Id }
+    });
+    await router.handle(rReq, rRes, { path: '/api/integration/safetime/v1/student-refresh', method: 'POST' });
+    assert.equal(rResult().status, 401);
+  }
+});
+
+test('Task 3B.2, 3B.3, 3B.4 (BAO-01, BAO-05, BAO-06, BAO-07, BAO-08, BAO-09): Real HTTP Server loopback end-to-end integration', async (t) => {
   const server = createOnlineServer({ databasePath: ':memory:' });
   server.listen(0, '127.0.0.1');
   await once(server, 'listening');
@@ -602,20 +784,61 @@ test('Task 3B.2 & 3B.3 (BAO-01, BAO-05, BAO-06, BAO-07): Real HTTP Server loopba
   assert.ok(loginData.ticket);
   assert.ok(loginData.refreshToken);
 
-  // 6. HTTP GET /api/integration/safetime/v1/status now paired: true
+  // 6. HTTP GET /api/integration/safetime/v1/sso (Task 3B.4)
+  const resSso = await fetch(`${origin}/api/integration/safetime/v1/sso?ticket=${loginData.ticket}&to=hoc/tieng-viet`, {
+    redirect: 'manual'
+  });
+  assert.equal(resSso.status, 302);
+  assert.equal(resSso.headers.get('location'), '/?online=1#/hoc/tieng-viet');
+  const cookieHeader = resSso.headers.get('set-cookie');
+  assert.ok(cookieHeader);
+  assert.match(cookieHeader, /baoan_online_session=/);
+
+  // 7. HTTP POST /api/integration/safetime/v1/student-refresh (Task 3B.4)
+  const resRefresh = await fetch(`${origin}/api/integration/safetime/v1/student-refresh`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      refreshToken: loginData.refreshToken,
+      studentId: student1Id
+    })
+  });
+  assert.equal(resRefresh.status, 200);
+  const refreshData = await resRefresh.json();
+  assert.ok(refreshData.ticket);
+  assert.ok(refreshData.refreshToken);
+  assert.notEqual(refreshData.refreshToken, loginData.refreshToken);
+
+  // 8. HTTP POST /api/integration/safetime/v1/student-logout (Task 3B.4)
+  const resLogout = await fetch(`${origin}/api/integration/safetime/v1/student-logout`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      refreshToken: refreshData.refreshToken
+    })
+  });
+  assert.equal(resLogout.status, 204);
+
+  // 9. HTTP GET /api/integration/safetime/v1/status now paired: true
   const res4 = await fetch(`${origin}/api/integration/safetime/v1/status`);
   assert.equal(res4.status, 200);
   const data4 = await res4.json();
   assert.equal(data4.paired, true);
 
-  // 7. HTTP DELETE /api/integration/safetime/v1/pair
+  // 10. HTTP DELETE /api/integration/safetime/v1/pair
   const res5 = await fetch(`${origin}/api/integration/safetime/v1/pair`, {
     method: 'DELETE',
     headers: { Authorization: `Bearer ${token}` }
   });
   assert.equal(res5.status, 204);
 
-  // 8. Token is now revoked
+  // 11. Token is now revoked
   const res6 = await fetch(`${origin}/api/integration/safetime/v1/students`, {
     headers: { Authorization: `Bearer ${token}` }
   });
