@@ -200,10 +200,17 @@ export function createSafeTimeIntegrationRouter({ store, db, authenticateUserCre
     });
   }
 
-  function isIntegrationEnabled() {
-    const hasCode = db.prepare('SELECT 1 FROM integration_pair_codes LIMIT 1').get();
-    const hasClient = db.prepare('SELECT 1 FROM integration_clients LIMIT 1').get();
-    return Boolean(hasCode || hasClient);
+  function isIntegrationEnabled(workspaceId = null) {
+    if (workspaceId && typeof store.isIntegrationEnabled === 'function') {
+      return store.isIntegrationEnabled(workspaceId);
+    }
+    const pairCode = db.prepare('SELECT workspace_id FROM integration_pair_codes LIMIT 1').get();
+    const client = db.prepare('SELECT workspace_id FROM integration_clients LIMIT 1').get();
+    const wsId = workspaceId || pairCode?.workspace_id || client?.workspace_id;
+    if (wsId && typeof store.isIntegrationEnabled === 'function') {
+      return store.isIntegrationEnabled(wsId);
+    }
+    return Boolean(pairCode || client);
   }
 
   async function parseBody(req, maxBytes = 2 * 1024 * 1024) {
@@ -351,6 +358,17 @@ export function createSafeTimeIntegrationRouter({ store, db, authenticateUserCre
           allowedStudentIds: pairCode.allowed_student_ids
         });
 
+        // Audit log (BAO-16)
+        if (typeof store.audit === 'function') {
+          try {
+            store.audit(
+              { workspaceId: pairCode.workspace_id, id: 'system' },
+              'integration.pair',
+              JSON.stringify({ clientId: client.id, deviceId, deviceName, allowedStudentIds: pairCode.allowed_student_ids })
+            );
+          } catch {}
+        }
+
         const workspace = store.workspace(pairCode.workspace_id);
         const students = getStudentsForClient(client);
 
@@ -373,6 +391,16 @@ export function createSafeTimeIntegrationRouter({ store, db, authenticateUserCre
           return true;
         }
         store.revokeIntegrationClient(auth.client.id);
+        // Audit log (BAO-16)
+        if (typeof store.audit === 'function') {
+          try {
+            store.audit(
+              { workspaceId: auth.client.workspace_id, id: 'system' },
+              'integration.client_revoke',
+              JSON.stringify({ clientId: auth.client.id, deviceId: auth.client.device_id, deviceName: auth.client.device_name, source: 'client' })
+            );
+          } catch {}
+        }
         res.writeHead(204, {
           'Cache-Control': 'no-store, private',
           'Pragma': 'no-cache',
@@ -420,6 +448,15 @@ export function createSafeTimeIntegrationRouter({ store, db, authenticateUserCre
         // Check if studentId is allowed on this client (BAO-07)
         if (Array.isArray(auth.client.allowed_student_ids) && auth.client.allowed_student_ids.length > 0) {
           if (!auth.client.allowed_student_ids.includes(studentId)) {
+            if (typeof store.audit === 'function') {
+              try {
+                store.audit(
+                  { workspaceId: auth.client.workspace_id, id: 'system' },
+                  'integration.login_failed',
+                  JSON.stringify({ clientId: auth.client.id, studentId, username, reason: 'student_not_allowed' })
+                );
+              } catch {}
+            }
             sendError(res, 403, 'student_not_allowed', 'Học sinh này chưa được bố mẹ cấp phép trên thiết bị này.');
             return true;
           }
@@ -430,6 +467,15 @@ export function createSafeTimeIntegrationRouter({ store, db, authenticateUserCre
         try {
           user = await authFn({ req, rawUsername: username, rawPassword: password });
         } catch (err) {
+          if (typeof store.audit === 'function') {
+            try {
+              store.audit(
+                { workspaceId: auth.client.workspace_id, id: 'system' },
+                'integration.login_failed',
+                JSON.stringify({ clientId: auth.client.id, studentId, username, reason: 'invalid_credentials' })
+              );
+            } catch {}
+          }
           const status = err.status || 401;
           const code = status === 429 ? 'login_rate_limited' : 'invalid_credentials';
           sendError(res, status, code, err.message || 'Tên đăng nhập hoặc mật khẩu chưa đúng.');
@@ -438,12 +484,30 @@ export function createSafeTimeIntegrationRouter({ store, db, authenticateUserCre
 
         // Must be a student account
         if (user.role !== 'student') {
+          if (typeof store.audit === 'function') {
+            try {
+              store.audit(
+                { workspaceId: auth.client.workspace_id, id: 'system' },
+                'integration.login_failed',
+                JSON.stringify({ clientId: auth.client.id, studentId, username, reason: 'not_student' })
+              );
+            } catch {}
+          }
           sendError(res, 403, 'not_student', 'Chỉ tài khoản học sinh mới có thể đăng nhập qua cổng này.');
           return true;
         }
 
         // Must match the requested studentId (BAO-07, LNK-09)
         if (user.student_id !== studentId) {
+          if (typeof store.audit === 'function') {
+            try {
+              store.audit(
+                { workspaceId: auth.client.workspace_id, id: 'system' },
+                'integration.login_failed',
+                JSON.stringify({ clientId: auth.client.id, studentId, username, reason: 'wrong_student' })
+              );
+            } catch {}
+          }
           sendError(res, 403, 'wrong_student', 'Tài khoản này không phải của bạn trên máy này. Hỏi bố mẹ nhé.');
           return true;
         }

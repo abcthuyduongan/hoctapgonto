@@ -1233,3 +1233,284 @@ test('Task 3B.6 (BAO-11): Real HTTP Server loopback GET /students/{id}/today end
 
   server.close();
 });
+
+
+// =============================================================================
+// Task 3B.8 Tests: Parent Portal SafeTime Management & Audit Logging (BAO-02, BAO-03, BAO-16)
+// =============================================================================
+
+test('Task 3B.8 (BAO-16): Audit logging for pairing, revocation and failed logins', async () => {
+  const store = new OnlineStore(':memory:');
+  const db = store.db;
+  const { workspaceId, student1Id, student2Id } = await setupWorkspaceWithStudents(store);
+
+  const router = createSafeTimeIntegrationRouter({
+    store,
+    db,
+    authenticateUserCredentials: async ({ rawUsername, rawPassword }) => {
+      if (rawUsername === 'hocsinh_minh' && rawPassword === 'MatKhauMinh123!') {
+        return { id: 'u1', role: 'student', student_id: student1Id };
+      }
+      throw { status: 401, message: 'Sai mật khẩu' };
+    }
+  });
+
+  // 1. Audit on pair code creation
+  const parentAuth = { workspaceId, id: 'parent-u1', role: 'parent' };
+  const pairCodeResult = store.parentCreatePairCode(parentAuth, [student1Id]);
+  assert.equal(pairCodeResult.code.length, 8);
+  const auditPairCode = db.prepare("SELECT * FROM audit WHERE action = 'integration.pair_code_create'").get();
+  assert.ok(auditPairCode);
+  const auditPairCodeData = JSON.parse(auditPairCode.target_id);
+  assert.equal(auditPairCodeData.code, pairCodeResult.code);
+  assert.deepEqual(auditPairCodeData.allowedStudentIds, [student1Id]);
+
+  // 2. Audit on successful pair
+  const mockPairReq = {
+    method: 'POST',
+    url: '/api/integration/safetime/v1/pair',
+    socket: { remoteAddress: '127.0.0.1' },
+    headers: { 'content-type': 'application/json' },
+    [Symbol.asyncIterator]: async function* () {
+      yield Buffer.from(JSON.stringify({
+        code: pairCodeResult.code,
+        deviceId: 'mac-audit-01',
+        deviceName: 'MacBook Của Con'
+      }));
+    }
+  };
+  const mockPairRes = {
+    statusCode: 200,
+    headers: {},
+    setHeader(k, v) { this.headers[k] = v; },
+    writeHead(status, headers) { this.statusCode = status; Object.assign(this.headers, headers); },
+    end(body) { this.body = body; }
+  };
+  await router.handle(mockPairReq, mockPairRes, { path: '/api/integration/safetime/v1/pair' });
+  assert.equal(mockPairRes.statusCode, 200);
+  const { token } = JSON.parse(mockPairRes.body);
+
+  const auditPair = db.prepare("SELECT * FROM audit WHERE action = 'integration.pair'").get();
+  assert.ok(auditPair);
+  const auditPairData = JSON.parse(auditPair.target_id);
+  assert.equal(auditPairData.deviceId, 'mac-audit-01');
+  assert.equal(auditPairData.deviceName, 'MacBook Của Con');
+
+  // 3. Audit on student login failure: wrong student
+  const mockLoginWrongStudent = {
+    method: 'POST',
+    url: '/api/integration/safetime/v1/student-login',
+    socket: { remoteAddress: '127.0.0.1' },
+    headers: {
+      'content-type': 'application/json',
+      authorization: `Bearer ${token}`
+    },
+    [Symbol.asyncIterator]: async function* () {
+      yield Buffer.from(JSON.stringify({
+        username: 'hocsinh_minh',
+        password: 'MatKhauMinh123!',
+        studentId: student2Id // student2Id not allowed on this device
+      }));
+    }
+  };
+  const mockLoginRes1 = {
+    statusCode: 200,
+    headers: {},
+    setHeader(k, v) { this.headers[k] = v; },
+    writeHead(status, headers) { this.statusCode = status; Object.assign(this.headers, headers); },
+    end(body) { this.body = body; }
+  };
+  await router.handle(mockLoginWrongStudent, mockLoginRes1, { path: '/api/integration/safetime/v1/student-login' });
+  assert.equal(mockLoginRes1.statusCode, 403);
+
+  const auditLoginFail1 = db.prepare("SELECT * FROM audit WHERE action = 'integration.login_failed' AND target_id LIKE '%student_not_allowed%'").get();
+  assert.ok(auditLoginFail1);
+
+  // 4. Audit on student login failure: invalid credentials
+  const mockLoginBadPass = {
+    method: 'POST',
+    url: '/api/integration/safetime/v1/student-login',
+    socket: { remoteAddress: '127.0.0.1' },
+    headers: {
+      'content-type': 'application/json',
+      authorization: `Bearer ${token}`
+    },
+    [Symbol.asyncIterator]: async function* () {
+      yield Buffer.from(JSON.stringify({
+        username: 'hocsinh_minh',
+        password: 'SaiPasswordHoanToan!',
+        studentId: student1Id
+      }));
+    }
+  };
+  const mockLoginRes2 = {
+    statusCode: 200,
+    headers: {},
+    setHeader(k, v) { this.headers[k] = v; },
+    writeHead(status, headers) { this.statusCode = status; Object.assign(this.headers, headers); },
+    end(body) { this.body = body; }
+  };
+  await router.handle(mockLoginBadPass, mockLoginRes2, { path: '/api/integration/safetime/v1/student-login' });
+  assert.equal(mockLoginRes2.statusCode, 401);
+
+  const auditLoginFail2 = db.prepare("SELECT * FROM audit WHERE action = 'integration.login_failed' AND target_id LIKE '%invalid_credentials%'").get();
+  assert.ok(auditLoginFail2);
+
+  // 5. Audit on client revocation via DELETE /pair
+  const mockDeletePair = {
+    method: 'DELETE',
+    url: '/api/integration/safetime/v1/pair',
+    socket: { remoteAddress: '127.0.0.1' },
+    headers: { authorization: `Bearer ${token}` }
+  };
+  const mockDeleteRes = {
+    statusCode: 200,
+    headers: {},
+    setHeader(k, v) { this.headers[k] = v; },
+    writeHead(status, headers) { this.statusCode = status; Object.assign(this.headers, headers); },
+    end() {}
+  };
+  await router.handle(mockDeletePair, mockDeleteRes, { path: '/api/integration/safetime/v1/pair', method: 'DELETE' });
+  assert.equal(mockDeleteRes.statusCode, 204);
+
+  const auditRevoke = db.prepare("SELECT * FROM audit WHERE action = 'integration.client_revoke' AND target_id LIKE '%client%'").get();
+  assert.ok(auditRevoke);
+
+  store.close();
+});
+
+test('Task 3B.8 (BAO-02, BAO-03, BAO-01): Parent store methods for status, pair code, client revoke and toggle', async () => {
+  const store = new OnlineStore(':memory:');
+  const db = store.db;
+  const { workspaceId, student1Id, student2Id } = await setupWorkspaceWithStudents(store);
+  const adminAuth = { workspaceId, id: 'admin-01', role: 'admin' };
+
+  // 1. Initial status: integration disabled by default (BAO-01)
+  assert.equal(store.isIntegrationEnabled(workspaceId), false);
+  const initialStatus = store.parentSafetimeStatus(adminAuth);
+  assert.equal(initialStatus.enabled, false);
+  assert.equal(initialStatus.paired, false);
+  assert.equal(initialStatus.clients.length, 0);
+  assert.equal(initialStatus.activePairCode, null);
+  assert.equal(initialStatus.availableStudents.length, 2);
+
+  // 2. Create pair code: enables integration and returns 8-char code (BAO-01, BAO-02)
+  const pairCodeRes = store.parentCreatePairCode(adminAuth, [student1Id, student2Id]);
+  assert.equal(pairCodeRes.code.length, 8);
+  assert.equal(store.isIntegrationEnabled(workspaceId), true);
+
+  const statusAfterCode = store.parentSafetimeStatus(adminAuth);
+  assert.equal(statusAfterCode.enabled, true);
+  assert.ok(statusAfterCode.activePairCode);
+  assert.equal(statusAfterCode.activePairCode.code, pairCodeRes.code);
+  assert.deepEqual(statusAfterCode.activePairCode.allowedStudentIds, [student1Id, student2Id]);
+
+  // 3. Client pairs and appears in clients list (BAO-03)
+  const client = store.createIntegrationClient(workspaceId, {
+    tokenHash: 'dummy-hash-for-parent-test',
+    deviceId: 'laptop-dell-01',
+    deviceName: 'Laptop Dell Inspiron',
+    allowedStudentIds: [student1Id]
+  });
+
+  const statusWithClient = store.parentSafetimeStatus(adminAuth);
+  assert.equal(statusWithClient.paired, true);
+  assert.equal(statusWithClient.clients.length, 1);
+  assert.equal(statusWithClient.clients[0].deviceName, 'Laptop Dell Inspiron');
+  assert.equal(statusWithClient.clients[0].revokedAt, null);
+
+  // 4. Revoke client from Parent Portal (BAO-03, BAO-16)
+  const revokeRes = store.parentRevokeClient(adminAuth, client.id);
+  assert.equal(revokeRes.success, true);
+
+  const statusAfterRevoke = store.parentSafetimeStatus(adminAuth);
+  assert.equal(statusAfterRevoke.paired, false);
+  assert.ok(statusAfterRevoke.clients[0].revokedAt);
+
+  const auditRevokeParent = db.prepare("SELECT * FROM audit WHERE action = 'integration.client_revoke' AND target_id LIKE '%parent%'").get();
+  assert.ok(auditRevokeParent);
+
+  // 5. Toggle integration
+  store.parentToggleIntegration(adminAuth, false);
+  assert.equal(store.isIntegrationEnabled(workspaceId), false);
+  const statusAfterToggleOff = store.parentSafetimeStatus(adminAuth);
+  assert.equal(statusAfterToggleOff.enabled, false);
+
+  store.parentToggleIntegration(adminAuth, true);
+  assert.equal(store.isIntegrationEnabled(workspaceId), true);
+
+  store.close();
+});
+
+test('Task 3B.8: Real HTTP loopback server testing for /parent/safetime/* endpoints', async () => {
+  const server = createOnlineServer({ databasePath: ':memory:' });
+  server.listen(0, '127.0.0.1');
+  await once(server, 'listening');
+  const port = server.address().port;
+  const origin = `http://127.0.0.1:${port}`;
+
+  const store = server.onlineStore;
+  const { workspaceId, student1Id } = await setupWorkspaceWithStudents(store);
+
+  // Let's create an admin user and login
+  const adminUserId = randomUUID();
+  const adminHash = await makePasswordHash('MatKhauAdmin123!');
+  store.db.prepare('INSERT INTO users(id, workspace_id, username, password_hash, role, created_at) VALUES(?, ?, ?, ?, ?, ?)')
+    .run(adminUserId, workspaceId, 'quantri_test', adminHash, 'admin', new Date().toISOString());
+
+  const loginRes = await fetch(`${origin}/api/online/login`, {
+    method: 'POST',
+    headers: {
+      Origin: origin,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ username: 'quantri_test', password: 'MatKhauAdmin123!' })
+  });
+  assert.equal(loginRes.status, 200);
+  const cookieHeader = loginRes.headers.get('set-cookie');
+  const sessionCookie = cookieHeader ? cookieHeader.split(';')[0] : '';
+  const loginData = await loginRes.json();
+  const csrf = loginData.csrfToken;
+
+  // 1. GET /api/online/parent/safetime/status
+  const statusRes = await fetch(`${origin}/api/online/parent/safetime/status`, {
+    headers: {
+      Cookie: sessionCookie,
+      'X-CSRF-Token': csrf
+    }
+  });
+  assert.equal(statusRes.status, 200);
+  const statusJson = await statusRes.json();
+  assert.equal(statusJson.enabled, false);
+  assert.equal(statusJson.paired, false);
+
+  // 2. POST /api/online/parent/safetime/pair-code
+  const pairCodeRes = await fetch(`${origin}/api/online/parent/safetime/pair-code`, {
+    method: 'POST',
+    headers: {
+      Origin: origin,
+      Cookie: sessionCookie,
+      'Content-Type': 'application/json',
+      'X-CSRF-Token': csrf
+    },
+    body: JSON.stringify({ studentIds: [student1Id] })
+  });
+  assert.equal(pairCodeRes.status, 200);
+  const pairCodeJson = await pairCodeRes.json();
+  assert.equal(pairCodeJson.code.length, 8);
+  assert.deepEqual(pairCodeJson.allowedStudentIds, [student1Id]);
+
+  // 3. GET status again to see active pair code
+  const statusRes2 = await fetch(`${origin}/api/online/parent/safetime/status`, {
+    headers: {
+      Cookie: sessionCookie,
+      'X-CSRF-Token': csrf
+    }
+  });
+  assert.equal(statusRes2.status, 200);
+  const statusJson2 = await statusRes2.json();
+  assert.equal(statusJson2.enabled, true);
+  assert.equal(statusJson2.activePairCode.code, pairCodeJson.code);
+
+  server.close();
+});

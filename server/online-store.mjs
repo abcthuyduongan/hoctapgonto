@@ -2434,4 +2434,142 @@ export class OnlineStore{
       contests
     };
   }
+
+  assertParentElevation(auth, studentId = null, parentToken = null) {
+    if (auth.role === 'admin') return true;
+    if (auth.role === 'parent') {
+      if (studentId) {
+        const linked = this.db.prepare('SELECT 1 FROM parent_students WHERE workspace_id=? AND parent_user_id=? AND student_id=?').get(auth.workspaceId, auth.id, studentId);
+        if (!linked) fail(403, 'Phụ huynh không có quyền quản lý học sinh này.');
+      }
+      return true;
+    }
+    if (auth.role === 'student') {
+      const sId = studentId || auth.studentId;
+      if (auth.studentId !== sId) fail(403, 'Không có quyền truy cập học sinh khác.');
+      const currentRaw = this.rawParentControls(auth.workspaceId, sId);
+      if (currentRaw?.pinHash) {
+        const tokenOk = parentToken && verifyParentElevationToken(parentToken, {
+          userId: auth.id,
+          studentId: sId,
+          workspaceId: auth.workspaceId,
+          pinHash: currentRaw.pinHash,
+          sessionHash: auth.tokenHash
+        });
+        if (!tokenOk) fail(403, 'Chưa xác thực quyền phụ huynh.');
+      }
+      return true;
+    }
+    fail(403, 'Không có quyền thực hiện thao tác này.');
+  }
+
+  isIntegrationEnabled(workspaceId) {
+    const hasPairCode = this.db.prepare('SELECT 1 FROM integration_pair_codes WHERE workspace_id = ? LIMIT 1').get(workspaceId);
+    const hasClient = this.db.prepare('SELECT 1 FROM integration_clients WHERE workspace_id = ? LIMIT 1').get(workspaceId);
+    if (!hasPairCode && !hasClient) return false;
+    const toggleAudit = this.db.prepare("SELECT target_id FROM audit WHERE workspace_id = ? AND action = 'integration.toggle' ORDER BY rowid DESC LIMIT 1").get(workspaceId);
+    if (toggleAudit) {
+      try {
+        const parsed = parse(toggleAudit.target_id);
+        if (typeof parsed?.enabled === 'boolean') return parsed.enabled;
+      } catch {}
+    }
+    return true;
+  }
+
+  parentSafetimeStatus(auth, studentId = null, parentToken = null) {
+    this.assertParentElevation(auth, studentId, parentToken);
+    const clients = this.listIntegrationClients(auth.workspaceId);
+    const activeClients = clients.filter(c => !c.revoked_at);
+    const activePairCodeRow = this.db.prepare(`
+      SELECT * FROM integration_pair_codes
+      WHERE workspace_id = ? AND used_at IS NULL AND expires_at > ?
+      ORDER BY created_at DESC LIMIT 1
+    `).get(auth.workspaceId, now());
+    const activePairCode = activePairCodeRow ? {
+      code: activePairCodeRow.code,
+      expiresAt: activePairCodeRow.expires_at,
+      allowedStudentIds: parse(activePairCodeRow.allowed_student_ids)
+    } : null;
+
+    let availableStudents = [];
+    if (auth.role === 'admin') {
+      availableStudents = this.db.prepare(`
+        SELECT s.id, s.name, COALESCE(c.name, '') AS className
+        FROM students s
+        LEFT JOIN classes c ON c.workspace_id = s.workspace_id AND c.id = s.class_id
+        WHERE s.workspace_id = ? AND s.active = 1
+        ORDER BY s.name ASC
+      `).all(auth.workspaceId);
+    } else if (auth.role === 'parent') {
+      availableStudents = this.db.prepare(`
+        SELECT s.id, s.name, COALESCE(c.name, '') AS className
+        FROM students s
+        JOIN parent_students ps ON ps.workspace_id = s.workspace_id AND ps.student_id = s.id
+        LEFT JOIN classes c ON c.workspace_id = s.workspace_id AND c.id = s.class_id
+        WHERE s.workspace_id = ? AND ps.parent_user_id = ? AND s.active = 1
+        ORDER BY s.name ASC
+      `).all(auth.workspaceId, auth.id);
+    } else if (auth.role === 'student') {
+      availableStudents = this.db.prepare(`
+        SELECT s.id, s.name, COALESCE(c.name, '') AS className
+        FROM students s
+        LEFT JOIN classes c ON c.workspace_id = s.workspace_id AND c.id = s.class_id
+        WHERE s.workspace_id = ? AND s.id = ?
+      `).all(auth.workspaceId, auth.studentId);
+    }
+
+    return {
+      enabled: this.isIntegrationEnabled(auth.workspaceId),
+      paired: activeClients.length > 0,
+      clients: clients.map(c => ({
+        id: c.id,
+        deviceName: c.device_name,
+        deviceId: c.device_id,
+        allowedStudentIds: c.allowed_student_ids,
+        createdAt: c.created_at,
+        lastUsedAt: c.last_used_at,
+        revokedAt: c.revoked_at
+      })),
+      activePairCode,
+      availableStudents
+    };
+  }
+
+  parentCreatePairCode(auth, studentIds, parentToken = null) {
+    this.assertParentElevation(auth, null, parentToken);
+    if (!Array.isArray(studentIds) || studentIds.length === 0) {
+      fail(400, 'Cần chọn ít nhất một học sinh được phép kết nối.');
+    }
+    const result = this.createIntegrationPairCode(auth.workspaceId, studentIds, 10);
+    this.audit(auth, 'integration.pair_code_create', json({
+      code: result.code,
+      allowedStudentIds: studentIds,
+      expiresAt: result.expiresAt
+    }));
+    return result;
+  }
+
+  parentRevokeClient(auth, clientId, parentToken = null) {
+    this.assertParentElevation(auth, null, parentToken);
+    const client = this.findIntegrationClientById(clientId);
+    if (!client || client.workspace_id !== auth.workspaceId) {
+      fail(404, 'Không tìm thấy thiết bị kết nối.');
+    }
+    this.revokeIntegrationClient(clientId);
+    this.audit(auth, 'integration.client_revoke', json({
+      clientId: client.id,
+      deviceId: client.device_id,
+      deviceName: client.device_name,
+      source: 'parent'
+    }));
+    return { success: true, clientId };
+  }
+
+  parentToggleIntegration(auth, enabled, parentToken = null) {
+    this.assertParentElevation(auth, null, parentToken);
+    const isEnabled = Boolean(enabled);
+    this.audit(auth, 'integration.toggle', json({ enabled: isEnabled }));
+    return { success: true, enabled: isEnabled };
+  }
 }

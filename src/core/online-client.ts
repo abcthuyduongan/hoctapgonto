@@ -1,5 +1,5 @@
 import type {AttemptInput,ContentPack,ModuleId,QuestionOpenReceipt} from './contracts';
-import type {OnlineAttemptReceipt,OnlineClass,OnlineDashboard,OnlineIdentity,OnlineMediaAsset,OnlineStudent,OnlineWeek,OnlineRecoveryCapability,OnlineRestorePreview,OnlineStudentSummary,OnlineCompactPlay,GiftItem,StudentGoal,StudentBadgeStatus,StudentStreakState,DailyMission,ParentDashboardResponse,ParentControls,ParentStudentInfo,ActiveContestSession,ContestHistoryResponse,TownSummaryResponse,PlaceBuildingResult,MaterialBalances} from './online-contracts';
+import type {OnlineAttemptReceipt,OnlineClass,OnlineDashboard,OnlineIdentity,OnlineMediaAsset,OnlineStudent,OnlineWeek,OnlineRecoveryCapability,OnlineRestorePreview,OnlineStudentSummary,OnlineCompactPlay,GiftItem,StudentGoal,StudentBadgeStatus,StudentStreakState,DailyMission,ParentDashboardResponse,ParentControls,ParentStudentInfo,ActiveContestSession,ContestHistoryResponse,TownSummaryResponse,PlaceBuildingResult,MaterialBalances,ParentSafetimeStatusResponse} from './online-contracts';
 import type {ContestPreset,ContestResult} from './contest-matrix';
 import type {MapOverviewResponse} from './world-map-contracts';
 import {OnlineRequestTimeoutError,withOnlineDeadline} from './online-request';
@@ -82,7 +82,9 @@ export const onlineApi={
   resetPassword:(id:string)=>request<{username:string;password:string}>(`/students/${segment(id)}/reset-password`,'POST',{}),
   publishWeek:(body:{requestId:string;title:string;classId:string;sets:{subjectLabel:string;subjectId?:string;pack:ContentPack}[];replaceWeekId?:string})=>request<OnlineWeek>('/weeks','POST',body),
   configureWallet:(body:{enabled:boolean;rateVnd:number})=>request('/wallet','POST',body),
+  installGiftPreset:()=>request<{created:number;kept:number;rateVnd:number}>('/gifts/preset/bao-an-20','POST',{}),
   transitionRedemption:(id:string,body:{status:'approved'|'rejected'|'fulfilled';note?:string})=>request(`/redemptions/${segment(id)}/transition`,'POST',body),
+  transitionParentRedemption:(id:string,body:{status:'approved'|'rejected'|'fulfilled';note?:string})=>request(`/parent/redemptions/${segment(id)}/transition`,'POST',body),
   student:()=>request<OnlineStudentSummary>('/student'),
   studentMap:(params?:{region?:string;chapter?:string|number},signal?:AbortSignal)=>{
     const search=new URLSearchParams();
@@ -165,5 +167,14 @@ export const onlineApi={
   visitTown:(studentId:string,signal?:AbortSignal)=>request<{studentName:string;town:any;animals:any[];cheersCount:number;isSelf:boolean}>(`/town/visit?studentId=${encodeURIComponent(studentId)}`,'GET',undefined,signal),
   cheerClassmate:(targetStudentId:string)=>request<{ok:true;alreadyCheeredToday:boolean;cheersCount:number}>('/town/cheer','POST',{targetStudentId}),
   classFeed:(classId?:string,signal?:AbortSignal)=>request<{enabled:boolean;events:any[]}>(classId?`/class-feed?classId=${encodeURIComponent(classId)}`:'/class-feed','GET',undefined,signal),
-  toggleFeed:(classId:string,feedEnabled:boolean)=>request<{id:string;feedEnabled:boolean}>(`/classes/${segment(classId)}/feed-toggle`,'POST',{feedEnabled})
+  toggleFeed:(classId:string,feedEnabled:boolean)=>request<{id:string;feedEnabled:boolean}>(`/classes/${segment(classId)}/feed-toggle`,'POST',{feedEnabled}),
+  parentSafetimeStatus:(studentId?:string,signal?:AbortSignal)=>{
+    const params=new URLSearchParams();
+    if(studentId)params.set('studentId',studentId);
+    const query=params.toString();
+    return request<ParentSafetimeStatusResponse>(query?`/parent/safetime/status?${query}`:'/parent/safetime/status','GET',undefined,signal);
+  },
+  parentCreatePairCode:(studentIds:string[])=>request<{code:string;expiresAt:string;allowedStudentIds:string[]}>('/parent/safetime/pair-code','POST',{studentIds}),
+  parentRevokeClient:(clientId:string)=>request<{success:true;clientId:string}>('/parent/safetime/revoke-client','POST',{clientId}),
+  parentToggleSafetime:(enabled:boolean)=>request<{success:true;enabled:boolean}>('/parent/safetime/toggle','POST',{enabled})
 };

@@ -1,6 +1,6 @@
 import pg from 'pg';
 import {BAO_AN_GIFT_PRESET,BAO_AN_GIFT_RATE_VND,BAO_AN_GIFT_PRESET_ID,presetGiftDetails} from '../src/core/gift-presets.ts';
-import {randomUUID,createHash} from 'node:crypto';
+import {randomUUID,createHash,randomBytes} from 'node:crypto';
 import {OnlineError,fail,shape,text,integer} from './online-errors.mjs';
 import {parseContentImport} from '../src/core/content-io.ts';
 import {GAME_REGISTRY,getGame} from '../src/core/registry.ts';
@@ -2335,5 +2335,281 @@ export class PostgresStore{
       dailyMissions,
       contests
     };
+  }
+
+  async createIntegrationPairCode(workspaceId, allowedStudentIds, expiresInMinutes = 10, client = this.pool) {
+    if (!Array.isArray(allowedStudentIds) || allowedStudentIds.length === 0) {
+      fail(400, 'Cần chọn ít nhất một học sinh được phép kết nối.');
+    }
+    const chars = '23456789ABCDEFGHJKMNPQRSTUVWXYZ';
+    const bytes = randomBytes(8);
+    let code = '';
+    for (let i = 0; i < 8; i++) {
+      code += chars[bytes[i] % chars.length];
+    }
+    const createdAt = now();
+    const expiresAt = new Date(Date.now() + expiresInMinutes * 60 * 1000).toISOString();
+    await this.exec(`
+      INSERT INTO bao_an.integration_pair_codes(code, workspace_id, allowed_student_ids, created_at, expires_at)
+      VALUES ($1, $2, $3, $4, $5)
+    `, [code, workspaceId, json(allowedStudentIds), createdAt, expiresAt], client);
+    return { code, expiresAt, allowedStudentIds };
+  }
+
+  async findIntegrationPairCode(code, client = this.pool) {
+    const row = await this.one('SELECT * FROM bao_an.integration_pair_codes WHERE code = $1', [code], client);
+    if (!row) return null;
+    return {
+      ...row,
+      allowed_student_ids: parse(row.allowed_student_ids)
+    };
+  }
+
+  async consumeIntegrationPairCode(code, client = this.pool) {
+    const row = await this.findIntegrationPairCode(code, client);
+    if (!row) fail(404, 'Mã ghép đôi không tồn tại.');
+    if (row.used_at) fail(400, 'Mã ghép đôi đã được sử dụng.');
+    if (new Date(row.expires_at) <= new Date()) fail(400, 'Mã ghép đôi đã hết hạn (hiệu lực 10 phút).');
+    const usedAt = now();
+    await this.exec('UPDATE bao_an.integration_pair_codes SET used_at = $1 WHERE code = $2', [usedAt, code], client);
+    return { ...row, used_at: usedAt };
+  }
+
+  async createIntegrationClient(workspaceId, { tokenHash, deviceId, deviceName, allowedStudentIds }, client = this.pool) {
+    if (!tokenHash || !deviceId || !deviceName) fail(400, 'Thiếu thông tin thiết bị hoặc khóa kết nối.');
+    const clientId = id();
+    const createdAt = now();
+    await this.exec(`
+      INSERT INTO bao_an.integration_clients(id, workspace_id, token_hash, device_id, device_name, allowed_student_ids, created_at)
+      VALUES ($1, $2, $3, $4, $5, $6, $7)
+    `, [clientId, workspaceId, tokenHash, deviceId, deviceName, json(allowedStudentIds || []), createdAt], client);
+    return {
+      id: clientId,
+      workspace_id: workspaceId,
+      token_hash: tokenHash,
+      device_id: deviceId,
+      device_name: deviceName,
+      allowed_student_ids: allowedStudentIds || [],
+      created_at: createdAt,
+      last_used_at: null,
+      revoked_at: null
+    };
+  }
+
+  async findIntegrationClientByTokenHash(tokenHash, client = this.pool) {
+    const row = await this.one('SELECT * FROM bao_an.integration_clients WHERE token_hash = $1 AND revoked_at IS NULL', [tokenHash], client);
+    if (!row) return null;
+    return {
+      ...row,
+      allowed_student_ids: parse(row.allowed_student_ids)
+    };
+  }
+
+  async findIntegrationClientById(id, client = this.pool) {
+    const row = await this.one('SELECT * FROM bao_an.integration_clients WHERE id = $1', [id], client);
+    if (!row) return null;
+    return {
+      ...row,
+      allowed_student_ids: parse(row.allowed_student_ids)
+    };
+  }
+
+  async listIntegrationClients(workspaceId, client = this.pool) {
+    const rows = await this.rows('SELECT * FROM bao_an.integration_clients WHERE workspace_id = $1 ORDER BY created_at DESC', [workspaceId], client);
+    return rows.map(r => ({
+      ...r,
+      allowed_student_ids: parse(r.allowed_student_ids)
+    }));
+  }
+
+  async touchIntegrationClient(id, client = this.pool) {
+    await this.exec('UPDATE bao_an.integration_clients SET last_used_at = $1 WHERE id = $2', [now(), id], client);
+  }
+
+  async revokeIntegrationClient(id, client = this.pool) {
+    const revokedAt = now();
+    await this.exec('UPDATE bao_an.integration_clients SET revoked_at = $1 WHERE id = $2 AND revoked_at IS NULL', [revokedAt, id], client);
+    await this.exec('UPDATE bao_an.integration_refresh_tokens SET revoked_at = $1 WHERE client_id = $2 AND revoked_at IS NULL', [revokedAt, id], client);
+    return true;
+  }
+
+  async createIntegrationTicket(workspaceId, clientId, studentId, expiresInSeconds = 60, client = this.pool) {
+    const ticket = randomUUID().replace(/-/g, '') + randomUUID().replace(/-/g, '');
+    const createdAt = now();
+    const expiresAt = new Date(Date.now() + expiresInSeconds * 1000).toISOString();
+    await this.exec(`
+      INSERT INTO bao_an.integration_tickets(ticket, workspace_id, client_id, student_id, created_at, expires_at)
+      VALUES ($1, $2, $3, $4, $5, $6)
+    `, [ticket, workspaceId, clientId, studentId, createdAt, expiresAt], client);
+    return { ticket, expiresAt };
+  }
+
+  async consumeIntegrationTicket(ticket, client = this.pool) {
+    const row = await this.one('SELECT * FROM bao_an.integration_tickets WHERE ticket = $1', [ticket], client);
+    if (!row) fail(404, 'Vé SSO không tồn tại.');
+    if (row.used_at) fail(400, 'Vé SSO đã được sử dụng.');
+    if (new Date(row.expires_at) <= new Date()) fail(400, 'Vé SSO đã hết hạn (hiệu lực 60 giây).');
+    const usedAt = now();
+    await this.exec('UPDATE bao_an.integration_tickets SET used_at = $1 WHERE ticket = $2', [usedAt, ticket], client);
+    return { ...row, used_at: usedAt };
+  }
+
+  async createIntegrationRefreshToken(workspaceId, clientId, studentId, expiresInDays = 30, client = this.pool) {
+    const rawToken = randomUUID().replace(/-/g, '') + randomUUID().replace(/-/g, '');
+    const tokenHash = createHash('sha256').update(rawToken).digest('hex');
+    const createdAt = now();
+    const expiresAt = new Date(Date.now() + expiresInDays * 24 * 3600 * 1000).toISOString();
+    await this.exec(`
+      INSERT INTO bao_an.integration_refresh_tokens(token_hash, workspace_id, client_id, student_id, created_at, expires_at)
+      VALUES ($1, $2, $3, $4, $5, $6)
+    `, [tokenHash, workspaceId, clientId, studentId, createdAt, expiresAt], client);
+    return { rawToken, expiresAt };
+  }
+
+  async consumeIntegrationRefreshToken(rawToken, client = this.pool) {
+    const tokenHash = createHash('sha256').update(rawToken).digest('hex');
+    const row = await this.one('SELECT * FROM bao_an.integration_refresh_tokens WHERE token_hash = $1 AND revoked_at IS NULL', [tokenHash], client);
+    if (!row) fail(401, 'Mã làm mới không hợp lệ hoặc đã bị thu hồi.');
+    if (new Date(row.expires_at) <= new Date()) fail(401, 'Mã làm mới đã hết hạn.');
+    await this.exec('UPDATE bao_an.integration_refresh_tokens SET revoked_at = $1 WHERE token_hash = $2', [now(), tokenHash], client);
+    return row;
+  }
+
+  async assertParentElevation(auth, studentId = null, parentToken = null, client = this.pool) {
+    if (auth.role === 'admin') return true;
+    if (auth.role === 'parent') {
+      if (studentId) {
+        const linked = await this.one('SELECT 1 FROM bao_an.parent_students WHERE workspace_id=$1 AND parent_user_id=$2 AND student_id=$3', [auth.workspaceId, auth.id, studentId], client);
+        if (!linked) fail(403, 'Phụ huynh không có quyền quản lý học sinh này.');
+      }
+      return true;
+    }
+    if (auth.role === 'student') {
+      const sId = studentId || auth.studentId;
+      if (auth.studentId !== sId) fail(403, 'Không có quyền truy cập học sinh khác.');
+      const currentRaw = await this.rawParentControls(auth.workspaceId, sId, client);
+      if (currentRaw?.pinHash) {
+        const tokenOk = parentToken && verifyParentElevationToken(parentToken, {
+          userId: auth.id,
+          studentId: sId,
+          workspaceId: auth.workspaceId,
+          pinHash: currentRaw.pinHash,
+          sessionHash: auth.tokenHash
+        });
+        if (!tokenOk) fail(403, 'Chưa xác thực quyền phụ huynh.');
+      }
+      return true;
+    }
+    fail(403, 'Không có quyền thực hiện thao tác này.');
+  }
+
+  async isIntegrationEnabled(workspaceId, client = this.pool) {
+    const hasPairCode = await this.one('SELECT 1 FROM bao_an.integration_pair_codes WHERE workspace_id = $1 LIMIT 1', [workspaceId], client);
+    const hasClient = await this.one('SELECT 1 FROM bao_an.integration_clients WHERE workspace_id = $1 LIMIT 1', [workspaceId], client);
+    if (!hasPairCode && !hasClient) return false;
+    const toggleAudit = await this.one("SELECT target_id FROM bao_an.audit WHERE workspace_id = $1 AND action = 'integration.toggle' ORDER BY at DESC, id DESC LIMIT 1", [workspaceId], client);
+    if (toggleAudit) {
+      try {
+        const parsed = parse(toggleAudit.target_id);
+        if (typeof parsed?.enabled === 'boolean') return parsed.enabled;
+      } catch {}
+    }
+    return true;
+  }
+
+  async parentSafetimeStatus(auth, studentId = null, parentToken = null, client = this.pool) {
+    await this.assertParentElevation(auth, studentId, parentToken, client);
+    const clients = await this.listIntegrationClients(auth.workspaceId, client);
+    const activeClients = clients.filter(c => !c.revoked_at);
+    const activePairCodeRow = await this.one(`
+      SELECT * FROM bao_an.integration_pair_codes
+      WHERE workspace_id = $1 AND used_at IS NULL AND expires_at > $2
+      ORDER BY created_at DESC LIMIT 1
+    `, [auth.workspaceId, now()], client);
+    const activePairCode = activePairCodeRow ? {
+      code: activePairCodeRow.code,
+      expiresAt: activePairCodeRow.expires_at,
+      allowedStudentIds: parse(activePairCodeRow.allowed_student_ids)
+    } : null;
+
+    let availableStudents = [];
+    if (auth.role === 'admin') {
+      availableStudents = await this.rows(`
+        SELECT s.id, s.name, COALESCE(c.name, '') AS "className"
+        FROM bao_an.students s
+        LEFT JOIN bao_an.classes c ON c.workspace_id = s.workspace_id AND c.id = s.class_id
+        WHERE s.workspace_id = $1 AND s.active = true
+        ORDER BY s.name ASC
+      `, [auth.workspaceId], client);
+    } else if (auth.role === 'parent') {
+      availableStudents = await this.rows(`
+        SELECT s.id, s.name, COALESCE(c.name, '') AS "className"
+        FROM bao_an.students s
+        JOIN bao_an.parent_students ps ON ps.workspace_id = s.workspace_id AND ps.student_id = s.id
+        LEFT JOIN bao_an.classes c ON c.workspace_id = s.workspace_id AND c.id = s.class_id
+        WHERE s.workspace_id = $1 AND ps.parent_user_id = $2 AND s.active = true
+        ORDER BY s.name ASC
+      `, [auth.workspaceId, auth.id], client);
+    } else if (auth.role === 'student') {
+      availableStudents = await this.rows(`
+        SELECT s.id, s.name, COALESCE(c.name, '') AS "className"
+        FROM bao_an.students s
+        LEFT JOIN bao_an.classes c ON c.workspace_id = s.workspace_id AND c.id = s.class_id
+        WHERE s.workspace_id = $1 AND s.id = $2
+      `, [auth.workspaceId, auth.studentId], client);
+    }
+
+    return {
+      enabled: await this.isIntegrationEnabled(auth.workspaceId, client),
+      paired: activeClients.length > 0,
+      clients: clients.map(c => ({
+        id: c.id,
+        deviceName: c.device_name,
+        deviceId: c.device_id,
+        allowedStudentIds: c.allowed_student_ids,
+        createdAt: c.created_at,
+        lastUsedAt: c.last_used_at,
+        revokedAt: c.revoked_at
+      })),
+      activePairCode,
+      availableStudents
+    };
+  }
+
+  async parentCreatePairCode(auth, studentIds, parentToken = null, client = this.pool) {
+    await this.assertParentElevation(auth, null, parentToken, client);
+    if (!Array.isArray(studentIds) || studentIds.length === 0) {
+      fail(400, 'Cần chọn ít nhất một học sinh được phép kết nối.');
+    }
+    const result = await this.createIntegrationPairCode(auth.workspaceId, studentIds, 10, client);
+    await this.audit(auth, 'integration.pair_code_create', json({
+      code: result.code,
+      allowedStudentIds: studentIds,
+      expiresAt: result.expiresAt
+    }), client);
+    return result;
+  }
+
+  async parentRevokeClient(auth, clientId, parentToken = null, client = this.pool) {
+    await this.assertParentElevation(auth, null, parentToken, client);
+    const clientRecord = await this.findIntegrationClientById(clientId, client);
+    if (!clientRecord || clientRecord.workspace_id !== auth.workspaceId) {
+      fail(404, 'Không tìm thấy thiết bị kết nối.');
+    }
+    await this.revokeIntegrationClient(clientId, client);
+    await this.audit(auth, 'integration.client_revoke', json({
+      clientId: clientRecord.id,
+      deviceId: clientRecord.device_id,
+      deviceName: clientRecord.device_name,
+      source: 'parent'
+    }), client);
+    return { success: true, clientId };
+  }
+
+  async parentToggleIntegration(auth, enabled, parentToken = null, client = this.pool) {
+    await this.assertParentElevation(auth, null, parentToken, client);
+    const isEnabled = Boolean(enabled);
+    await this.audit(auth, 'integration.toggle', json({ enabled: isEnabled }), client);
+    return { success: true, enabled: isEnabled };
   }
 }

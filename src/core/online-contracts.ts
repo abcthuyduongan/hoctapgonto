@@ -31,6 +31,9 @@ export interface GiftItem {
   classId: string | null;
   title: string;
   imageMediaId: string | null;
+  imageUrl?: string;
+  referencePriceVnd?: number;
+  sourceUrl?: string;
   priceStars: number;
   kind: GiftKind;
   weeklyLimit: number | null;
@@ -129,6 +132,11 @@ export interface ParentWeeklyRedemption {
   status: string;
   requestedAt: string;
   note?: string;
+  giftId?: string;
+  kind?: string;
+  rateVnd?: number;
+  amountVnd?: number;
+  goalVnd?: number;
 }
 
 export interface ParentWeeklyReport {
@@ -212,5 +220,31 @@ export interface PlaceBuildingResult {
   materials: import('./town-contracts.ts').MaterialBalances;
   placedBuilding?: import('./town-contracts.ts').PlacedBuilding;
   duplicate?: boolean;
+}
+
+export interface IntegrationClientInfo {
+  id: string;
+  deviceName: string;
+  deviceId: string;
+  allowedStudentIds: string[];
+  createdAt: string;
+  lastUsedAt: string | null;
+  revokedAt: string | null;
+}
+
+export interface ParentSafetimeStatusResponse {
+  enabled: boolean;
+  paired: boolean;
+  clients: IntegrationClientInfo[];
+  activePairCode: {
+    code: string;
+    expiresAt: string;
+    allowedStudentIds: string[];
+  } | null;
+  availableStudents: Array<{
+    id: string;
+    name: string;
+    className: string;
+  }>;
 }
 

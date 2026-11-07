@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react';
 import { onlineApi } from '../core/online-client';
+import {onlineMoney} from '../core/online-format';
 import type {
   ParentDashboardResponse,
-  OnlineIdentity
+  OnlineIdentity,
+  ParentSafetimeStatusResponse,
+  IntegrationClientInfo
 } from '../core/online-contracts';
 import '../styles/parent-portal.css';
 
@@ -20,7 +23,7 @@ export default function ParentPortalScreen({
   onClose
 }: ParentPortalScreenProps) {
   const [data, setData] = useState<ParentDashboardResponse | null>(initialData ?? null);
-  const [activeTab, setActiveTab] = useState<'report' | 'gifts' | 'settings'>('report');
+  const [activeTab, setActiveTab] = useState<'report' | 'gifts' | 'settings' | 'safetime'>('report');
   const [selectedStudentId, setSelectedStudentId] = useState<string>(
     initialData?.student?.id ?? identity?.user?.studentId ?? ''
   );
@@ -28,6 +31,15 @@ export default function ParentPortalScreen({
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
   const [busy, setBusy] = useState(false);
+
+  // SafeTime Integration state (BAO-02, BAO-03, BAO-16)
+  const [safetimeStatus, setSafetimeStatus] = useState<ParentSafetimeStatusResponse | null>(null);
+  const [safetimeLoading, setSafetimeLoading] = useState(false);
+  const [safetimeError, setSafetimeError] = useState('');
+  const [selectedStudentIdsForPairing, setSelectedStudentIdsForPairing] = useState<string[]>([]);
+  const [createdPairCode, setCreatedPairCode] = useState<{ code: string; expiresAt: string; allowedStudentIds: string[] } | null>(null);
+  const [pairCodeCopied, setPairCodeCopied] = useState(false);
+  const [clientToRevoke, setClientToRevoke] = useState<IntegrationClientInfo | null>(null);
 
   // Settings form state
   const [maxMinutes, setMaxMinutes] = useState<number>(0);
@@ -101,8 +113,8 @@ export default function ParentPortalScreen({
   };
 
   const handleChangePin = async () => {
-    if (!/^\d{4,6}$/.test(newPin)) {
-      setPinChangeError('Mã PIN mới phải gồm từ 4 đến 6 chữ số.');
+    if (!/^\d{6}$/.test(newPin)) {
+      setPinChangeError('Mã PIN mới phải gồm đủ 6 chữ số.');
       return;
     }
     if (newPin !== confirmNewPin) {
@@ -141,7 +153,7 @@ export default function ParentPortalScreen({
     setError('');
     setNotice('');
     try {
-      await onlineApi.transitionRedemption(requestId, {
+      await onlineApi.transitionParentRedemption(requestId, {
         status,
         note: redemptionNotes[requestId]?.trim() || undefined
       });
@@ -150,6 +162,66 @@ export default function ParentPortalScreen({
       await loadDashboard(selectedStudentId);
     } catch (err: any) {
       setError(err?.message || 'Chưa cập nhật được trạng thái đổi quà.');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const loadSafetimeStatus = async () => {
+    setSafetimeLoading(true);
+    setSafetimeError('');
+    try {
+      const res = await onlineApi.parentSafetimeStatus(selectedStudentId || undefined);
+      setSafetimeStatus(res);
+      if (res.activePairCode) {
+        setCreatedPairCode(res.activePairCode);
+      }
+      if (res.availableStudents && res.availableStudents.length > 0 && selectedStudentIdsForPairing.length === 0) {
+        setSelectedStudentIdsForPairing(res.availableStudents.map(s => s.id));
+      }
+    } catch (err: any) {
+      setSafetimeError(err?.message || 'Không thể tải trạng thái kết nối SafeTime.');
+    } finally {
+      setSafetimeLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === 'safetime') {
+      void loadSafetimeStatus();
+    }
+  }, [activeTab]);
+
+  const handleCreatePairCode = async () => {
+    if (selectedStudentIdsForPairing.length === 0) {
+      setSafetimeError('Vui lòng chọn ít nhất một học sinh được phép kết nối.');
+      return;
+    }
+    setBusy(true);
+    setSafetimeError('');
+    try {
+      const res = await onlineApi.parentCreatePairCode(selectedStudentIdsForPairing);
+      setCreatedPairCode(res);
+      setPairCodeCopied(false);
+      setNotice('Đã tạo mã ghép đôi mới có hiệu lực trong 10 phút.');
+      await loadSafetimeStatus();
+    } catch (err: any) {
+      setSafetimeError(err?.message || 'Chưa tạo được mã ghép đôi.');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const handleRevokeClient = async (client: IntegrationClientInfo) => {
+    setBusy(true);
+    setSafetimeError('');
+    try {
+      await onlineApi.parentRevokeClient(client.id);
+      setNotice(`Đã ngắt kết nối với thiết bị "${client.deviceName}".`);
+      setClientToRevoke(null);
+      await loadSafetimeStatus();
+    } catch (err: any) {
+      setSafetimeError(err?.message || 'Chưa ngắt được kết nối thiết bị.');
     } finally {
       setBusy(false);
     }
@@ -171,11 +243,11 @@ export default function ParentPortalScreen({
   const student = data?.student;
   const children = data?.children || [];
   const redemptions = report?.redemptions || [];
-  const pendingRedemptions = redemptions.filter(r => r.status === 'pending');
-  const pastRedemptions = redemptions.filter(r => r.status !== 'pending');
+  const pendingRedemptions = redemptions.filter(r => r.status === 'pending'||r.status==='approved');
+  const pastRedemptions = redemptions.filter(r => r.status !== 'pending'&&r.status!=='approved');
 
   return (
-    <div className="parent-portal-root">
+    <div className="parent-portal-root" data-theme="desk">
       {/* Top Navigation Bar */}
       <header className="parent-header no-print">
         <div className="parent-header-brand">
@@ -259,6 +331,14 @@ export default function ParentPortalScreen({
           aria-selected={activeTab === 'settings'}
         >
           ⚙️ Giờ học & Mã PIN
+        </button>
+        <button
+          type="button"
+          className={`parent-tab-btn ${activeTab === 'safetime' ? 'active' : ''}`}
+          onClick={() => setActiveTab('safetime')}
+          aria-selected={activeTab === 'safetime'}
+        >
+          🛡️ Kết nối SafeTime
         </button>
       </nav>
 
@@ -466,7 +546,7 @@ export default function ParentPortalScreen({
             {/* Pending Requests */}
             <section className="gifts-section" aria-labelledby="pending-gifts-title">
               <h3 id="pending-gifts-title" className="section-title">
-                ⏳ Yêu cầu đang chờ duyệt ({pendingRedemptions.length})
+                ⏳ Yêu cầu cần xử lý ({pendingRedemptions.length})
               </h3>
               {pendingRedemptions.length > 0 ? (
                 <div className="redemptions-cards-list">
@@ -477,8 +557,10 @@ export default function ParentPortalScreen({
                         <span className="redemption-stars">⭐ {r.stars} sao</span>
                       </div>
                       <p className="redemption-meta">
+                        {r.status==='approved'?'Đã duyệt · Chờ trao tiền / quà. ':'Chờ phụ huynh duyệt. '}
                         Thời gian con gửi: {new Date(r.requestedAt).toLocaleString('vi-VN')}
                       </p>
+                      {(!r.giftId||r.kind==='saving')&&r.amountVnd!==undefined&&<p className="redemption-money">{r.stars} sao × {onlineMoney(r.rateVnd??0)} = <strong>{onlineMoney(r.amountVnd)}</strong><br/><small>Giữ nguyên tỷ lệ tại lúc con gửi yêu cầu.</small></p>}
                       <div className="redemption-note-input">
                         <label htmlFor={`note-${r.requestId}`}>Lời nhắn của ba mẹ cho con (tùy chọn):</label>
                         <input
@@ -495,23 +577,23 @@ export default function ParentPortalScreen({
                         />
                       </div>
                       <div className="redemption-actions">
-                        <button
+                        {r.status==='pending'&&<button
                           type="button"
                           className="online-btn btn-approve"
                           onClick={() => handleRedemptionTransition(r.requestId, 'approved')}
                           disabled={busy}
                         >
                           ✓ Duyệt quà
-                        </button>
-                        <button
+                        </button>}
+                        {r.status==='approved'&&<button
                           type="button"
                           className="online-btn btn-fulfill"
-                          onClick={() => handleRedemptionTransition(r.requestId, 'fulfilled')}
+                          onClick={() => {if(window.confirm(`Xác nhận đã trao tiền / quà “${r.title}” cho con?`))void handleRedemptionTransition(r.requestId, 'fulfilled');}}
                           disabled={busy}
                         >
-                          🎁 Đã trao quà cho con
-                        </button>
-                        <button
+                          🎁 Xác nhận đã trao tiền / quà
+                        </button>}
+                        {r.status==='pending'&&<button
                           type="button"
                           className="online-btn btn-reject"
                           onClick={() => {
@@ -522,13 +604,13 @@ export default function ParentPortalScreen({
                           disabled={busy}
                         >
                           ✕ Từ chối (Hoàn sao)
-                        </button>
+                        </button>}
                       </div>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="report-empty-note">Hiện tại không có yêu cầu đổi quà nào đang chờ duyệt.</p>
+                <p className="report-empty-note">Hiện tại không có yêu cầu đổi quà nào cần xử lý.</p>
               )}
             </section>
 
@@ -542,6 +624,7 @@ export default function ParentPortalScreen({
                       <tr>
                         <th>Tên quà</th>
                         <th>Số sao</th>
+                        <th>Tiền tiết kiệm</th>
                         <th>Trạng thái</th>
                         <th>Ngày gửi</th>
                         <th>Ghi chú</th>
@@ -552,6 +635,7 @@ export default function ParentPortalScreen({
                         <tr key={r.requestId}>
                           <td><strong>{r.title}</strong></td>
                           <td>⭐ {r.stars}</td>
+                          <td>{(!r.giftId||r.kind==='saving')&&r.amountVnd!==undefined?onlineMoney(r.amountVnd):'—'}</td>
                           <td>
                             <span className={`status-pill status-${r.status}`}>
                               {r.status === 'approved' ? 'Đã duyệt' : r.status === 'fulfilled' ? 'Đã trao quà' : r.status === 'rejected' ? 'Đã từ chối' : r.status}
@@ -670,7 +754,7 @@ export default function ParentPortalScreen({
             <div className="settings-section pin-settings-section">
               <h3 className="section-title">🔒 Đổi mã PIN Phụ huynh</h3>
               <p className="settings-desc">
-                Mã PIN gồm 4–6 chữ số để ngăn học sinh tự thay đổi giờ học hoặc tự duyệt quà.
+                Mã PIN gồm 6 chữ số để ngăn học sinh tự thay đổi giờ học hoặc tự duyệt quà.
               </p>
 
               {pinChangeError && (
@@ -702,7 +786,7 @@ export default function ParentPortalScreen({
                 )}
 
                 <div className="form-row">
-                  <label htmlFor="new-pin">Mã PIN mới (4–6 số):</label>
+                  <label htmlFor="new-pin">Mã PIN mới (6 số):</label>
                   <input
                     id="new-pin"
                     type="password"
@@ -733,12 +817,223 @@ export default function ParentPortalScreen({
                   type="button"
                   className="online-btn btn-change-pin"
                   onClick={handleChangePin}
-                  disabled={busy || newPin.length < 4}
+                  disabled={busy || newPin.length < 6}
                 >
                   {busy ? 'Đang cập nhật…' : 'Đổi mã PIN'}
                 </button>
               </div>
             </div>
+          </div>
+        )}
+
+        {/* TAB 4: SAFETIME INTEGRATION (BAO-02, BAO-03, BAO-16) */}
+        {activeTab === 'safetime' && (
+          <div className="parent-safetime-view">
+            {/* Banner */}
+            <div className="safetime-banner-card">
+              <div className="safetime-banner-header">
+                <span className="safetime-badge-icon" aria-hidden="true">🛡️</span>
+                <div>
+                  <h2>Kết nối SafeTime với Bảo An Learning</h2>
+                  <p>
+                    Cho phép SafeTime giám sát phiên học, mở bài học trực tiếp và tự động ghi nhận kết quả thi thử Violympic / IOE.
+                  </p>
+                </div>
+              </div>
+              <div className="safetime-security-badges">
+                <span className="security-badge">🔒 Chỉ nhận kết nối nội bộ (127.0.0.1)</span>
+                <span className="security-badge">⭐ Không can thiệp ví sao</span>
+                <span className="security-badge">🔑 Khóa bảo mật 32-byte</span>
+              </div>
+            </div>
+
+            {safetimeLoading && (
+              <div className="parent-portal-loading" role="status">
+                <p>Đang tải thông tin kết nối SafeTime…</p>
+              </div>
+            )}
+
+            {safetimeError && (
+              <div className="online-notice online-error" role="alert">
+                {safetimeError}
+              </div>
+            )}
+
+            {/* Section 1: Tạo mã ghép đôi (BAO-02) */}
+            <div className="parent-card safetime-pair-section">
+              <div className="parent-card-header">
+                <h3>🔗 Ghép đôi thiết bị mới</h3>
+              </div>
+              <div className="parent-card-body">
+                <p className="settings-desc">
+                  Chọn các con được phép học trên máy tính này, sau đó bấm <strong>Tạo mã ghép đôi</strong>. Nhập mã này vào SafeTime trong vòng 10 phút.
+                </p>
+
+                {safetimeStatus?.availableStudents && safetimeStatus.availableStudents.length > 0 ? (
+                  <div className="safetime-students-checklist">
+                    <span className="checklist-label">Học sinh được phép học trên thiết bị ghép đôi:</span>
+                    <div className="checklist-items">
+                      {safetimeStatus.availableStudents.map(s => {
+                        const checked = selectedStudentIdsForPairing.includes(s.id);
+                        return (
+                          <label key={s.id} className="student-checkbox-item">
+                            <input
+                              type="checkbox"
+                              checked={checked}
+                              onChange={e => {
+                                if (e.target.checked) {
+                                  setSelectedStudentIdsForPairing(prev => [...prev, s.id]);
+                                } else {
+                                  setSelectedStudentIdsForPairing(prev => prev.filter(id => id !== s.id));
+                                }
+                              }}
+                              disabled={busy}
+                            />
+                            <span>{s.name} ({s.className || 'Chưa xếp lớp'})</span>
+                          </label>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ) : (
+                  <p className="safetime-no-students">Không tìm thấy học sinh để ghép đôi.</p>
+                )}
+
+                <div className="pair-action-row">
+                  <button
+                    type="button"
+                    className="online-btn btn-create-pair-code"
+                    onClick={handleCreatePairCode}
+                    disabled={busy || selectedStudentIdsForPairing.length === 0}
+                  >
+                    {busy ? 'Đang tạo…' : 'Tạo mã ghép đôi (10 phút)'}
+                  </button>
+                </div>
+
+                {/* Pair code display card */}
+                {createdPairCode && (
+                  <div className="safetime-code-card" role="region" aria-label="Mã ghép đôi SafeTime">
+                    <div className="code-display-header">
+                      <span>Mã ghép đôi SafeTime (dùng 1 lần, hiệu lực 10 phút):</span>
+                    </div>
+                    <div className="code-display-box">
+                      <span className="code-text" data-testid="safetime-pair-code">{createdPairCode.code}</span>
+                      <button
+                        type="button"
+                        className="online-btn btn-copy-code"
+                        onClick={() => {
+                          if (typeof navigator !== 'undefined' && navigator.clipboard) {
+                            navigator.clipboard.writeText(createdPairCode.code);
+                            setPairCodeCopied(true);
+                            setTimeout(() => setPairCodeCopied(false), 3000);
+                          }
+                        }}
+                      >
+                        {pairCodeCopied ? '✓ Đã chép' : '📋 Sao chép'}
+                      </button>
+                    </div>
+                    <p className="code-instruction">
+                      👉 Trên máy của con: mở <strong>SafeTime</strong> › <strong>Bảng phụ huynh</strong> › <strong>Cài đặt</strong> › <strong>Kết nối Bảo An Learning</strong> và nhập mã trên.
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Section 2: Danh sách thiết bị đã kết nối (BAO-03) */}
+            <div className="parent-card safetime-clients-section">
+              <div className="parent-card-header">
+                <h3>💻 Thiết bị đã kết nối ({safetimeStatus?.clients ? safetimeStatus.clients.filter(c => !c.revokedAt).length : 0})</h3>
+              </div>
+              <div className="parent-card-body">
+                {safetimeStatus?.clients && safetimeStatus.clients.filter(c => !c.revokedAt).length > 0 ? (
+                  <div className="safetime-clients-list">
+                    {safetimeStatus.clients.filter(c => !c.revokedAt).map(client => (
+                      <div key={client.id} className="safetime-client-card" data-testid={`safetime-client-${client.id}`}>
+                        <div className="client-info">
+                          <div className="client-name-row">
+                            <span className="client-icon" aria-hidden="true">🖥️</span>
+                            <strong className="client-name">{client.deviceName || 'Máy tính học sinh'}</strong>
+                            <span className="status-pill status-approved">Đang kết nối</span>
+                          </div>
+                          <div className="client-details">
+                            <span>Mã thiết bị: <code>{client.deviceId}</code></span>
+                            <span>Ngày kết nối: {new Date(client.createdAt).toLocaleDateString('vi-VN')}</span>
+                            {client.lastUsedAt && (
+                              <span>Lần dùng cuối: {new Date(client.lastUsedAt).toLocaleDateString('vi-VN')} {new Date(client.lastUsedAt).toLocaleTimeString('vi-VN')}</span>
+                            )}
+                          </div>
+                          <div className="client-students">
+                            <span className="client-students-label">Học sinh được phép: </span>
+                            {client.allowedStudentIds && client.allowedStudentIds.length > 0 ? (
+                              client.allowedStudentIds.map(sId => {
+                                const studentObj = safetimeStatus.availableStudents.find(s => s.id === sId);
+                                return (
+                                  <span key={sId} className="client-student-tag">
+                                    {studentObj ? studentObj.name : sId}
+                                  </span>
+                                );
+                              })
+                            ) : (
+                              <span className="client-student-tag">Tất cả con</span>
+                            )}
+                          </div>
+                        </div>
+                        <div className="client-actions">
+                          <button
+                            type="button"
+                            className="online-btn btn-revoke-client"
+                            onClick={() => setClientToRevoke(client)}
+                            disabled={busy}
+                          >
+                            Ngắt kết nối
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="safetime-empty-clients">
+                    <span className="empty-icon" aria-hidden="true">📭</span>
+                    <p>Chưa có máy tính nào kết nối với Bảo An Learning.</p>
+                    <p className="empty-sub">Hãy tạo mã ghép đôi ở trên và nhập vào phần mềm SafeTime trên máy của con.</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Revoke confirmation modal */}
+            {clientToRevoke && (
+              <div className="parent-portal-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modal-revoke-title">
+                <div className="parent-portal-modal-card">
+                  <h3 id="modal-revoke-title">Xác nhận ngắt kết nối</h3>
+                  <p>
+                    Bạn có chắc muốn ngắt kết nối với thiết bị <strong>{clientToRevoke.deviceName}</strong>?
+                  </p>
+                  <p className="modal-warning-text">
+                    ⚠️ Sau khi ngắt, SafeTime trên máy này sẽ không thể tự động đăng nhập hoặc đồng bộ kết quả học của con cho đến khi được ghép đôi lại.
+                  </p>
+                  <div className="modal-actions-row">
+                    <button
+                      type="button"
+                      className="online-btn btn-modal-cancel"
+                      onClick={() => setClientToRevoke(null)}
+                      disabled={busy}
+                    >
+                      Hủy bỏ
+                    </button>
+                    <button
+                      type="button"
+                      className="online-btn btn-modal-danger"
+                      onClick={() => handleRevokeClient(clientToRevoke)}
+                      disabled={busy}
+                    >
+                      {busy ? 'Đang ngắt…' : 'Đồng ý ngắt'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </main>

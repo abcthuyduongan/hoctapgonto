@@ -164,10 +164,13 @@ export function createCloudApi({store,storage,publicOrigin,setupToken,performanc
       const play=route.match(/^\/play\/([^/]+)\/(attempt|question-open|question-hint|complete|complete-compact|abandon)$/);
       if(method==='POST'&&play){role(auth,'student');const input=await body(request),id=decodeURIComponent(play[1]);if(play[2]==='attempt')return cloudJson(200,await store.attempt(auth,id,input,true));if(play[2]==='question-hint')return cloudJson(200,await store.questionHint(auth,id,input));if(play[2]==='question-open')return cloudJson(200,await store.openQuestion(auth,id,input,true));shape(input,[]);return cloudJson(200,await store.finishPlay(auth,id,play[2]==='abandon',true,true));}
       if(method==='POST'&&route==='/redemptions'){role(auth,'student');return cloudJson(201,await store.requestReward(auth,await body(request)));}
+      const parentRedemption=route.match(/^\/parent\/redemptions\/([^/]+)\/transition$/);
+      if(method==='POST'&&parentRedemption){role(auth,['admin','parent','student']);return cloudJson(200,await store.transitionReward(auth,decodeURIComponent(parentRedemption[1]),await body(request),false,request.headers.get('x-parent-token')));}
       const redemption=route.match(/^\/redemptions\/([^/]+)\/(transition|cancel)$/);
       if(method==='POST'&&redemption){role(auth,redemption[2]==='cancel'?'student':['admin','parent']);return cloudJson(200,await store.transitionReward(auth,decodeURIComponent(redemption[1]),await body(request),redemption[2]==='cancel'));}
       if(method==='GET'&&route==='/gifts'){return cloudJson(200,await store.gifts(auth,url.searchParams.get('classId')));}
       if(method==='POST'&&route==='/gifts'){role(auth,'admin');return cloudJson(201,await store.createGift(auth,await body(request)));}
+      if(method==='POST'&&route==='/gifts/preset/bao-an-20'){role(auth,'admin');return cloudJson(200,await store.installGiftPreset(auth,await body(request)));}
       const giftMatch=route.match(/^\/gifts\/([^/]+)$/);
       if(giftMatch&&(method==='PATCH'||method==='PUT'||method==='POST')){role(auth,'admin');return cloudJson(200,await store.updateGift(auth,decodeURIComponent(giftMatch[1]),await body(request)));}
       if(method==='GET'&&route==='/student/goal'){role(auth,'student');return cloudJson(200,await store.studentGoal(auth));}
@@ -209,6 +212,30 @@ export function createCloudApi({store,storage,publicOrigin,setupToken,performanc
       if(method==='GET'&&route==='/parent/students'){
         role(auth,'parent');
         return cloudJson(200,await store.parentStudents(auth));
+      }
+      if(method==='GET'&&route==='/parent/safetime/status'){
+        role(auth,['student','admin','parent']);
+        const studentId=auth.role==='student'?auth.studentId:(url.searchParams.get('studentId')||auth.studentId);
+        const parentToken=request.headers.get('x-parent-token')||url.searchParams.get('parentToken')||null;
+        return cloudJson(200,await store.parentSafetimeStatus(auth,studentId,parentToken));
+      }
+      if(method==='POST'&&route==='/parent/safetime/pair-code'){
+        role(auth,['student','admin','parent']);
+        const input=await body(request);
+        const parentToken=request.headers.get('x-parent-token')||input.parentToken||null;
+        return cloudJson(200,await store.parentCreatePairCode(auth,input.studentIds,parentToken));
+      }
+      if(method==='POST'&&route==='/parent/safetime/revoke-client'){
+        role(auth,['student','admin','parent']);
+        const input=await body(request);
+        const parentToken=request.headers.get('x-parent-token')||input.parentToken||null;
+        return cloudJson(200,await store.parentRevokeClient(auth,input.clientId,parentToken));
+      }
+      if(method==='POST'&&route==='/parent/safetime/toggle'){
+        role(auth,['student','admin','parent']);
+        const input=await body(request);
+        const parentToken=request.headers.get('x-parent-token')||input.parentToken||null;
+        return cloudJson(200,await store.parentToggleIntegration(auth,input.enabled,parentToken));
       }
       if(method==='POST'&&route==='/parents'){
         role(auth,'admin');

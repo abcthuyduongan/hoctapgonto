@@ -267,6 +267,30 @@ export function createOnlineServer({databasePath,staticRoot=resolve('dist'),publ
           role(auth,'parent');
           return json(res,200,store.parentStudents(auth));
         }
+        if(method==='GET'&&route==='/parent/safetime/status'){
+          role(auth,['student','admin','parent']);
+          const studentId=auth.role==='student'?auth.studentId:(url.searchParams.get('studentId')||auth.studentId);
+          const parentToken=req.headers['x-parent-token']||url.searchParams.get('parentToken')||null;
+          return json(res,200,await store.parentSafetimeStatus(auth,studentId,parentToken));
+        }
+        if(method==='POST'&&route==='/parent/safetime/pair-code'){
+          role(auth,['student','admin','parent']);
+          const{input,auth:current}=await authenticatedBody(req,auth.role);
+          const parentToken=req.headers['x-parent-token']||input.parentToken||null;
+          return json(res,200,await store.parentCreatePairCode(current,input.studentIds,parentToken));
+        }
+        if(method==='POST'&&route==='/parent/safetime/revoke-client'){
+          role(auth,['student','admin','parent']);
+          const{input,auth:current}=await authenticatedBody(req,auth.role);
+          const parentToken=req.headers['x-parent-token']||input.parentToken||null;
+          return json(res,200,await store.parentRevokeClient(current,input.clientId,parentToken));
+        }
+        if(method==='POST'&&route==='/parent/safetime/toggle'){
+          role(auth,['student','admin','parent']);
+          const{input,auth:current}=await authenticatedBody(req,auth.role);
+          const parentToken=req.headers['x-parent-token']||input.parentToken||null;
+          return json(res,200,await store.parentToggleIntegration(current,input.enabled,parentToken));
+        }
         if(method==='POST'&&route==='/parents'){
           role(auth,'admin');
           const{input,auth:current}=await authenticatedBody(req,'admin');

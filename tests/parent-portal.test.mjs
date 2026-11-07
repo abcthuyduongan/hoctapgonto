@@ -5,6 +5,13 @@ import { OnlineStore } from '../server/online-store.mjs';
 import { createPostgresFixture, authFor } from './helpers/postgres-fixture.mjs';
 import { getVietnamTimeParts } from '../src/core/parent-controls.ts';
 import { adminExport } from '../server/admin-data.mjs';
+import {buildParentWeeklyReport} from '../server/parent-data.mjs';
+
+test('parent report preserves money redemption stars, frozen rate, amount and latest note',()=>{
+  const request={title:'Tiết kiệm',stars:4,rateVnd:500,amountVnd:2000,goalVnd:2000,requestedAt:'2026-11-07T08:00:00.000Z',history:[{status:'pending',at:'2026-11-07T08:00:00.000Z'},{status:'approved',at:'2026-11-07T08:01:00.000Z',note:'Trao vào cuối tuần'}]};
+  const report=buildParentWeeklyReport({student:{name:'An'},className:'Lớp 3',week:null,events:[],redemptions:[{id:'money-report',json:JSON.stringify(request),status:'approved'}],startDateIso:'2026-11-02T00:00:00.000Z',endDateIso:'2026-11-08T23:59:59.999Z'});
+  assert.equal(report.redemptions[0].stars,4);assert.equal(report.redemptions[0].rateVnd,500);assert.equal(report.redemptions[0].amountVnd,2000);assert.equal(report.redemptions[0].note,'Trao vào cuối tuần');
+});
 
 const at = '2026-11-23T00:00:00.000Z';
 
@@ -447,5 +454,47 @@ for (const engine of ['SQLite', 'PostgreSQL']) {
     assert.equal(report.topMistakes.length, 1);
     assert.equal(report.topMistakes[0].itemId, 'q1');
     assert.equal(report.topMistakes[0].errorCount, 1);
+  });
+
+  test(`${engine}: Parent portal SafeTime status, pair code creation and client revoke`, async t => {
+    const { store, admin } = await fixture(t, engine);
+    const cls = await store.createClass(admin, { name: 'Lớp 3A', grade: 3 });
+    const { student } = await addStudent(store, admin, cls.id, 'Minh Hoàng', 'hocsinh_minh', engine);
+
+    // Initial status: not enabled, not paired
+    const initialStatus = await store.parentSafetimeStatus(admin);
+    assert.equal(initialStatus.enabled, false);
+    assert.equal(initialStatus.paired, false);
+
+    // Create pair code
+    const pairCode = await store.parentCreatePairCode(admin, [student.id]);
+    assert.equal(pairCode.code.length, 8);
+
+    const statusAfter = await store.parentSafetimeStatus(admin);
+    assert.equal(statusAfter.enabled, true);
+    assert.ok(statusAfter.activePairCode);
+    assert.equal(statusAfter.activePairCode.code, pairCode.code);
+    assert.deepEqual(statusAfter.activePairCode.allowedStudentIds, [student.id]);
+
+    // Client pairs
+    const client = await store.createIntegrationClient(admin.workspaceId, {
+      tokenHash: 'test-token-hash-parent-portal',
+      deviceId: 'dev-pc-01',
+      deviceName: 'PC Của Minh',
+      allowedStudentIds: [student.id]
+    });
+
+    const statusWithClient = await store.parentSafetimeStatus(admin);
+    assert.equal(statusWithClient.paired, true);
+    assert.equal(statusWithClient.clients.length, 1);
+    assert.equal(statusWithClient.clients[0].deviceName, 'PC Của Minh');
+
+    // Revoke client
+    const revokeRes = await store.parentRevokeClient(admin, client.id);
+    assert.equal(revokeRes.success, true);
+
+    const statusAfterRevoke = await store.parentSafetimeStatus(admin);
+    assert.equal(statusAfterRevoke.paired, false);
+    assert.ok(statusAfterRevoke.clients[0].revokedAt);
   });
 }
